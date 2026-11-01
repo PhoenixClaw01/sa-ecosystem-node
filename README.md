@@ -4,14 +4,16 @@ A read-only ecosystem node inspired by Star Atlas. It is an MCP server anyone ca
 
 This is not an ATMTA product, and the product name is not Star Atlas. It holds no funds, no game keys, and no Council keys. The server does not sign, and it does not write to any chain.
 
-**Status:** public v1.0.0 testnet-hardened node. Licensed under [Apache-2.0](LICENSE) ([NOTICE](NOTICE)).
+**Status:** public v1.0.0. Game reads use the z.ink test realm. Treasury, proposals, and player records use public mainnet data. Licensed under [Apache-2.0](LICENSE) ([NOTICE](NOTICE)). Hub listings, guild records, descriptions, and lore are CC BY 4.0, as the hub repository states. Each project keeps the rights to its own name and logo.
 
-The public hub is [sa-ecosystem-hub](https://github.com/PhoenixClaw01/sa-ecosystem-hub). Governance is [phoenix-gate](https://github.com/PhoenixClaw01/phoenix-gate).
+The public node is [https://sa-ecosystem-node-dashboard.vercel.app](https://sa-ecosystem-node-dashboard.vercel.app) (Vercel project `sa-ecosystem-node-dashboard`, separate from the DAO Council preview). `/` on that site redirects to `/plain/`. The public hub is [sa-ecosystem-hub](https://github.com/PhoenixClaw01/sa-ecosystem-hub). Governance notes are in [phoenix-gate](https://github.com/PhoenixClaw01/phoenix-gate).
 
-This deployment uses threshold 2 with `HUB_ALLOW_AUTHOR_APPROVAL=true`, so the author's own approval counts as one of the two. The author is Phoenix Collective and the second approval is Falkor (`FC1e`).
+This deployment uses threshold 2 with `HUB_ALLOW_AUTHOR_APPROVAL=true`, so the author's own approval counts as one of the two. The author is Phoenix Collective and the second approval is Falkor (`FC1e`). `HUB_GIT_REPO`, `HUB_GIT_COMMIT`, and `HUB_STORE_MANIFEST_HASH` are set. On 1 November 2026 the pinned commit was `f064f18db1da60c4f3e562d4064c8f344042e97e`.
 
-- [Spec](docs/spec.md)
-- [Decentralization](docs/decentralization.md)
+- [Spec v1.0.0](docs/spec.md)
+- [Hosting](docs/hosting.md)
+- [Decentralization](docs/decentralization.md) (what is live, then the later design)
+- [Claim and verify](docs/claim-and-verify.md)
 
 ## Quickstart
 
@@ -45,7 +47,7 @@ Public RPC URLs have safe defaults (`https://testnet-rpc.z.ink` for game data). 
 | `pip_tracker` | Payments and milestones from the public Council Tracker sheet |
 | `galaxy_overview` | Star systems, starbases, and an activity summary from the z.ink read |
 | `list_categories` | The v0 category ids. Approved members stay unknown |
-| `hub_updates` | Signed updates from a public git repo pinned to a commit. The manifest hash is checked first. An allowlisted update needs enough distinct allowlisted approvals. A claim or an attestation is included when its own signature checks pass. It does not change the signer set. An empty allowlist still rejects curator updates |
+| `hub_updates` | Signed updates from a public git repo pinned to a commit. The manifest hash is checked first. An allowlisted update needs enough distinct allowlisted approvals. Claim records and attestation records are left out. A listing or guild update signed by a claimant is included only when that claim is active. It does not change the signer set. An empty allowlist still rejects curator updates |
 | `list_listings` | Signed business listings from that same pinned store. Filter by stream, category, or status. Expired listings stay hidden unless `includeExpired` is set, and those rows are marked expired. Each row names the signer and includes a plain `signedMeaning` line. An optional `image` is a public png, jpeg, or webp logo covered by the signature. The node does not take payment and does not upload images |
 | `search_hub` | One text query over signed listings and guild listings (names, descriptions, tags) and the display name of a player who opted in. Players who did not opt in are left out. Nothing is uploaded |
 | `claim_status` | Claim state for one listing identity, or for every claim in the pinned hub. Players need a matching player-profile key. Guilds and businesses need a curator countersign. X and Discord stay self-attested unless a trusted verifier attestation is current |
@@ -90,7 +92,7 @@ A `listing` is a signed business listing. It uses the same author, threshold, re
 
 A `guild` listing is a separate hub update kind, because listings do not have a type enum of ecosystem, business, and hybrid. Those remain streams and categories on kind `listing`. The `guild` object fields are `name` (at most 80 characters), `description` (the short description, at most 280 characters), `links` (up to 8 `https` URLs), optional `tags` (1 to 8 short labels), optional `image` (the same object as on a listing), optional `site` (one `https` page), and optional `discord`. `discord` is only `https://discord.gg/<code>` or `https://discord.com/invite/<code>`, at most 80 characters. Any other host, a query, or a hash is rejected. The plain page shows `site` and `discord` as links with `rel="noopener noreferrer"`. Unknown fields are rejected. A member list, a wallet field, or a price in the name, description, tags, image alt, or body is rejected. An allowlisted curator signs it with the same threshold, revocation, and manifest-pin checks as the other kinds. Curators publish public links and logos only. `search_hub` shows the newest guild update for each name. There is no guild-claim signer, so a curator and any other signer follow that same latest-wins rule. `withdrawn: true` removes that name from search. A guild that is not withdrawn needs at least one of `site` or `links`. A `withdrawn: true` record may omit both. Search starts at most 6 player-name reads, caches a miss for about a minute, and does not queue the whole opt-in list on the legacy gate. A wallet-shaped token in a URL is rejected. A price word in a URL is not. Player name reads for search run in parallel under the existing legacy concurrency gate, wait about 5 seconds, and return what finished. `truncated` is true when an opted-in player was not checked. Names are cached and the next search rotates to wallets that were not read, so the same first few are not the only ones ever checked. Display names have control and bidi characters removed.
 
-`search_hub` takes one `query` of at most 80 characters. It matches listing titles, owners, categories, streams, offer text, and the listing note, plus guild names, descriptions, and tags, plus the display name of a player with a current unrevoked story opt-in. A revoked or missing opt-in is not searched and is not returned. At most 8 opted-in names are read per query, through the same public profile read as `player_legacy`. The query is not an address. When the hub pin is unset, the tool returns no rows and says the pin is not set.
+`search_hub` takes one `query` of at most 80 characters. It matches listing titles, owners, categories, streams, offer text, and the listing note, plus guild names, descriptions, and tags, plus the display name of a player with a current unrevoked story opt-in. A revoked or missing opt-in is not searched and is not returned. At most 6 opted-in names are read per query (`SEARCH_NAME_BATCH` in `src/hub/search.ts`), through the same public profile read as `player_legacy`. The query is not an address. When the hub pin is unset, the tool returns no rows and says the pin is not set.
 
 A `story-optin` records one player's permission to tell a public story. It uses the same author, threshold, revocation, and manifest-pin checks as the other kinds. The `storyOptIn` fields are `action` (`allow` or `revoke`), `wallet` (the player's base58 address), `date` (`YYYY-MM-DD`), and `signature` (the player's detached ed25519 signature, base58). Unknown fields are rejected. The signature must match the wallet over one fixed sentence for this hub. Allow: `I allow sa-ecosystem-node to tell my public Star Atlas story. Wallet: <address>. Date: <YYYY-MM-DD>. Hub: <id>. Links: yes.` or `I allow sa-ecosystem-node to tell my public Star Atlas story. Wallet: <address>. Date: <YYYY-MM-DD>. Hub: <id>. Links: no.` Revoke: `I revoke sa-ecosystem-node from telling my public Star Atlas story. Wallet: <address>. Date: <YYYY-MM-DD>. Hub: <id>.` `<id>` is the normalized `HUB_GIT_REPO` URL, such as `https://github.com/owner/repo`. It is not the manifest file name. The hub id and the links choice are not fields the hub author sets. Each `story-optin` from `hub_updates` has `consent` of `valid` or `inert`. `valid` means the player signature matches this hub. It does not mean that sentence is the current opt-in. A signature for another repository, a bad player signature, or a pin that is not a valid https repository URL is `inert` and does not grant consent. The update stays in the chain, so later listings and signer updates are kept. A date after the current UTC date stays in the chain and does not count until that date. An allow whose date is on or before the latest revoke date does not restore consent. When more than one allow is in force, the latest signed date wins. `npm run hub-add-update -- --kind story-optin --story-optin <json> --hub-repo <url>` embeds that signature and checks it against that repository URL before it writes. When `--hub-repo` is omitted, the command uses the store's git origin URL. The node does not keep a second copy of the opt-in.
 
@@ -124,7 +126,7 @@ This repository does not contain signing secrets. `hub/signers.json` ships with 
 
 The public deployment is threshold `2` with `HUB_ALLOW_AUTHOR_APPROVAL=true`, so the author's own approval counts as one of the two. The author is Phoenix Collective (`G2PhCi6MApcuC6f5o2CDQBWDnJt9hRcozHuuN55PYisU`) and Falkor (`FC1eRr99GGJZuc4KZeUivBpbSMGvjcBB839KaEfAuhcq`) adds the second. GaliaMeta DAC stays on the allowlist and is not required for that pair. The same wallet twice counts once. Without `HUB_ALLOW_AUTHOR_APPROVAL`, the author's approval would not count at threshold 2, and that is not this deployment. The example config stays at threshold 1 for a local dry run: one distinct allowlisted approval is enough, including the author's own approval, and that result is `selfApproved: true` when no other key approved. Publish a store commit whose updates already have the Collective signature and Falkor's approval before raising a local node to threshold 2, then pin that commit.
 
-Leave `HUB_GIT_REPO`, `HUB_GIT_COMMIT`, and `HUB_STORE_MANIFEST_HASH` unset on the live read-only endpoint until that dry run should be served. Do not add a submit tool.
+The public node sets `HUB_GIT_REPO` to `https://github.com/PhoenixClaw01/sa-ecosystem-hub`, `HUB_APPROVAL_THRESHOLD` to `2`, and `HUB_ALLOW_AUTHOR_APPROVAL` to `true`. On 1 November 2026 `HUB_GIT_COMMIT` was `f064f18db1da60c4f3e562d4064c8f344042e97e`, and `HUB_STORE_MANIFEST_HASH` was the sha256 of `hub-manifest.json` at that commit: `1fd4536e3a5b4176beebc04c16c53834092f519d98c0e30172862a2f24ae24f2`. Leave the three pin variables unset on a local process that should not serve the hub. Do not add a submit tool.
 
 ### Collective key
 
@@ -139,7 +141,7 @@ The command refuses a path inside this repository and sets the file mode to `060
 
 ### Allowlist
 
-Ask each owner for the wallet address their wallet displays. The shipped file already lists these three testnet keys. A fourth slot may be added later.
+Ask each owner for the wallet address their wallet displays. The shipped file is the live allowlist. Live approvals are by Falkor and Phoenix Collective. GaliaMeta DAC is on the same list. A fourth slot may be added later.
 
 ```json
 {
@@ -300,21 +302,21 @@ These inputs are unknown because the PIP text does not state them. The tool retu
 
 ## Hosting the MCP
 
-Anyone can run this process. [docs/hosting.md](docs/hosting.md) is the full matrix: `node.config.json`, Docker Compose, stdio/`npx` for Claude Desktop and Cursor, the Node HTTP entry, the unchanged Vercel deploy, Railway, Fly, and Render. Cloudflare Workers is documented there as not feasible without a rewrite. The Vercel function can read a pinned `github.com` commit over HTTPS when `git` is absent, and it still reads the signer allowlist from disk. Workers do not run those Node filesystem calls.
+Anyone can run this process. [docs/hosting.md](docs/hosting.md) is the full matrix: `node.config.json`, Docker Compose, stdio/`npx` for Claude Desktop and Cursor, the Node HTTP entry, the public Vercel project `sa-ecosystem-node-dashboard`, Railway, Fly, and Render. Cloudflare Workers is documented there as not feasible without a rewrite. The Vercel function can read a pinned `github.com` commit over HTTPS when `git` is absent, and it still reads the signer allowlist from disk. Workers do not run those Node filesystem calls.
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/PhoenixClaw01/sa-ecosystem-node&root-directory=dashboard)
 [![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/new/template?template=https://github.com/PhoenixClaw01/sa-ecosystem-node)
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/PhoenixClaw01/sa-ecosystem-node)
 
-A public Node process (`PUBLIC_NODE=1`) stays read-only. It refuses to start when `allowedHosts` is empty or `*` unless `ALLOW_ANY_HOST=1` is set. The Docker image, Compose file, Fly config, and Render config do not set that opt-in. Set `ALLOWED_HOSTS` to the hostname clients use, or startup exits. `POST /submit` and every other non-MCP path return 404. Each IP is limited by `rateLimitMax` / `rateLimitWindowMs`. The limiter is in memory on each instance. Request bodies over `maxRequestBytes` (default 512 KiB) are refused with HTTP 413 before a tool runs. The live MCP list stays the 22 read-only tools. `submit_hub_update` is not one of them.
+A public Node process (`PUBLIC_NODE=1`) stays read-only. It refuses to start when `allowedHosts` is empty or `*` unless `ALLOW_ANY_HOST=1` is set. The Docker image, Compose file, Fly config, and Render config do not set that opt-in. Set `ALLOWED_HOSTS` to the hostname clients use, or startup exits. `POST /submit` and every other non-MCP path return 404. Each client key is limited by `rateLimitMax` / `rateLimitWindowMs`. The key is the socket address unless `TRUST_PROXY=1`, which the Vercel configs set. The limiter is in memory on each instance. Request bodies over `maxRequestBytes` (default 512 KiB) are refused with HTTP 413 before a tool runs. The live MCP list stays the 22 read-only tools. `submit_hub_update` is not one of them.
 
 The MCP server is the product. The dashboard is a thin demo of the same balance reader: one `getMultipleAccounts` call, then the treasury cache if that read fails. `data_health` reports that wallet-balance check as `live` or `cached`.
 
 `SOLANA_RPC_URL` defaults to `https://solana-rpc.publicnode.com`. `SOLANA_RPC_FALLBACK_URLS` defaults to `https://api.mainnet-beta.solana.com`. Both are public endpoints. No API key is required. Set either variable to point the open-source server at your own RPC.
 
 - **Local.** `npm start` serves Streamable HTTP. `npm run start:stdio` speaks MCP on stdin. The cache file is `TREASURY_CACHE_PATH` (default `data/treasury-cache.json`).
-- **Vercel, this Council preview.** The git-linked project keeps Root Directory `dashboard` and production branch `main`. The function is the committed bundle `dashboard/api/mcp.js` (`npm run build:dashboard-mcp`). It inlines this repo's dependencies, so the deploy does not install the parent package and Vercel does not compile TypeScript for that route. The function is capped at 25 seconds. `dashboard/package.json` asks for Node.js 22.
-- **Vercel, repo root.** `api/mcp.ts` re-exports the same handler. The root `vercel.json` rewrites `/mcp` to it. That file is not what the dashboard project deploys.
+- **Vercel, public node.** Project `sa-ecosystem-node-dashboard` is separate from the DAO Council preview. Root Directory is `dashboard` and the production branch is `main`. `PUBLIC_HOME=plain`. The function is the committed bundle `dashboard/api/mcp.js` (`npm run build:dashboard-mcp`). It inlines this repo's dependencies, so the deploy does not install the parent package and Vercel does not compile TypeScript for that route. The function is capped at 25 seconds. `dashboard/package.json` asks for Node.js 22. The `HUB_*` values are listed in [docs/hosting.md](docs/hosting.md).
+- **Vercel, repo root.** `api/mcp.ts` re-exports the same handler. The root `vercel.json` rewrites `/mcp` to it. That file is not what the public node deploys.
 - **Cloudflare or any other host.** The Solana client is fetch-only and sends the allow-listed read methods. Set `SOLANA_RPC_URL` to the RPC that host can reach. This repo does not ship a Workers entry.
 
 Live balances still answer when the cache file is absent. History and payment tools fail closed without it. The server process does not refresh the cache. `npm run refresh-treasury` does, with read methods only. A scheduled refresh runs every 3 hours (`17 */3 * * *`), about 240 runs in a 30-day month: about 240 Actions minutes if each run bills one minute, or about 480 if install pushes a run into a second minute.
@@ -328,7 +330,7 @@ Cursor, in `~/.cursor/mcp.json` or the project `.cursor/mcp.json`:
 ```json
 {
   "mcpServers": {
-    "sa-council": {
+    "sa-ecosystem-node": {
       "url": "https://sa-ecosystem-node-dashboard.vercel.app/api/mcp"
     }
   }
@@ -340,7 +342,7 @@ Claude Desktop, in `claude_desktop_config.json`:
 ```json
 {
   "mcpServers": {
-    "sa-council": {
+    "sa-ecosystem-node": {
       "type": "http",
       "url": "https://sa-ecosystem-node-dashboard.vercel.app/api/mcp"
     }
@@ -350,19 +352,19 @@ Claude Desktop, in `claude_desktop_config.json`:
 
 In Claude.ai, add a custom connector and paste that URL. Any other client that speaks Streamable HTTP can use the same URL.
 
-Each request has a 20 second timeout, a 512 KiB request-body cap, and a 512 KiB response cap. A request over 524288 bytes is refused with HTTP 413 before a tool runs. A response over that size is replaced with the same status and is not truncated. The server allows 120 requests per minute per IP on each instance. That limiter is in memory: it is not shared across Vercel instances, and it resets when an instance recycles. It is not a security boundary. Tool inputs are checked before a read runs. An upstream failure comes back as a short MCP error. The response does not include a stack trace.
+Each request has a 20 second timeout, a 512 KiB request-body cap, and a 512 KiB response cap. A request over 524288 bytes is refused with HTTP 413 before a tool runs. A response over that size is replaced with the same status and is not truncated. The server allows 120 requests per minute per client key on each instance. On this Vercel project `TRUST_PROXY=1`, so the key is the first `X-Forwarded-For` hop. That limiter is in memory: it is not shared across Vercel instances, and it resets when an instance recycles. It is not a security boundary. Tool inputs are checked before a read runs. An upstream failure comes back as a short MCP error. The response does not include a stack trace.
 
 `list_proposals` returns 20 proposals by default and at most 100. The page includes `nextCursor`. Pass that value back as `cursor` to read the next page.
 
 The dashboard Ask the MCP panel still reads `dashboard/data/mcp-recorded.json`. It does not call this endpoint.
 
-On the Vercel project, leave Root Directory as `dashboard` and the production branch as `main`. Leave the install command empty: the MCP route is already bundled, and a parent `npm ci` is not used. Confirm the Node.js version is 22.x. `SOLANA_RPC_URL` and `SOLANA_RPC_FALLBACK_URLS` are optional; unset, they stay on the public defaults. Do not add an API key. `dashboard/vercel.json` includes `ata.js`, `squads.js`, `data/treasury-cache.json`, and `hub/signers.json` in the function. `hub/signers.json` there is a byte-for-byte copy of the repository `hub/signers.json`, written by `npm run build:dashboard-mcp`. Do not edit the copy. The cache glob matches nothing until the cache job commits that file, and a missing match does not fail the deploy. `treasury_history` and `ecofund_limit` then return a result that says the cache is not yet populated, with no figures. Payment and flow tools still fail closed until the file is present. `data_health` and `treasury_balances` read live balances without that file. The bundle carries `ata.js` and `squads.js` inside it, so the function does not `require()` those scripts. When `git` is not on the function, a pinned `github.com` hub is read over HTTPS. Docker and the other container hosts still use `git`.
+On the public Vercel project `sa-ecosystem-node-dashboard`, leave Root Directory as `dashboard` and the production branch as `main`. Leave the install command empty: the MCP route is already bundled, and a parent `npm ci` is not used. Confirm the Node.js version is 22.x. Set `PUBLIC_HOME=plain` and the `HUB_*` pins from [docs/hosting.md](docs/hosting.md). `SOLANA_RPC_URL` and `SOLANA_RPC_FALLBACK_URLS` are optional; unset, they stay on the public defaults. Do not add an API key. `dashboard/vercel.json` includes `ata.js`, `squads.js`, `data/treasury-cache.json`, and `hub/signers.json` in the function. `hub/signers.json` there is a byte-for-byte copy of the repository `hub/signers.json`, written by `npm run build:dashboard-mcp`. Do not edit the copy. The cache job commits `dashboard/data/treasury-cache.json`. A missing match does not fail the deploy. If that file is absent, `treasury_history` and `ecofund_limit` say the cache is not yet populated and include no figures. Payment and flow tools fail closed until the file is present. On 1 November 2026 `data_health` on the public node reported `treasury_cache` ok, and `treasury_history` returned cached series. `data_health` and `treasury_balances` can read live balances without that file. The bundle carries `ata.js` and `squads.js` inside it, so the function does not `require()` those scripts. When `git` is not on the function, a pinned `github.com` hub is read over HTTPS. Docker and the other container hosts still use `git`.
 
 ## Deploy
 
-The dashboard in `dashboard/` is a separate static site. Its Vercel project uses Root Directory `dashboard` and does not use the root `vercel.json`. See `dashboard/README.md`. `config.js` `rpcUrl` and `rpcFallbackUrls` mirror the MCP defaults. The page paints tiles from `readBalancesWithFallback`. It does not keep a second balance parser.
+The files in `dashboard/` are what project `sa-ecosystem-node-dashboard` deploys. That project uses Root Directory `dashboard` and does not use the root `vercel.json`. See `dashboard/README.md`. `config.js` `rpcUrl` and `rpcFallbackUrls` mirror the MCP defaults. The page paints tiles from `readBalancesWithFallback`. It does not keep a second balance parser.
 
-`PUBLIC_HOME=plain` on that project redirects a request for `/` or `/index.html` to `/plain/` with status 302. `dashboard/middleware.js` reads the variable. With `PUBLIC_HOME` unset, `/` serves the dashboard preview, so the existing preview deployment stays as it is. The MCP server does not read `PUBLIC_HOME`, and `GET /` on that process stays the status document.
+`PUBLIC_HOME=plain` on the public node redirects a request for `/` or `/index.html` to `/plain/` with status 302. `dashboard/middleware.js` reads the variable. The MCP server does not read `PUBLIC_HOME`, and `GET /` on the local Node process stays the status document. With `PUBLIC_HOME` unset, `/` serves the dashboard page in this repository. That is not how the public node is configured.
 
 The in-memory rate limiter is a placeholder. It resets when the process restarts and is not shared across instances.
 

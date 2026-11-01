@@ -1272,7 +1272,7 @@ function paintToolbarAndCards(doc, host, records, config) {
   } else {
     syncToolbar(bar, filter, sort);
   }
-  const stale = (host.childNodes || []).slice();
+  const stale = Array.from(host.childNodes || []);
   for (const kid of stale) {
     if (kid !== bar) host.removeChild(kid);
   }

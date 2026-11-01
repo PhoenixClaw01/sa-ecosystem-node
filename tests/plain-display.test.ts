@@ -37,6 +37,13 @@ import {
 const HASH = "ab".repeat(32);
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
+interface MiniList {
+  readonly length: number;
+  item(index: number): MiniNode | null;
+  [index: number]: MiniNode | undefined;
+  [Symbol.iterator](): Iterator<MiniNode>;
+}
+
 interface MiniNode {
   nodeType: number;
   tagName: string;
@@ -45,7 +52,7 @@ interface MiniNode {
   hidden: boolean;
   disabled: boolean;
   value: string;
-  childNodes: MiniNode[];
+  childNodes: MiniList;
   parentNode: MiniNode | null;
   attrs: Record<string, string>;
   textContent: string;
@@ -58,6 +65,30 @@ interface MiniNode {
   dispatch(type: string, event?: { preventDefault?: () => void; target?: unknown }): void;
 }
 
+/** Live list with indexed access and iteration, and none of the array copy methods. */
+function nodeListView(nodes: MiniNode[]): MiniList {
+  const view = {
+    get length() {
+      return nodes.length;
+    },
+    item(index: number) {
+      return nodes[index] ?? null;
+    },
+    [Symbol.iterator]() {
+      return nodes[Symbol.iterator]();
+    },
+  };
+  return new Proxy(view, {
+    get(target, prop, receiver) {
+      if (typeof prop === "string" && /^(?:0|[1-9]\d*)$/.test(prop)) {
+        const index = Number(prop);
+        return index < nodes.length ? nodes[index] : undefined;
+      }
+      return Reflect.get(target, prop, receiver);
+    },
+  }) as MiniList;
+}
+
 class MiniEl implements MiniNode {
   nodeType = 1;
   tagName: string;
@@ -66,7 +97,7 @@ class MiniEl implements MiniNode {
   hidden = false;
   disabled = false;
   value = "";
-  childNodes: MiniNode[] = [];
+  private kids: MiniNode[] = [];
   parentNode: MiniNode | null = null;
   attrs: Record<string, string> = {};
   private listeners: Record<string, ((event: { preventDefault?: () => void; target?: unknown }) => void)[]> = {};
@@ -75,8 +106,18 @@ class MiniEl implements MiniNode {
     this.tagName = tag.toUpperCase();
   }
 
+  get childNodes(): MiniList {
+    return nodeListView(this.kids);
+  }
+
+  set childNodes(value: MiniList | readonly MiniNode[]) {
+    const next: MiniNode[] = [];
+    for (const node of value ?? []) next.push(node);
+    this.kids.splice(0, this.kids.length, ...next);
+  }
+
   get textContent(): string {
-    return this.childNodes.map((node) => node.textContent).join("");
+    return this.kids.map((node) => node.textContent).join("");
   }
 
   set textContent(value: string) {
@@ -92,12 +133,12 @@ class MiniEl implements MiniNode {
   }
 
   get firstChild(): MiniNode | null {
-    return this.childNodes[0] ?? null;
+    return this.kids[0] ?? null;
   }
 
   appendChild(child: MiniNode): MiniNode {
     child.parentNode = this;
-    this.childNodes.push(child);
+    this.kids.push(child);
     return child;
   }
 
@@ -106,8 +147,8 @@ class MiniEl implements MiniNode {
   }
 
   removeChild(child: MiniNode): MiniNode {
-    const index = this.childNodes.indexOf(child);
-    if (index >= 0) this.childNodes.splice(index, 1);
+    const index = this.kids.indexOf(child);
+    if (index >= 0) this.kids.splice(index, 1);
     child.parentNode = null;
     return child;
   }
@@ -246,6 +287,22 @@ function filesNamed(dir: string, fileName: string, acc: string[] = []): string[]
 }
 
 describe("plain display escaping", () => {
+  it("gives elements a live child list without array copy methods", () => {
+    const doc = createDoc();
+    const parent = doc.createElement("div");
+    const child = doc.createElement("span");
+    parent.appendChild(child);
+    const list = parent.childNodes as MiniList & { slice?: unknown; map?: unknown; filter?: unknown };
+    expect(list.length).toBe(1);
+    expect(list.item(0)).toBe(child);
+    expect(list[0]).toBe(child);
+    expect(Array.from(list)).toEqual([child]);
+    expect([...list]).toEqual([child]);
+    expect(list.slice).toBeUndefined();
+    expect(list.map).toBeUndefined();
+    expect(list.filter).toBeUndefined();
+  });
+
   it("renders hostile strings as inert text", () => {
     const doc = createDoc();
     const card = renderListingCard(doc, {
