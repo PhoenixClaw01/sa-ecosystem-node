@@ -130,6 +130,13 @@ h3 { font-size: 1.15rem; margin: 0 0 0.35rem; }
 
 .what { margin: 0; }
 
+.guides {
+  margin: 0.4rem 0 0;
+  padding-left: 1.2rem;
+}
+
+.guides li { margin: 0.15rem 0; }
+
 section { margin: 1.75rem 0; }
 
 .card {

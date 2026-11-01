@@ -75,7 +75,7 @@ flowchart LR
 In every case, **no funds or game assets are at risk**: nodes never hold them.
 
 ## 6. Who governs the code
-- **Licence:** open source under **Apache-2.0 (planned)**. The Council chooses.
+- **Licence:** open source under **Apache-2.0**.
 - **Ownership:** Phoenix builds and proves it, then the repo **moves to a Council-owned GitHub organization.**
 - **Contributions:**
   - Anyone can open a pull request.
@@ -92,7 +92,7 @@ In every case, **no funds or game assets are at risk**: nodes never hold them.
 1. **Private build:** read-only tools, signature checks, the git store.
 2. **Testnet with 2+ independent nodes:** run by different operators, ideally including one the Council runs, to prove they agree.
 3. **Security review:** an independent review of the signature checks, revocation handling and node setup. Findings are published.
-4. **Open source:** a public repo under Apache-2.0 (planned), with a node template and a contributor guide.
+4. **Open source:** a public repo under Apache-2.0, with a node template and a contributor guide.
 5. **Transfer to the Council:** the repo moves to the Council's GitHub, and approver keys stay in the Council's wallets or multisig.
 
 *Ground rules throughout:* read-only first; no ATMTA release form for the open directory and the permissionless layers; no signing bots or game automation without ATMTA's written authorization. Contact: support@phoenix-collective.app

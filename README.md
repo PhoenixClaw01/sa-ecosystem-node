@@ -4,7 +4,11 @@ A read-only ecosystem node inspired by Star Atlas. It is an MCP server anyone ca
 
 This is not an ATMTA product, and the product name is not Star Atlas. It holds no funds, no game keys, and no Council keys. The server does not sign, and it does not write to any chain.
 
-**Status:** private while it is being proven. The licence is Apache-2.0 (planned). No licence file is included. Full development waits for the Founder's go.
+**Status:** public v1.0.0 testnet-hardened node. Licensed under [Apache-2.0](LICENSE) ([NOTICE](NOTICE)).
+
+The public hub is [sa-ecosystem-hub](https://github.com/PhoenixClaw01/sa-ecosystem-hub). Governance is [phoenix-gate](https://github.com/PhoenixClaw01/phoenix-gate).
+
+This deployment uses threshold 2 with `HUB_ALLOW_AUTHOR_APPROVAL=true`, so the author's own approval counts as one of the two. The author is Phoenix Collective and the second approval is Falkor (`FC1e`).
 
 - [Spec](docs/spec.md)
 - [Decentralization](docs/decentralization.md)
@@ -110,7 +114,7 @@ A host with the `git` binary checks out that commit. A host without it, includin
 
 ## Operator runbook
 
-This repository does not contain signing secrets. `hub/signers.json` ships with three public keys for the testnet dry run, and the threshold is 1. A fourth slot may be added later.
+This repository does not contain signing secrets. `hub/signers.json` ships with three public keys. The public deployment uses threshold 2 with `HUB_ALLOW_AUTHOR_APPROVAL=true`, so the author's own approval counts as one of the two: Phoenix Collective, plus Falkor (`FC1e`). The example config stays at threshold 1 for a local dry run. A fourth slot may be added later.
 
 | Label | Public key | Who signs | How the approval is produced |
 |---|---|---|---|
@@ -118,7 +122,7 @@ This repository does not contain signing secrets. `hub/signers.json` ships with 
 | GaliaMeta DAC | `EU7zwmY8QP7B9FFUUyMu1eTNkrwuj27NQkgEmNMWreq1` | GaliaMeta DAC wallet owner | Same `signMessage` flow |
 | Phoenix Collective (Falkor's team) | `G2PhCi6MApcuC6f5o2CDQBWDnJt9hRcozHuuN55PYisU` | Collective author | A new ed25519 key from `hub-keygen`, kept outside this repository |
 
-Threshold `1` is the testnet dry run: one distinct allowlisted approval is enough, including the author's own approval. That result is `selfApproved: true` when no other key approved. Launch is threshold `2` with `HUB_ALLOW_AUTHOR_APPROVAL=true`. The Collective author (`G2PhCi6MApcuC6f5o2CDQBWDnJt9hRcozHuuN55PYisU`) counts as one approval, and Falkor (`FC1eRr99GGJZuc4KZeUivBpbSMGvjcBB839KaEfAuhcq`) adds the second. GaliaMeta DAC stays on the allowlist and is not required for that pair. The same wallet twice counts once. Without `HUB_ALLOW_AUTHOR_APPROVAL`, the author's approval would not count at threshold 2, and that is not the launch setup. Publish a store commit whose updates already have the Collective signature and Falkor's approval before raising the threshold, then pin that commit.
+The public deployment is threshold `2` with `HUB_ALLOW_AUTHOR_APPROVAL=true`, so the author's own approval counts as one of the two. The author is Phoenix Collective (`G2PhCi6MApcuC6f5o2CDQBWDnJt9hRcozHuuN55PYisU`) and Falkor (`FC1eRr99GGJZuc4KZeUivBpbSMGvjcBB839KaEfAuhcq`) adds the second. GaliaMeta DAC stays on the allowlist and is not required for that pair. The same wallet twice counts once. Without `HUB_ALLOW_AUTHOR_APPROVAL`, the author's approval would not count at threshold 2, and that is not this deployment. The example config stays at threshold 1 for a local dry run: one distinct allowlisted approval is enough, including the author's own approval, and that result is `selfApproved: true` when no other key approved. Publish a store commit whose updates already have the Collective signature and Falkor's approval before raising a local node to threshold 2, then pin that commit.
 
 Leave `HUB_GIT_REPO`, `HUB_GIT_COMMIT`, and `HUB_STORE_MANIFEST_HASH` unset on the live read-only endpoint until that dry run should be served. Do not add a submit tool.
 
@@ -222,7 +226,7 @@ npm run sign-hub-update -- \
   --out ./update.falkor.json
 ```
 
-Repeat for the next wallet, using the file that already has the first approval as `--approve`. For the dry run at threshold 1, one wallet is enough. Launch sets `HUB_APPROVAL_THRESHOLD=2` and `HUB_ALLOW_AUTHOR_APPROVAL=true`: the Collective author signs, and Falkor (`FC1e`) approves. Those two approvals meet the threshold. GaliaMeta DAC can still approve, and is not required for that pair.
+Repeat for the next wallet, using the file that already has the first approval as `--approve`. The public deployment sets `HUB_APPROVAL_THRESHOLD=2` and `HUB_ALLOW_AUTHOR_APPROVAL=true`: the Collective author signs, and Falkor (`FC1e`) approves. Those two approvals meet the threshold. The author's own approval counts as one of the two. GaliaMeta DAC can still approve, and is not required for that pair. A local dry run at threshold 1 still accepts one wallet.
 
 The Collective agent can approve with its key file. That signature is over the same bytes:
 
@@ -317,7 +321,7 @@ Live balances still answer when the cache file is absent. History and payment to
 
 ## Public MCP endpoint
 
-The live read-only endpoint is [https://sa-council-dashboard-preview.vercel.app/api/mcp](https://sa-council-dashboard-preview.vercel.app/api/mcp). No API key. A short discovery file is at [https://sa-council-dashboard-preview.vercel.app/.well-known/mcp.json](https://sa-council-dashboard-preview.vercel.app/.well-known/mcp.json).
+The live read-only endpoint is [https://sa-ecosystem-node-dashboard.vercel.app/api/mcp](https://sa-ecosystem-node-dashboard.vercel.app/api/mcp). No API key. A short discovery file is at [https://sa-ecosystem-node-dashboard.vercel.app/.well-known/mcp.json](https://sa-ecosystem-node-dashboard.vercel.app/.well-known/mcp.json).
 
 Cursor, in `~/.cursor/mcp.json` or the project `.cursor/mcp.json`:
 
@@ -325,7 +329,7 @@ Cursor, in `~/.cursor/mcp.json` or the project `.cursor/mcp.json`:
 {
   "mcpServers": {
     "sa-council": {
-      "url": "https://sa-council-dashboard-preview.vercel.app/api/mcp"
+      "url": "https://sa-ecosystem-node-dashboard.vercel.app/api/mcp"
     }
   }
 }
@@ -338,7 +342,7 @@ Claude Desktop, in `claude_desktop_config.json`:
   "mcpServers": {
     "sa-council": {
       "type": "http",
-      "url": "https://sa-council-dashboard-preview.vercel.app/api/mcp"
+      "url": "https://sa-ecosystem-node-dashboard.vercel.app/api/mcp"
     }
   }
 }
@@ -357,6 +361,8 @@ On the Vercel project, leave Root Directory as `dashboard` and the production br
 ## Deploy
 
 The dashboard in `dashboard/` is a separate static site. Its Vercel project uses Root Directory `dashboard` and does not use the root `vercel.json`. See `dashboard/README.md`. `config.js` `rpcUrl` and `rpcFallbackUrls` mirror the MCP defaults. The page paints tiles from `readBalancesWithFallback`. It does not keep a second balance parser.
+
+`PUBLIC_HOME=plain` on that project redirects a request for `/` or `/index.html` to `/plain/` with status 302. `dashboard/middleware.js` reads the variable. With `PUBLIC_HOME` unset, `/` serves the dashboard preview, so the existing preview deployment stays as it is. The MCP server does not read `PUBLIC_HOME`, and `GET /` on that process stays the status document.
 
 The in-memory rate limiter is a placeholder. It resets when the process restarts and is not shared across instances.
 

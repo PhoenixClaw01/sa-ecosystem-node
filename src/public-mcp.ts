@@ -1,8 +1,8 @@
 import { publicErrorMessage } from "./errors.js";
 import type { NodeHandler } from "./handler.js";
 
-/** Live Council preview. The dashboard Vercel project serves this path. */
-export const PUBLIC_MCP_URL = "https://sa-council-dashboard-preview.vercel.app/api/mcp";
+/** Public ecosystem node. The dashboard project serves this path. */
+export const PUBLIC_MCP_URL = "https://sa-ecosystem-node-dashboard.vercel.app/api/mcp";
 
 /** Return before the platform cuts the invocation off, so the client gets a clean error. */
 export const REQUEST_TIMEOUT_MS = 20_000;

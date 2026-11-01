@@ -1,5 +1,6 @@
 import { Client } from "@modelcontextprotocol/client";
 import { StreamableHTTPClientTransport } from "@modelcontextprotocol/client";
+import { readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
@@ -8,7 +9,7 @@ import { loadConfig } from "../src/config.js";
 import { createDaoReaders } from "../src/dao/readers.js";
 import { createNodeHandler, type NodeHandler } from "../src/handler.js";
 import { auditProfileKeys } from "../src/profile/audit.js";
-import { createPublicMcpFetch, jsonRpcError } from "../src/public-mcp.js";
+import { createPublicMcpFetch, jsonRpcError, PUBLIC_MCP_URL } from "../src/public-mcp.js";
 import { createRateLimiter } from "../src/rate-limit.js";
 import { READ_ONLY_TOOLS, type NodeDeps } from "../src/server.js";
 import { stubPlayerLegacy } from "./dao-stubs.js";
@@ -142,6 +143,14 @@ async function connect(): Promise<Client> {
 function toolText(result: { content?: { type: string; text?: string }[] }): string {
   return (result.content ?? []).map((item) => item.text ?? "").join("\n");
 }
+
+describe("public MCP URL", () => {
+  it("pins the published endpoint to the public ecosystem node", () => {
+    expect(PUBLIC_MCP_URL).toBe("https://sa-ecosystem-node-dashboard.vercel.app/api/mcp");
+    const discovery = JSON.parse(readFileSync("dashboard/.well-known/mcp.json", "utf8")) as { url: string };
+    expect(discovery.url).toBe(PUBLIC_MCP_URL);
+  });
+});
 
 describe("public MCP endpoint", () => {
   it("calls every read-only tool through the HTTP handler against the mocked RPC", async () => {

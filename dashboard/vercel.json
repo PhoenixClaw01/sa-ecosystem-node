@@ -28,7 +28,6 @@
     {
       "source": "/plain",
       "headers": [
-        { "key": "X-Robots-Tag", "value": "noindex" },
         {
           "key": "Content-Security-Policy",
           "value": "default-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; object-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' https://raw.githubusercontent.com; font-src 'self'; connect-src 'self'"
@@ -38,7 +37,6 @@
     {
       "source": "/plain/(.*)",
       "headers": [
-        { "key": "X-Robots-Tag", "value": "noindex" },
         {
           "key": "Content-Security-Policy",
           "value": "default-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; object-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' https://raw.githubusercontent.com; font-src 'self'; connect-src 'self'"

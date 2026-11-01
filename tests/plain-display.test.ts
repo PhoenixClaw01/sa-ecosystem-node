@@ -218,6 +218,16 @@ function htmlFiles(dir: string, acc: string[] = []): string[] {
   return acc;
 }
 
+function filesNamed(dir: string, fileName: string, acc: string[] = []): string[] {
+  for (const name of readdirSync(dir)) {
+    if (name === "node_modules" || name === "dist" || name === ".git") continue;
+    const full = path.join(dir, name);
+    if (statSync(full).isDirectory()) filesNamed(full, fileName, acc);
+    else if (name === fileName) acc.push(full);
+  }
+  return acc;
+}
+
 describe("plain display escaping", () => {
   it("renders hostile strings as inert text", () => {
     const doc = createDoc();
@@ -620,7 +630,7 @@ describe("plain display page", () => {
 });
 
 describe("plain display privacy", () => {
-  it("keeps the page out of the index and off public pages", () => {
+  it("keeps /plain indexable, under a strict content policy, and off other public pages", () => {
     const page = readFileSync(path.join(ROOT, "dashboard/plain/index.html"), "utf8");
     const source = readFileSync(path.join(ROOT, "dashboard/plain/plain.js"), "utf8");
     const style = readFileSync(path.join(ROOT, "dashboard/plain/plain.css"), "utf8");
@@ -629,7 +639,8 @@ describe("plain display privacy", () => {
       headers: { source: string; headers: { key: string; value: string }[] }[];
     };
     expect(config.redirects).toContainEqual({ source: "/plain", destination: "/plain/", permanent: true });
-    expect(page).toContain('<meta name="robots" content="noindex,nofollow">');
+    expect(page.toLowerCase()).not.toContain("noindex");
+    expect(page).not.toMatch(/<meta\s+name=["']robots["']/i);
     expect(page).toContain('<link rel="icon" href="/plain/favicon.svg" type="image/svg+xml">');
     expect(page).toContain('<link rel="stylesheet" href="/plain/plain.css">');
     expect(page).toContain('<script type="module" src="/plain/plain.js"></script>');
@@ -696,7 +707,7 @@ describe("plain display privacy", () => {
     for (const rule of plainHeaders) {
       const robots = rule.headers.find((header) => header.key === "X-Robots-Tag");
       const csp = rule.headers.find((header) => header.key === "Content-Security-Policy");
-      expect(robots?.value).toBe("noindex");
+      expect(robots).toBeUndefined();
       expect(csp?.value).toContain("default-src 'none'");
       expect(csp?.value).toContain("script-src 'self'");
       expect(csp?.value).toContain("connect-src 'self'");
@@ -713,6 +724,38 @@ describe("plain display privacy", () => {
     for (const file of publicHtml) {
       expect(readFileSync(file, "utf8"), file).not.toContain("plain/");
     }
+    for (const file of filesNamed(ROOT, "robots.txt")) {
+      expect(readFileSync(file, "utf8"), file).not.toMatch(/disallow:\s*\/plain\b/i);
+    }
+  });
+});
+
+describe("plain guides", () => {
+  it("links the guides, the hub, and the source as static anchors under the intro", () => {
+    const page = readFileSync(path.join(ROOT, "dashboard/plain/index.html"), "utf8");
+    const source = readFileSync(path.join(ROOT, "dashboard/plain/plain.js"), "utf8");
+    const intro = page.indexOf("everyday words.");
+    const guides = page.indexOf('id="guides"');
+    const board = page.indexOf('id="board"');
+    expect(intro).toBeGreaterThan(-1);
+    expect(guides).toBeGreaterThan(intro);
+    expect(board).toBeGreaterThan(guides);
+    expect(page).toContain(">Guides<");
+    const links: [string, string][] = [
+      ["https://phoenix-collective.app/star-atlas/HOW-IT-WORKS.pdf", "Plain-language guide (PDF)"],
+      ["https://phoenix-collective.app/star-atlas/HOW-IT-WORKS.md", "How it works (tech spec)"],
+      ["https://github.com/PhoenixClaw01/sa-ecosystem-hub", "Hub repository"],
+      ["https://github.com/PhoenixClaw01/sa-ecosystem-node", "Source"],
+    ];
+    for (const [href, label] of links) {
+      expect(page).toContain(`href="${href}"`);
+      expect(page).toContain(`>${label}</a>`);
+    }
+    const section = page.slice(guides, board);
+    expect(section).not.toMatch(/<script|\son\w+=/);
+    expect(source).not.toContain("HOW-IT-WORKS");
+    expect(source).not.toContain("sa-ecosystem-hub");
+    expect(source).not.toMatch(/innerHTML|outerHTML|insertAdjacentHTML|document\.write|eval\(|new Function/);
   });
 });
 

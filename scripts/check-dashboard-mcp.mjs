@@ -49,7 +49,7 @@ const headers = {
 
 async function post(body) {
   const response = await handler.fetch(
-    new globalThis.Request("https://sa-council-dashboard-preview.vercel.app/api/mcp", {
+    new globalThis.Request("https://sa-ecosystem-node-dashboard.vercel.app/api/mcp", {
       method: "POST",
       headers,
       body: JSON.stringify(body),
@@ -79,8 +79,18 @@ const initialized = await post({
     clientInfo: { name: "bundle-check", version: "0" },
   },
 });
+const versionFile = readFileSync("src/version.ts", "utf8");
+const serverVersion = versionFile.match(/export const SERVER_VERSION = "([^"]+)"/)?.[1];
+if (!serverVersion) {
+  console.error("SERVER_VERSION is missing from src/version.ts.");
+  process.exit(1);
+}
 if (initialized.result?.serverInfo?.name !== "sa-ecosystem-node") {
   console.error("initialize did not return the server name.");
+  process.exit(1);
+}
+if (initialized.result?.serverInfo?.version !== serverVersion) {
+  console.error(`initialize serverInfo.version is ${initialized.result?.serverInfo?.version}, expected ${serverVersion}.`);
   process.exit(1);
 }
 
