@@ -1,0 +1,62 @@
+[
+  {
+    "id": "c90854f3-55a1-4d7e-8da7-8d9533f27c6d",
+    "proposalId": "c00de055-1942-486f-a64d-dd4ee360500f",
+    "walletPublicKey": "VseEGdcwjBwb9TqjQgBJLoZmUGKsKDDHvpLC5NpWBWh",
+    "message": "I VseEGdcwjBwb9TqjQgBJLoZmUGKsKDDHvpLC5NpWBWh vote no to PIP-36 with hash fd77f502ae on 2026-09-26T09:08:31.611Z with 116568.3893343 POLIS locked until 1948093670",
+    "signature": "DhSyYolAUa27Kf7aR1gpFIdTqLuhR/u9NuItjEzHwyjI5lQahisiRIAS26nMopFuXTjOjVPnUg2ZepMgPdxrCA==",
+    "voteResult": "no",
+    "votingPower": "1161455.783097974",
+    "proposalHash": "fd77f502ae",
+    "memoProgramUsed": false,
+    "createdAt": "2026-09-26T09:08:34.284Z"
+  },
+  {
+    "id": "0149a323-16d9-4768-8b2e-f6c55761ec65",
+    "proposalId": "c00de055-1942-486f-a64d-dd4ee360500f",
+    "walletPublicKey": "V4RSZJC12i2WekA6QyfxuS9dzcxQhpk178CANUQ4gLh",
+    "message": "I V4RSZJC12i2WekA6QyfxuS9dzcxQhpk178CANUQ4gLh vote no to PIP-36 with hash fd77f502ae on 2026-09-20T08:34:54.514Z with 105355.21957872 POLIS locked until 1943391747",
+    "signature": "zJWkQlWuJ6wRxK9ejxIRbiGYaqE/gyuF0evhv6eXkFequ+4YZQU3n6lVG6hlb+sWvQjEhzflgOISt3xGLp+xDA==",
+    "voteResult": "no",
+    "votingPower": "1018314.50961992",
+    "proposalHash": "fd77f502ae",
+    "memoProgramUsed": false,
+    "createdAt": "2026-09-20T08:34:56.945Z"
+  },
+  {
+    "id": "212d4fcc-17be-40f6-b64b-156306495c14",
+    "proposalId": "c00de055-1942-486f-a64d-dd4ee360500f",
+    "walletPublicKey": "ushELAkUDBPTtGALVo1LzZJ7xetybPQPscD4p5i9Ete",
+    "message": "I ushELAkUDBPTtGALVo1LzZJ7xetybPQPscD4p5i9Ete vote no to PIP-36 with hash fd77f502ae on 2026-10-01T01:47:16.940Z with 72363.56434141 POLIS locked until 1920602254",
+    "signature": "SK33A21EYRCiDRnJsKwfRi7q1oe/DEWq5fRoBicDtOKeIFveTiG5fSdVV8Npw1JHLnScbhsjmeDgjeYSi8wqDA==",
+    "voteResult": "no",
+    "votingPower": "594845.4562284908",
+    "proposalHash": "fd77f502ae",
+    "memoProgramUsed": false,
+    "createdAt": "2026-10-01T01:47:19.311Z"
+  },
+  {
+    "id": "d8057585-d07c-4f5f-a894-4f18c87fc17c",
+    "proposalId": "c00de055-1942-486f-a64d-dd4ee360500f",
+    "walletPublicKey": "UPGDyBjEsknrZhKYSj6onqnoG5yhUCvoqX3GbFoQWzp",
+    "message": "I UPGDyBjEsknrZhKYSj6onqnoG5yhUCvoqX3GbFoQWzp vote yes to PIP-36 with hash fd77f502ae on 2026-09-23T22:07:40.006Z with 262731.6570754 POLIS locked until 1926911024",
+    "signature": "n2EghxsEI6/xsZuDGtbat+yX23IaGnDUsmzL8QVKhOnbH0SqVzXo5wNTOUaX6zk6DfGA8iG2AvRA+CdBtFnIAA==",
+    "voteResult": "yes",
+    "votingPower": "2264834.611169965",
+    "proposalHash": "fd77f502ae",
+    "memoProgramUsed": false,
+    "createdAt": "2026-09-23T22:07:42.758Z"
+  },
+  {
+    "id": "128182c0-6f6b-4f3e-8186-85214a33d0dc",
+    "proposalId": "c00de055-1942-486f-a64d-dd4ee360500f",
+    "walletPublicKey": "uhV8bWNqRoshUwiXn7YrD4BEaqKWvGKozvbo2u1RmxJ",
+    "message": "I uhV8bWNqRoshUwiXn7YrD4BEaqKWvGKozvbo2u1RmxJ vote yes to PIP-36 with hash fd77f502ae on 2026-09-22T08:42:16.604Z with 225019.84143573 POLIS locked until 1892900418",
+    "signature": "bHrL/xLQcfC9VvnhaGhSDoJnkBkSw6PxVOinkMBGtpeQSjSZV3RO5UVDRlJxJCkCKd/lznvQdEQURG4ZOT3cAA==",
+    "voteResult": "yes",
+    "votingPower": "1454392.212793704",
+    "proposalHash": "fd77f502ae",
+    "memoProgramUsed": false,
+    "createdAt": "2026-09-22T08:42:19.612Z"
+  }
+]

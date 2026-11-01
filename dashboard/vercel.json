@@ -1,0 +1,49 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "installCommand": "",
+  "buildCommand": "",
+  "outputDirectory": ".",
+  "env": {
+    "TRUST_PROXY": "1"
+  },
+  "functions": {
+    "api/mcp.js": {
+      "maxDuration": 25,
+      "includeFiles": "{ata.js,squads.js,data/treasury-cache.json,hub/signers.json}"
+    }
+  },
+  "redirects": [
+    { "source": "/plain", "destination": "/plain/", "permanent": true }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "no-referrer" },
+        { "key": "Permissions-Policy", "value": "interest-cohort=()" }
+      ]
+    },
+    {
+      "source": "/plain",
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex" },
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; object-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' https://raw.githubusercontent.com; font-src 'self'; connect-src 'self'"
+        }
+      ]
+    },
+    {
+      "source": "/plain/(.*)",
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex" },
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; object-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' https://raw.githubusercontent.com; font-src 'self'; connect-src 'self'"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+node_modules
+dist
+.git
+.env
+.env.*
+!.env.example
+node.config.json
+*.keypair.json
+coverage
+dashboard/data/*.tmp
+data/*.tmp

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Star Atlas DAO Dashboard — Preview</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <nav class="topbar" aria-label="Dashboard sections">
+    <div class="brand"><span class="brand-mark" aria-hidden="true">▲</span><span>Star Atlas DAO</span><span class="badge">PREVIEW</span></div>
+    <div class="tabs" id="tabs">
+      <a href="#payments" class="tab active">PIP Payments</a>
+      <a href="#council" class="tab">Council</a>
+      <a href="#limit" class="tab">Ecosystem Fund</a>
+      <a href="#balances" class="tab">Balance Sheet</a>
+      <a href="#results" class="tab">PIP Results</a>
+      <a href="#history" class="tab">Treasury History</a>
+      <a href="#community" class="tab">Galaxy at a glance</a>
+      <a href="#revenue" class="tab">Revenue</a>
+      <a href="#health" class="tab">Data Health</a>
+      <a href="#ask" class="tab">Ask the MCP</a>
+      <a href="#sources" class="tab">Sources</a>
+    </div>
+  </nav>
+
+  <header class="page-head">
+    <h1>DAO Dashboard</h1>
+    <p class="lede">Live Star Atlas DAO data, served by the read-only Star Atlas DAO MCP. Figures come from the Council PIP Tracker, the DAO wallets, Galaxy, and the treasury history cache. <a href="#ask">Ask the MCP</a>.</p>
+    <div id="source-banner" class="banner">Loading…</div>
+  </header>
+
+  <main>
+    <section id="payments" class="view">
+      <div class="view-head">
+        <h2>PIP Payment Tracker</h2>
+        <p class="hint">How much has been paid to funded PIPs, how much is still owed, and how many payment milestones are done. Totals add up the payment columns on the Tracker tab.</p>
+      </div>
+      <div class="kpis" id="payment-grid"></div>
+      <h3 class="sub-head">Per PIP (passed PIPs with a funding amount)</h3>
+      <div class="table-wrap card-like" id="payment-table"></div>
+      <h3 class="sub-head">Monthly treasury flows</h3>
+      <p class="hint">Inflows and outflows from the published treasury cache. External, internal, and withheld rows are separate. Cached numbers carry the cache timestamp.</p>
+      <div id="flows-host" class="chain-host"><p class="hint">Loading the treasury cache…</p></div>
+      <h3 class="sub-head">On-chain payment ledger</h3>
+      <p class="hint">External outflows from that same cache. Internal transfers and SOL network fees are left out. Each row links to Solscan.</p>
+      <div id="ledger-host" class="chain-host"><p class="hint">Loading the treasury cache…</p></div>
+      <h3 class="sub-head">Payment to PIP</h3>
+      <div id="match-host" class="chain-host"><p class="hint">Matching starts once the cache is complete.</p></div>
+    </section>
+
+    <section id="council" class="view">
+      <div class="view-head">
+        <h2>Council Dashboard</h2>
+        <p class="hint">Counts and averages worked out on this page from Tracker columns. The sheet has no single "accomplishments" or "average" column, so each tile says exactly which column it uses.</p>
+      </div>
+      <div class="kpis" id="council-grid"></div>
+      <h3 class="sub-head">By Council term (SAC Term column)</h3>
+      <div class="table-wrap card-like" id="term-table"></div>
+      <details class="card-like sheet-summary" id="sheet-summary-wrap">
+        <summary>Tracker term summary</summary>
+        <p class="hint">The Tracker tab also has a small summary block to the right of the main table. It is printed here exactly as written. It may count differently from the computed table above.</p>
+        <div class="table-wrap" id="sheet-summary"></div>
+      </details>
+    </section>
+
+    <section id="limit" class="view">
+      <div class="view-head">
+        <h2>Ecosystem Fund Limit</h2>
+        <p class="hint">Council figures for the current limit, then the PIP-23 calculation from the treasury cache. Where that text is silent, the figure shows as —.</p>
+      </div>
+      <div class="kpis" id="limit-grid"></div>
+      <h3 class="sub-head">Calculated from PIP-23</h3>
+      <div id="ecofund-host" class="chain-host"><p class="hint">Loading the treasury cache…</p></div>
+    </section>
+
+    <section id="balances" class="view">
+      <div class="view-head">
+        <h2>Balance Sheet</h2>
+        <p class="hint">What the DAO wallets hold right now. A tile that cannot be read shows the cached figure.</p>
+        <button type="button" id="balance-refresh" class="vote-load">Refresh balances</button>
+        <label class="usd-toggle"><input type="checkbox" id="usd-toggle"> Approximate USD, off unless this is checked. A missing price stays —.</label>
+      </div>
+      <div id="rpc-note" class="banner warn" style="display:none;margin-bottom:0.8rem"></div>
+      <div id="wallet-cards" class="wallets"></div>
+      <div class="mcp-slot" data-mcp-panel="balances"></div>
+      <div id="multisig-other-wrap" style="display:none">
+        <h3 class="sub-head">Other multisigs</h3>
+        <div id="multisig-cards" class="wallets"></div>
+      </div>
+      <p class="hint">Other Council multisigs are listed once their addresses are published.</p>
+      <div class="mcp-slot" data-mcp-panel="multisigs"></div>
+      <h3 class="sub-head">Payment history</h3>
+      <div class="card-like note-card">
+        <p>Monthly flows and the on-chain payment ledger are on <a href="#payments">PIP Payments</a>. They come from the treasury history cache, refreshed every few hours. A failed live read shows the cached figure.</p>
+      </div>
+    </section>
+
+    <section id="results" class="view">
+      <div class="view-head">
+        <h2>PIP Results Tracker</h2>
+        <p class="hint" id="results-note">Every numbered PIP on the Tracker. Yes, No, and Abstain are the sheet figures. A missing figure shows as —.</p>
+      </div>
+      <div class="table-wrap card-like" id="results-table"></div>
+      <h3 class="sub-head">On-chain votes</h3>
+      <p class="hint">Yes, No, and Abstain from Galaxy. Voting power is abbreviated. A missing total shows as —.</p>
+      <div id="galaxy-host" class="chain-host"><p class="hint">Loading galaxy proposals…</p></div>
+    </section>
+
+    <section id="history" class="view">
+      <div class="view-head">
+        <h2>DAO Treasury History</h2>
+        <p class="hint">The chart below is the published treasury cache. Ryden's graph stays a separate link. Its numbers are not copied.</p>
+      </div>
+      <div id="history-host" class="chain-host"><p class="hint">Loading the treasury cache…</p></div>
+      <div class="card-like note-card">
+        <p><strong>Ryden DAO treasury graph</strong> (external site, opens in a new tab):<br><a id="ryden-link" href="#" target="_blank" rel="noopener noreferrer"></a></p>
+      </div>
+    </section>
+
+    <section id="community" class="view">
+      <div class="view-head">
+        <h2>Galaxy at a glance</h2>
+        <p class="hint"><a href="https://www.npmjs.com/package/@aephia/atlas-kit" target="_blank" rel="noopener noreferrer">Game data from Atlas Kit</a>.</p>
+        <p class="hint">Served by the same read-only <a href="#ask">MCP</a>.</p>
+      </div>
+      <div class="kpis" id="community-grid"></div>
+    </section>
+
+    <section id="revenue" class="view">
+      <div class="view-head">
+        <h2>Revenue by source</h2>
+        <p class="hint">Monthly DAO income in USDC, from the Star Atlas Galaxy treasury feed.</p>
+      </div>
+      <div id="revenue-host" class="chain-host"><p class="hint">Loading galaxy revenue…</p></div>
+    </section>
+
+    <section id="health" class="view">
+      <div class="view-head">
+        <h2>Data Health</h2>
+        <p class="hint">Freshness and errors for each source this page actually read. A source that was not checked stays blank.</p>
+      </div>
+      <div id="health-host" class="chain-host"><p class="hint">Waiting for the page to finish its reads…</p></div>
+    </section>
+
+    <section id="ask" class="view">
+      <div class="view-head">
+        <h2>Ask the MCP</h2>
+      </div>
+      <div class="card-like note-card">
+        <h3 class="sub-head">Connect your agent</h3>
+        <p class="hint">Read-only. No API key.</p>
+        <pre class="mcp-record">{
+  "mcpServers": {
+    "sa-dao": {
+      "url": "https://sa-council-dashboard-preview.vercel.app/api/mcp"
+    }
+  }
+}</pre>
+      </div>
+      <h3 class="sub-head">Tools</h3>
+      <ul class="tool-list">
+        <li><span class="mono">dao_overview</span> Treasury balances, a short proposal list, and data-health checks.</li>
+        <li><span class="mono">list_proposals</span> Galaxy proposals with status, dates, and published vote totals.</li>
+        <li><span class="mono">get_proposal_votes</span> Vote count and voting power for one proposal.</li>
+        <li><span class="mono">dao_revenue</span> Monthly DAO revenue by source from Galaxy.</li>
+        <li><span class="mono">dao_treasury_flows</span> Monthly inflows and outflows for the DAO wallets.</li>
+        <li><span class="mono">dao_payments</span> Payment ledger of treasury outflows, each row linking to Solscan.</li>
+        <li><span class="mono">treasury_history</span> Treasury balance over time from the published cache.</li>
+        <li><span class="mono">ecofund_limit</span> Ecosystem Fund limit and refills from PIP-23.</li>
+        <li><span class="mono">treasury_balances</span> Current SOL, ATLAS, and USDC balances of the two DAO wallets.</li>
+        <li><span class="mono">pip_tracker</span> PIP payments and milestones from the Council Tracker.</li>
+        <li><span class="mono">hub_updates</span> Published hub updates, when a public feed is configured.</li>
+        <li><span class="mono">data_health</span> How fresh each source is, and the last error if a read failed.</li>
+      </ul>
+      <h3 class="sub-head">Public game data</h3>
+      <ul class="tool-list">
+        <li><span class="mono">list_star_systems</span> Star systems from the public test realm.</li>
+        <li><span class="mono">get_fleet</span> One public fleet, or the fleets on a player profile.</li>
+        <li><span class="mono">profile_key_audit</span> Keys on a player profile, with permissions and risk flags.</li>
+        <li><span class="mono">galaxy_overview</span> Star systems with starbases and an activity summary.</li>
+        <li><span class="mono">list_categories</span> The ecosystem category ids this server publishes.</li>
+      </ul>
+    </section>
+
+    <section id="sources" class="view">
+      <div class="view-head">
+        <h2>Sources</h2>
+      </div>
+      <div class="card-like note-card" id="sources-body"></div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Unofficial community dashboard. Missing figures show as —.</p>
+  </footer>
+  <script src="config.js"></script>
+  <script src="ata.js"></script>
+  <script src="squads.js"></script>
+  <script src="dao.js"></script>
+  <script src="app.js"></script>
+  <script src="chain.js"></script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build:dashboard-dao
+      - run: npm run build:dashboard-mcp
+      - run: node scripts/check-dashboard-mcp.mjs
+      - run: npm run record-mcp
+      - run: git diff --exit-code -- dashboard/dao.js dashboard/api/mcp.js dashboard/data/mcp-recorded.json dashboard/hub/signers.json

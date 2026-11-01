@@ -1,0 +1,12 @@
+node_modules/
+data/*.tmp
+dashboard/data/*.tmp
+data/treasury-cache.json
+.env*
+!.env.example
+node.config.json
+dist/
+.vercel/
+coverage/
+*.tsbuildinfo
+*.keypair.json

@@ -1,0 +1,31 @@
+{
+  "v": 1,
+  "zinkRpcUrl": "https://testnet-rpc.z.ink",
+  "solanaRpcUrl": "https://solana-rpc.publicnode.com",
+  "solanaRpcFallbackUrls": ["https://api.mainnet-beta.solana.com"],
+  "galaxyBaseUrl": "https://galaxy.staratlas.com",
+  "host": "127.0.0.1",
+  "port": 8787,
+  "publicNode": false,
+  "allowedHosts": [],
+  "allowAnyHost": false,
+  "trustProxy": false,
+  "rateLimitMax": 120,
+  "rateLimitWindowMs": 60000,
+  "maxRequestBytes": 524288,
+  "maxResponseBytes": 524288,
+  "hub": {
+    "gitRepo": "",
+    "gitCommit": "",
+    "storeManifest": "hub-manifest.json",
+    "storeManifestHash": "",
+    "approvalThreshold": 1,
+    "allowAuthorApproval": false,
+    "revokedSigners": [],
+    "trustedVerifiers": [],
+    "signersPath": "hub/signers.json",
+    "signerSets": [
+      { "id": "default", "path": "hub/signers.json", "threshold": 1 }
+    ]
+  }
+}

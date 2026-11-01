@@ -1,0 +1,72 @@
+name: Refresh treasury cache
+
+on:
+  schedule:
+    # Every 3 hours, at minute 17. 8 runs/day, about 240 runs in a 30-day month.
+    # GitHub bills each run in whole minutes. About 240 minutes/month if a run
+    # stays within one minute, about 480 if install pushes it into a second.
+    # The free private-repo budget is 2,000 minutes/month. The job timeout below
+    # caps a stuck run at 5 minutes.
+    - cron: "17 */3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# A new run waits until the current one finishes. Runs do not overlap.
+concurrency:
+  group: treasury-cache-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Refresh from public Solana RPCs
+        id: refresh
+        # Newer signatures first, then older history from the oldest parsed signature.
+        # The page caps keep one run short. Unfinished history continues next time.
+        run: npm run refresh-treasury -- --cache=dashboard/data/treasury-cache.json --max-atlas-pages=20 --max-signature-pages=2 --incremental
+        env:
+          SOLANA_RPC_URL: https://solana-rpc.publicnode.com
+          SOLANA_RPC_FALLBACK_URLS: https://api.mainnet-beta.solana.com
+      - name: Validate the cache file
+        id: cache
+        if: always()
+        run: node scripts/check-treasury-cache.mjs
+      - name: Commit a full or partial cache
+        if: always() && steps.cache.outputs.present == 'true'
+        run: |
+          git add -- dashboard/data/treasury-cache.json
+          if git diff --cached --quiet; then
+            echo "No change."
+            exit 0
+          fi
+          names="$(git diff --cached --name-only)"
+          test "$names" = "dashboard/data/treasury-cache.json"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          stamp="$(date -u +%Y-%m-%dT%H:%MZ)"
+          if [ "${{ steps.cache.outputs.completeness }}" = "partial" ]; then
+            git commit -m "Treasury cache partial ${stamp}"
+          else
+            git commit -m "Treasury cache ${stamp}"
+          fi
+          git push
+      - name: Fail loudly when the refresh did not finish
+        if: always() && steps.refresh.outcome != 'success'
+        run: |
+          echo "::error::Public Solana RPC refresh failed. Tried https://solana-rpc.publicnode.com, then https://api.mainnet-beta.solana.com. The refresh step log has the status from each host."
+          if [ "${{ steps.cache.outputs.present }}" = "true" ]; then
+            echo "::error::A partial cache was still committed and marked partial (generatedAt ${{ steps.cache.outputs.generatedAt }})."
+          else
+            echo "::error::No cache file was written. No balances were invented."
+          fi
+          exit 1

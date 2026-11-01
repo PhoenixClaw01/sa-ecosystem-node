@@ -1,0 +1,17 @@
+{
+  "v": 1,
+  "signers": [
+    {
+      "label": "Falkor",
+      "publicKey": "FC1eRr99GGJZuc4KZeUivBpbSMGvjcBB839KaEfAuhcq"
+    },
+    {
+      "label": "GaliaMeta DAC",
+      "publicKey": "EU7zwmY8QP7B9FFUUyMu1eTNkrwuj27NQkgEmNMWreq1"
+    },
+    {
+      "label": "Phoenix Collective (Falkor's team)",
+      "publicKey": "G2PhCi6MApcuC6f5o2CDQBWDnJt9hRcozHuuN55PYisU"
+    }
+  ]
+}

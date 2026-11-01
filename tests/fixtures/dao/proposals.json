@@ -1,0 +1,104 @@
+[
+  {
+    "id": "ad1945d8-60dc-4ed7-b52a-63dd33f97415",
+    "pipNumber": 4,
+    "categories": [
+      "Funding"
+    ],
+    "assignedCouncilMembers": [],
+    "authorPublicKey": "BVJESvrDeXZcSX5UVdK2Tt57Lur9gyakgCfdX45pVQ1V",
+    "authorVotingPower": "0",
+    "createdAt": "2024-07-08T17:21:06.160Z",
+    "updatedAt": "2024-07-08T17:21:06.160Z",
+    "title": "Star Atlas Ecosystem Fund",
+    "brief": "This proposal seeks to create the Star Atlas Ecosystem Fund, seed it with a budget of 20% of the Star Atlas DAO\u2019s treasury (subject to limitations below), and establish a process by which community members may apply to the Star Atlas DAO for grants from the fund to develop various aspects of Star Atlas.",
+    "discordLink": "https://discord.com/channels/789226204980707409/1259884170121969697",
+    "votingStartsAt": "2024-07-24T16:00:00.000Z",
+    "votingEndsAt": "2024-08-06T16:00:00.000Z",
+    "voteOptionsMaxChoices": 1,
+    "voteWinners": 1,
+    "status": "Voting_Complete_Measure_Passes",
+    "voteData": {
+      "Abstain": {
+        "count": "6",
+        "pvp": "203935.9438189092"
+      },
+      "No": {
+        "count": "33",
+        "pvp": "14242581.31620797"
+      },
+      "Yes": {
+        "count": "421",
+        "pvp": "81843902.5128978"
+      }
+    }
+  },
+  {
+    "id": "0ecf2928-15df-497e-8b67-d87eda030d5a",
+    "pipNumber": 23,
+    "categories": [
+      "Funding"
+    ],
+    "assignedCouncilMembers": [],
+    "authorPublicKey": "BVJESvrDeXZcSX5UVdK2Tt57Lur9gyakgCfdX45pVQ1V",
+    "authorVotingPower": "0",
+    "createdAt": "2025-11-03T14:48:14.351Z",
+    "updatedAt": "2025-11-03T14:48:14.351Z",
+    "title": "Refresh of PIP-4 the Ecosystem Fund",
+    "brief": "This proposal continues the Star Atlas Ecosystem Fund and establishes a budget of 20% of the Star Atlas DAO\u2019s Treasury.",
+    "discordLink": "https://discord.com/channels/789226204980707409/1026590874865504426",
+    "votingStartsAt": "2025-11-04T23:59:59.999Z",
+    "votingEndsAt": "2025-11-18T23:59:59.999Z",
+    "voteOptionsMaxChoices": 1,
+    "voteWinners": 1,
+    "status": "Voting_Complete_Measure_Passes",
+    "voteData": {
+      "abstain": {
+        "count": "6",
+        "pvp": "792710.9199434808"
+      },
+      "no": {
+        "count": "34",
+        "pvp": "24262645.413694594"
+      },
+      "yes": {
+        "count": "77",
+        "pvp": "86030422.0270553"
+      }
+    }
+  },
+  {
+    "id": "c00de055-1942-486f-a64d-dd4ee360500f",
+    "pipNumber": 36,
+    "categories": [
+      "Funding"
+    ],
+    "assignedCouncilMembers": [],
+    "authorPublicKey": "BVJESvrDeXZcSX5UVdK2Tt57Lur9gyakgCfdX45pVQ1V",
+    "authorVotingPower": "0",
+    "createdAt": "2026-09-16T03:26:59.914Z",
+    "updatedAt": "2026-09-16T03:26:59.914Z",
+    "title": "Star Atlas DAO Dashboard",
+    "brief": "This proposal authorizes the creation of a public Star Atlas DAO Dashboard and a competitive Request for Proposal (RFP) process to select a DEVELOPER to build the Dashboard. The Dashboard will consolidate important DAO financial, governance, PIP, and Council information into a single publicly accessible resource. The maximum amount authorized under this PIP is 13,992,734 ATLAS (the current 5% Ecosystem Fund limit). Following approval, the DAO Council will publish an RFP listing Dashboard requirements and the process for selecting a DEVELOPER.",
+    "discordLink": "https://discord.com/channels/789226204980707409/1026590874865504426",
+    "votingStartsAt": "2026-09-18T23:59:59.999Z",
+    "votingEndsAt": "2026-10-02T23:59:59.999Z",
+    "voteOptionsMaxChoices": 1,
+    "voteWinners": 1,
+    "status": "Voting_Complete_Measure_Passes",
+    "voteData": {
+      "abstain": {
+        "count": "6",
+        "pvp": "413554.53111165436"
+      },
+      "no": {
+        "count": "31",
+        "pvp": "30557054.966636125"
+      },
+      "yes": {
+        "count": "32",
+        "pvp": "42635296.911563985"
+      }
+    }
+  }
+]

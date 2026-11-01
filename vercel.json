@@ -1,0 +1,11 @@
+{
+  "rewrites": [{ "source": "/mcp", "destination": "/api/mcp" }],
+  "functions": {
+    "api/mcp.ts": {
+      "includeFiles": "hub/signers.json"
+    }
+  },
+  "env": {
+    "TRUST_PROXY": "1"
+  }
+}

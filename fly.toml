@@ -1,0 +1,27 @@
+# Home or any free shared-cpu machine. No volume and no paid addon.
+# fly launch --copy-config --no-deploy
+# Then set the app name fly writes here and run fly deploy.
+
+primary_region = "iad"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[http_service]
+  internal_port = 8787
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+
+[env]
+  HOST = "0.0.0.0"
+  PUBLIC_NODE = "1"
+  # Set ALLOWED_HOSTS to this app's hostname. Startup exits until it is set.
+  # ALLOWED_HOSTS=your-app.fly.dev
+  NODE_CONFIG = "/app/node.config.json"
+
+[[vm]]
+  memory = "256mb"
+  cpu_kind = "shared"
+  cpus = 1

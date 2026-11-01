@@ -1,0 +1,8 @@
+{
+  "note": "Public key and detached signature only. No secret key is stored.",
+  "messageUtf8": "sa-ecosystem-node v0 fixture: ed25519 detached signature",
+  "messageHex": "73612d65636f73797374656d2d6e6f646520763020666978747572653a2065643235353139206465746163686564207369676e6174757265",
+  "publicKeyHex": "98820bb9dc6dddee4cd0362d80880b220b37b140719214a00285086b313d767a",
+  "signatureHex": "2a131d6bc102332574f2ce5feb9c0e85238d80c6d42b45e166a7069f32584e8da4912bcf7ea273d80aab73c600a3f53424d27984c51efee8c0d25822f6181806",
+  "otherPublicKeyHex": "670ddbe1384f44f36d7fd55a2150d415748acab520613415b8d03bf345aca7df"
+}

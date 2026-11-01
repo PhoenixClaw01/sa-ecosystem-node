@@ -1,0 +1,164 @@
+{
+  "blockTime": 1751583549,
+  "slot": 350942836,
+  "meta": {
+    "err": null,
+    "fee": 25518,
+    "preBalances": [
+      908389327,
+      2039280,
+      3967200,
+      12222818,
+      2039280,
+      5658480,
+      1,
+      54034374208,
+      1,
+      315134289,
+      2262000,
+      1141440,
+      934087680
+    ],
+    "postBalances": [
+      908263809,
+      2039280,
+      3967200,
+      12322818,
+      2039280,
+      5658480,
+      1,
+      54034374208,
+      1,
+      315134289,
+      2262000,
+      1141440,
+      934087680
+    ],
+    "preTokenBalances": [
+      {
+        "accountIndex": 1,
+        "mint": "ATLASXmbPQxBUYbxPsV97usA3fPQYEqzQBUHgiFCUsXx",
+        "owner": "CuwnarNh7FEqZMmffFjRyWj54RecyS7zwFg1CxfzNudi",
+        "programId": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+        "uiTokenAmount": {
+          "amount": "98399348746869134",
+          "decimals": 8,
+          "uiAmount": 983993487.4686913,
+          "uiAmountString": "983993487.46869134"
+        }
+      },
+      {
+        "accountIndex": 4,
+        "mint": "ATLASXmbPQxBUYbxPsV97usA3fPQYEqzQBUHgiFCUsXx",
+        "owner": "BxKehkp298nQunu8BWxh5U6VvfphFyjEB3t7USst7Uag",
+        "programId": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+        "uiTokenAmount": {
+          "amount": "13654309100000000",
+          "decimals": 8,
+          "uiAmount": 136543091.0,
+          "uiAmountString": "136543091"
+        }
+      }
+    ],
+    "postTokenBalances": [
+      {
+        "accountIndex": 1,
+        "mint": "ATLASXmbPQxBUYbxPsV97usA3fPQYEqzQBUHgiFCUsXx",
+        "owner": "CuwnarNh7FEqZMmffFjRyWj54RecyS7zwFg1CxfzNudi",
+        "programId": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+        "uiTokenAmount": {
+          "amount": "89644224846869134",
+          "decimals": 8,
+          "uiAmount": 896442248.4686913,
+          "uiAmountString": "896442248.46869134"
+        }
+      },
+      {
+        "accountIndex": 4,
+        "mint": "ATLASXmbPQxBUYbxPsV97usA3fPQYEqzQBUHgiFCUsXx",
+        "owner": "BxKehkp298nQunu8BWxh5U6VvfphFyjEB3t7USst7Uag",
+        "programId": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+        "uiTokenAmount": {
+          "amount": "22409433000000000",
+          "decimals": 8,
+          "uiAmount": 224094330.0,
+          "uiAmountString": "224094330"
+        }
+      }
+    ]
+  },
+  "transaction": {
+    "signatures": [
+      "KkCq9JzQT7Tb2HPfwVDBiFuAcb3eDvE1Ab3GhkCksYJJgN8pi1CQR1VeLa7DKxRsV5kTeUTME5qCz4FtPSSmASD"
+    ],
+    "message": {
+      "accountKeys": [
+        {
+          "pubkey": "HDfEmEpHP4vdBqkrPbG4CnHRhmxizoSRw8byis9wVvW8",
+          "signer": true,
+          "writable": true
+        },
+        {
+          "pubkey": "5XJei3jBZi8WuqDGUQ5KCe8t72vMRMTWLr6ok3hhXE2R",
+          "signer": false,
+          "writable": true
+        },
+        {
+          "pubkey": "D2pEzvQE3Jo6k3H5Cv3uskaUjyQHoFu3hMzpDjHuQ8jj",
+          "signer": false,
+          "writable": true
+        },
+        {
+          "pubkey": "DttWaMuVvTiduZRnguLF7jNxTgiMBZ1hyAumKUiL2KRL",
+          "signer": false,
+          "writable": true
+        },
+        {
+          "pubkey": "FKGnjptpNquEmYtWAXqBty4M2m5kBaaZ86E8SBuczTkR",
+          "signer": false,
+          "writable": true
+        },
+        {
+          "pubkey": "FNkEjQ234efsv88sJijSok6twYTGBBLR4xKKFbqu3v4k",
+          "signer": false,
+          "writable": true
+        },
+        {
+          "pubkey": "11111111111111111111111111111111",
+          "signer": false,
+          "writable": false
+        },
+        {
+          "pubkey": "ATLASXmbPQxBUYbxPsV97usA3fPQYEqzQBUHgiFCUsXx",
+          "signer": false,
+          "writable": false
+        },
+        {
+          "pubkey": "ComputeBudget111111111111111111111111111111",
+          "signer": false,
+          "writable": false
+        },
+        {
+          "pubkey": "CuwnarNh7FEqZMmffFjRyWj54RecyS7zwFg1CxfzNudi",
+          "signer": false,
+          "writable": false
+        },
+        {
+          "pubkey": "J55XPDmzUgHPHws3JAMEprjCVdNhenpaEBH47RMX7syn",
+          "signer": false,
+          "writable": false
+        },
+        {
+          "pubkey": "SMPLecH534NA9acpos4G6x7uf3LWbCAwZQE9e8ZekMu",
+          "signer": false,
+          "writable": false
+        },
+        {
+          "pubkey": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+          "signer": false,
+          "writable": false
+        }
+      ]
+    }
+  }
+}

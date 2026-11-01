@@ -1,0 +1,35 @@
+[
+  {
+    "_id": "69cfeb71d3ba22c126bd38b9",
+    "segmentation": "Game Activity",
+    "recorded_period": "2023-05-01",
+    "mint": "ATLAS",
+    "__v": 0,
+    "amount": 324443734.657649,
+    "createdAt": "2026-04-03T16:31:45.513Z",
+    "updatedAt": "2026-04-03T16:31:45.513Z",
+    "usdc_value": 733442.58604847
+  },
+  {
+    "_id": "69cfeb71d3ba22c126bd38bb",
+    "mint": "ATLAS",
+    "recorded_period": "2023-05-01",
+    "segmentation": "Marketplace Fees",
+    "__v": 0,
+    "amount": 372991.92678948,
+    "createdAt": "2026-04-03T16:31:45.513Z",
+    "updatedAt": "2026-04-03T16:31:45.513Z",
+    "usdc_value": 843.19138925
+  },
+  {
+    "_id": "6a96f7d47f57ab84923d635e",
+    "mint": "USDC",
+    "segmentation": "Marketplace Fees",
+    "recorded_period": "2026-08-01",
+    "__v": 0,
+    "amount": 1050.130936,
+    "createdAt": "2026-09-01T16:05:40.880Z",
+    "updatedAt": "2026-09-01T16:05:40.880Z",
+    "usdc_value": 1050.130936
+  }
+]

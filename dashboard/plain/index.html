@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="referrer" content="no-referrer">
+  <title>Listings and player records</title>
+  <link rel="icon" href="/plain/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/plain/plain.css">
+</head>
+<body>
+  <a class="skip" href="#content">Skip to content</a>
+  <header class="page-head">
+    <h1>Listings and player records</h1>
+    <p class="what">This page shows public listings, shared updates, and a player's public record in everyday words.</p>
+  </header>
+  <main id="content">
+    <div id="board">
+      <section id="search" aria-labelledby="search-heading">
+        <h2 id="search-heading">Search</h2>
+        <form id="search-form" action="#search" method="post">
+          <label for="search-query">Search</label>
+          <div class="lookup-row">
+            <input id="search-query" name="q" type="search" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="80" placeholder="Name, group, or description">
+            <button type="submit" id="search-submit">Search</button>
+          </div>
+        </form>
+        <div id="search-body" aria-live="polite">
+          <p class="quiet">Search the shared board.</p>
+        </div>
+      </section>
+
+      <section id="listings" aria-labelledby="listings-heading">
+        <h2 id="listings-heading">Listings</h2>
+        <p class="intro">Each offer is <span class="gloss"><button type="button" class="term" aria-expanded="false">signed</button><span class="tip" role="tooltip">A named person marked this as their own. The mark does not move money.</span></span> by a <span class="gloss"><button type="button" class="term" aria-expanded="false">signer</button><span class="tip" role="tooltip">The person who published this.</span></span>.</p>
+        <div id="listings-body" aria-live="polite">
+          <p class="status">Loading listings…</p>
+        </div>
+      </section>
+
+      <section id="updates" aria-labelledby="updates-heading">
+        <h2 id="updates-heading">Hub updates</h2>
+        <p class="intro">Short notes published on the <span class="gloss"><button type="button" class="term" aria-expanded="false">hub</button><span class="tip" role="tooltip">The shared board these updates are published on.</span></span>.</p>
+        <div id="updates-body" aria-live="polite">
+          <p class="status">Loading updates…</p>
+        </div>
+      </section>
+
+      <section id="player" aria-labelledby="player-heading">
+        <h2 id="player-heading">Look up a player</h2>
+        <p class="intro">Look up a <span class="gloss"><button type="button" class="term" aria-expanded="false">profile</button><span class="tip" role="tooltip">A player's public page.</span></span>, then read any <span class="gloss"><button type="button" class="term" aria-expanded="false">fleet</button><span class="tip" role="tooltip">The ships still listed on a player's public record.</span></span> or <span class="gloss"><button type="button" class="term" aria-expanded="false">faction</button><span class="tip" role="tooltip">The side a player joined: MUD, ONI, or Ustur.</span></span> on the public record.</p>
+        <form id="lookup" action="#player" method="post">
+          <label for="player-address">Player address</label>
+          <div class="lookup-row">
+            <input id="player-address" name="address" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="44" placeholder="Paste a public player address">
+            <button type="submit" id="lookup-submit">Look up</button>
+          </div>
+        </form>
+        <div id="player-body" aria-live="polite">
+          <p class="quiet">Enter an address to look someone up.</p>
+        </div>
+      </section>
+    </div>
+
+    <section id="detail" hidden aria-labelledby="detail-heading">
+      <p><a class="back" href="#listings">Back to the list</a></p>
+      <h2 id="detail-heading">Offer</h2>
+      <div id="detail-body"></div>
+    </section>
+  </main>
+  <footer>
+    <p>Unofficial community preview. Inspired by Star Atlas. This page does not move money.</p>
+  </footer>
+  <script type="module" src="/plain/plain.js"></script>
+</body>
+</html>

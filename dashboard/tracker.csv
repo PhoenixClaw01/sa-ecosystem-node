@@ -1,0 +1,70 @@
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+PIP Phase,Draft Date,"Voted 
+Started","Vote 
+Ended",Status,PDF sent to Foundation,Markdown sent to ATMTA,Step #,PIP,PIP Name,Amount,Type,"DAO ROI
+What did it accomplish?",Ecosystem Fund?,"Vote 
+Result","# of 
+Votes","PVP 
+Voted (M)","PVP 
+Participation","Total 
+PVP (M)",Yes,No,Abstain,Category,SAC Term,Note,Total Amount Paid (USDC),Total Amount Left (USDC),Total Amount Paid (ATLAS),Total Amount Left (ATLAS),Completed Milestones,Total Payment Milestones,,,,,
+Voting,,7/10/2024,7/23/2024,Actionable,TRUE,TRUE,10,PIP-1,Star Atlas DAO,0,,"Created Star Atlas DAO initiative, expectations, and participation venue by community members.",No,Passed,894,175,32%,541,68%,29%,4%,Governance,N/A,,,,,,1,1,,,,,
+Voting,,7/10/2024,7/23/2024,Actionable,TRUE,TRUE,10,PIP-2,Foundation,"100,000",USDC,Created company that acted as legal representation to protect the DAO,No,Passed,852,176,33%,541,57%,39%,4%,Governance,N/A,,?,,,,1,1,,,,,
+Voting,,7/24/2024,8/6/2024,Actionable,TRUE,TRUE,10,PIP-3,Star Atlas Council,0,,Created SA DAO Council voting ability and community representation at leadership level.,No,Passed,479,97,18%,541,87%,13%,0%,Governance,N/A,,,,,,1,1,,,,,
+Voting,,7/24/2024,8/6/2024,Actionable,TRUE,TRUE,10,PIP-4,Star Atlas Ecosystem Fund,0,,Expedited 20 PIPs to for funding. Expedited low-ATLAS/Dollar projects related to SA community for execution,No,Passed,460,96,18%,541,85%,15%,0%,Ecosystem Fund,N/A,,,,,,1,1,,,,,
+Voting,,7/26/2024,8/9/2024,Actionable,TRUE,TRUE,10,PIP-5,Co-Sponsor the Naabathon,"6,000,000",ATLAS,"Hosted community competition to create tools and services. 
+
+Winners were: 
+ATOM Service. 
+Atlas Link by harshh.16 and sidh1999
+Star Atlas Crew Dashboard by Aephia 
+Star Atlas Dispatcher by Teykarat
+Warfront Invasion by visualjc 
+Eveeye Ship Comparison and Viewer ",YES,Passed,411,101,19%,541,80%,20%,1%,Governance,N/A,,,,"6,000,000.00",0,1,1,,,,,
+Voting,,9/14/2024,9/21/2024,Actionable,TRUE,TRUE,10,PIP-6,Council Election #1 - First Round,0,,See PIP-3 impact,No,Passed,587,161,30%,541,N/A,N/A,N/A,Governance,N/A,,,,,,1,1,,,,,
+Voting,,9/27/2024,10/11/2024,Actionable,TRUE,TRUE,10,PIP-7,Council Election #1 - Second Round,0,,"Elected 5 volunteers giving ~260 hours to SA DAO of 53K tokenholders, established knowledgebase and enacted voting mechanic improvements",No,Passed,576,175,32%,541,N/A,N/A,N/A,Ecosystem Fund,N/A,,,,,,1,1,,,,,
+Voting,,2/20/2025,2/26/2025,Actionable,TRUE,TRUE,10,PIP-8,Star Atlas Comet: Community Meetup at Gamescom 2025,"7,472",Pounds,"70 SA community members attended, built camaraderie of SA community, celebration post had ## impression on X. 
+Sponsors alongside SA DAO: Superphoenix DAO, SA TV, SAG, AEP, Polaris Fuel. Community experts present to introduce people to SA. Presentations from well known community members to introduce SA ecosystem, DAO, the DACs and what they do. Livestreamed e-sport competition (Iris Quest) at the venue. Merch distributed to attendees.
+",YES,Passed,285,85,16%,541,85%,14%,1%,Ecosystem Fund,SAC-1,First PIP that had SAC-1 involvement,,,"7,723,034.00",0,1,1,,,,,
+Voting,,2/28/2025,3/6/2025,Actionable,TRUE,TRUE,10,PIP-9,Adjust STV Backup Vote Handling to Prevent Unintended Vote Redistribution,0,,"Improved voting mechanic by nullifying ""supercharged"" votes that imbalance voting outcomes of PIPs",No,Passed,127,61,11%,541,99%,1%,0%,Governance,SAC-1,,,,,,1,1,,,,,
+Voting,,2/28/2025,3/13/2025,Actionable,TRUE,TRUE,10,PIP-10,Star Atlas Council: Second Term & Beyond,0,,See PIP-3 impact,No,Passed,211,86,16%,541,99%,1%,0%,Governance,SAC-1,,,,,,1,1,,,,,
+Voting,,3/23/2025,4/6/2025,Actionable,TRUE,TRUE,10,PIP-11,Council Election #2,0,,"5 SAC-3 council members volunteered ~675+ hours over 9 months, completing 147 accomplishments positively affecting the SA DAO ecosystem, paying out 61.5M ATLAS for PIP authors, facilitating voting process for 14 PIPs with 2.2K votes cast, achieving average voter participation rate of 19%, publishing 48 DAO transparency reports",No,Passed,348,150,28%,541,N/A,N/A,N/A,Governance,SAC-1,,,,,,1,1,,,,,
+Closed,,4/14/2025,4/27/2025,Actionable,TRUE,TRUE,10,PIP-12,Iris’s Bounty: The Feast,"10,000",USDC,"## Feast events funded, ## total SA community members attended, built camaraderie of SA community, total celebration post had ## impression on X",YES,Passed,143,84,16%,541,65%,19%,15%,Ecosystem Fund,SAC-2,,,,"7,429,420.00",0,1,1,,,,,
+Voting,,4/15/2025,4/28/2025,Actionable,TRUE,TRUE,9b,PIP-13,Implementing Term Limits for Star Atlas DAO Council Members,0,,N/A,No,Failed,161,85,16%,541,27%,68%,4%,Governance,SAC-2,,,,N/A,,1,1,,,,,
+Closed,,4/17/2025,4/30/2025,Actionable,TRUE,TRUE,10,PIP-14,Deepening THEO Integration into the Star Atlas Economy,"10,000",USDC,None. PIP was terminated due non-performance of PIP deliverables,YES,Passed,176,108,20%,541,93%,7%,0%,Ecosystem Fund,SAC-2,,,,"4,462,301.00","25,125,628.14",1,2,,,,,
+Voting,,5/9/2025,5/22/2025,Actionable,TRUE,TRUE,9b,PIP-15,In-Person Community Meetups Platform,"9,540",USDC,N/A,YES,Failed,161,104,19%,548,37%,60%,3%,Ecosystem Fund,SAC-2,,,,N/A,,N/A,N/A,,,,,
+Voting,,5/9/2025,5/22/2025,Actionable,TRUE,TRUE,10,PIP-16,Ryden Systems,"10,000",USDC,Funded widely used Eveeye project that makes playing SAGE easy with superior information.,YES,Passed,202,107,20%,548,76%,7%,18%,Ecosystem Fund,SAC-2,Transitioning from Eveeye Star Atlas,"8,464.79",,"7,985,657.00",0,1,1,,,,,
+Closed,,5/30/2025,6/12/2025,Actionable,TRUE,TRUE,10,PIP-17,Star Atlas Ecosystem Media Expansion Proposal by Lord Raspy III,"20,000,000",ATLAS,None. PIP was canceled due to non-performance of PIP deliverables.,YES,Passed,194,111,20%,548,61%,39%,1%,Ecosystem Fund,SAC-2,,,,0.00,,0,1,,Goes into Dashboard in Powerpoint Slides,,,
+Voting,,7/4/2025,7/17/2025,Actionable,TRUE,TRUE,10,PIP-18,Marketing & Merch Expansion for Gamescom 2025,"5,775",Euros,Expanded success of PIP-8 by giving more merch out,YES,Passed,116,55,10%,548,75%,21%,4%,Ecosystem Fund,SAC-2,,,,"5,781,393.00",0,2,2,,,,,
+Voting,6/14/2025,9/21/2025,10/5/2025,Actionable,TRUE,TRUE,9b,PIP-19,Funding Independent Economic Research and Maintenance of Critical Data Resources [Comprehensive PIP],"11,200,000",ATLAS,N/A,YES,Failed,157,144,25%,573,41%,58%,1%,Ecosystem Fund,SAC-2,,,,N/A,,N/A,N/A,,SAC-1,SAC-2,SAC-3,
+Voting,4/2/2025,10/1/2025,10/15/2025,Actionable,TRUE,TRUE,10,PIP-20,Creation of DAO Caster Role,"10,800,000",ATLAS,Elected 5 content creators producing 4 content pieces a month on social media. Earned ## impressions on X and ## views on YouTube. ,YES,Passed,150,122,21%,577,87%,13%,0%,Ecosystem Fund,SAC-2,,,,"4,320,000.00","5,400,000",0,1,PIPs Completed Voting,16,14,10,
+Voting,7/21/2025,10/1/2025,10/15/2025,Actionable,TRUE,TRUE,10,PIP-21,Rogue Data Hub (RDH),"8,820",USDC,Funded website that indexes and processes 20 programs (smart contracts) of on-chain Star Atlas data,YES,Passed,184,147,25%,577,52%,38%,10%,Ecosystem Fund,SAC-2,,"2,083.00",,"7,317,073.00","35,225,130.90",?,2,Total # of Votes,971,2212,1335,
+Voting,9/29/2025,11/5/2025,11/18/2025,Actionable,TRUE,TRUE,10,PIP-22,Iris Bounty - The Arena,"11,000,000",ATLAS,Funded 3 self-organized community tournaments which earned top 1% Twitch/10% YouTube livestream channels for 2 months,YES,Passed,117,141,23%,623,98%,2%,0%,Ecosystem Fund,SAC-2,,,,"2,000,000.00","9,000,000",0,1,Total PVP Participated,382,1539,1467,M
+Voting,10/11/2025,11/5/2025,11/18/2025,Actionable,TRUE,TRUE,10,PIP-23,Refresh of PIP-4 the Ecosystem Fund,0,ATLAS,Clarified and improved upon Ecosystem Fund process and procedures,No,Passed,135,111,18%,623,77%,22%,1%,Governance,SAC-2,,,,N/A,,N/A,N/A,Avg Votes per PIP,243,158,134,
+Voting,10/7/2025,11/9/2025,11/22/2025,Actionable,TRUE,TRUE,10,PIP-24,DAO-Supported Hosting Service,675,USDC,"Funded the SLY Assistant automation tool, which enabled players to run SLY accounts autonomously without user interaction. Improved accessibility and uptime for ## Star Atlas players.",YES,Passed,140,108,17%,629,59%,40%,1%,Ecosystem Fund,SAC-2,,,,?,?,3,3,Average PVP Votes,96,110,147,M
+Voting,11/26/2025,11/26/2025,12/10/2025,Actionable,FALSE,TRUE,10,PIP-25,Council Election #3,0,USDC,"Five SAC-3 council members volunteered ~8+ hours per month, completing 20 accomplishments positively affecting the SA DAO ecosystem, paying out 1.2M+ ATLAS for PIP authors, facilitating voting process for 6 PIPs with 871 votes cast, achieving average voter participation rate of 23%, publishing 21 DAO transparency reports",No,Passed,176,112,17%,641,N/A,N/A,N/A,Governance,SAC-2,,,,N/A,,N/A,N/A,Avg PVP Participation,18%,19%,21%,
+Voting,11/24/2025,1/23/2026,2/6/2026,Actionable,TRUE,TRUE,9a,PIP-26,Star Atlas Crew Adventure Series – Season Production,"13,143,639",ATLAS,N/A,YES,Failed,147,167,25%,661,30%,53%,17%,Ecosystem Fund,SAC-3,First PIP that had SAC-3 involvement,,,N/A,,N/A,N/A,Total ATLAS Paid,?,?,"19,576,803",
+Voting,2/4/2025,2/20/2026,3/6/2026,Actionable,TRUE,TRUE,10,PIP-27,DAO Casters Election: Term 1,0,,See PIP-20 ROI,YES,Passed,128,147,22%,667,N/A,N/A,N/A,Governance,SAC-3,,,,N/A,,N/A,N/A,,,,,
+Voting,2/2/2026,2/20/2026,3/6/2026,Actionable,TRUE,TRUE,10,PIP-28,"Temporary DAO Funding to Preserve Core Lore, Design, and Community Functions","30,000",USDC,"Retained key SA company member (Jose) from employee layoffs, supporting 7 critical components of the SA ecosystem.",No,Passed,145,143,21%,666,93%,6%,1%,DAO Treasury,SAC-3,,"30,000.00",,,,6,6,,,,,
+Voting,1/28/2026,3/18/2026,4/1/2026,Actionable,TRUE,TRUE,10,PIP-29,PIP-29: Star Atlas Relay Program (Pilot),"13,143,639",ATLAS,Funded platform that showcases and rewards quality SA content created by community members. Incentivizes participation to enhance social media presence and engagement with web3 community.,YES,Passed,105,163,24%,669,96%,3%,1%,Ecosystem Fund,SAC-3,,,,"13,143,639.00",0,,,,,,,
+Voting,2/17/2026,3/18/2026,4/1/2026,Actionable,TRUE,TRUE,10,PIP-30,PIP-30: ATOM Cloud Infrastructure Sustainability — DAO Funding Pilot,"13,143,639",ATLAS,"Funded widely used ATOM Cloud, made free for all users until C4. Processes ~100,000 transactions/day for 104 daily active accounts.",YES,Passed,205,183,27%,669,61%,38%,1%,Ecosystem Fund,SAC-3,,"1,650.00",,"6,433,164.00","6,710,475",,,,,,,
+Withdrawn,11/3/2025,4/18/2026,5/2/2026,Actionable,TRUE,TRUE,10,PIP-31,PIP-31: Star Seekers Ecosystem Expansion,"13,000,000",ATLAS,"N/A. Passed, but withdrawn by PIP author.",YES,Passed,141,135,20%,670,40%,35%,25%,Ecosystem Fund,SAC-3,"PIP passed, but withdrawn by PIP Author, will not be implemented",,,,,,,,,,,
+Voting,4/14/2026,5/26/2026,6/10/2026,Actionable,TRUE,TRUE,10,PIP-32,PIP-32: Igniting the Star Atlas Triad Tournament - A Super Phoenix Sports Live Esports Event,"13,576,392",ATLAS,"Production and broadcast of the Star Atlas Triad Tournament in June 2026, a first-ever combined competitive event spanning all three UE5 game modes: Racing Mode (Star Racer), Gun Mode (Star Shooter), Siege Mode (Star Fighter)",YES,Passed,118,119,17%,683,74%,11%,15%,Ecosystem Fund,SAC-3,,,,,,,,,,,,
+Voting,6/17/2026,6/26/2026,7/11/2026,Actionable,TRUE,FALSE,10,PIP-33,PIP-33: ATMTA Historic Expense Reimbursement,"469,514",USDC,"Seeks reimbursement of $469,513.53 USD from the Star Atlas DAO Treasury for verified historic expenditures paid by ATMTA on behalf of the Star Atlas DAO covering 2021 tax obligations and payments to two professional services providers.",NO,Passed,220,279,38%,693,61%,9%,30%,DAO Treasury,SAC-3,,,,,,,,,,,,
+Voting,6/20/2026,7/18/2026,8/1/2026,Actionable,TRUE,TRUE,8,PIP-34,PIP-34: Star Atlas Crew Adventure Series – Season Production,"13,576,392",ATLAS,N/A,YES,Failed,93,98,13%,741,32%,53%,14%,Ecosystem Fund,SAC-3,,,,,,,,,,,,
+Voting,8/2/2026,8/30/2026,9/11/2026,Actionable,FALSE,TRUE,10,PIP-35,PIP-35: Council Election #4,0,ATLAS,Three SAC-3 council members volunteered,NO,Passed,33,33,4%,747,N/A,N/A,N/A,Governance,SAC-3,,,,,,,,,,,,
+Voting,5/12/2026,9/20/2026,10/4/2026,Actionable,TRUE,TRUE,6,PIP-36,PIP-36: Dashboard PIP,0,ATLAS,,YES,,,,,,,,,,,,,,,,,,,,,,
+Withdrawn,3/31/2025,,,Actionable,FALSE,FALSE,4b,,Establishing a Values List for the Star Atlas DAO,0,USDC,,No,,,,,,,,,,,,,,,,,,,,,,
+Withdrawn,7/28/2025,,,Non-actionable,FALSE,FALSE,3,,The Infinite Star Atlas IP Universe,"600,000",USDC,,No,,,,,,,,,,,,,,,,,,,,,,
+Withdrawn,2/11/2025,,,Actionable,FALSE,FALSE,4b,,DAO Working Groups,"6,000,000",ATLAS,,YES,,,,,,,,,,,,,,,,,,,,,,
+Withdrawn,11/29/2026,,,Actionable,FALSE,FALSE,4a,,Payment for Term-3 Star Atlas DAO Council,"10,000,000",ATLAS,,No,,,,,,,,,,,,,,,,,,,,,,
+,,,,,FALSE,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,FALSE,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,FALSE,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,FALSE,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,FALSE,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,FALSE,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,FALSE,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,FALSE,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,FALSE,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,FALSE,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,

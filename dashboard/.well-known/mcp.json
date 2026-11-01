@@ -1,0 +1,7 @@
+{
+  "name": "sa-ecosystem-node",
+  "transport": "streamable-http",
+  "url": "https://sa-council-dashboard-preview.vercel.app/api/mcp",
+  "readOnly": true,
+  "note": "Public read-only MCP. No API key. Tool inputs are validated. The dashboard Ask the MCP panel still reads the recorded file."
+}

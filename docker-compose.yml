@@ -1,0 +1,15 @@
+services:
+  node:
+    build: .
+    ports:
+      - "8787:8787"
+    environment:
+      HOST: 0.0.0.0
+      PORT: "8787"
+      PUBLIC_NODE: "1"
+      # Set ALLOWED_HOSTS to the hostname clients use (a LAN name, your-app.fly.dev, or the Render host).
+      # Startup exits until it is set.
+      # ALLOWED_HOSTS=your-app.fly.dev
+      TRUST_PROXY: "0"
+      NODE_CONFIG: /app/node.config.json
+    restart: unless-stopped

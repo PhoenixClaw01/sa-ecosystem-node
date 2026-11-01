@@ -1,0 +1,327 @@
+/* Dark theme tokens from the builder guide. Fonts are self-hosted under /plain/fonts/. */
+
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/plain/fonts/inter-400.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/plain/fonts/inter-600.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Space Grotesk";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("/plain/fonts/space-grotesk-500.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Space Grotesk";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/plain/fonts/space-grotesk-700.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Orbitron";
+  font-style: normal;
+  font-weight: 400 900;
+  font-display: swap;
+  src: url("/plain/fonts/Orbitron[wght].ttf") format("truetype");
+}
+
+:root {
+  color-scheme: dark;
+  --bg: #04070e;
+  --bg-2: #061024;
+  --bg-3: #08101d;
+  --card: #0b1526;
+  --card-2: #0e1b30;
+  --line: rgba(77, 214, 255, 0.20);
+  --ink: #d5deec;
+  --white: #f4f8ff;
+  --mute: #8d9bb3;
+  --cy: #4dd6ff;
+  --cy-deep: #1fa8d6;
+  --cy-bright: #9aebff;
+  --control: rgba(77, 214, 255, 0.55);
+  --gold: #e7b24c;
+  --grn: #6fe3a5;
+  --red: #ff7a7a;
+  --radius: 16px;
+  --shadow: 0 18px 40px rgba(0, 0, 0, 0.38);
+}
+
+* { box-sizing: border-box; }
+
+[hidden] { display: none !important; }
+
+html { font-size: 100%; }
+
+body {
+  margin: 0;
+  font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  color: var(--ink);
+  background-color: var(--bg);
+  background-image: linear-gradient(180deg, var(--bg-2) 0%, var(--bg) 28rem);
+  background-repeat: no-repeat;
+}
+
+.skip {
+  position: absolute;
+  left: 0.75rem;
+  top: 0.75rem;
+  transform: translateY(-200%);
+  background: var(--card);
+  color: var(--white);
+  padding: 0.4rem 0.7rem;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+}
+
+.skip:focus { transform: none; }
+
+.page-head,
+main,
+footer {
+  width: min(38rem, calc(100% - 2rem));
+  margin: 0 auto;
+}
+
+.page-head { padding-top: 1.75rem; }
+
+h1, h2, h3 {
+  font-family: "Orbitron", sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  line-height: 1.2;
+  color: var(--white);
+}
+
+h1 { font-size: 1.9rem; margin: 0 0 0.6rem; }
+
+h2 { font-size: 1.4rem; margin: 0 0 0.4rem; }
+
+h3 { font-size: 1.15rem; margin: 0 0 0.35rem; }
+
+.what, .intro, .quiet, .meta { color: var(--mute); }
+
+.badge {
+  display: inline-block;
+  margin: 0 0 0.35rem;
+  padding: 0.05rem 0.45rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--ink);
+  font-size: 0.75rem;
+}
+
+.what { margin: 0; }
+
+section { margin: 1.75rem 0; }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 0.9rem 1rem;
+  margin: 0 0 0.75rem;
+  overflow-wrap: anywhere;
+}
+
+.card:hover,
+.player-result:hover { background: var(--card-2); }
+
+.player-result {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 0.9rem 1rem;
+  margin: 0.75rem 0 0;
+  overflow-wrap: anywhere;
+}
+
+.byline, .disclosure, .offer, .note, .update-body, .story, .player-line { margin: 0.45rem 0; }
+
+.search-head {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+img.logo,
+.logo-initial {
+  width: 32px;
+  height: 32px;
+  flex: 0 0 auto;
+  background: var(--bg-3);
+  border-radius: 8px;
+}
+
+img.logo { object-fit: contain; }
+
+.logo-initial {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--white);
+  font-family: "Space Grotesk", "Inter", "Segoe UI", sans-serif;
+  font-weight: 700;
+}
+
+.disclosure { font-weight: 600; color: var(--white); }
+
+a { color: var(--cy); }
+
+a:hover { color: var(--cy-bright); }
+
+a.more, a.external, a.back { display: inline-block; margin: 0.35rem 0.8rem 0.15rem 0; }
+
+.gloss { display: inline; }
+
+.term {
+  display: inline;
+  margin: 0;
+  padding: 0 0.1rem;
+  border: 0;
+  border-bottom: 1px dotted var(--mute);
+  background: transparent;
+  color: var(--cy);
+  font: inherit;
+  cursor: help;
+}
+
+.tip {
+  display: none;
+  margin: 0.45rem 0 0.2rem;
+  padding: 0.55rem 0.7rem;
+  background: var(--card-2);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  color: var(--ink);
+  font-size: 1rem;
+}
+
+.gloss:hover .tip,
+.gloss:focus-within .tip,
+.term[aria-expanded="true"] + .tip { display: block; }
+
+.explain-answer { margin: 0.35rem 0 0.6rem; }
+
+label,
+th {
+  font-family: "Space Grotesk", "Inter", "Segoe UI", sans-serif;
+  font-weight: 500;
+  color: var(--white);
+}
+
+label {
+  display: block;
+  font-size: 1rem;
+  margin-bottom: 0.35rem;
+}
+
+.lookup-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+input, button { font: inherit; }
+
+input {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--control);
+  border-radius: 12px;
+  background: var(--bg-3);
+  color: var(--ink);
+}
+
+input::placeholder { color: var(--mute); }
+
+button[type="submit"]:disabled {
+  opacity: 0.55;
+  cursor: wait;
+}
+
+button[type="submit"] {
+  min-height: 2.75rem;
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--cy-deep);
+  border-radius: 12px;
+  background: var(--cy-deep);
+  color: var(--bg);
+  font-family: "Space Grotesk", "Inter", "Segoe UI", sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+button[type="submit"]:hover {
+  background: var(--cy);
+  border-color: var(--cy);
+  color: var(--bg);
+}
+
+.explain-toggle {
+  min-height: 2.75rem;
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--gold);
+  border-radius: 12px;
+  background: transparent;
+  color: var(--gold);
+  font-family: "Space Grotesk", "Inter", "Segoe UI", sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.empty, .quiet { margin: 0.4rem 0; }
+
+.disclaimer, .source-account, .source-fact { overflow-wrap: anywhere; }
+
+.sources { margin: 0.6rem 0; }
+
+.sources summary {
+  cursor: pointer;
+  color: var(--white);
+  font-family: "Space Grotesk", "Inter", "Segoe UI", sans-serif;
+  font-weight: 700;
+}
+
+.source-list { margin: 0.35rem 0 0; padding-left: 1.2rem; }
+
+footer {
+  padding: 0.5rem 0 2.5rem;
+  font-size: 0.95rem;
+  color: var(--mute);
+}
+
+:focus-visible {
+  outline: 3px solid var(--cy);
+  outline-offset: 3px;
+}
+
+@media (min-width: 40rem) {
+  h1 { font-size: 2.25rem; }
+  .lookup-row { flex-direction: row; align-items: center; }
+  .lookup-row input { flex: 1; }
+  .lookup-row button { width: auto; }
+}

@@ -1,0 +1,1196 @@
+{
+  "label": "recorded MCP output",
+  "recordedAt": "2026-10-24T00:00:00.000Z",
+  "liveEndpoint": "",
+  "network": false,
+  "note": "Tools ran against the checked-in galaxy sample and the checked-in Tracker export. The clock is fixed so the file stays stable. This was not a live network read. No balance was invented.",
+  "panels": {
+    "results": {
+      "tool": "list_proposals",
+      "arguments": {
+        "limit": 100
+      },
+      "registered": true,
+      "ok": true,
+      "output": {
+        "dataMode": "live",
+        "asOf": "2026-10-24T00:00:00.000Z",
+        "sources": [
+          {
+            "url": "https://galaxy.staratlas.com/proposals",
+            "note": "Public galaxy proposal list."
+          }
+        ],
+        "matched": 3,
+        "returned": 3,
+        "truncated": false,
+        "nextCursor": null,
+        "proposals": [
+          {
+            "id": "ad1945d8-60dc-4ed7-b52a-63dd33f97415",
+            "pipNumber": 4,
+            "title": "Star Atlas Ecosystem Fund",
+            "brief": "This proposal seeks to create the Star Atlas Ecosystem Fund, seed it with a budget of 20% of the Star Atlas DAO’s treasury (subject to limitations below), and establish a process by which community members may apply to the Star Atlas DAO for grants from the fund to develop various aspects of Star Atlas.",
+            "categories": [
+              "Funding"
+            ],
+            "status": "Voting_Complete_Measure_Passes",
+            "authorPublicKey": "BVJESvrDeXZcSX5UVdK2Tt57Lur9gyakgCfdX45pVQ1V",
+            "createdAt": "2024-07-08T17:21:06.160Z",
+            "updatedAt": "2024-07-08T17:21:06.160Z",
+            "votingStartsAt": "2024-07-24T16:00:00.000Z",
+            "votingEndsAt": "2024-08-06T16:00:00.000Z",
+            "voteOptionsMaxChoices": 1,
+            "voteWinners": 1,
+            "voteData": {
+              "Abstain": {
+                "count": "6",
+                "pvp": "203935.9438189092"
+              },
+              "No": {
+                "count": "33",
+                "pvp": "14242581.31620797"
+              },
+              "Yes": {
+                "count": "421",
+                "pvp": "81843902.5128978"
+              }
+            }
+          },
+          {
+            "id": "0ecf2928-15df-497e-8b67-d87eda030d5a",
+            "pipNumber": 23,
+            "title": "Refresh of PIP-4 the Ecosystem Fund",
+            "brief": "This proposal continues the Star Atlas Ecosystem Fund and establishes a budget of 20% of the Star Atlas DAO’s Treasury.",
+            "categories": [
+              "Funding"
+            ],
+            "status": "Voting_Complete_Measure_Passes",
+            "authorPublicKey": "BVJESvrDeXZcSX5UVdK2Tt57Lur9gyakgCfdX45pVQ1V",
+            "createdAt": "2025-11-03T14:48:14.351Z",
+            "updatedAt": "2025-11-03T14:48:14.351Z",
+            "votingStartsAt": "2025-11-04T23:59:59.999Z",
+            "votingEndsAt": "2025-11-18T23:59:59.999Z",
+            "voteOptionsMaxChoices": 1,
+            "voteWinners": 1,
+            "voteData": {
+              "abstain": {
+                "count": "6",
+                "pvp": "792710.9199434808"
+              },
+              "no": {
+                "count": "34",
+                "pvp": "24262645.413694594"
+              },
+              "yes": {
+                "count": "77",
+                "pvp": "86030422.0270553"
+              }
+            }
+          },
+          {
+            "id": "c00de055-1942-486f-a64d-dd4ee360500f",
+            "pipNumber": 36,
+            "title": "Star Atlas DAO Dashboard",
+            "brief": "This proposal authorizes the creation of a public Star Atlas DAO Dashboard and a competitive Request for Proposal (RFP) process to select a DEVELOPER to build the Dashboard. The Dashboard will consolidate important DAO financial, governance, PIP, and Council information into a single publicly accessible resource. The maximum amount authorized under this PIP is 13,992,734 ATLAS (the current 5% Ecosystem Fund limit). Following approval, the DAO Council will publish an RFP listing Dashboard requirements and the process for selecting a DEVELOPER.",
+            "categories": [
+              "Funding"
+            ],
+            "status": "Voting_Complete_Measure_Passes",
+            "authorPublicKey": "BVJESvrDeXZcSX5UVdK2Tt57Lur9gyakgCfdX45pVQ1V",
+            "createdAt": "2026-09-16T03:26:59.914Z",
+            "updatedAt": "2026-09-16T03:26:59.914Z",
+            "votingStartsAt": "2026-09-18T23:59:59.999Z",
+            "votingEndsAt": "2026-10-02T23:59:59.999Z",
+            "voteOptionsMaxChoices": 1,
+            "voteWinners": 1,
+            "voteData": {
+              "abstain": {
+                "count": "6",
+                "pvp": "413554.53111165436"
+              },
+              "no": {
+                "count": "31",
+                "pvp": "30557054.966636125"
+              },
+              "yes": {
+                "count": "32",
+                "pvp": "42635296.911563985"
+              }
+            }
+          }
+        ]
+      },
+      "error": null
+    },
+    "votes": {
+      "tool": "get_proposal_votes",
+      "arguments": {
+        "pipNumber": 36,
+        "topN": 5
+      },
+      "registered": true,
+      "ok": true,
+      "output": {
+        "dataMode": "live",
+        "asOf": "2026-10-24T00:00:00.000Z",
+        "sources": [
+          {
+            "url": "https://galaxy.staratlas.com/proposals/votes/c00de055-1942-486f-a64d-dd4ee360500f.json",
+            "note": "Public signed-vote file."
+          }
+        ],
+        "proposalId": "c00de055-1942-486f-a64d-dd4ee360500f",
+        "voterCount": 5,
+        "uniqueWallets": 5,
+        "options": [
+          {
+            "choice": "yes",
+            "count": 2,
+            "votingPower": "3719226.823963669"
+          },
+          {
+            "choice": "no",
+            "count": 3,
+            "votingPower": "2774615.7489463848"
+          }
+        ],
+        "topVoters": [
+          {
+            "wallet": "UPGDyBjEsknrZhKYSj6onqnoG5yhUCvoqX3GbFoQWzp",
+            "choice": "yes",
+            "votingPower": "2264834.611169965",
+            "createdAt": "2026-09-23T22:07:42.758Z"
+          },
+          {
+            "wallet": "uhV8bWNqRoshUwiXn7YrD4BEaqKWvGKozvbo2u1RmxJ",
+            "choice": "yes",
+            "votingPower": "1454392.212793704",
+            "createdAt": "2026-09-22T08:42:19.612Z"
+          },
+          {
+            "wallet": "VseEGdcwjBwb9TqjQgBJLoZmUGKsKDDHvpLC5NpWBWh",
+            "choice": "no",
+            "votingPower": "1161455.783097974",
+            "createdAt": "2026-09-26T09:08:34.284Z"
+          },
+          {
+            "wallet": "V4RSZJC12i2WekA6QyfxuS9dzcxQhpk178CANUQ4gLh",
+            "choice": "no",
+            "votingPower": "1018314.50961992",
+            "createdAt": "2026-09-20T08:34:56.945Z"
+          },
+          {
+            "wallet": "ushELAkUDBPTtGALVo1LzZJ7xetybPQPscD4p5i9Ete",
+            "choice": "no",
+            "votingPower": "594845.4562284908",
+            "createdAt": "2026-10-01T01:47:19.311Z"
+          }
+        ],
+        "rankedWinner": {
+          "status": "unknown",
+          "reason": "The votes file records a choice and voting power for each signature. It does not define a ranked-choice winner. This tool does not invent one. list_proposals includes the published voteWinners and voteOptionsMaxChoices."
+        }
+      },
+      "error": null
+    },
+    "revenue": {
+      "tool": "dao_revenue",
+      "arguments": {},
+      "registered": true,
+      "ok": true,
+      "output": {
+        "dataMode": "live",
+        "asOf": "2026-10-24T00:00:00.000Z",
+        "sources": [
+          {
+            "url": "https://galaxy.staratlas.com/dao/treasury",
+            "note": "Public monthly revenue by segment and mint. Amounts are the figures galaxy published."
+          }
+        ],
+        "rowCount": 3,
+        "months": [
+          {
+            "period": "2023-05-01",
+            "sources": [
+              {
+                "segmentation": "Game Activity",
+                "mint": "ATLAS",
+                "amount": "324443734.657649",
+                "usdcValue": "733442.58604847"
+              },
+              {
+                "segmentation": "Marketplace Fees",
+                "mint": "ATLAS",
+                "amount": "372991.92678948",
+                "usdcValue": "843.19138925"
+              }
+            ]
+          },
+          {
+            "period": "2026-08-01",
+            "sources": [
+              {
+                "segmentation": "Marketplace Fees",
+                "mint": "USDC",
+                "amount": "1050.130936",
+                "usdcValue": "1050.130936"
+              }
+            ]
+          }
+        ],
+        "bySource": [
+          {
+            "segmentation": "Game Activity",
+            "mint": "ATLAS",
+            "amount": "324443734.657649",
+            "usdcValue": "733442.58604847",
+            "months": 1
+          },
+          {
+            "segmentation": "Marketplace Fees",
+            "mint": "ATLAS",
+            "amount": "372991.92678948",
+            "usdcValue": "843.19138925",
+            "months": 1
+          },
+          {
+            "segmentation": "Marketplace Fees",
+            "mint": "USDC",
+            "amount": "1050.130936",
+            "usdcValue": "1050.130936",
+            "months": 1
+          }
+        ]
+      },
+      "error": null
+    },
+    "income": {
+      "tool": "dao_revenue",
+      "arguments": {},
+      "registered": false,
+      "ok": true,
+      "output": {
+        "months": [
+          {
+            "period": "2023-05-01",
+            "usdcValue": "734285.77743772"
+          },
+          {
+            "period": "2026-08-01",
+            "usdcValue": "1050.130936"
+          }
+        ],
+        "earliestPublished": "2023-05-01",
+        "may2023Present": true
+      },
+      "error": null
+    },
+    "payments": {
+      "tool": "dao_payments",
+      "arguments": {
+        "direction": "out",
+        "limit": 20
+      },
+      "registered": true,
+      "ok": true,
+      "output": {
+        "dataMode": "cached",
+        "asOf": "2026-10-31T12:34:59.681Z",
+        "sources": [
+          {
+            "url": "https://star-atlas-dao.gitbook.io/knowledge-base/overview/treasury",
+            "note": "Published DAO Treasury and Ecosystem Fund addresses. The retired pre-multisig treasury is not scanned."
+          },
+          {
+            "url": "https://govern.staratlas.com/proposals/0ecf2928-15df-497e-8b67-d87eda030d5a",
+            "note": "PIP-23 names the same two wallets."
+          },
+          {
+            "url": "https://solana-rpc.publicnode.com/ then https://api.mainnet-beta.solana.com/",
+            "note": "Public Solana read methods only. The URL is redacted."
+          },
+          {
+            "url": "https://solscan.io/tx/",
+            "note": "Transaction links are built from signatures. Solscan is not queried."
+          }
+        ],
+        "total": 1,
+        "offset": 0,
+        "limit": 20,
+        "truncated": false,
+        "omitted": [
+          {
+            "role": "ecosystem_fund",
+            "mint": "ATLASXmbPQxBUYbxPsV97usA3fPQYEqzQBUHgiFCUsXx",
+            "reason": "The ATLAS backfill for ecosystem_fund is incomplete or did not reconcile to the RPC balance."
+          },
+          {
+            "role": "dao_treasury",
+            "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+            "reason": "The USDC backfill for dao_treasury is incomplete or did not reconcile to the RPC balance."
+          }
+        ],
+        "payments": [
+          {
+            "signature": "2CZsYH9kZVXFZvLdsgj7cuxZHvnPc5N5GEj5wfB5y2iPBNjegX1vPn3FMqaCGGuJW3bcJJmwwbX9HLj7pFjmEdun",
+            "solscanUrl": "https://solscan.io/tx/2CZsYH9kZVXFZvLdsgj7cuxZHvnPc5N5GEj5wfB5y2iPBNjegX1vPn3FMqaCGGuJW3bcJJmwwbX9HLj7pFjmEdun",
+            "blockTime": 1784914849,
+            "time": "2026-07-24T17:40:49.000Z",
+            "wallet": "CuwnarNh7FEqZMmffFjRyWj54RecyS7zwFg1CxfzNudi",
+            "role": "dao_treasury",
+            "mint": "ATLASXmbPQxBUYbxPsV97usA3fPQYEqzQBUHgiFCUsXx",
+            "symbol": "ATLAS",
+            "amountRaw": "37685358800000000",
+            "amount": "376853588",
+            "direction": "out",
+            "internal": false,
+            "attribution": "counterparty",
+            "counterparties": [
+              "BTFfKDtnQoq6UdqNSqDqVieahZvbBunQWLXkTyb59fbW"
+            ],
+            "complete": true
+          }
+        ],
+        "notes": [
+          "Payments default to external outflows. Internal vault-to-vault transfers and SOL network fees are omitted unless requested.",
+          "DAO Treasury ATLAS rows are complete only after the vault-wallet backfill and the ATLAS-account outflow sample both pass. The sample is not a fetch of every fee drip."
+        ],
+        "cache": {
+          "generatedAt": "2026-10-31T12:34:59.681Z",
+          "rpc": "https://solana-rpc.publicnode.com/ then https://api.mainnet-beta.solana.com/",
+          "atlasScanReachedEnd": false,
+          "atlasOutflowSample": "holds"
+        }
+      },
+      "error": null
+    },
+    "flows": {
+      "tool": "dao_treasury_flows",
+      "arguments": {},
+      "registered": true,
+      "ok": true,
+      "output": {
+        "dataMode": "cached",
+        "asOf": "2026-10-31T12:34:59.681Z",
+        "sources": [
+          {
+            "url": "https://star-atlas-dao.gitbook.io/knowledge-base/overview/treasury",
+            "note": "Published DAO Treasury and Ecosystem Fund addresses. The retired pre-multisig treasury is not scanned."
+          },
+          {
+            "url": "https://govern.staratlas.com/proposals/0ecf2928-15df-497e-8b67-d87eda030d5a",
+            "note": "PIP-23 names the same two wallets."
+          },
+          {
+            "url": "https://solana-rpc.publicnode.com/ then https://api.mainnet-beta.solana.com/",
+            "note": "Public Solana read methods only. The URL is redacted."
+          },
+          {
+            "url": "https://solscan.io/tx/",
+            "note": "Transaction links are built from signatures. Solscan is not queried."
+          }
+        ],
+        "rows": [
+          {
+            "month": "2024-08",
+            "through": "2024-08-31",
+            "monthClosed": true,
+            "wallet": "BxKehkp298nQunu8BWxh5U6VvfphFyjEB3t7USst7Uag",
+            "role": "ecosystem_fund",
+            "mint": "native",
+            "symbol": "SOL",
+            "decimals": 9,
+            "method": "parsed",
+            "complete": true,
+            "externalIn": "0",
+            "externalInStatus": "known",
+            "externalInReason": null,
+            "externalOut": "0",
+            "internalIn": "0",
+            "internalOut": "0",
+            "unattributed": "0.001",
+            "fees": "0"
+          },
+          {
+            "month": "2024-10",
+            "through": "2024-10-31",
+            "monthClosed": true,
+            "wallet": "BxKehkp298nQunu8BWxh5U6VvfphFyjEB3t7USst7Uag",
+            "role": "ecosystem_fund",
+            "mint": "native",
+            "symbol": "SOL",
+            "decimals": 9,
+            "method": "parsed",
+            "complete": true,
+            "externalIn": "0.000001",
+            "externalInStatus": "known",
+            "externalInReason": null,
+            "externalOut": "0",
+            "internalIn": "0",
+            "internalOut": "0",
+            "unattributed": "0",
+            "fees": "0"
+          },
+          {
+            "month": "2025-08",
+            "through": "2025-08-31",
+            "monthClosed": true,
+            "wallet": "BxKehkp298nQunu8BWxh5U6VvfphFyjEB3t7USst7Uag",
+            "role": "ecosystem_fund",
+            "mint": "native",
+            "symbol": "SOL",
+            "decimals": 9,
+            "method": "parsed",
+            "complete": true,
+            "externalIn": "0",
+            "externalInStatus": "known",
+            "externalInReason": null,
+            "externalOut": "0",
+            "internalIn": "0",
+            "internalOut": "0",
+            "unattributed": "0.000001002",
+            "fees": "0"
+          },
+          {
+            "month": "2026-10",
+            "through": "2026-10-31",
+            "monthClosed": true,
+            "wallet": "BxKehkp298nQunu8BWxh5U6VvfphFyjEB3t7USst7Uag",
+            "role": "ecosystem_fund",
+            "mint": "native",
+            "symbol": "SOL",
+            "decimals": 9,
+            "method": "parsed",
+            "complete": true,
+            "externalIn": "0.02",
+            "externalInStatus": "known",
+            "externalInReason": null,
+            "externalOut": "0",
+            "internalIn": "0",
+            "internalOut": "0",
+            "unattributed": "0",
+            "fees": "0"
+          }
+        ],
+        "omitted": [
+          {
+            "role": "dao_treasury",
+            "mint": "ATLASXmbPQxBUYbxPsV97usA3fPQYEqzQBUHgiFCUsXx",
+            "reason": "The ATLAS scan has not reached the start of this month."
+          },
+          {
+            "role": "dao_treasury",
+            "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+            "reason": "The USDC backfill for dao_treasury is incomplete or did not reconcile to the RPC balance."
+          },
+          {
+            "role": "dao_treasury",
+            "mint": "native",
+            "reason": "The SOL backfill for dao_treasury is incomplete or did not reconcile to the RPC balance."
+          },
+          {
+            "role": "ecosystem_fund",
+            "mint": "ATLASXmbPQxBUYbxPsV97usA3fPQYEqzQBUHgiFCUsXx",
+            "reason": "The ATLAS backfill for ecosystem_fund is incomplete or did not reconcile to the RPC balance."
+          }
+        ],
+        "notes": [
+          "USDC, Ecosystem Fund ATLAS, and SOL are sums of parsed balance changes.",
+          "DAO Treasury ATLAS inflows are the balance change minus parsed treasury ATLAS movements. That residual is published only when a sample of the other ATLAS-account signatures did not decrease the balance.",
+          "Internal means the counterparty is the other published wallet. Unattributed means the counterparty amounts did not add up, and those amounts are not folded into inflows or outflows."
+        ],
+        "cache": {
+          "generatedAt": "2026-10-31T12:34:59.681Z",
+          "rpc": "https://solana-rpc.publicnode.com/ then https://api.mainnet-beta.solana.com/",
+          "atlasScanReachedEnd": false,
+          "atlasOutflowSample": "holds"
+        }
+      },
+      "error": null
+    },
+    "history": {
+      "tool": "treasury_history",
+      "arguments": {
+        "granularity": "month"
+      },
+      "registered": true,
+      "ok": true,
+      "output": {
+        "dataMode": "cached",
+        "asOf": "2026-10-31T12:34:59.681Z",
+        "sources": [
+          {
+            "url": "https://star-atlas-dao.gitbook.io/knowledge-base/overview/treasury",
+            "note": "Published DAO Treasury and Ecosystem Fund addresses. The retired pre-multisig treasury is not scanned."
+          },
+          {
+            "url": "https://govern.staratlas.com/proposals/0ecf2928-15df-497e-8b67-d87eda030d5a",
+            "note": "PIP-23 names the same two wallets."
+          },
+          {
+            "url": "https://solana-rpc.publicnode.com/ then https://api.mainnet-beta.solana.com/",
+            "note": "Public Solana read methods only. The URL is redacted."
+          },
+          {
+            "url": "https://solscan.io/tx/",
+            "note": "Transaction links are built from signatures. Solscan is not queried."
+          }
+        ],
+        "granularity": "month",
+        "series": [
+          {
+            "role": "dao_treasury",
+            "wallet": "CuwnarNh7FEqZMmffFjRyWj54RecyS7zwFg1CxfzNudi",
+            "mint": "ATLASXmbPQxBUYbxPsV97usA3fPQYEqzQBUHgiFCUsXx",
+            "symbol": "ATLAS",
+            "method": "end_of_day_snapshot",
+            "status": "known",
+            "complete": false,
+            "points": [
+              {
+                "day": "2026-10-25",
+                "amount": "818259689.02903592",
+                "amountRaw": "81825968902903592"
+              }
+            ]
+          },
+          {
+            "role": "ecosystem_fund",
+            "wallet": "BxKehkp298nQunu8BWxh5U6VvfphFyjEB3t7USst7Uag",
+            "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+            "symbol": "USDC",
+            "method": "replay",
+            "status": "known",
+            "complete": true,
+            "points": []
+          },
+          {
+            "role": "ecosystem_fund",
+            "wallet": "BxKehkp298nQunu8BWxh5U6VvfphFyjEB3t7USst7Uag",
+            "mint": "native",
+            "symbol": "SOL",
+            "method": "replay",
+            "status": "known",
+            "complete": true,
+            "points": [
+              {
+                "day": "2024-08-31",
+                "amount": "0.001",
+                "amountRaw": "1000000"
+              },
+              {
+                "day": "2024-09-30",
+                "amount": "0.001",
+                "amountRaw": "1000000"
+              },
+              {
+                "day": "2024-10-31",
+                "amount": "0.001001",
+                "amountRaw": "1001000"
+              },
+              {
+                "day": "2024-11-30",
+                "amount": "0.001001",
+                "amountRaw": "1001000"
+              },
+              {
+                "day": "2024-12-31",
+                "amount": "0.001001",
+                "amountRaw": "1001000"
+              },
+              {
+                "day": "2025-01-31",
+                "amount": "0.001001",
+                "amountRaw": "1001000"
+              },
+              {
+                "day": "2025-02-28",
+                "amount": "0.001001",
+                "amountRaw": "1001000"
+              },
+              {
+                "day": "2025-03-31",
+                "amount": "0.001001",
+                "amountRaw": "1001000"
+              },
+              {
+                "day": "2025-04-30",
+                "amount": "0.001001",
+                "amountRaw": "1001000"
+              },
+              {
+                "day": "2025-05-31",
+                "amount": "0.001001",
+                "amountRaw": "1001000"
+              },
+              {
+                "day": "2025-06-30",
+                "amount": "0.001001",
+                "amountRaw": "1001000"
+              },
+              {
+                "day": "2025-07-31",
+                "amount": "0.001001",
+                "amountRaw": "1001000"
+              },
+              {
+                "day": "2025-08-31",
+                "amount": "0.001002002",
+                "amountRaw": "1002002"
+              },
+              {
+                "day": "2025-09-30",
+                "amount": "0.001002002",
+                "amountRaw": "1002002"
+              },
+              {
+                "day": "2025-10-31",
+                "amount": "0.001002002",
+                "amountRaw": "1002002"
+              },
+              {
+                "day": "2025-11-30",
+                "amount": "0.001002002",
+                "amountRaw": "1002002"
+              },
+              {
+                "day": "2025-12-31",
+                "amount": "0.001002002",
+                "amountRaw": "1002002"
+              },
+              {
+                "day": "2026-01-31",
+                "amount": "0.001002002",
+                "amountRaw": "1002002"
+              },
+              {
+                "day": "2026-02-28",
+                "amount": "0.001002002",
+                "amountRaw": "1002002"
+              },
+              {
+                "day": "2026-03-31",
+                "amount": "0.001002002",
+                "amountRaw": "1002002"
+              },
+              {
+                "day": "2026-04-30",
+                "amount": "0.001002002",
+                "amountRaw": "1002002"
+              },
+              {
+                "day": "2026-05-31",
+                "amount": "0.001002002",
+                "amountRaw": "1002002"
+              },
+              {
+                "day": "2026-06-30",
+                "amount": "0.001002002",
+                "amountRaw": "1002002"
+              },
+              {
+                "day": "2026-07-31",
+                "amount": "0.001002002",
+                "amountRaw": "1002002"
+              },
+              {
+                "day": "2026-08-31",
+                "amount": "0.001002002",
+                "amountRaw": "1002002"
+              },
+              {
+                "day": "2026-09-30",
+                "amount": "0.001002002",
+                "amountRaw": "1002002"
+              },
+              {
+                "day": "2026-10-28",
+                "amount": "0.021002002",
+                "amountRaw": "21002002"
+              }
+            ]
+          }
+        ],
+        "omitted": [
+          {
+            "role": "dao_treasury",
+            "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+            "reason": "The USDC backfill for dao_treasury is incomplete or did not reconcile to the RPC balance."
+          },
+          {
+            "role": "dao_treasury",
+            "mint": "native",
+            "reason": "The SOL backfill for dao_treasury is incomplete or did not reconcile to the RPC balance."
+          },
+          {
+            "role": "ecosystem_fund",
+            "mint": "ATLASXmbPQxBUYbxPsV97usA3fPQYEqzQBUHgiFCUsXx",
+            "reason": "The ATLAS backfill for ecosystem_fund is incomplete or did not reconcile to the RPC balance."
+          }
+        ],
+        "notes": [
+          "DAO Treasury ATLAS is the end-of-day post-balance of the last signature that day, carried across days with no signatures.",
+          "Other series replay parsed post-balances. A series is omitted when its backfill is incomplete unless allowPartial is set."
+        ],
+        "cache": {
+          "generatedAt": "2026-10-31T12:34:59.681Z",
+          "rpc": "https://solana-rpc.publicnode.com/ then https://api.mainnet-beta.solana.com/",
+          "atlasScanReachedEnd": false,
+          "atlasOutflowSample": "holds"
+        }
+      },
+      "error": null
+    },
+    "limit": {
+      "tool": "ecofund_limit",
+      "arguments": {},
+      "registered": true,
+      "ok": true,
+      "output": {
+        "dataMode": "cached",
+        "asOf": "2026-10-31T12:34:59.681Z",
+        "sources": [
+          {
+            "url": "https://star-atlas-dao.gitbook.io/knowledge-base/overview/treasury",
+            "note": "Published DAO Treasury and Ecosystem Fund addresses. The retired pre-multisig treasury is not scanned."
+          },
+          {
+            "url": "https://govern.staratlas.com/proposals/0ecf2928-15df-497e-8b67-d87eda030d5a",
+            "note": "PIP-23 names the same two wallets."
+          },
+          {
+            "url": "https://solana-rpc.publicnode.com/ then https://api.mainnet-beta.solana.com/",
+            "note": "Public Solana read methods only. The URL is redacted."
+          },
+          {
+            "url": "https://solscan.io/tx/",
+            "note": "Transaction links are built from signatures. Solscan is not queried."
+          },
+          {
+            "url": "https://govern.staratlas.com/proposals/0ecf2928-15df-497e-8b67-d87eda030d5a",
+            "note": "Refill rule, 5% limit, and quarter dates. Passed as Voting_Complete_Measure_Passes on the public proposals list (checked 2026-10-24)."
+          },
+          {
+            "url": "https://star-atlas-dao.gitbook.io/knowledge-base/archive/foundational-pips/pip-4-star-atlas-ecosystem-fund",
+            "note": "Replaced in its entirety by PIP-23. Not used for the current numbers."
+          },
+          {
+            "url": "https://developers.circle.com/stablecoins/usdc-contract-addresses",
+            "note": "Circle's published Solana USDC mint, matched to the treasury token account."
+          },
+          {
+            "url": "https://galaxy.staratlas.com/proposals",
+            "note": "Proposal status was read from this public list on 2026-10-24. This call does not refresh it."
+          }
+        ],
+        "scope": {
+          "wallets": [
+            "CuwnarNh7FEqZMmffFjRyWj54RecyS7zwFg1CxfzNudi",
+            "BxKehkp298nQunu8BWxh5U6VvfphFyjEB3t7USst7Uag"
+          ],
+          "mints": {
+            "ATLAS": "ATLASXmbPQxBUYbxPsV97usA3fPQYEqzQBUHgiFCUsXx",
+            "USDC": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+            "SOL": "native"
+          },
+          "retiredTreasuryNotScanned": "DRGThVUMGEYcsoTERhmkFSa5q7HVjxBQdKwMNjyvehD1"
+        },
+        "wallets": {
+          "daoTreasury": "CuwnarNh7FEqZMmffFjRyWj54RecyS7zwFg1CxfzNudi",
+          "ecosystemFund": "BxKehkp298nQunu8BWxh5U6VvfphFyjEB3t7USst7Uag",
+          "source": "https://star-atlas-dao.gitbook.io/knowledge-base/overview/treasury"
+        },
+        "rule": {
+          "pip": "PIP-23",
+          "galaxyStatus": "Voting_Complete_Measure_Passes",
+          "source": "https://govern.staratlas.com/proposals/0ecf2928-15df-497e-8b67-d87eda030d5a",
+          "replaced": {
+            "pip": "PIP-4",
+            "source": "https://star-atlas-dao.gitbook.io/knowledge-base/archive/foundational-pips/pip-4-star-atlas-ecosystem-fund",
+            "note": "PIP-23 says it replaces PIP-4 in its entirety. The PIP-4 USDC formula is not applied."
+          },
+          "perPipLimit": "No Ecosystem Fund PIP shall exceed 5% of the Balance After of the last refill transaction.",
+          "atlasRefill": "On a quarter, if Ecosystem Fund ATLAS is under 20% of (DAO Treasury ATLAS + Ecosystem Fund ATLAS), send ATLAS so the fund is 20% of that total.",
+          "usdcRefill": "If DAO Treasury USDC is more than 500,000, send 20% of the amount above 500,000. Otherwise send no USDC.",
+          "quarters": "on or about Mar 31, Jun 20, Sep 30, and Dec 31 (June 20 is copied from PIP-23, not normalized).",
+          "unknown": [
+            "USDC-to-ATLAS conversion rate and venue.",
+            "Rounding when a refill is not an integer raw amount.",
+            "The list of unpaid PIPs. PIP-23 does not publish one."
+          ]
+        },
+        "movementsComplete": false,
+        "refills": [
+          {
+            "signature": "65RaYtgHcmDDGzTspotpJGzwc6vDM6opyZ2xsvkLLn2XcSYeA3QtfqLaiWzuxe1a2tvTjMJoZxmbn3d6g87LbLg8",
+            "blockTime": 1777944507,
+            "time": "2026-05-05T01:28:27.000Z",
+            "amountRaw": "4942934000000000",
+            "amount": "49429340",
+            "balanceBeforeRaw": "22609850200000001",
+            "balanceBefore": "226098502.00000001",
+            "balanceAfterRaw": "27552784200000001",
+            "balanceAfter": "275527842.00000001",
+            "decimals": 8,
+            "solscanUrl": "https://solscan.io/tx/65RaYtgHcmDDGzTspotpJGzwc6vDM6opyZ2xsvkLLn2XcSYeA3QtfqLaiWzuxe1a2tvTjMJoZxmbn3d6g87LbLg8",
+            "detection": "Internal ATLAS transfer from the DAO Treasury wallet to the Ecosystem Fund wallet. PIP-23 does not put an on-chain tag on a refill, so every transfer of this shape is listed. A transfer that is not a refill can be overridden."
+          },
+          {
+            "signature": "E5kRjqhf7dmLqBsVveMp7h2v3hDZdS4eDEHK8cEzA3C4kxi4kbVDVS5bfYE2uxKssJbXTBViU233NCRPN2F9LZN",
+            "blockTime": 1783546156,
+            "time": "2026-07-08T21:29:16.000Z",
+            "amountRaw": "2190323000000000",
+            "amount": "21903230",
+            "balanceBeforeRaw": "27552784200000001",
+            "balanceBefore": "275527842.00000001",
+            "balanceAfterRaw": "29743107200000001",
+            "balanceAfter": "297431072.00000001",
+            "decimals": 8,
+            "solscanUrl": "https://solscan.io/tx/E5kRjqhf7dmLqBsVveMp7h2v3hDZdS4eDEHK8cEzA3C4kxi4kbVDVS5bfYE2uxKssJbXTBViU233NCRPN2F9LZN",
+            "detection": "Internal ATLAS transfer from the DAO Treasury wallet to the Ecosystem Fund wallet. PIP-23 does not put an on-chain tag on a refill, so every transfer of this shape is listed. A transfer that is not a refill can be overridden."
+          }
+        ],
+        "lastRefill": {
+          "signature": "E5kRjqhf7dmLqBsVveMp7h2v3hDZdS4eDEHK8cEzA3C4kxi4kbVDVS5bfYE2uxKssJbXTBViU233NCRPN2F9LZN",
+          "blockTime": 1783546156,
+          "time": "2026-07-08T21:29:16.000Z",
+          "amountRaw": "2190323000000000",
+          "amount": "21903230",
+          "balanceBeforeRaw": "27552784200000001",
+          "balanceBefore": "275527842.00000001",
+          "balanceAfterRaw": "29743107200000001",
+          "balanceAfter": "297431072.00000001",
+          "decimals": 8,
+          "solscanUrl": "https://solscan.io/tx/E5kRjqhf7dmLqBsVveMp7h2v3hDZdS4eDEHK8cEzA3C4kxi4kbVDVS5bfYE2uxKssJbXTBViU233NCRPN2F9LZN",
+          "detection": "Internal ATLAS transfer from the DAO Treasury wallet to the Ecosystem Fund wallet. PIP-23 does not put an on-chain tag on a refill, so every transfer of this shape is listed. A transfer that is not a refill can be overridden."
+        },
+        "currentPerPipLimit": {
+          "rawNumerator": "148715536000000005",
+          "rawDenominator": "100",
+          "amount": "14871553.6000000005",
+          "exact": true,
+          "rule": "5% of the Ecosystem Fund ATLAS balance after the last refill transaction (PIP-23 section c)."
+        },
+        "balances": {
+          "asOf": "2026-10-31T12:33:32.895Z",
+          "dataMode": "cached",
+          "treasuryAtlas": "822000372.66314347",
+          "ecosystemFundAtlas": "283854680.00000001",
+          "treasuryUsdc": "209590.016741",
+          "ecosystemFundUsdc": "0",
+          "fundShareOfCombinedAtlas": {
+            "fraction": null,
+            "percent": null,
+            "belowTwentyPercent": false
+          }
+        },
+        "nextQuarter": {
+          "date": "2026-12-31",
+          "onOrAbout": true,
+          "evaluatedOn": "2026-10-31T12:33:32.895Z",
+          "note": "The date is the next published quarter mark. Amounts use cached balances as of the balance timestamp, not a prediction of that date.",
+          "atlasRefill": {
+            "due": false,
+            "amount": "0",
+            "exact": true,
+            "onChainRounding": "not_applicable",
+            "reason": "Ecosystem Fund ATLAS is at least 20% of treasury ATLAS plus fund ATLAS, so PIP-23 sends no ATLAS."
+          },
+          "usdcRefill": {
+            "due": false,
+            "amount": "0",
+            "exact": true,
+            "onChainRounding": "not_applicable",
+            "threshold": "500000",
+            "reason": "PIP-23 sends no USDC unless the DAO Treasury holds more than 500,000 USDC."
+          },
+          "perPipLimit": {
+            "status": "known",
+            "amount": "14871553.6000000005",
+            "sameAsCurrent": true,
+            "reason": "No ATLAS refill is due on these balances. PIP-23 keeps the current 5% limit until the next refill transaction."
+          },
+          "usdcConversionEffectOnAtlasLimit": {
+            "status": "not_applicable",
+            "reason": "No USDC refill is due, or USDC balances are unavailable."
+          }
+        },
+        "remainingAfterUnpaidPips": {
+          "status": "unknown",
+          "reason": "PIP-23 does not publish unpaid PIP amounts. Pass unpaidPips, each with a sourceLabel. An omitted list is unknown, not zero."
+        },
+        "councilOverride": null,
+        "figureInForce": {
+          "perPipLimitAtlas": "14871553.6000000005",
+          "source": "pip23"
+        },
+        "cache": {
+          "generatedAt": "2026-10-31T12:34:59.681Z",
+          "rpc": "https://solana-rpc.publicnode.com/"
+        }
+      },
+      "error": null
+    },
+    "match": {
+      "tool": "dao_payments",
+      "arguments": {
+        "direction": "out",
+        "limit": 20
+      },
+      "registered": false,
+      "ok": true,
+      "output": {
+        "matches": [],
+        "mismatches": [],
+        "unresolved": [
+          {
+            "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+            "pip": "PIP-16",
+            "signature": null,
+            "amount": "8464.79",
+            "detail": "The scan for this mint is not complete, so this paid amount is not called a mismatch."
+          },
+          {
+            "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+            "pip": "PIP-21",
+            "signature": null,
+            "amount": "2083.00",
+            "detail": "The scan for this mint is not complete, so this paid amount is not called a mismatch."
+          },
+          {
+            "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+            "pip": "PIP-28",
+            "signature": null,
+            "amount": "30000.00",
+            "detail": "The scan for this mint is not complete, so this paid amount is not called a mismatch."
+          },
+          {
+            "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+            "pip": "PIP-30",
+            "signature": null,
+            "amount": "1650.00",
+            "detail": "The scan for this mint is not complete, so this paid amount is not called a mismatch."
+          },
+          {
+            "mint": "ATLASXmbPQxBUYbxPsV97usA3fPQYEqzQBUHgiFCUsXx",
+            "pip": null,
+            "signature": "2CZsYH9kZVXFZvLdsgj7cuxZHvnPc5N5GEj5wfB5y2iPBNjegX1vPn3FMqaCGGuJW3bcJJmwwbX9HLj7pFjmEdun",
+            "amount": "376853588",
+            "detail": "The scan for this mint is not complete, so this outflow is not called a mismatch."
+          },
+          {
+            "mint": "ATLASXmbPQxBUYbxPsV97usA3fPQYEqzQBUHgiFCUsXx",
+            "pip": "PIP-5",
+            "signature": null,
+            "amount": "6000000.00",
+            "detail": "The scan for this mint is not complete, so this paid amount is not called a mismatch."
+          },
+          {
+            "mint": "ATLASXmbPQxBUYbxPsV97usA3fPQYEqzQBUHgiFCUsXx",
+            "pip": "PIP-8",
+            "signature": null,
+            "amount": "7723034.00",
+            "detail": "The scan for this mint is not complete, so this paid amount is not called a mismatch."
+          },
+          {
+            "mint": "ATLASXmbPQxBUYbxPsV97usA3fPQYEqzQBUHgiFCUsXx",
+            "pip": "PIP-12",
+            "signature": null,
+            "amount": "7429420.00",
+            "detail": "The scan for this mint is not complete, so this paid amount is not called a mismatch."
+          },
+          {
+            "mint": "ATLASXmbPQxBUYbxPsV97usA3fPQYEqzQBUHgiFCUsXx",
+            "pip": "PIP-14",
+            "signature": null,
+            "amount": "4462301.00",
+            "detail": "The scan for this mint is not complete, so this paid amount is not called a mismatch."
+          },
+          {
+            "mint": "ATLASXmbPQxBUYbxPsV97usA3fPQYEqzQBUHgiFCUsXx",
+            "pip": "PIP-16",
+            "signature": null,
+            "amount": "7985657.00",
+            "detail": "The scan for this mint is not complete, so this paid amount is not called a mismatch."
+          },
+          {
+            "mint": "ATLASXmbPQxBUYbxPsV97usA3fPQYEqzQBUHgiFCUsXx",
+            "pip": "PIP-18",
+            "signature": null,
+            "amount": "5781393.00",
+            "detail": "The scan for this mint is not complete, so this paid amount is not called a mismatch."
+          },
+          {
+            "mint": "ATLASXmbPQxBUYbxPsV97usA3fPQYEqzQBUHgiFCUsXx",
+            "pip": "PIP-20",
+            "signature": null,
+            "amount": "4320000.00",
+            "detail": "The scan for this mint is not complete, so this paid amount is not called a mismatch."
+          },
+          {
+            "mint": "ATLASXmbPQxBUYbxPsV97usA3fPQYEqzQBUHgiFCUsXx",
+            "pip": "PIP-21",
+            "signature": null,
+            "amount": "7317073.00",
+            "detail": "The scan for this mint is not complete, so this paid amount is not called a mismatch."
+          },
+          {
+            "mint": "ATLASXmbPQxBUYbxPsV97usA3fPQYEqzQBUHgiFCUsXx",
+            "pip": "PIP-22",
+            "signature": null,
+            "amount": "2000000.00",
+            "detail": "The scan for this mint is not complete, so this paid amount is not called a mismatch."
+          },
+          {
+            "mint": "ATLASXmbPQxBUYbxPsV97usA3fPQYEqzQBUHgiFCUsXx",
+            "pip": "PIP-29",
+            "signature": null,
+            "amount": "13143639.00",
+            "detail": "The scan for this mint is not complete, so this paid amount is not called a mismatch."
+          },
+          {
+            "mint": "ATLASXmbPQxBUYbxPsV97usA3fPQYEqzQBUHgiFCUsXx",
+            "pip": "PIP-30",
+            "signature": null,
+            "amount": "6433164.00",
+            "detail": "The scan for this mint is not complete, so this paid amount is not called a mismatch."
+          }
+        ],
+        "unknownCells": [
+          {
+            "pip": "PIP-2",
+            "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+            "raw": "?"
+          },
+          {
+            "pip": "PIP-13",
+            "mint": "ATLASXmbPQxBUYbxPsV97usA3fPQYEqzQBUHgiFCUsXx",
+            "raw": "N/A"
+          },
+          {
+            "pip": "PIP-15",
+            "mint": "ATLASXmbPQxBUYbxPsV97usA3fPQYEqzQBUHgiFCUsXx",
+            "raw": "N/A"
+          },
+          {
+            "pip": "PIP-19",
+            "mint": "ATLASXmbPQxBUYbxPsV97usA3fPQYEqzQBUHgiFCUsXx",
+            "raw": "N/A"
+          },
+          {
+            "pip": "PIP-23",
+            "mint": "ATLASXmbPQxBUYbxPsV97usA3fPQYEqzQBUHgiFCUsXx",
+            "raw": "N/A"
+          },
+          {
+            "pip": "PIP-24",
+            "mint": "ATLASXmbPQxBUYbxPsV97usA3fPQYEqzQBUHgiFCUsXx",
+            "raw": "?"
+          },
+          {
+            "pip": "PIP-25",
+            "mint": "ATLASXmbPQxBUYbxPsV97usA3fPQYEqzQBUHgiFCUsXx",
+            "raw": "N/A"
+          },
+          {
+            "pip": "PIP-26",
+            "mint": "ATLASXmbPQxBUYbxPsV97usA3fPQYEqzQBUHgiFCUsXx",
+            "raw": "N/A"
+          },
+          {
+            "pip": "PIP-27",
+            "mint": "ATLASXmbPQxBUYbxPsV97usA3fPQYEqzQBUHgiFCUsXx",
+            "raw": "N/A"
+          }
+        ],
+        "blankCells": 47,
+        "notes": [
+          "A match is recorded only when a Tracker paid amount equals a chain outflow, or when one remaining paid amount equals the sum of the remaining outflows.",
+          "A blank cell is unknown. It is not treated as zero."
+        ]
+      },
+      "error": null
+    },
+    "balances": {
+      "tool": "treasury_balances",
+      "arguments": {},
+      "registered": false,
+      "ok": false,
+      "output": null,
+      "error": "No balance reader ran for this recording. Wallet balances stay a browser read. No balance was invented."
+    },
+    "health": {
+      "tool": "data_health",
+      "arguments": {},
+      "registered": false,
+      "ok": true,
+      "output": {
+        "sources": [
+          {
+            "source": "galaxy /proposals",
+            "status": "ok",
+            "asOf": "2026-10-24T00:00:00.000Z",
+            "detail": null
+          },
+          {
+            "source": "galaxy /proposals/votes",
+            "status": "ok",
+            "asOf": "2026-10-24T00:00:00.000Z",
+            "detail": null
+          },
+          {
+            "source": "galaxy /dao/treasury",
+            "status": "ok",
+            "asOf": "2026-10-24T00:00:00.000Z",
+            "detail": null
+          },
+          {
+            "source": "treasury cache",
+            "status": "ok",
+            "asOf": null,
+            "detail": null
+          },
+          {
+            "source": "Council Tracker export",
+            "status": "ok",
+            "asOf": "2026-10-24T00:00:00.000Z",
+            "detail": "Parsed the checked-in copy of the public Tracker export. Not a live sheet fetch."
+          },
+          {
+            "source": "Jupiter price",
+            "status": "not_requested",
+            "asOf": null,
+            "detail": "The approximate USD toggle defaults to off. No price was requested."
+          },
+          {
+            "source": "other Council multisigs",
+            "status": "missing",
+            "asOf": null,
+            "detail": "Other Council multisigs are listed once their addresses are published."
+          }
+        ]
+      },
+      "error": null
+    },
+    "multisigs": {
+      "tool": "other_multisigs",
+      "arguments": {},
+      "registered": false,
+      "ok": true,
+      "output": {
+        "verified": [],
+        "detail": "Other Council multisigs are listed once their addresses are published."
+      },
+      "error": null
+    },
+    "usd": {
+      "tool": "jupiter_price",
+      "arguments": {},
+      "registered": false,
+      "ok": false,
+      "output": null,
+      "error": "Not requested. The approximate USD toggle is off. No price was invented."
+    }
+  }
+}

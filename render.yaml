@@ -1,0 +1,18 @@
+# Blueprint for a Docker web service. plan: free selects Render's free instance
+# when that plan is offered. This file does not select a paid instance.
+services:
+  - type: web
+    name: sa-ecosystem-node
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /
+    envVars:
+      - key: HOST
+        value: 0.0.0.0
+      - key: PUBLIC_NODE
+        value: "1"
+      # Set ALLOWED_HOSTS to the Render hostname. Startup exits until it is set.
+      # ALLOWED_HOSTS=your-app.onrender.com
+      - key: NODE_CONFIG
+        value: /app/node.config.json

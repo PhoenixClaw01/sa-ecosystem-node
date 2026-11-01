@@ -1,0 +1,53 @@
+{
+  "name": "sa-ecosystem-node",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Read-only ecosystem node inspired by Star Atlas. Public game reads, profile key audit, and read-only DAO treasury, proposal, and revenue tools.",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "bin": {
+    "sa-ecosystem-node": "./bin/sa-ecosystem-node.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "start": "npm run build && node dist/http.js",
+    "start:stdio": "npm run build && node dist/stdio.js",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "refresh-treasury": "npm run build && node dist/dao/refresh-cli.js",
+    "smoke-dao": "npm run build && node dist/dao/smoke-cli.js",
+    "build:dashboard-dao": "esbuild src/dao/browser-entry.ts --bundle --format=iife --global-name=SA_DAO --platform=browser --target=es2022 --legal-comments=none --outfile=dashboard/dao.js",
+    "build:dashboard-mcp": "node scripts/build-dashboard-mcp.mjs",
+    "record-mcp": "npm run build && node dist/dao/record-cli.js",
+    "sign-hub-update": "npm run build && node dist/hub/sign-cli.js",
+    "hub-keygen": "npm run build && node dist/hub/keygen-cli.js",
+    "hub-store-init": "npm run build && node dist/hub/store-init-cli.js",
+    "hub-add-update": "npm run build && node dist/hub/add-update-cli.js",
+    "hub-claim": "npm run build && node dist/hub/claim-cli.js",
+    "hub-attest": "npm run build && node dist/hub/attest-cli.js"
+  },
+  "dependencies": {
+    "@aephia/atlas-kit": "^0.5.0",
+    "@modelcontextprotocol/node": "^2.1.2",
+    "@modelcontextprotocol/server": "^2.4.0",
+    "@solana/kit": "^6.10.0",
+    "tweetnacl": "^1.0.3",
+    "zod": "^4.6.7"
+  },
+  "overrides": {
+    "@hono/node-server": "^2.1.3"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@modelcontextprotocol/client": "^2.4.0",
+    "@types/node": "^22.19.1",
+    "esbuild": "0.28.2",
+    "eslint": "^9.39.1",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.2",
+    "vitest": "^5.0.5"
+  }
+}
