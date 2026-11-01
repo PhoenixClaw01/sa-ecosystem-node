@@ -41,9 +41,21 @@
 
       <section id="listings" aria-labelledby="listings-heading">
         <h2 id="listings-heading">Listings</h2>
-        <p class="intro">Each offer is <span class="gloss"><button type="button" class="term" aria-expanded="false">signed</button><span class="tip" role="tooltip">A named person marked this as their own. The mark does not move money.</span></span> by a <span class="gloss"><button type="button" class="term" aria-expanded="false">signer</button><span class="tip" role="tooltip">The person who published this.</span></span>.</p>
+        <details class="signed-note" id="signed-note">
+          <summary>What does <span>signed</span> mean?</summary>
+          <p>Signed means approved hub signers checked and published this record with their wallets. It is not an endorsement, it is not proof of ownership, and it does not move money. The business is responsible for its own offer.</p>
+        </details>
+        <p class="disclosure" id="page-disclosure">This page does not take payment. Offers link to each business's own page.</p>
         <div id="listings-body" aria-live="polite">
           <p class="status">Loading listings…</p>
+        </div>
+      </section>
+
+      <section id="guilds" aria-labelledby="guilds-heading">
+        <h2 id="guilds-heading">Groups</h2>
+        <p class="intro">Groups published on the hub.</p>
+        <div id="guilds-body" aria-live="polite">
+          <p class="status">Loading groups…</p>
         </div>
       </section>
 

@@ -4,8 +4,6 @@
  */
 
 const DEFINITIONS = {
-  signed: "A named person marked this as their own. The mark does not move money.",
-  signer: "The person who published this.",
   hub: "The shared board these updates are published on.",
   profile: "A player's public page.",
   fleet: "The ships still listed on a player's public record.",
@@ -79,7 +77,10 @@ const MONTHS = [
 ];
 
 const boundTerms = new WeakSet();
-const DEFAULT_DISCLOSURE = "This page does not take payment. Offers link to each business's own page.";
+/** Shown once under Listings. Cards do not repeat it. */
+export const PAGE_DISCLOSURE = "This page does not take payment. Offers link to each business's own page.";
+/** Collapsed cards keep one short line and never cut a word in half. */
+export const PREVIEW_LIMIT = 64;
 
 function isBidiOrInvisible(code) {
   if (code === 0x61c || code === 0xfeff) return true;
@@ -247,10 +248,113 @@ export function storyParagraphs(data) {
   return [];
 }
 
-export function signedExplainer(listing) {
-  const line = neutralizeText(listing && listing.signedMeaning);
-  if (line) return line;
-  return "Signed means this signer published the listing. It does not move money.";
+/**
+ * Shorten text on a word boundary. A limit that lands inside a word moves
+ * back to the previous space. A first word longer than the limit is kept whole.
+ * The ellipsis is omitted when the text already fits.
+ */
+export function truncateAtWord(value, limit = PREVIEW_LIMIT) {
+  const text = typeof value === "string" ? value.replace(/\s+/g, " ").trim() : "";
+  const max = typeof limit === "number" && Number.isFinite(limit) ? Math.floor(limit) : PREVIEW_LIMIT;
+  if (!text || max <= 0) return "";
+  if (text.length <= max) return text;
+  const head = text.slice(0, max);
+  const space = head.lastIndexOf(" ");
+  if (space > 0) return `${head.slice(0, space).trimEnd()}…`;
+  const next = text.indexOf(" ");
+  if (next === -1) return text;
+  return `${text.slice(0, next)}…`;
+}
+
+export function listingCategoryLabel(listing) {
+  const raw = listing && typeof listing.category === "string" ? listing.category : "";
+  if (!raw) return "";
+  return CATEGORY_LABEL[raw] || neutralizeText(raw);
+}
+
+/** Tags on a guild update, or "Group" when a guild has none. */
+export function guildTypeLabels(update) {
+  const guild = update && update.guild && typeof update.guild === "object" ? update.guild : null;
+  const tags = guild && Array.isArray(guild.tags) ? guild.tags.map((tag) => neutralizeText(tag)).filter(Boolean) : [];
+  if (tags.length > 0) return tags;
+  if ((update && update.kind === "guild") || guild) return ["Group"];
+  return [];
+}
+
+export function searchKindLabel(hit) {
+  if (!hit || typeof hit !== "object") return "";
+  if (hit.kind === "guild") return "Group";
+  if (hit.kind === "player") return "Player";
+  if (hit.kind === "listing") return "Listing";
+  return "";
+}
+
+/** Unique category labels from the records on the page, in A-Z order. */
+export function categoryChoices(records, categoriesOf) {
+  const seen = new Set();
+  const choices = [];
+  const list = Array.isArray(records) ? records : [];
+  const read = typeof categoriesOf === "function" ? categoriesOf : () => [];
+  for (const record of list) {
+    const labels = read(record);
+    const items = Array.isArray(labels) ? labels : [];
+    for (const label of items) {
+      if (typeof label !== "string") continue;
+      const clean = label.trim();
+      if (!clean) continue;
+      const key = clean.toLocaleLowerCase();
+      if (seen.has(key)) continue;
+      seen.add(key);
+      choices.push(clean);
+    }
+  }
+  choices.sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
+  return choices;
+}
+
+/**
+ * Filter and sort a list without mutating it.
+ * sort is "az", "newest", or "category".
+ * filter "all" keeps every record. Any other filter keeps records whose
+ * categoriesOf list includes that label.
+ * Newest keeps the incoming order when no record has a date.
+ */
+export function applyView(records, options) {
+  const list = Array.isArray(records) ? records.filter((item) => item && typeof item === "object") : [];
+  const categoriesOf = options && typeof options.categoriesOf === "function" ? options.categoriesOf : () => [];
+  const nameOf = options && typeof options.nameOf === "function" ? options.nameOf : () => "";
+  const dateOf = options && typeof options.dateOf === "function" ? options.dateOf : () => "";
+  const filter = options && options.filter ? options.filter : "all";
+  const sort = options && options.sort ? options.sort : "az";
+  const filtered =
+    filter === "all"
+      ? list.slice()
+      : list.filter((item) => {
+          const labels = categoriesOf(item);
+          return Array.isArray(labels) && labels.includes(filter);
+        });
+  if (sort === "newest") {
+    if (!filtered.some((item) => dateOf(item))) return filtered;
+    return filtered.slice().sort((a, b) => compareNewest(dateOf(a), dateOf(b), nameOf(a), nameOf(b)));
+  }
+  if (sort === "category") {
+    return filtered.slice().sort((a, b) => {
+      const byCategory = firstLabel(categoriesOf(a)).localeCompare(firstLabel(categoriesOf(b)), undefined, { sensitivity: "base" });
+      if (byCategory !== 0) return byCategory;
+      return String(nameOf(a)).localeCompare(String(nameOf(b)), undefined, { sensitivity: "base" });
+    });
+  }
+  return filtered.slice().sort((a, b) => String(nameOf(a)).localeCompare(String(nameOf(b)), undefined, { sensitivity: "base" }));
+}
+
+export function setCardsOpen(root, open) {
+  if (!root) return;
+  walk(root, (node) => {
+    if (!node || node.tagName !== "DETAILS") return;
+    if (!hasClass(node, "card-details")) return;
+    if (open) node.setAttribute("open", "");
+    else if (typeof node.removeAttribute === "function") node.removeAttribute("open");
+  });
 }
 
 export function playerLines(card) {
@@ -322,67 +426,50 @@ export async function lookupPlayer(rpc, address, storyTool) {
   }
 }
 
-export function renderListingCard(doc, listing) {
-  const card = el(doc, "article", "card");
-  appendLogo(doc, card, listing && listing.image, listing && listing.title);
-  card.appendChild(el(doc, "h3", "card-title", displayText(listing && listing.title, "Untitled offer")));
-  appendClaimed(doc, card, listing);
-  const by = el(doc, "p", "byline");
-  by.textContent = `Listed by ${signerName(listing)}`;
-  card.appendChild(by);
-  card.appendChild(explainer(doc, signedExplainer(listing)));
-  appendDisclosure(doc, card, listing);
+export function renderListingCard(doc, listing, options) {
+  const title = displayText(listing && listing.title, "Untitled offer");
   const offer = displayText(listing && listing.offerText, "");
-  if (offer) card.appendChild(el(doc, "p", "offer", offer));
+  const category = listingCategoryLabel(listing);
   const status = STATUS_LABEL[listing && listing.status] || "";
-  if (status) card.appendChild(el(doc, "p", "status", status));
-  appendOfferLink(doc, card, listing);
-  appendExternal(doc, card, listing && listing.url);
-  return card;
+  const meta = [category, status].filter(Boolean).join(" · ");
+  return renderSummaryCard(doc, {
+    className: options && options.open ? "card detail-card" : "card",
+    open: Boolean(options && options.open),
+    title,
+    owner: `Listed by ${signerName(listing)}`,
+    meta,
+    record: listing,
+    signed: true,
+    logo: { image: listing && listing.image, fallback: title },
+    preview: offer ? truncateAtWord(offer, PREVIEW_LIMIT) : "",
+    fill(more) {
+      appendListingMore(doc, more, listing);
+    },
+  });
 }
 
 export function renderListingDetail(doc, listing) {
-  const card = el(doc, "article", "card detail-card");
-  appendLogo(doc, card, listing && listing.image, listing && listing.title);
-  appendClaimed(doc, card, listing);
-  const by = el(doc, "p", "byline");
-  by.textContent = `Listed by ${signerName(listing)}`;
-  card.appendChild(by);
-  card.appendChild(explainer(doc, signedExplainer(listing)));
-  appendDisclosure(doc, card, listing);
-  const offer = displayText(listing && listing.offerText, "");
-  if (offer) card.appendChild(el(doc, "p", "offer", offer));
-  const note = displayText(listing && listing.verifyLiveNote, "");
-  if (note) card.appendChild(el(doc, "p", "note", note));
-  const owner = displayText(listing && listing.owner, "");
-  if (owner) card.appendChild(el(doc, "p", "meta", `From ${owner}`));
-  const status = STATUS_LABEL[listing && listing.status] || "";
-  if (status) card.appendChild(el(doc, "p", "status", status));
-  const stream = STREAM_LABEL[listing && listing.stream] || "";
-  if (stream) card.appendChild(el(doc, "p", "meta", stream));
-  const category = CATEGORY_LABEL[listing && listing.category] || "";
-  if (category) card.appendChild(el(doc, "p", "meta", category));
-  const asOf = plainDate(listing && listing.asOf);
-  if (asOf) card.appendChild(el(doc, "p", "meta", `Noted on ${asOf}`));
-  const expires = plainDate(listing && listing.expiresAt);
-  if (expires) card.appendChild(el(doc, "p", "meta", `Open through ${expires}`));
-  if (listing && listing.expired === true) card.appendChild(el(doc, "p", "meta", "This offer is past its end date."));
-  appendExternal(doc, card, listing && listing.url);
-  return card;
+  return renderListingCard(doc, listing, { open: true });
 }
 
 export function renderHubUpdate(doc, update) {
   if (!isPublicUpdate(update)) return el(doc, "p", "empty", "");
-  const card = el(doc, "article", "card");
-  card.appendChild(el(doc, "h3", "card-title", KIND_LABEL[update && update.kind] || "Update"));
-  appendClaimed(doc, card, update);
-  const when = monthYear(update && update.created_at);
-  if (when) card.appendChild(el(doc, "p", "meta", when));
+  if (update && update.kind === "guild") return renderGuildCard(doc, update);
   const body = displayText(update && update.body, "");
-  if (body) card.appendChild(el(doc, "p", "update-body", body));
-  if (update && update.kind === "guild") appendGuild(doc, card, update.guild);
-  if (update && update.kind === "listing") appendOfferLink(doc, card, update);
-  return card;
+  const when = monthYear(update && update.created_at);
+  const title = KIND_LABEL[update && update.kind] || "Update";
+  const preview = body ? truncateAtWord(body, PREVIEW_LIMIT) : "";
+  return renderSummaryCard(doc, {
+    title,
+    meta: when,
+    record: update,
+    signed: true,
+    preview,
+    fill(more) {
+      if (body && body !== preview) more.appendChild(el(doc, "p", "update-body", body));
+      if (update && update.kind === "listing") appendOfferLink(doc, more, update);
+    },
+  });
 }
 
 /** Only a hub file at the pinned commit. External https logos are not loaded. */
@@ -406,39 +493,69 @@ export function allowedImageUrl(value) {
   return href;
 }
 
-export function renderSearchResults(doc, data) {
+export function renderSearchResults(doc, data, view) {
   const host = el(doc, "div", "search-results");
-  if (!data || data.pinned === false) {
-    host.appendChild(el(doc, "p", "empty", "No shared board is pinned, so there is nothing to search."));
-    return host;
-  }
-  const results = Array.isArray(data.results) ? data.results : [];
-  if (results.length === 0) {
-    host.appendChild(el(doc, "p", "empty", "No matches."));
-    return host;
-  }
-  for (const hit of results) host.appendChild(renderSearchHit(doc, hit));
-  if (data.truncated === true) {
-    host.appendChild(el(doc, "p", "quiet", "Some opted-in players were not checked."));
-  }
+  fillSearchResults(doc, host, data, view);
   return host;
 }
 
+function fillSearchResults(doc, host, data, view) {
+  if (!data || data.pinned === false) {
+    clear(host);
+    host.appendChild(el(doc, "p", "empty", "No shared board is pinned, so there is nothing to search."));
+    return;
+  }
+  const results = Array.isArray(data.results) ? data.results.filter((hit) => hit && typeof hit === "object") : [];
+  if (results.length === 0) {
+    clear(host);
+    host.appendChild(el(doc, "p", "empty", "No matches."));
+    return;
+  }
+  const prefs = view && typeof view === "object" ? view : {};
+  const filter = prefs.filter || "all";
+  const sort = prefs.sort || "az";
+  paintToolbarAndCards(doc, host, results, {
+    filter,
+    sort,
+    categoriesOf: (hit) => {
+      const label = searchKindLabel(hit);
+      return label ? [label] : [];
+    },
+    nameOf: (hit) => displayText(hit.name, "Untitled"),
+    dateOf: () => "",
+    onFilter: (next) => {
+      if (typeof prefs.onChange === "function") prefs.onChange({ filter: next, sort });
+    },
+    onSort: (next) => {
+      if (typeof prefs.onChange === "function") prefs.onChange({ filter, sort: next });
+    },
+    render: (hit) => renderSearchHit(doc, hit),
+  });
+  if (data.truncated === true) {
+    host.appendChild(el(doc, "p", "quiet", "Some opted-in players were not checked."));
+  }
+}
+
 export function renderSearchHit(doc, hit) {
-  const row = el(doc, "article", "card search-hit");
-  const head = el(doc, "div", "search-head");
-  appendLogo(doc, head, hit && hit.image, hit && hit.name);
-  head.appendChild(el(doc, "h3", "card-title", displayText(hit && hit.name, "Untitled")));
-  row.appendChild(head);
-  appendClaimed(doc, row, hit);
+  const name = displayText(hit && hit.name, "Untitled");
   const description = displayText(hit && hit.description, "");
-  if (description) row.appendChild(el(doc, "p", "offer", description));
-  const kind = hit && hit.kind === "guild" ? "Group" : hit && hit.kind === "player" ? "Player" : hit && hit.kind === "listing" ? "Listing" : "";
-  if (kind) row.appendChild(el(doc, "p", "meta", kind));
-  appendSearchLink(doc, row, hit && hit.link);
-  if (hit && hit.site && hit.site !== hit.link) appendExternal(doc, row, hit.site);
-  appendDiscord(doc, row, hit && hit.discord);
-  return row;
+  const preview = description ? truncateAtWord(description, PREVIEW_LIMIT) : "";
+  const kind = searchKindLabel(hit);
+  return renderSummaryCard(doc, {
+    className: "card search-hit",
+    title: name,
+    meta: kind,
+    record: hit,
+    signed: hit && (hit.kind === "listing" || hit.kind === "guild"),
+    logo: { image: hit && hit.image, fallback: name },
+    preview,
+    fill(more) {
+      if (description && description !== preview) more.appendChild(el(doc, "p", "offer", description));
+      appendSearchLink(doc, more, hit && hit.link);
+      if (hit && hit.site && hit.site !== hit.link) appendExternal(doc, more, hit.site);
+      appendDiscord(doc, more, hit && hit.discord);
+    },
+  });
 }
 
 export function allowedDiscordInvite(value) {
@@ -468,21 +585,24 @@ export function allowedDiscordInvite(value) {
 }
 
 export function renderPlayerResult(doc, result) {
-  const wrap = el(doc, "div", "player-result");
+  const wrap = el(doc, "div", "player-result cards");
   const legacy = result && result.legacy;
+  let more = null;
   if (!legacy) wrap.appendChild(el(doc, "p", "empty", "That player could not be loaded."));
   else {
-    for (const line of playerLines(legacy)) appendPlayerLine(doc, wrap, line);
-    appendLegacyNotes(doc, wrap, legacy);
+    const card = renderPlayerCard(doc, legacy);
+    wrap.appendChild(card);
+    more = findByClass(card, "card-more");
   }
+  const storyTarget = more || wrap;
   const story = (result && result.story) || { state: "absent" };
   if (story.state === "ready") {
-    wrap.appendChild(el(doc, "h3", "story-title", story.title || "Story"));
-    for (const paragraph of story.paragraphs || []) wrap.appendChild(el(doc, "p", "story", paragraph));
+    storyTarget.appendChild(el(doc, "h3", "story-title", story.title || "Story"));
+    for (const paragraph of story.paragraphs || []) storyTarget.appendChild(el(doc, "p", "story", paragraph));
   } else if (story.state === "absent") {
-    wrap.appendChild(el(doc, "p", "quiet", "A longer story is not available yet."));
+    storyTarget.appendChild(el(doc, "p", "quiet", "A longer story is not available yet."));
   } else {
-    wrap.appendChild(el(doc, "p", "quiet", "No story is available for this player."));
+    storyTarget.appendChild(el(doc, "p", "quiet", "No story is available for this player."));
   }
   return wrap;
 }
@@ -549,6 +669,15 @@ export async function bindPage(doc, env = {}) {
     updatesFailed: false,
     storyTool: null,
     hash: location.hash || "",
+    listingFilter: "all",
+    listingSort: "az",
+    updateFilter: "all",
+    updateSort: "az",
+    guildFilter: "all",
+    guildSort: "az",
+    searchFilter: "all",
+    searchSort: "az",
+    searchData: null,
   };
   try {
     await rpc("initialize", {
@@ -579,7 +708,7 @@ export async function bindPage(doc, env = {}) {
       renderPage(doc, state);
     });
   }
-  bindSearch(doc, rpc);
+  bindSearch(doc, rpc, state);
   const form = doc.getElementById("lookup");
   if (form && typeof form.addEventListener === "function") {
     let lookupSeq = 0;
@@ -657,26 +786,98 @@ function clear(node) {
   while (node.firstChild) node.removeChild(node.firstChild);
 }
 
-function explainer(doc, text) {
-  const wrap = el(doc, "div", "explain");
-  const button = el(doc, "button", "explain-toggle", "What does signed mean?");
-  button.setAttribute("type", "button");
-  button.setAttribute("aria-expanded", "false");
-  const answer = el(doc, "p", "explain-answer", text);
-  answer.hidden = true;
-  button.addEventListener("click", () => {
-    const open = button.getAttribute("aria-expanded") === "true";
-    button.setAttribute("aria-expanded", open ? "false" : "true");
-    answer.hidden = open;
-  });
-  wrap.appendChild(button);
-  wrap.appendChild(answer);
-  return wrap;
+function renderSummaryCard(doc, spec) {
+  const card = el(doc, "article", spec.className || "card");
+  const details = el(doc, "details", "card-details");
+  if (spec.open) details.setAttribute("open", "");
+  const summary = el(doc, "summary", "card-summary");
+  const main = el(doc, "div", "summary-main");
+  if (spec.logo) appendLogo(doc, main, spec.logo.image, spec.logo.fallback);
+  const text = el(doc, "div", "summary-text");
+  text.appendChild(el(doc, "h3", "card-title", spec.title));
+  if (spec.owner) text.appendChild(el(doc, "p", "byline", spec.owner));
+  if (spec.meta) text.appendChild(el(doc, "p", "meta", spec.meta));
+  if (spec.record) appendClaimed(doc, text, spec.record);
+  if (spec.signed) text.appendChild(el(doc, "p", "signed-badge", "Signed"));
+  main.appendChild(text);
+  summary.appendChild(main);
+  if (spec.preview) summary.appendChild(el(doc, "p", "preview", spec.preview));
+  details.appendChild(summary);
+  const more = el(doc, "div", "card-more");
+  if (typeof spec.fill === "function") spec.fill(more);
+  if (more.childNodes && more.childNodes.length > 0) details.appendChild(more);
+  else details.className = "card-details is-brief";
+  card.appendChild(details);
+  return card;
 }
 
-function appendDisclosure(doc, card, listing) {
-  const disclosure = displayText(listing && listing.disclosure, DEFAULT_DISCLOSURE);
-  card.appendChild(el(doc, "p", "disclosure", `Disclosure: ${disclosure}`));
+function appendListingMore(doc, more, listing) {
+  const offer = displayText(listing && listing.offerText, "");
+  const preview = offer ? truncateAtWord(offer, PREVIEW_LIMIT) : "";
+  if (offer && offer !== preview) more.appendChild(el(doc, "p", "offer", offer));
+  const note = displayText(listing && listing.verifyLiveNote, "");
+  if (note) more.appendChild(el(doc, "p", "note", note));
+  const owner = displayText(listing && listing.owner, "");
+  if (owner) more.appendChild(el(doc, "p", "meta", `From ${owner}`));
+  const stream = STREAM_LABEL[listing && listing.stream] || "";
+  if (stream) more.appendChild(el(doc, "p", "meta", stream));
+  const asOf = plainDate(listing && listing.asOf);
+  if (asOf) more.appendChild(el(doc, "p", "meta", `Noted on ${asOf}`));
+  const expires = plainDate(listing && listing.expiresAt);
+  if (expires) more.appendChild(el(doc, "p", "meta", `Open through ${expires}`));
+  if (listing && listing.expired === true) more.appendChild(el(doc, "p", "meta", "This offer is past its end date."));
+  appendOfferLink(doc, more, listing);
+  appendExternal(doc, more, listing && listing.url);
+}
+
+function renderGuildCard(doc, update) {
+  const guild = update && update.guild && typeof update.guild === "object" ? update.guild : {};
+  const name = displayText(guild.name, "Group");
+  const description = displayText(guild.description, "");
+  const body = displayText(update && update.body, "");
+  const types = guildTypeLabels(update);
+  const when = monthYear(update && update.created_at);
+  const meta = [types.join(", "), when].filter(Boolean).join(" · ");
+  const previewSource = description || body;
+  const preview = previewSource ? truncateAtWord(previewSource, PREVIEW_LIMIT) : "";
+  return renderSummaryCard(doc, {
+    className: "card guild-card",
+    title: name,
+    meta,
+    record: update,
+    signed: true,
+    logo: { image: guild.image, fallback: name },
+    preview,
+    fill(more) {
+      if (description && description !== preview) more.appendChild(el(doc, "p", "offer", description));
+      if (body && body !== description) more.appendChild(el(doc, "p", "update-body", body));
+      const links = Array.isArray(guild.links) ? guild.links : [];
+      for (const link of links) appendExternal(doc, more, link);
+      appendExternal(doc, more, guild.site);
+      appendDiscord(doc, more, guild.discord);
+    },
+  });
+}
+
+function renderPlayerCard(doc, legacy) {
+  const profiles = Array.isArray(legacy.profiles) ? legacy.profiles : [];
+  const lines = playerLines(legacy);
+  const name = displayText(profiles[0] && profiles[0].name, lines[0] || "Player");
+  const faction = displayText(profiles[0] && profiles[0].faction, "");
+  const meta = faction && faction !== "Unaligned" ? `Faction: ${faction}` : "No faction listed.";
+  const fleets = Array.isArray(legacy.fleets) ? legacy.fleets : [];
+  const fleetName = fleets.length > 0 ? displayText(fleets[0] && fleets[0].name, "Unnamed fleet") : "";
+  const preview = fleetName ? truncateAtWord(`Fleet: ${fleetName}`, PREVIEW_LIMIT) : "";
+  return renderSummaryCard(doc, {
+    className: "card player-card",
+    title: name,
+    meta,
+    preview,
+    fill(more) {
+      for (const line of lines) appendPlayerLine(doc, more, line);
+      appendLegacyNotes(doc, more, legacy);
+    },
+  });
 }
 
 function setLookupBusy(button, busy) {
@@ -747,19 +948,30 @@ function appendClaimed(doc, parent, record) {
   parent.appendChild(el(doc, "p", "badge", "claimed"));
 }
 
-function appendGuild(doc, card, guild) {
-  if (!guild || typeof guild !== "object") return;
-  appendLogo(doc, card, guild.image, guild.name);
-  const name = displayText(guild.name, "");
-  if (name) card.appendChild(el(doc, "p", "offer", name));
-  const description = displayText(guild.description, "");
-  if (description) card.appendChild(el(doc, "p", "note", description));
-  const tags = Array.isArray(guild.tags) ? guild.tags.map((tag) => neutralizeText(tag)).filter(Boolean) : [];
-  if (tags.length > 0) card.appendChild(el(doc, "p", "meta", tags.join(", ")));
-  const links = Array.isArray(guild.links) ? guild.links : [];
-  for (const link of links) appendExternal(doc, card, link);
-  appendExternal(doc, card, guild.site);
-  appendDiscord(doc, card, guild.discord);
+function firstLabel(labels) {
+  return Array.isArray(labels) && typeof labels[0] === "string" ? labels[0] : "";
+}
+
+function compareNewest(aDate, bDate, aName, bName) {
+  const da = typeof aDate === "string" ? aDate : "";
+  const db = typeof bDate === "string" ? bDate : "";
+  if (da === db) return String(aName).localeCompare(String(bName), undefined, { sensitivity: "base" });
+  if (!da) return 1;
+  if (!db) return -1;
+  return da < db ? 1 : -1;
+}
+
+function hasClass(node, name) {
+  return typeof node.className === "string" && node.className.split(/\s+/).includes(name);
+}
+
+function findByClass(node, className) {
+  let found = null;
+  walk(node, (child) => {
+    if (found || !child || typeof child.className !== "string") return;
+    if (child.className.split(/\s+/).includes(className)) found = child;
+  });
+  return found;
 }
 
 function appendDiscord(doc, parent, value) {
@@ -791,7 +1003,7 @@ function appendSearchLink(doc, parent, value) {
   appendExternal(doc, parent, value);
 }
 
-function bindSearch(doc, rpc) {
+function bindSearch(doc, rpc, state) {
   const form = doc.getElementById("search-form");
   if (!form || typeof form.addEventListener !== "function") return;
   let busy = false;
@@ -805,6 +1017,7 @@ function bindSearch(doc, rpc) {
     if (!host) return;
     clear(host);
     if (raw.length > 80) {
+      state.searchData = null;
       host.appendChild(el(doc, "p", "empty", "Search text must be at most 80 characters."));
       return;
     }
@@ -816,19 +1029,43 @@ function bindSearch(doc, rpc) {
         clear(host);
         const data = callData(message);
         if (!data) {
+          state.searchData = null;
           host.appendChild(el(doc, "p", "empty", "Search could not be loaded."));
           return;
         }
-        host.appendChild(renderSearchResults(doc, data));
+        state.searchFilter = "all";
+        state.searchData = data;
+        paintSearch(doc, state);
       })
       .catch(() => {
         clear(host);
+        state.searchData = null;
         host.appendChild(el(doc, "p", "empty", "Search could not be loaded."));
       })
       .then(() => {
         busy = false;
         setLookupBusy(submit, false);
       });
+  });
+}
+
+function paintSearch(doc, state) {
+  const host = doc.getElementById("search-body");
+  if (!host || !state.searchData) return;
+  let results = directChild(host, "search-results");
+  if (!results) {
+    clear(host);
+    results = el(doc, "div", "search-results");
+    host.appendChild(results);
+  }
+  fillSearchResults(doc, results, state.searchData, {
+    filter: state.searchFilter || "all",
+    sort: state.searchSort || "az",
+    onChange(next) {
+      state.searchFilter = next.filter;
+      state.searchSort = next.sort;
+      paintSearch(doc, state);
+    },
   });
 }
 
@@ -914,35 +1151,217 @@ function walk(node, visit) {
 }
 
 function fillListings(doc, host, state) {
-  clear(host);
   if (state && state.listingsFailed) {
+    clear(host);
     host.appendChild(el(doc, "p", "empty", "Listings could not be loaded."));
     return;
   }
-  const listings = state && Array.isArray(state.listings) ? state.listings : [];
+  const listings = (state && Array.isArray(state.listings) ? state.listings : []).filter((item) => item && typeof item === "object");
   if (listings.length === 0) {
+    clear(host);
     host.appendChild(el(doc, "p", "empty", "No listings yet"));
     return;
   }
-  for (const listing of listings) {
-    if (!listing || typeof listing !== "object") continue;
-    host.appendChild(renderListingCard(doc, listing));
-  }
+  paintToolbarAndCards(doc, host, listings, {
+    filter: state.listingFilter || "all",
+    sort: state.listingSort || "az",
+    categoriesOf: (item) => {
+      const label = listingCategoryLabel(item);
+      return label ? [label] : [];
+    },
+    nameOf: (item) => displayText(item.title, "Untitled offer"),
+    dateOf: listingSortDate,
+    onFilter: (next) => {
+      state.listingFilter = next;
+      renderPage(doc, state);
+    },
+    onSort: (next) => {
+      state.listingSort = next;
+      renderPage(doc, state);
+    },
+    render: (item) => renderListingCard(doc, item),
+  });
 }
 
 function fillUpdates(doc, host, state) {
-  clear(host);
+  const guildHost = doc.getElementById("guilds-body");
   if (state && state.updatesFailed) {
+    clear(host);
     host.appendChild(el(doc, "p", "empty", "Updates could not be loaded."));
+    if (guildHost) {
+      clear(guildHost);
+      guildHost.appendChild(el(doc, "p", "empty", "Groups could not be loaded."));
+    }
     return;
   }
   const raw = state && Array.isArray(state.updates) ? state.updates : [];
   const updates = raw.filter((update) => isPublicUpdate(update));
-  if (updates.length === 0) {
-    host.appendChild(el(doc, "p", "empty", "No updates yet"));
+  const guilds = guildHost ? updates.filter((update) => update.kind === "guild") : [];
+  const rest = guildHost ? updates.filter((update) => update.kind !== "guild") : updates;
+  paintPlainSection(doc, host, state, rest, {
+    filterKey: "updateFilter",
+    sortKey: "updateSort",
+    emptyText: "No updates yet",
+    categoriesOf: (update) => [KIND_LABEL[update.kind] || "Update"],
+    nameOf: (update) => displayText(update.body, KIND_LABEL[update.kind] || "Update"),
+    dateOf: (update) => (typeof update.created_at === "string" ? update.created_at : ""),
+    render: (update) => renderHubUpdate(doc, update),
+  });
+  if (!guildHost) return;
+  paintPlainSection(doc, guildHost, state, guilds, {
+    filterKey: "guildFilter",
+    sortKey: "guildSort",
+    emptyText: "No groups yet",
+    categoriesOf: (update) => guildTypeLabels(update),
+    nameOf: (update) => displayText(update.guild && update.guild.name, "Group"),
+    dateOf: (update) => (typeof update.created_at === "string" ? update.created_at : ""),
+    render: (update) => renderHubUpdate(doc, update),
+  });
+}
+
+function paintPlainSection(doc, host, state, records, config) {
+  if (records.length === 0) {
+    clear(host);
+    host.appendChild(el(doc, "p", "empty", config.emptyText));
     return;
   }
-  for (const update of updates) host.appendChild(renderHubUpdate(doc, update));
+  paintToolbarAndCards(doc, host, records, {
+    filter: state[config.filterKey] || "all",
+    sort: state[config.sortKey] || "az",
+    categoriesOf: config.categoriesOf,
+    nameOf: config.nameOf,
+    dateOf: config.dateOf,
+    onFilter: (next) => {
+      state[config.filterKey] = next;
+      renderPage(doc, state);
+    },
+    onSort: (next) => {
+      state[config.sortKey] = next;
+      renderPage(doc, state);
+    },
+    render: config.render,
+  });
+}
+
+function paintToolbarAndCards(doc, host, records, config) {
+  const choices = categoryChoices(records, config.categoriesOf);
+  const filter = config.filter && config.filter !== "all" && choices.includes(config.filter) ? config.filter : "all";
+  const sort = config.sort || "az";
+  const shown = applyView(records, {
+    filter,
+    sort,
+    categoriesOf: config.categoriesOf,
+    nameOf: config.nameOf,
+    dateOf: config.dateOf,
+  });
+  const choiceKey = JSON.stringify(choices);
+  let bar = directChild(host, "toolbar");
+  if (!bar || bar.getAttribute("data-choices") !== choiceKey) {
+    if (bar) host.removeChild(bar);
+    appendToolbar(doc, host, {
+      choices,
+      filter,
+      sort,
+      onFilter: config.onFilter,
+      onSort: config.onSort,
+      onExpand: () => setCardsOpen(host, true),
+      onCollapse: () => setCardsOpen(host, false),
+    });
+    bar = directChild(host, "toolbar");
+    if (bar) bar.setAttribute("data-choices", choiceKey);
+  } else {
+    syncToolbar(bar, filter, sort);
+  }
+  const stale = (host.childNodes || []).slice();
+  for (const kid of stale) {
+    if (kid !== bar) host.removeChild(kid);
+  }
+  if (shown.length === 0) {
+    host.appendChild(el(doc, "p", "empty", "Nothing matches that filter."));
+    return;
+  }
+  const grid = el(doc, "div", "cards");
+  for (const record of shown) grid.appendChild(config.render(record));
+  host.appendChild(grid);
+}
+
+function directChild(host, className) {
+  for (const kid of host.childNodes || []) {
+    if (hasClass(kid, className)) return kid;
+  }
+  return null;
+}
+
+function syncToolbar(bar, filter, sort) {
+  walk(bar, (node) => {
+    if (hasClass(node, "chip")) {
+      const pressed = (filter === "all" && node.textContent === "All") || node.textContent === filter;
+      node.setAttribute("aria-pressed", pressed ? "true" : "false");
+    }
+    if (node.tagName === "SELECT" && hasClass(node, "sort")) node.value = sort || "az";
+  });
+}
+
+function appendToolbar(doc, host, config) {
+  const bar = el(doc, "div", "toolbar");
+  const choices = Array.isArray(config.choices) ? config.choices : [];
+  if (choices.length > 0 && typeof config.onFilter === "function") {
+    const group = el(doc, "div", "chips");
+    group.setAttribute("role", "group");
+    group.setAttribute("aria-label", "Filter by category");
+    group.appendChild(chipButton(doc, "All", config.filter === "all", () => config.onFilter("all")));
+    for (const choice of choices) {
+      group.appendChild(chipButton(doc, choice, config.filter === choice, () => config.onFilter(choice)));
+    }
+    bar.appendChild(group);
+  }
+  if (typeof config.onSort === "function") {
+    const label = el(doc, "label", "sort-label");
+    label.appendChild(doc.createTextNode("Sort"));
+    const select = el(doc, "select", "sort");
+    select.setAttribute("aria-label", "Sort");
+    for (const [value, text] of [
+      ["az", "A-Z"],
+      ["newest", "Newest"],
+      ["category", "Category"],
+    ]) {
+      const option = el(doc, "option", "", text);
+      option.setAttribute("value", value);
+      option.value = value;
+      select.appendChild(option);
+    }
+    select.value = config.sort || "az";
+    select.addEventListener("change", () => {
+      const next = typeof select.value === "string" && select.value ? select.value : "az";
+      config.onSort(next);
+    });
+    label.appendChild(select);
+    bar.appendChild(label);
+  }
+  if (typeof config.onExpand === "function") bar.appendChild(toolButton(doc, "Expand all", config.onExpand));
+  if (typeof config.onCollapse === "function") bar.appendChild(toolButton(doc, "Collapse all", config.onCollapse));
+  if (bar.childNodes.length > 0) host.appendChild(bar);
+}
+
+function chipButton(doc, text, pressed, onClick) {
+  const button = el(doc, "button", "chip", text);
+  button.setAttribute("type", "button");
+  button.setAttribute("aria-pressed", pressed ? "true" : "false");
+  button.addEventListener("click", onClick);
+  return button;
+}
+
+function toolButton(doc, text, onClick) {
+  const button = el(doc, "button", "tool", text);
+  button.setAttribute("type", "button");
+  button.addEventListener("click", onClick);
+  return button;
+}
+
+function listingSortDate(listing) {
+  if (listing && typeof listing.created_at === "string" && listing.created_at) return listing.created_at;
+  if (listing && typeof listing.asOf === "string" && listing.asOf) return listing.asOf;
+  return "";
 }
 
 if (globalThis.document && globalThis.document.getElementById("board")) {

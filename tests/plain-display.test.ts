@@ -7,13 +7,19 @@ import { describe, expect, it } from "vitest";
 
 import {
   allowedHttpsUrl,
+  applyView,
   bindPage,
+  categoryChoices,
+  guildTypeLabels,
+  listingCategoryLabel,
   loadBoard,
   lookupPlayer,
   neutralizeText,
   offerFragment,
+  PAGE_DISCLOSURE,
   parseRpcBody,
   playerStoryArguments,
+  PREVIEW_LIMIT,
   allowedDiscordInvite,
   allowedImageUrl,
   renderHubUpdate,
@@ -22,7 +28,10 @@ import {
   renderPlayerResult,
   renderSearchHit,
   renderSearchResults,
+  searchKindLabel,
+  setCardsOpen,
   storyParagraphs,
+  truncateAtWord,
 } from "../dashboard/plain/plain.js";
 
 const HASH = "ab".repeat(32);
@@ -92,6 +101,10 @@ class MiniEl implements MiniNode {
     return child;
   }
 
+  removeAttribute(name: string): void {
+    delete this.attrs[name];
+  }
+
   removeChild(child: MiniNode): MiniNode {
     const index = this.childNodes.indexOf(child);
     if (index >= 0) this.childNodes.splice(index, 1);
@@ -152,6 +165,10 @@ function byTag(node: MiniNode, tag: string): MiniEl[] {
     if (child.tagName === tag.toUpperCase()) found.push(child);
   });
   return found;
+}
+
+function hasClass(node: { className?: string } | null, className: string): boolean {
+  return Boolean(node && typeof node.className === "string" && node.className.split(/\s+/).includes(className));
 }
 
 function byClass(node: MiniNode, className: string): MiniEl[] {
@@ -248,18 +265,21 @@ describe("plain display escaping", () => {
     expect(card.textContent).toContain("Listed by Ann [click](https://evil.example)");
     expect(card.textContent).toContain("[docs](javascript:alert(1))");
     expect(card.textContent).not.toContain("claimed");
-    expect(card.textContent).toContain("Disclosure: Hello world");
+    expect(card.textContent).not.toContain(PAGE_DISCLOSURE);
+    expect(card.textContent).not.toContain("What does signed mean?");
+    expect(byClass(card, "explain-toggle")).toEqual([]);
+    expect(byClass(card, "disclosure")).toEqual([]);
     expect(card.textContent).not.toMatch(/[\u202A-\u202E\u2066-\u2069]/);
     const hrefs = byTag(card, "a").map((link) => link.getAttribute("href"));
     expect(hrefs).toEqual([`#offer/${HASH}`]);
     expect(hrefs.join(" ")).not.toContain("javascript:");
     expect(hrefs.join(" ")).not.toContain("evil.example");
-
-    const button = byClass(card, "explain-toggle")[0];
-    expect(button?.textContent).toBe("What does signed mean?");
-    button?.dispatch("click");
-    expect(card.textContent).toContain("Signed by <script>alert(1)</script>. done");
-    expect(byClass(card, "explain-answer")[0]?.hidden).toBe(false);
+    expect(byTag(card, "details")).toHaveLength(1);
+    expect(byTag(card, "summary")).toHaveLength(1);
+    expect(byTag(card, "details")[0]?.getAttribute("open")).toBeNull();
+    const link = byClass(card, "more")[0];
+    expect(link?.parentNode && hasClass(link.parentNode, "card-summary")).toBe(false);
+    expect(card.textContent).not.toContain("Signed by <script>alert(1)</script>");
   });
 
   it("shows a claimed badge as text and does not add a wallet address", () => {
@@ -354,7 +374,8 @@ describe("plain display url allowlist", () => {
     expect(external?.getAttribute("target")).toBe("_blank");
     expect(external?.textContent).toBe("Open dock-bakery.example");
     expect(card.textContent).toContain("Listed by Rowan Hale");
-    expect(card.textContent).toContain("Disclosure: This is a referral.");
+    expect(card.textContent).not.toContain("Disclosure:");
+    expect(byClass(card, "signed-badge")[0]?.textContent).toBe("Signed");
 
     const blocked = renderListingCard(doc, {
       title: "Stall",
@@ -400,7 +421,7 @@ describe("plain display page", () => {
     expect(doc.getElementById("detail-heading")?.textContent).toBe("Morning bread at the dock");
     const detail = doc.getElementById("detail-body");
     expect(detail?.textContent).toContain("Listed by Rowan Hale");
-    expect(detail?.textContent).toContain("Disclosure: This is a referral.");
+    expect(detail?.textContent).not.toContain(PAGE_DISCLOSURE);
     expect(detail?.textContent).toContain("Fresh loaves on weekday mornings.");
     expect(detail?.textContent).toContain("From Dock Bakery");
     expect(offerFragment({ hash: "<script>" })).toBeNull();
@@ -516,29 +537,41 @@ describe("plain display page", () => {
     expect(doc.getElementById("lookup-submit")?.disabled).toBe(false);
   });
 
-  it("uses the server signedMeaning, a default disclosure, and text-only sources", () => {
+  it("keeps signing and the disclosure on the page once, and text-only sources", () => {
     const doc = createDoc();
     const meaning = "Signed by Rowan Hale. This signature means that signer published this listing. It does not move money, and this node never handles payment.";
     const named = renderListingCard(doc, {
       title: "Morning bread",
       signerDisplayName: "Rowan Hale",
       signedMeaning: meaning,
+      disclosure: "This is a referral.",
       hash: HASH,
     });
-    expect(byClass(named, "explain-answer")[0]?.textContent).toBe(meaning);
-    expect(byClass(named, "disclosure")[0]?.textContent).toBe(
-      "Disclosure: This page does not take payment. Offers link to each business's own page.",
-    );
-    const own = renderListingCard(doc, {
+    const other = renderListingCard(doc, {
       title: "Stall",
-      disclosure: "This is a referral.",
+      disclosure: "Hello world",
       signedMeaning: "",
       hash: HASH,
     });
-    expect(byClass(own, "disclosure")[0]?.textContent).toBe("Disclosure: This is a referral.");
-    expect(byClass(own, "explain-answer")[0]?.textContent).toBe(
-      "Signed means this signer published the listing. It does not move money.",
-    );
+    expect(named.textContent).not.toContain(meaning);
+    expect(named.textContent).not.toContain("This is a referral.");
+    expect(other.textContent).not.toContain("Hello world");
+    expect(named.textContent + other.textContent).not.toContain(PAGE_DISCLOSURE);
+    expect(byClass(named, "explain-toggle")).toEqual([]);
+    expect(byClass(other, "disclosure")).toEqual([]);
+    expect(byClass(named, "signed-badge")).toHaveLength(1);
+    const page = readFileSync(path.join(ROOT, "dashboard/plain/index.html"), "utf8");
+    const source = readFileSync(path.join(ROOT, "dashboard/plain/plain.js"), "utf8");
+    const signedMeaning =
+      "Signed means approved hub signers checked and published this record with their wallets. It is not an endorsement, it is not proof of ownership, and it does not move money. The business is responsible for its own offer.";
+    expect(page.split(signedMeaning).length - 1).toBe(1);
+    expect(page).not.toContain("marked this as their own");
+    expect(source).not.toContain("marked this as their own");
+    expect(source).not.toContain("signedExplainer");
+    expect(page.split(PAGE_DISCLOSURE).length - 1).toBe(1);
+    expect(page.match(/id="signed-note"/g)).toHaveLength(1);
+    expect(page.match(/id="page-disclosure"/g)).toHaveLength(1);
+    expect(page).not.toContain("explain-toggle");
 
     const player = renderPlayerResult(doc, {
       legacy: {
@@ -557,8 +590,7 @@ describe("plain display page", () => {
     });
     expect(byTag(player, "script")).toEqual([]);
     expect(byTag(player, "a")).toEqual([]);
-    expect(byTag(player, "details")).toHaveLength(1);
-    expect(byTag(player, "summary")[0]?.textContent).toBe("Sources");
+    expect(byTag(player, "summary").some((node) => node.textContent === "Sources")).toBe(true);
     expect(player.textContent).toContain("Inspired by Star Atlas. Unofficial community read. <script>alert(1)</script>");
     expect(player.textContent).toContain("https://evil.example/<script>");
     expect(player.textContent).toContain("profile <script>alert(1)</script>");
@@ -650,10 +682,12 @@ describe("plain display privacy", () => {
     expect(favicon.toLowerCase()).not.toMatch(/<script|javascript:|onload=/);
     expect(page).not.toMatch(/\son\w+=/);
     expect(source).not.toMatch(/innerHTML|outerHTML|insertAdjacentHTML|document\.write|eval\(|new Function/);
-    for (const word of ["signed", "signer", "hub", "profile", "fleet", "faction"]) {
+    for (const word of ["signed", "hub", "profile", "fleet", "faction"]) {
       expect(page).toContain(`>${word}<`);
     }
-    expect(page.toLowerCase()).not.toMatch(/yield|crypto|blockchain|wallet|nft|\bprice\b/);
+    const aside = page.replace(/<details class="signed-note"[\s\S]*?<\/details>/, "");
+    expect(aside.toLowerCase()).not.toMatch(/yield|crypto|blockchain|wallet|nft|\bprice\b/);
+    expect(page.toLowerCase()).not.toMatch(/yield|crypto|blockchain|nft|\bprice\b/);
     expect(style.toLowerCase()).not.toMatch(/yield|crypto|blockchain/);
     for (const token of ["--bg: #04070e", "--card: #0b1526", "--card-2: #0e1b30", "--line: rgba(77, 214, 255, 0.20)", "--ink: #d5deec", "--white: #f4f8ff", "--mute: #8d9bb3", "--cy: #4dd6ff", "--cy-deep: #1fa8d6", "--gold: #e7b24c", "--grn: #6fe3a5", "--red: #ff7a7a"]) {
       expect(style).toContain(token);
@@ -727,6 +761,159 @@ describe("plain display privacy", () => {
     for (const file of filesNamed(ROOT, "robots.txt")) {
       expect(readFileSync(file, "utf8"), file).not.toMatch(/disallow:\s*\/plain\b/i);
     }
+  });
+});
+
+describe("plain layout controls", () => {
+  it("cuts a short line on a word boundary and never mid-word", () => {
+    const sentence =
+      "Wholly owned subsidiary of Neuro Block Game Assets (NBGA). Our primary in-game goal is to expand and participate in all aspects of the game except political. Especially the council.";
+    const naive = sentence.slice(0, 160);
+    expect(naive.endsWith("Es")).toBe(true);
+    const safe = truncateAtWord(sentence, 160);
+    expect(safe.endsWith("…")).toBe(true);
+    expect(safe.endsWith("Es")).toBe(false);
+    const stem = safe.slice(0, -1);
+    expect(sentence.startsWith(stem)).toBe(true);
+    expect(sentence.charAt(stem.length)).toBe(" ");
+    expect(truncateAtWord("alpha bravo charlie", 10)).toBe("alpha…");
+    expect(truncateAtWord("short line", 40)).toBe("short line");
+    expect(truncateAtWord("Supercalifragilistic expialidocious", 8)).toBe("Supercalifragilistic…");
+    expect(truncateAtWord("Supercalifragilistic", 8)).toBe("Supercalifragilistic");
+    expect(truncateAtWord("  spaced   out  ", 40)).toBe("spaced out");
+
+    const doc = createDoc();
+    const hit = renderSearchHit(doc, {
+      kind: "listing",
+      name: "Empiria",
+      description: naive,
+      link: "https://example.com/empiria",
+    });
+    const preview = byClass(hit, "preview")[0]?.textContent ?? "";
+    expect(preview.endsWith("…")).toBe(true);
+    expect(preview.endsWith("Es")).toBe(false);
+    expect(preview.length).toBeLessThanOrEqual(PREVIEW_LIMIT + 1);
+    expect(hit.textContent).toContain(naive);
+    const full = byClass(hit, "offer")[0];
+    expect(full?.parentNode && hasClass(full.parentNode, "card-summary")).toBe(false);
+  });
+
+  it("filters and sorts listings, guilds, and search hits as pure functions", () => {
+    const listings = [
+      { title: "Cress", category: "events", created_at: "2026-01-01T00:00:00.000Z" },
+      { title: "Anchor", category: "creators", created_at: "2026-06-01T00:00:00.000Z" },
+      { title: "Baker", category: "creators", created_at: "2026-03-01T00:00:00.000Z" },
+    ];
+    const categoriesOf = (row: { category?: string }) => {
+      const label = listingCategoryLabel(row);
+      return label ? [label] : [];
+    };
+    const nameOf = (row: { title: string }) => row.title;
+    const dateOf = (row: { created_at: string }) => row.created_at;
+    expect(categoryChoices(listings, categoriesOf)).toEqual(["Creators", "Events"]);
+    expect(applyView(listings, { filter: "Creators", sort: "az", categoriesOf, nameOf, dateOf }).map((row: { title: string }) => row.title)).toEqual([
+      "Anchor",
+      "Baker",
+    ]);
+    expect(applyView(listings, { filter: "all", sort: "newest", categoriesOf, nameOf, dateOf }).map((row: { title: string }) => row.title)).toEqual([
+      "Anchor",
+      "Baker",
+      "Cress",
+    ]);
+    expect(applyView(listings, { filter: "all", sort: "category", categoriesOf, nameOf, dateOf }).map((row: { title: string }) => row.title)).toEqual([
+      "Anchor",
+      "Baker",
+      "Cress",
+    ]);
+    expect(applyView(listings, { filter: "Missing", sort: "az", categoriesOf, nameOf, dateOf })).toEqual([]);
+
+    const guilds = [
+      { kind: "guild", guild: { name: "Dawn", tags: ["Dock", "Dawn"] }, created_at: "2026-02-01T00:00:00.000Z" },
+      { kind: "guild", guild: { name: "North" }, created_at: "2026-08-01T00:00:00.000Z" },
+    ];
+    expect(guildTypeLabels(guilds[0])).toEqual(["Dock", "Dawn"]);
+    expect(guildTypeLabels(guilds[1])).toEqual(["Group"]);
+    expect(categoryChoices(guilds, guildTypeLabels)).toEqual(["Dawn", "Dock", "Group"]);
+    expect(
+      applyView(guilds, {
+        filter: "Dock",
+        sort: "az",
+        categoriesOf: guildTypeLabels,
+        nameOf: (row: { guild: { name: string } }) => row.guild.name,
+        dateOf: (row: { created_at: string }) => row.created_at,
+      }).map((row: { guild: { name: string } }) => row.guild.name),
+    ).toEqual(["Dawn"]);
+
+    const hits = [
+      { kind: "player", name: "Zed" },
+      { kind: "guild", name: "Dawn" },
+      { kind: "listing", name: "Anchor" },
+    ];
+    const hitCategories = (hit: { kind?: string }) => {
+      const label = searchKindLabel(hit);
+      return label ? [label] : [];
+    };
+    expect(categoryChoices(hits, hitCategories)).toEqual(["Group", "Listing", "Player"]);
+    expect(applyView(hits, { filter: "Group", sort: "az", categoriesOf: hitCategories, nameOf: (hit: { name: string }) => hit.name, dateOf: () => "" }).map((hit: { name: string }) => hit.name)).toEqual([
+      "Dawn",
+    ]);
+    expect(applyView(hits, { filter: "all", sort: "newest", categoriesOf: hitCategories, nameOf: (hit: { name: string }) => hit.name, dateOf: () => "" }).map((hit: { name: string }) => hit.name)).toEqual([
+      "Zed",
+      "Dawn",
+      "Anchor",
+    ]);
+  });
+
+  it("collapses cards by default and opens or closes every card together", () => {
+    const { doc } = pageDoc();
+    const state = {
+      listings: [
+        { title: "Cress stand", category: "events", offerText: "Late greens.", hash: HASH, status: "available", created_at: "2026-01-02T00:00:00.000Z" },
+        {
+          title: "Anchor booth",
+          category: "creators",
+          offerText: "Morning sketches.",
+          hash: "cd".repeat(32),
+          status: "paused",
+          created_at: "2026-05-02T00:00:00.000Z",
+          url: "https://anchor.example/booth",
+        },
+      ],
+      updates: [],
+      hash: "",
+      listingFilter: "all",
+      listingSort: "az",
+    };
+    renderPage(doc, state);
+    const body = doc.getElementById("listings-body");
+    expect(body?.textContent ?? "").not.toContain(PAGE_DISCLOSURE);
+    const cards = byClass(body ?? doc.body, "card");
+    expect(cards).toHaveLength(2);
+    expect(byTag(body ?? doc.body, "details").every((node) => node.getAttribute("open") === null)).toBe(true);
+    const expand = byTag(body ?? doc.body, "button").find((node) => node.textContent === "Expand all");
+    const collapse = byTag(body ?? doc.body, "button").find((node) => node.textContent === "Collapse all");
+    expect(expand?.textContent).toBe("Expand all");
+    expand?.dispatch("click");
+    expect(byTag(body ?? doc.body, "details").every((node) => node.getAttribute("open") === "")).toBe(true);
+    collapse?.dispatch("click");
+    expect(byTag(body ?? doc.body, "details").every((node) => node.getAttribute("open") === null)).toBe(true);
+    setCardsOpen(body, true);
+    expect(byTag(body ?? doc.body, "details")[0]?.getAttribute("open")).toBe("");
+
+    const titles = () => byTag(body ?? doc.body, "h3").map((node) => node.textContent);
+    expect(titles()).toEqual(["Anchor booth", "Cress stand"]);
+    const events = byTag(body ?? doc.body, "button").find((node) => node.textContent === "Events");
+    const sort = byTag(body ?? doc.body, "select")[0];
+    events?.dispatch("click");
+    const next = doc.getElementById("listings-body");
+    expect(byTag(next ?? doc.body, "h3").map((node) => node.textContent)).toEqual(["Cress stand"]);
+    expect(events?.getAttribute("aria-pressed")).toBe("true");
+    expect(byTag(next ?? doc.body, "button").find((node) => node.textContent === "Events")).toBe(events);
+    expect(byTag(next ?? doc.body, "select")[0]).toBe(sort);
+    if (sort) sort.value = "newest";
+    sort?.dispatch("change");
+    expect(byTag(doc.getElementById("listings-body") ?? doc.body, "select")[0]).toBe(sort);
+    expect(doc.getElementById("listings-body")?.textContent).toContain("Cress stand");
   });
 });
 
