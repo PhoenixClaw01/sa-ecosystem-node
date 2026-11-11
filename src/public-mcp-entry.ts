@@ -1,6 +1,7 @@
 import { loadConfig } from "./config.js";
 import { createNodeHandler } from "./handler.js";
 import { createPublicMcpFetch } from "./public-mcp.js";
+import { h2hCard } from "./h2h/feeds.js";
 import { createDefaultDeps } from "./runtime.js";
 
 /**
@@ -10,9 +11,15 @@ import { createDefaultDeps } from "./runtime.js";
  * module without the repo dependencies.
  */
 const settings = loadConfig();
-const fetchMcp = createPublicMcpFetch(createNodeHandler(createDefaultDeps(settings), settings), {
+const deps = createDefaultDeps(settings);
+const fetchMcp = createPublicMcpFetch(createNodeHandler(deps, settings), {
   maxRequestBytes: settings.maxRequestBytes,
   maxBytes: settings.maxResponseBytes,
+  feeds: {
+    c4Markers: () => deps.c4Markers({}),
+    communityTools: () => deps.communityTools(),
+    card: () => h2hCard(),
+  },
 });
 
 export default {

@@ -24,7 +24,7 @@ npm run lint && npm run typecheck && npm test
 
 1. Register it with `server.registerTool(...)` in `src/server.ts` (game and player reads) or `src/dao/register.ts` (DAO and hub reads). Use `readOnlyAnnotations` and a `zod` input schema with caps on every number and string.
 2. Add its name to `READ_ONLY_TOOLS` in `src/server.ts`.
-3. Update the tool count. Tests check it: `tests/server.test.ts`, `tests/run-modes.test.ts`, and the "22 read-only tools" line in `README.md` (checked by `tests/player-story.test.ts`). Add a row to the tools table in `README.md` and `docs/spec.md`.
+3. Update the tool count. Tests check it: `tests/server.test.ts`, `tests/run-modes.test.ts`, and the "24 read-only tools" line in `README.md` (checked by `tests/player-story.test.ts`). Add a row to the tools table in `README.md` and `docs/spec.md`.
 4. Add a test under `tests/`. Keep it offline: inject a stub reader, as the existing tests do.
 5. Rebuild the bundled public function, because CI fails if it is stale:
 

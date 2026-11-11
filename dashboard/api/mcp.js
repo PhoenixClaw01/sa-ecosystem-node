@@ -91,6 +91,46 @@ function publicErrorMessage(error2) {
   return message.length > 500 ? `${message.slice(0, 500)}\u2026` : message;
 }
 
+// src/h2h/routes.ts
+var H2H_FEED_PATHS = {
+  "/c4-markers.json": "c4Markers",
+  "/community-tools.json": "communityTools",
+  "/.well-known/h2h-card.json": "card"
+};
+var QUERY_FEEDS = {
+  "c4-markers": "c4Markers",
+  "community-tools": "communityTools",
+  card: "card"
+};
+function h2hFeedFor(request) {
+  if (request.method !== "GET" && request.method !== "HEAD") return null;
+  let url2;
+  try {
+    url2 = new URL(request.url);
+  } catch {
+    return null;
+  }
+  const byPath = H2H_FEED_PATHS[url2.pathname];
+  if (byPath) return byPath;
+  const query = url2.searchParams.get("h2h");
+  if (query !== null && Object.hasOwn(QUERY_FEEDS, query)) return QUERY_FEEDS[query] ?? null;
+  return null;
+}
+async function h2hFeedResponse(request, feeds) {
+  const feed = h2hFeedFor(request);
+  if (!feed) return null;
+  const body = await feeds[feed]();
+  const text2 = `${JSON.stringify(body, null, 2)}
+`;
+  return new Response(request.method === "HEAD" ? null : text2, {
+    status: 200,
+    headers: {
+      "content-type": "application/json; charset=utf-8",
+      "cache-control": "public, max-age=300, s-maxage=300"
+    }
+  });
+}
+
 // src/public-mcp.ts
 var REQUEST_TIMEOUT_MS = 2e4;
 var MAX_RESPONSE_BYTES = 512 * 1024;
@@ -125,6 +165,10 @@ function createPublicMcpFetch(handler, options) {
     if (request.method === "OPTIONS") return withCors(new Response(null, { status: 204 }));
     let timer;
     const pending = (async () => {
+      if (options?.feeds) {
+        const feed = await h2hFeedResponse(request, options.feeds);
+        if (feed) return feed;
+      }
       const prepared = await limitedRequest(request, maxRequestBytes);
       if (prepared instanceof Response) return prepared;
       return handler.fetch(prepared);
@@ -15167,8 +15211,8 @@ var require_keyword = /* @__PURE__ */ __commonJSMin(((exports) => {
   exports.validSchemaType = validSchemaType;
   function validateKeywordUsage({ schema, opts, self, errSchemaPath }, def, keyword) {
     if (Array.isArray(def.keyword) ? !def.keyword.includes(keyword) : def.keyword !== keyword) throw new Error("ajv implementation error");
-    const deps = def.dependencies;
-    if (deps === null || deps === void 0 ? void 0 : deps.some((kwd) => !Object.prototype.hasOwnProperty.call(schema, kwd))) throw new Error(`parent schema must have dependencies of ${keyword}: ${deps.join(",")}`);
+    const deps2 = def.dependencies;
+    if (deps2 === null || deps2 === void 0 ? void 0 : deps2.some((kwd) => !Object.prototype.hasOwnProperty.call(schema, kwd))) throw new Error(`parent schema must have dependencies of ${keyword}: ${deps2.join(",")}`);
     if (def.validateSchema) {
       if (!def.validateSchema(schema[keyword])) {
         const msg = `keyword "${keyword}" value is invalid at path "${errSchemaPath}": ` + self.errorsText(def.validateSchema.errors);
@@ -18390,14 +18434,14 @@ var require_dependencies = /* @__PURE__ */ __commonJSMin(((exports) => {
   const util_1 = require_util();
   const code_1 = require_code();
   exports.error = {
-    message: ({ params: { property, depsCount, deps } }) => {
+    message: ({ params: { property, depsCount, deps: deps2 } }) => {
       const property_ies = depsCount === 1 ? "property" : "properties";
-      return (0, codegen_1.str)`must have ${property_ies} ${deps} when property ${property} is present`;
+      return (0, codegen_1.str)`must have ${property_ies} ${deps2} when property ${property} is present`;
     },
-    params: ({ params: { property, depsCount, deps, missingProperty } }) => (0, codegen_1._)`{property: ${property},
+    params: ({ params: { property, depsCount, deps: deps2, missingProperty } }) => (0, codegen_1._)`{property: ${property},
     missingProperty: ${missingProperty},
     depsCount: ${depsCount},
-    deps: ${deps}}`
+    deps: ${deps2}}`
   };
   const def = {
     keyword: "dependencies",
@@ -18415,8 +18459,8 @@ var require_dependencies = /* @__PURE__ */ __commonJSMin(((exports) => {
     const schemaDeps = {};
     for (const key in schema) {
       if (key === "__proto__") continue;
-      const deps = Array.isArray(schema[key]) ? propertyDeps : schemaDeps;
-      deps[key] = schema[key];
+      const deps2 = Array.isArray(schema[key]) ? propertyDeps : schemaDeps;
+      deps2[key] = schema[key];
     }
     return [propertyDeps, schemaDeps];
   }
@@ -18425,19 +18469,19 @@ var require_dependencies = /* @__PURE__ */ __commonJSMin(((exports) => {
     if (Object.keys(propertyDeps).length === 0) return;
     const missing = gen.let("missing");
     for (const prop in propertyDeps) {
-      const deps = propertyDeps[prop];
-      if (deps.length === 0) continue;
+      const deps2 = propertyDeps[prop];
+      if (deps2.length === 0) continue;
       const hasProperty = (0, code_1.propertyInData)(gen, data, prop, it2.opts.ownProperties);
       cxt.setParams({
         property: prop,
-        depsCount: deps.length,
-        deps: deps.join(", ")
+        depsCount: deps2.length,
+        deps: deps2.join(", ")
       });
       if (it2.allErrors) gen.if(hasProperty, () => {
-        for (const depProp of deps) (0, code_1.checkReportMissingProp)(cxt, depProp);
+        for (const depProp of deps2) (0, code_1.checkReportMissingProp)(cxt, depProp);
       });
       else {
-        gen.if((0, codegen_1._)`${hasProperty} && (${(0, code_1.checkMissingProp)(cxt, deps, missing)})`);
+        gen.if((0, codegen_1._)`${hasProperty} && (${(0, code_1.checkMissingProp)(cxt, deps2, missing)})`);
         (0, code_1.reportMissingProp)(cxt, missing);
         gen.else();
       }
@@ -20516,7 +20560,7 @@ var require_formats = /* @__PURE__ */ __commonJSMin(((exports) => {
   function isLeapYear(year) {
     return year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
   }
-  const DATE = /^(\d\d\d\d)-(\d\d)-(\d\d)$/;
+  const DATE2 = /^(\d\d\d\d)-(\d\d)-(\d\d)$/;
   const DAYS = [
     0,
     31,
@@ -20533,7 +20577,7 @@ var require_formats = /* @__PURE__ */ __commonJSMin(((exports) => {
     31
   ];
   function date4(str) {
-    const matches = DATE.exec(str);
+    const matches = DATE2.exec(str);
     if (!matches) return false;
     const year = +matches[1];
     const month2 = +matches[2];
@@ -26377,9 +26421,9 @@ function signatureKey(signature) {
     return signature;
   }
 }
-function createPlayerStoryReader(deps) {
-  const now = deps.now ?? Date.now;
-  const cache = deps.cache ?? createTtlCache(STORY_TTL_MS, STORY_CACHE_MAX);
+function createPlayerStoryReader(deps2) {
+  const now = deps2.now ?? Date.now;
+  const cache = deps2.cache ?? createTtlCache(STORY_TTL_MS, STORY_CACHE_MAX);
   return async ({ address: address2 }) => {
     let wallet2;
     try {
@@ -26389,7 +26433,7 @@ function createPlayerStoryReader(deps) {
       throw new UserInputError("The address is not a Solana address.");
     }
     const today = utcDay(now());
-    const bundle = await deps.hub();
+    const bundle = await deps2.hub();
     if (!bundle.hubId || !isHubConsentId(bundle.hubId)) return storyUnavailable();
     const decision = resolveStoryOptIn(bundle.updates, wallet2, { hubId: bundle.hubId, today });
     if (!decision.optedIn || !decision.hash) return notOptedIn();
@@ -26398,7 +26442,7 @@ ${decision.hash}
 ${decision.showLinks ? "1" : "0"}`;
     const hit = cache.get(key, now());
     if (hit) return { ...hit, fromCache: true };
-    const card = await deps.playerLegacy({ address: wallet2 });
+    const card = await deps2.playerLegacy({ address: wallet2 });
     if (card.queried.address !== wallet2) {
       throw new SafeClientError("The public record did not match this wallet. No story was returned.");
     }
@@ -28033,6 +28077,42 @@ function registerDaoTools(server, dao) {
     }
   );
   server.registerTool(
+    "list_c4_markers",
+    {
+      title: "List C4 markers (H2H)",
+      description: "H2H bridge feed h2h.c4-markers.v1 (protocol/h2h/SPEC.md section 6.1). One marker per current signed listing and guild listing, with the same signer, threshold, revocation, and manifest-pin checks as hub_updates. Every marker is placement orbit with anchor none: coordinates come only from a signed c4-anchor record, and that kind is not built yet. Also served as GET /c4-markers.json. Not game fleets. Read-only.",
+      inputSchema: object({
+        kind: _enum(["listing", "guild", "all"]).optional().describe("listing, guild, or all. Default all."),
+        anchored: boolean2().optional().describe("true returns only markers with a resolved signed anchor (none exist yet)."),
+        stream: _enum(LISTING_STREAMS).optional().describe("Listing stream. Guild markers have no stream and are left out when this is set.")
+      }),
+      annotations: readOnlyAnnotations
+    },
+    async (args) => {
+      try {
+        return jsonResult({ readOnly: true, ...await dao.c4Markers(args) });
+      } catch (error2) {
+        return failure2(error2);
+      }
+    }
+  );
+  server.registerTool(
+    "list_community_tools",
+    {
+      title: "List community tools (H2H)",
+      description: "H2H bridge feed h2h.community-tools.v1 (protocol/h2h/SPEC.md section 6.2). A curated list from protocol/h2h/community-tools.json in this node's repo. Anyone can add a tool with one pull request. A row is a pointer, not an endorsement, a referral, or a price. Also served as GET /community-tools.json. Read-only.",
+      inputSchema: object({}),
+      annotations: readOnlyAnnotations
+    },
+    async () => {
+      try {
+        return jsonResult({ readOnly: true, disclaimer: DISCLAIMER, ...dao.communityTools() });
+      } catch (error2) {
+        return failure2(error2);
+      }
+    }
+  );
+  server.registerTool(
     "claim_status",
     {
       title: "Claim status",
@@ -29184,9 +29264,9 @@ var SERVER_VERSION = "1.0.0";
 // src/server.ts
 var DEFAULT_SYSTEM_LIMIT = 100;
 var MAX_SYSTEM_LIMIT = 500;
-async function playerDisplayName(deps, wallet2) {
+async function playerDisplayName(deps2, wallet2) {
   try {
-    const card = await deps.playerLegacy({ address: wallet2 });
+    const card = await deps2.playerLegacy({ address: wallet2 });
     for (const profile of card.profiles) {
       if (typeof profile.name === "string" && profile.name.trim()) return profile.name.trim();
     }
@@ -29215,14 +29295,14 @@ var readOnlyAnnotations2 = {
   idempotentHint: true,
   openWorldHint: true
 };
-function createNodeServer(deps, config2) {
+function createNodeServer(deps2, config2) {
   const server = new McpServer({
     name: SERVER_NAME,
     version: SERVER_VERSION
   });
   const readPlayerStory = createPlayerStoryReader({
-    playerLegacy: (query) => deps.playerLegacy(query),
-    hub: () => deps.storyContext()
+    playerLegacy: (query) => deps2.playerLegacy(query),
+    hub: () => deps2.storyContext()
   });
   server.registerTool(
     "list_star_systems",
@@ -29237,7 +29317,7 @@ function createNodeServer(deps, config2) {
     async ({ limit }) => {
       try {
         const cap = limit ?? DEFAULT_SYSTEM_LIMIT;
-        const page = await deps.listStarSystems(cap);
+        const page = await deps2.listStarSystems(cap);
         return jsonResult2({
           readOnly: true,
           cluster: config2.cluster,
@@ -29269,7 +29349,7 @@ function createNodeServer(deps, config2) {
         if (!fleetAddress && !profileAddress) {
           throw new UserInputError("Provide fleetAddress or profileAddress.");
         }
-        const fleets = await deps.getFleet({ fleetAddress, profileAddress });
+        const fleets = await deps2.getFleet({ fleetAddress, profileAddress });
         return jsonResult2({
           readOnly: true,
           cluster: config2.cluster,
@@ -29294,7 +29374,7 @@ function createNodeServer(deps, config2) {
     },
     async ({ profileAddress }) => {
       try {
-        const audit = await deps.auditProfile(profileAddress);
+        const audit = await deps2.auditProfile(profileAddress);
         return jsonResult2({
           readOnly: true,
           cluster: config2.cluster,
@@ -29320,7 +29400,7 @@ function createNodeServer(deps, config2) {
     },
     async ({ address: address2 }) => {
       try {
-        return jsonResult2(await deps.playerLegacy({ address: address2 }));
+        return jsonResult2(await deps2.playerLegacy({ address: address2 }));
       } catch (error2) {
         return failure3(error2);
       }
@@ -29361,9 +29441,9 @@ function createNodeServer(deps, config2) {
         }
       };
       const sections = await Promise.all([
-        section("treasury_balances", () => deps.treasuryBalances()),
-        section("proposals", () => deps.listProposals({ limit: 10 })),
-        section("data_health", () => deps.dataHealth())
+        section("treasury_balances", () => deps2.treasuryBalances()),
+        section("proposals", () => deps2.listProposals({ limit: 10 })),
+        section("data_health", () => deps2.dataHealth())
       ]);
       return jsonResult2({
         readOnly: true,
@@ -29386,7 +29466,7 @@ function createNodeServer(deps, config2) {
     async ({ limit }) => {
       try {
         const cap = limit ?? 100;
-        const page = await deps.listStarSystems(cap);
+        const page = await deps2.listStarSystems(cap);
         return jsonResult2({
           readOnly: true,
           cluster: config2.cluster,
@@ -29439,23 +29519,23 @@ function createNodeServer(deps, config2) {
         return jsonResult2({
           readOnly: true,
           disclaimer: DISCLAIMER,
-          ...await deps.searchDirectory({ query }, (wallet2) => playerDisplayName(deps, wallet2))
+          ...await deps2.searchDirectory({ query }, (wallet2) => playerDisplayName(deps2, wallet2))
         });
       } catch (error2) {
         return failure3(error2);
       }
     }
   );
-  registerDaoTools(server, deps);
+  registerDaoTools(server, deps2);
   return server;
 }
 
 // src/handler.ts
-function createNodeHandler(deps, config2, limiter = createRateLimiter({
+function createNodeHandler(deps2, config2, limiter = createRateLimiter({
   limit: config2.rateLimitMax,
   windowMs: config2.rateLimitWindowMs
 })) {
-  const mcp = createMcpHandler(() => createNodeServer(deps, config2), { responseMode: "json" });
+  const mcp = createMcpHandler(() => createNodeServer(deps2, config2), { responseMode: "json" });
   return {
     async fetch(request) {
       const decision = limiter.check(clientKeyFromRequest(request, config2.trustProxy));
@@ -29475,6 +29555,356 @@ function createNodeHandler(deps, config2, limiter = createRateLimiter({
     },
     close: () => mcp.close()
   };
+}
+
+// src/h2h/data.generated.ts
+var H2H_CARD = {
+  "schema": "h2h.card.v0",
+  "stack": "phoenix-ecosystem-node",
+  "displayName": "Phoenix ecosystem node",
+  "updatedAt": "2026-11-11T14:00:00.000Z",
+  "stewards": [
+    {
+      "handle": "Falkor (Phoenix steward)",
+      "github": "PhoenixClaw01",
+      "gates": [
+        "merge",
+        "money",
+        "public-speech"
+      ]
+    }
+  ],
+  "harnesses": [
+    {
+      "id": "phoenix-agent",
+      "kind": "agent",
+      "runtime": "hosted-agent",
+      "github": "PhoenixClaw01",
+      "speaksFor": "harness",
+      "note": "Today the Phoenix agent posts from the PhoenixClaw01 account and marks each board post as written by the agent. A separate bot account is planned."
+    }
+  ],
+  "recordKeys": [
+    {
+      "label": "Phoenix Collective (Falkor's team)",
+      "alg": "ed25519",
+      "publicKey": "G2PhCi6MApcuC6f5o2CDQBWDnJt9hRcozHuuN55PYisU",
+      "set": "agents",
+      "vouchedIn": "https://github.com/PhoenixClaw01/sa-ecosystem-node/pull/3",
+      "note": "Also in the default set (hub/signers.json). Author of every hub record so far."
+    },
+    {
+      "label": "Phoenix reviewer",
+      "alg": "ed25519",
+      "publicKey": "AANzSFjMzGuKn5gC1YygMsZZGeLUiMM9HAmKH6n2YqgH",
+      "set": "agents",
+      "vouchedIn": "https://github.com/PhoenixClaw01/sa-ecosystem-node/pull/3",
+      "note": "Second Phoenix agent key, on a different machine from the first. The public node trusts the agents set only after migration step M5 (SPEC section 17)."
+    }
+  ],
+  "provides": [
+    {
+      "id": "mcp",
+      "kind": "mcp",
+      "transport": "streamable-http",
+      "url": "https://sa-ecosystem-node-dashboard.vercel.app/api/mcp",
+      "readOnly": true,
+      "auth": "none"
+    },
+    {
+      "id": "c4-markers",
+      "kind": "json-feed",
+      "schema": "h2h.c4-markers.v1",
+      "url": "https://sa-ecosystem-node-dashboard.vercel.app/c4-markers.json",
+      "mcpTool": "list_c4_markers",
+      "status": "live",
+      "note": "Every marker is in orbit with no coordinates until a signed c4-anchor kind exists (code item C1)."
+    },
+    {
+      "id": "community-tools",
+      "kind": "json-feed",
+      "schema": "h2h.community-tools.v1",
+      "url": "https://sa-ecosystem-node-dashboard.vercel.app/community-tools.json",
+      "mcpTool": "list_community_tools",
+      "status": "live"
+    },
+    {
+      "id": "signed-records",
+      "kind": "git-store",
+      "repo": "https://github.com/PhoenixClaw01/sa-ecosystem-hub",
+      "schema": "sa-ecosystem-node.hub-update.v1",
+      "readOnly": true
+    }
+  ],
+  "consumes": [
+    {
+      "id": "zink-ptr-sdk",
+      "kind": "npm",
+      "name": "@aephia/atlas-kit",
+      "pin": "0.6.1",
+      "note": "dependency of this node, not an H2H peer"
+    }
+  ],
+  "accepts": {
+    "board": "https://github.com/PhoenixClaw01/sa-ecosystem-node/issues?q=label%3Ah2h",
+    "kinds": [
+      "hello",
+      "request",
+      "review",
+      "verify",
+      "blocked",
+      "close"
+    ],
+    "lanes": [
+      "read-only-data",
+      "docs",
+      "verification",
+      "code-proposal"
+    ],
+    "pollEvery": "PT6H",
+    "maxOpenThreadsFromOnePeer": 3
+  },
+  "agentDocs": [
+    {
+      "kind": "start-here",
+      "url": "https://github.com/PhoenixClaw01/sa-ecosystem-node/blob/main/protocol/h2h/START-HERE.md"
+    },
+    {
+      "kind": "spec",
+      "url": "https://github.com/PhoenixClaw01/sa-ecosystem-node/blob/main/protocol/h2h/SPEC.md"
+    },
+    {
+      "kind": "contributing",
+      "url": "https://github.com/PhoenixClaw01/sa-ecosystem-node/blob/main/CONTRIBUTING.md"
+    }
+  ],
+  "licenses": [
+    {
+      "path": "code",
+      "spdx": "Apache-2.0"
+    },
+    {
+      "path": "hub content",
+      "spdx": "CC-BY-4.0"
+    }
+  ],
+  "neverDoes": [
+    "sign-transactions",
+    "hold-keys-for-others",
+    "speak-as-a-human",
+    "write-to-peer-repos",
+    "promise-money",
+    "sign-for-a-player"
+  ]
+};
+var H2H_COMMUNITY_TOOLS = {
+  "schema": "h2h.community-tools.v1",
+  "tools": [
+    {
+      "id": "phoenix-ecosystem-node-mcp",
+      "name": "Ecosystem node MCP",
+      "url": "https://sa-ecosystem-node-dashboard.vercel.app/api/mcp",
+      "what": "Read-only MCP server: signed hub listings and guilds, public game reads, profile key audit, and DAO treasury reads. It does not sign or write.",
+      "license": {
+        "spdx": "Apache-2.0"
+      },
+      "operatedBy": "Phoenix Collective",
+      "weOperateIt": true,
+      "h2hCard": "https://sa-ecosystem-node-dashboard.vercel.app/.well-known/h2h-card.json",
+      "addedIn": null,
+      "checkedAt": "2026-11-11"
+    },
+    {
+      "id": "phoenix-ecosystem-hub",
+      "name": "Signed hub record store",
+      "url": "https://github.com/PhoenixClaw01/sa-ecosystem-hub",
+      "what": "Public git repo of signed listing and guild records. Anyone can verify each record with VERIFY.md.",
+      "license": {
+        "spdx": "CC-BY-4.0",
+        "note": "hub content; each project keeps the rights to its own name and logo"
+      },
+      "operatedBy": "Phoenix Collective",
+      "weOperateIt": true,
+      "h2hCard": "https://sa-ecosystem-node-dashboard.vercel.app/.well-known/h2h-card.json",
+      "addedIn": null,
+      "checkedAt": "2026-11-11"
+    },
+    {
+      "id": "phoenix-plain-directory",
+      "name": "Plain directory page",
+      "url": "https://sa-ecosystem-node-dashboard.vercel.app/plain/",
+      "what": "A plain page of the signed listings and guilds, for people rather than agents.",
+      "license": {
+        "spdx": "Apache-2.0"
+      },
+      "operatedBy": "Phoenix Collective",
+      "weOperateIt": true,
+      "h2hCard": "https://sa-ecosystem-node-dashboard.vercel.app/.well-known/h2h-card.json",
+      "addedIn": null,
+      "checkedAt": "2026-11-11"
+    }
+  ]
+};
+
+// src/h2h/feeds.ts
+var C4_MARKERS_SCHEMA = "h2h.c4-markers.v1";
+var COMMUNITY_TOOLS_SCHEMA = "h2h.community-tools.v1";
+var H2H_CARD_SCHEMA = "h2h.card.v0";
+var MARKER_KINDS = ["listing", "guild", "all"];
+var MARKERS_DISCLAIMER = "Unofficial. Inspired by Star Atlas. These are signed directory records, not game fleets. No marker has coordinates until a signed c4-anchor record exists (code item C1, not built).";
+function normalizeMarkersQuery(query) {
+  if (query.kind !== void 0 && !MARKER_KINDS.includes(query.kind)) {
+    throw new UserInputError(`Unknown marker kind ${query.kind}.`);
+  }
+  if (query.anchored !== void 0 && typeof query.anchored !== "boolean") throw new UserInputError("anchored must be true or false.");
+  if (query.stream !== void 0 && (typeof query.stream !== "string" || !/^[a-z_]{1,24}$/.test(query.stream))) {
+    throw new UserInputError("stream must be a listing stream id.");
+  }
+  return {
+    kind: query.kind ?? "all",
+    ...query.anchored !== void 0 ? { anchored: query.anchored } : {},
+    ...query.stream ? { stream: query.stream } : {}
+  };
+}
+async function listC4Markers(source, allowlist, threshold, query = {}, signerSets, options, labels = /* @__PURE__ */ new Map(), now = /* @__PURE__ */ new Date()) {
+  const q11 = normalizeMarkersQuery(query);
+  const pinned = Boolean(source.repo?.trim() && source.commit?.trim() && source.manifestHash?.trim());
+  const markers = [];
+  let sourceUrl = null;
+  if (pinned && q11.anchored !== true) {
+    if (q11.kind !== "guild") {
+      const listings = await listListings(source, allowlist, threshold, q11.stream ? { stream: q11.stream } : {}, signerSets, options, labels, now);
+      sourceUrl = listings.sourceUrl;
+      for (const listing of listings.listings) {
+        markers.push({
+          id: `listing:${listing.id}`,
+          kind: "listing",
+          title: listing.title,
+          owner: listing.owner,
+          url: listing.url,
+          stream: listing.stream,
+          category: listing.category,
+          status: listing.status,
+          signer: listing.signer,
+          approvedBy: [...listing.approvedBy],
+          signedMeaning: listing.signedMeaning,
+          recordHash: listing.hash,
+          placement: "orbit",
+          anchor: { status: "none", how: null }
+        });
+      }
+    }
+    if (q11.kind !== "listing" && !q11.stream) {
+      const guilds = await readHubUpdates(source, allowlist, threshold, "guild", signerSets, { ...options, now });
+      sourceUrl = sourceUrl ?? guilds.sourceUrl;
+      for (const update of guilds.updates) {
+        if (!update.guild || update.guild.withdrawn || !guilds.picks.has(update.id)) continue;
+        const display = labels.get(update.signer) ?? null;
+        markers.push({
+          id: `guild:${update.id}`,
+          kind: "guild",
+          title: update.guild.name,
+          owner: null,
+          url: update.guild.site ?? update.guild.links[0] ?? null,
+          stream: null,
+          category: null,
+          status: null,
+          signer: update.signer,
+          approvedBy: [...update.approvedBy],
+          signedMeaning: signedMeaning(display).replace("this listing", "this guild listing"),
+          recordHash: update.hash,
+          placement: "orbit",
+          anchor: { status: "none", how: null }
+        });
+      }
+    }
+  }
+  return {
+    schema: C4_MARKERS_SCHEMA,
+    v: 1,
+    generatedAt: now.toISOString(),
+    source: pinned ? { hubRepo: source.repo?.trim() ?? null, hubCommit: source.commit?.trim() ?? null, manifestHash: source.manifestHash?.trim() ?? null } : null,
+    realm: { cluster: "zink-ptr", readPackage: null, systemsReadAt: null },
+    disclaimer: MARKERS_DISCLAIMER,
+    renderers: [],
+    centre: {
+      kind: "centre",
+      label: null,
+      note: "Lore reference only. Not a Council record. No one signs on the Council's behalf. Renderer decides the label."
+    },
+    markers,
+    note: pinned ? "Markers are the current signed listings and guild listings that passed the same signer, threshold, revocation, and manifest-pin checks as hub_updates. Every marker is placement orbit with anchor none, because no c4-anchor record kind exists yet." : "HUB_GIT_REPO, HUB_GIT_COMMIT, and HUB_STORE_MANIFEST_HASH are not set. No markers were read, and none were invented.",
+    sourceUrl
+  };
+}
+var TOOL_ID = /^[a-z0-9][a-z0-9-]{1,47}$/;
+var DATE = /^\d{4}-\d{2}-\d{2}$/;
+var PRICE_OR_REFERRAL = /\$|€|£|\b(?:price|prices|discount|referral|affiliate|airdrop|token sale|guaranteed)\b/i;
+function httpsUrl(value) {
+  if (typeof value !== "string" || value.length > 300) return false;
+  try {
+    const url2 = new URL(value);
+    return url2.protocol === "https:" && url2.hostname.includes(".") && !url2.username && !url2.password && !url2.hash;
+  } catch {
+    return false;
+  }
+}
+function parseCommunityTools(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error("community-tools.json must be an object.");
+  const record4 = value;
+  if (record4.schema !== COMMUNITY_TOOLS_SCHEMA || !Array.isArray(record4.tools) || record4.tools.length > 200) {
+    throw new Error("community-tools.json does not match h2h.community-tools.v1.");
+  }
+  const seen = /* @__PURE__ */ new Set();
+  return record4.tools.map((entry, index) => {
+    if (!entry || typeof entry !== "object" || Array.isArray(entry)) throw new Error(`Tool ${index} is not an object.`);
+    const row = entry;
+    const allowed = /* @__PURE__ */ new Set(["id", "name", "url", "what", "license", "operatedBy", "weOperateIt", "h2hCard", "addedIn", "checkedAt"]);
+    for (const key of Object.keys(row)) if (!allowed.has(key)) throw new Error(`Tool ${index} has an unknown field ${key}.`);
+    if (typeof row.id !== "string" || !TOOL_ID.test(row.id) || seen.has(row.id)) throw new Error(`Tool ${index} has a missing, invalid, or repeated id.`);
+    seen.add(row.id);
+    for (const key of ["name", "what", "operatedBy"]) {
+      const text2 = row[key];
+      if (typeof text2 !== "string" || text2.trim() === "" || text2.length > (key === "what" ? 280 : 80)) throw new Error(`Tool ${row.id} has an invalid ${key}.`);
+      if (PRICE_OR_REFERRAL.test(text2)) throw new Error(`Tool ${row.id} ${key} has a price, referral, or promise word.`);
+    }
+    if (!httpsUrl(row.url)) throw new Error(`Tool ${row.id} url must be https.`);
+    if (row.h2hCard !== null && !httpsUrl(row.h2hCard)) throw new Error(`Tool ${row.id} h2hCard must be https or null.`);
+    if (row.addedIn !== null && !httpsUrl(row.addedIn)) throw new Error(`Tool ${row.id} addedIn must be an https PR link or null.`);
+    if (typeof row.weOperateIt !== "boolean") throw new Error(`Tool ${row.id} weOperateIt must be true or false.`);
+    if (typeof row.checkedAt !== "string" || !DATE.test(row.checkedAt)) throw new Error(`Tool ${row.id} checkedAt must be YYYY-MM-DD.`);
+    const license = row.license;
+    if (!license || typeof license !== "object" || typeof license.spdx !== "string" || !/^[A-Za-z0-9.+-]{2,40}$/.test(license.spdx)) {
+      throw new Error(`Tool ${row.id} license.spdx is missing.`);
+    }
+    return {
+      id: row.id,
+      name: row.name,
+      url: row.url,
+      what: row.what,
+      license: { spdx: license.spdx, ...typeof license.note === "string" ? { note: license.note } : {} },
+      operatedBy: row.operatedBy,
+      weOperateIt: row.weOperateIt,
+      h2hCard: row.h2hCard ?? null,
+      addedIn: row.addedIn ?? null,
+      checkedAt: row.checkedAt
+    };
+  });
+}
+function listCommunityTools(now = /* @__PURE__ */ new Date()) {
+  const tools = parseCommunityTools(H2H_COMMUNITY_TOOLS);
+  return {
+    schema: COMMUNITY_TOOLS_SCHEMA,
+    generatedAt: now.toISOString(),
+    tools,
+    note: "A curated list in protocol/h2h/community-tools.json. Anyone can add a tool with one pull request, reviewed by a board steward. A row is a pointer, not an endorsement, a referral, or a price. weOperateIt is true only for tools Phoenix runs.",
+    howToAdd: "https://github.com/PhoenixClaw01/sa-ecosystem-node/blob/main/protocol/h2h/START-HERE.md"
+  };
+}
+function h2hCard() {
+  const card = H2H_CARD;
+  if (card.schema !== H2H_CARD_SCHEMA) throw new Error("protocol/h2h/card.json does not match h2h.card.v0.");
+  return card;
 }
 
 // src/dao/amount.ts
@@ -31935,6 +32365,19 @@ function createDaoReaders(config2, fetchImpl = fetch, now = () => /* @__PURE__ *
         { schema: result.schema, hubId: result.hubId, claims: result.claims, note: result.note },
         now()
       );
+    },
+    async c4Markers(query) {
+      const source = hubSource();
+      const verify = claimReadOptions();
+      if (!source.repo && !source.commit && !source.manifestHash) {
+        return listC4Markers(source, /* @__PURE__ */ new Set(), config2.hubApprovalThreshold, query, void 0, verify, /* @__PURE__ */ new Map(), now());
+      }
+      const directory = loadSignerDirectory(config2.hubSignerSets);
+      const allowlist = new Set(directory.sets.flatMap((set) => [...set.publicKeys]));
+      return listC4Markers(source, allowlist, config2.hubApprovalThreshold, query, directory.sets, verify, directory.labels, now());
+    },
+    communityTools() {
+      return listCommunityTools(now());
     },
     async dataHealth() {
       const readAt = now().toISOString();
@@ -51100,9 +51543,15 @@ function createDefaultDeps(config2 = loadConfig()) {
 
 // src/public-mcp-entry.ts
 var settings = loadConfig();
-var fetchMcp = createPublicMcpFetch(createNodeHandler(createDefaultDeps(settings), settings), {
+var deps = createDefaultDeps(settings);
+var fetchMcp = createPublicMcpFetch(createNodeHandler(deps, settings), {
   maxRequestBytes: settings.maxRequestBytes,
-  maxBytes: settings.maxResponseBytes
+  maxBytes: settings.maxResponseBytes,
+  feeds: {
+    c4Markers: () => deps.c4Markers({}),
+    communityTools: () => deps.communityTools(),
+    card: () => h2hCard()
+  }
 });
 var public_mcp_entry_default = {
   fetch(request) {

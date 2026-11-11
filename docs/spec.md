@@ -25,7 +25,7 @@ flowchart LR
     C[Public Solana and galaxy JSON<br/>treasury, proposals, votes, revenue]
     H[(Public git hub<br/>signed update files)]
   end
-  G --> N[sa-ecosystem-node<br/>22 read-only tools]
+  G --> N[sa-ecosystem-node<br/>24 read-only tools]
   C --> N
   H --> N
   N --> P["/plain/ page"]
@@ -51,7 +51,7 @@ Solid lines are live. Dashed lines are planned and are not in this version. The 
 
 `/plain/` shows listings, groups, hub updates, search results, and a player lookup as a card grid: one column on phones, two columns from 48rem, three from 68.75rem, and four on very wide screens from 93.75rem (`dashboard/plain/plain.css`). Cards in the grid start collapsed (`<details>` with no `open` attribute). Listings, groups, hub updates, and search each have Expand all, Collapse all, category filter chips, and a sort of A-Z, Newest, or Category (`dashboard/plain/plain.js`). The sort starts at A-Z. Groups are the guild rows from `hub_updates`. The page calls same-origin `/api/mcp` for `list_listings`, `hub_updates`, `search_hub`, `player_legacy`, and `player_story`. Under Listings there is one signed note, "What does signed mean?": "Signed means approved hub signers checked and published this record with their signing keys. It is not an endorsement, it is not proof of ownership, and it does not move money. The business is responsible for its own offer." The one payment line is: "This page does not take payment. Offers link to each business's own page." Each card can show the word Signed. `signedMeaning` is a field on `list_listings` results. The page does not print that field on each card. No API key.
 
-Checked on 1 November 2026: `initialize` returned server `sa-ecosystem-node` version `1.0.0`, and `tools/list` returned the 22 tools below. Every one has `readOnlyHint: true`.
+Checked on 1 November 2026: `initialize` returned server `sa-ecosystem-node` version `1.0.0`, and `tools/list` returned 22 tools. `list_c4_markers` and `list_community_tools` were added on 11 November 2026, for 24 in the list below. Every one has `readOnlyHint: true`.
 
 ## Tools
 
@@ -79,6 +79,8 @@ The names are the tools registered in `createNodeServer` (`src/server.ts`) and `
 | `pip_tracker` | Payments and milestones from the public Council Tracker sheet. Blank cells stay null |
 | `hub_updates` | Signed hub updates from the pinned git commit. Claim records and attestation records are left out |
 | `list_listings` | Signed business listings from that commit. The node does not take payment |
+| `list_c4_markers` | Signed listings and guilds as map markers for a renderer (H2H). No coordinates yet |
+| `list_community_tools` | A curated list of community tools anyone can add to with a PR (H2H) |
 | `claim_status` | Whether a listing or guild name has a claim, and what state that claim is in |
 | `data_health` | Freshness and the last error for the cache, galaxy, the Council sheet, and wallet balances |
 
@@ -108,6 +110,8 @@ Omitted optional fields use the defaults in the table. Unknown extra fields are 
 | `pip_tracker` | none |
 | `hub_updates` | optional `kind`: `announcement`, `proposal-note`, `payment-note`, `status`, `signer-change`, `listing`, `guild`, `story-optin`, `claim`, or `attestation`. A `claim` or `attestation` filter still returns no rows, because those kinds are removed before the response |
 | `list_listings` | optional `stream` (`referral`, `hybrid`, `irl`, `player`), `category`, `status`, `includeExpired` |
+| `list_c4_markers` | optional `kind` (`listing`, `guild`, `all`), `anchored` (boolean), `stream` (a listing stream) |
+| `list_community_tools` | none |
 | `claim_status` | optional `identity`: a listing id, a guild name, `id:<listingId>`, or `guild:<normalized name>`. Omit it to list every claim |
 | `data_health` | none |
 

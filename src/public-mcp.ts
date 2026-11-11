@@ -1,5 +1,6 @@
 import { publicErrorMessage } from "./errors.js";
 import type { NodeHandler } from "./handler.js";
+import { h2hFeedResponse, type H2hFeeds } from "./h2h/routes.js";
 
 /** Public ecosystem node. The dashboard project serves this path. */
 export const PUBLIC_MCP_URL = "https://sa-ecosystem-node-dashboard.vercel.app/api/mcp";
@@ -44,7 +45,7 @@ export function jsonRpcError(message: string, status = 500): Response {
  */
 export function createPublicMcpFetch(
   handler: NodeHandler,
-  options?: { timeoutMs?: number; maxBytes?: number; maxRequestBytes?: number },
+  options?: { timeoutMs?: number; maxBytes?: number; maxRequestBytes?: number; feeds?: H2hFeeds },
 ): (request: Request) => Promise<Response> {
   const timeoutMs = options?.timeoutMs ?? REQUEST_TIMEOUT_MS;
   const maxBytes = options?.maxBytes ?? MAX_RESPONSE_BYTES;
@@ -55,6 +56,10 @@ export function createPublicMcpFetch(
 
     let timer: ReturnType<typeof setTimeout> | undefined;
     const pending = (async () => {
+      if (options?.feeds) {
+        const feed = await h2hFeedResponse(request, options.feeds);
+        if (feed) return feed;
+      }
       const prepared = await limitedRequest(request, maxRequestBytes);
       if (prepared instanceof Response) return prepared;
       return handler.fetch(prepared);

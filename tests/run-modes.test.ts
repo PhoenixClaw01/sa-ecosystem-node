@@ -157,14 +157,14 @@ describe("run mode boot", () => {
     expect(oversized.body).not.toMatch(/supersecret/);
   });
 
-  it("boots stdio and the npx bin with the same 22 read-only tools", async () => {
+  it("boots stdio and the npx bin with the same 24 read-only tools", async () => {
     const env = { SOLANA_RPC_URL: "https://rpc.example/path?api-key=supersecret" };
     for (const args of [["dist/stdio.js"], ["bin/sa-ecosystem-node.js"]]) {
       const { client, stderr } = await connectStdio(args, env);
       try {
         const names = (await client.listTools()).tools.map((tool) => tool.name).sort();
         expect(names).toEqual([...READ_ONLY_TOOLS].sort());
-        expect(names).toHaveLength(22);
+        expect(names).toHaveLength(24);
         expect(names).not.toContain("submit_hub_update");
         expect(stderr.text).toMatch(/listening on stdio/);
         expect(stderr.text).not.toMatch(/supersecret|api-key/);

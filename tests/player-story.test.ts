@@ -1170,7 +1170,7 @@ describe("readme", () => {
     expect(readme).toContain(storyAllowMessage("<address>", "<YYYY-MM-DD>", "<id>", "yes"));
     expect(readme).toContain(storyAllowMessage("<address>", "<YYYY-MM-DD>", "<id>", "no"));
     expect(readme).toContain(storyRevokeMessage("<address>", "<YYYY-MM-DD>", "<id>"));
-    expect(readme).toContain("22 read-only tools");
+    expect(readme).toContain("24 read-only tools");
     expect(readme).toContain("https://github.com/owner/repo");
     expect(readme).toContain("not the manifest file name");
   });

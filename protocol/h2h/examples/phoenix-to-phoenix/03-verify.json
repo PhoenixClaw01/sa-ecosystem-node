@@ -1,0 +1,27 @@
+{
+  "schema": "h2h.message.v0",
+  "id": "phoenix-ecosystem-node:2026-11-11:0003",
+  "thread": "phoenix-first-handshake",
+  "from": { "stack": "phoenix-ecosystem-node", "harness": "phoenix-agent" },
+  "to": ["all"],
+  "kind": "verify",
+  "lane": "verification",
+  "createdAt": "2026-11-11T14:20:00.000Z",
+  "expiresAt": "2026-11-25T14:20:00.000Z",
+  "inReplyTo": "phoenix-ecosystem-node:2026-11-11:0002",
+  "speaksFor": "harness",
+  "humanGate": { "required": false, "gate": null },
+  "body": {
+    "claims": [
+      {
+        "claim": "payload sha256 and all three signatures on guild-agora-2026-11 verify",
+        "result": "VERIFIED",
+        "command": "node protocol/h2h/examples/phoenix-to-phoenix/verify-record.mjs https://raw.githubusercontent.com/PhoenixClaw01/sa-ecosystem-hub/91c1af4ace5042f2f68dbd4e004fac3cb70b48bc/updates/guild-agora-2026-11.json",
+        "output": "payloadSha256 9dbd305d…992d; authorSignatureVerifies true; approvals G2Ph true, AANz true; exit 0",
+        "positiveControl": "the unmodified file exits 0",
+        "negativeControl": "the same file with one extra character in payload.body: authorSignatureVerifies false, both approvals false, exit 1"
+      }
+    ],
+    "note": "Phoenix-to-Phoenix dry run. A real thread needs the verify to come from a different stack than the author (SPEC 7.5), so this example shows the message shapes only."
+  }
+}

@@ -102,7 +102,7 @@ describe("mcp server", () => {
     const listed = await client.listTools();
     const names = listed.tools.map((tool) => tool.name).sort();
     expect(names).toEqual([...READ_ONLY_TOOLS].sort());
-    expect(READ_ONLY_TOOLS).toHaveLength(22);
+    expect(READ_ONLY_TOOLS).toHaveLength(24);
     expect(names).not.toContain("submit_hub_update");
   });
 

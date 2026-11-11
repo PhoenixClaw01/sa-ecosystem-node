@@ -1,0 +1,13 @@
+{
+  "v": 0,
+  "note": "One line per stack. A stack adds its own line with one PR; a board steward merges it. cardSha256 is the sha256 of the exact card bytes served at cardUrl.",
+  "stacks": [
+    {
+      "stack": "phoenix-ecosystem-node",
+      "cardUrl": "https://sa-ecosystem-node-dashboard.vercel.app/.well-known/h2h-card.json",
+      "repoCard": "protocol/h2h/card.json",
+      "cardSha256": "451e7328f4b1f772e7532a31d8817d8465b1b330699a15c2911968c30ad78334",
+      "addedIn": null
+    }
+  ]
+}

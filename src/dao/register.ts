@@ -305,6 +305,46 @@ export function registerDaoTools(server: McpServer, dao: DaoReaders): void {
   );
 
   server.registerTool(
+    "list_c4_markers",
+    {
+      title: "List C4 markers (H2H)",
+      description:
+        "H2H bridge feed h2h.c4-markers.v1 (protocol/h2h/SPEC.md section 6.1). One marker per current signed listing and guild listing, with the same signer, threshold, revocation, and manifest-pin checks as hub_updates. Every marker is placement orbit with anchor none: coordinates come only from a signed c4-anchor record, and that kind is not built yet. Also served as GET /c4-markers.json. Not game fleets. Read-only.",
+      inputSchema: z.object({
+        kind: z.enum(["listing", "guild", "all"]).optional().describe("listing, guild, or all. Default all."),
+        anchored: z.boolean().optional().describe("true returns only markers with a resolved signed anchor (none exist yet)."),
+        stream: z.enum(LISTING_STREAMS).optional().describe("Listing stream. Guild markers have no stream and are left out when this is set."),
+      }),
+      annotations: readOnlyAnnotations,
+    },
+    async (args) => {
+      try {
+        return jsonResult({ readOnly: true, ...(await dao.c4Markers(args)) });
+      } catch (error) {
+        return failure(error);
+      }
+    },
+  );
+
+  server.registerTool(
+    "list_community_tools",
+    {
+      title: "List community tools (H2H)",
+      description:
+        "H2H bridge feed h2h.community-tools.v1 (protocol/h2h/SPEC.md section 6.2). A curated list from protocol/h2h/community-tools.json in this node's repo. Anyone can add a tool with one pull request. A row is a pointer, not an endorsement, a referral, or a price. Also served as GET /community-tools.json. Read-only.",
+      inputSchema: z.object({}),
+      annotations: readOnlyAnnotations,
+    },
+    async () => {
+      try {
+        return jsonResult({ readOnly: true, disclaimer: DISCLAIMER, ...dao.communityTools() });
+      } catch (error) {
+        return failure(error);
+      }
+    },
+  );
+
+  server.registerTool(
     "claim_status",
     {
       title: "Claim status",

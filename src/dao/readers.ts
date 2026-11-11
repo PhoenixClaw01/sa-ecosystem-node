@@ -1,6 +1,7 @@
 import { buildFlows, buildHistory, buildPayments, requireRows, type PaymentQuery, type ReportQuery } from "./aggregate.js";
 import { readPublishedMultisigs, readWalletBalancesWithFallback } from "./balances.js";
 import { probeDataHealth } from "./health.js";
+import { listC4Markers, listCommunityTools, type C4MarkersQuery } from "../h2h/feeds.js";
 import { claimStatus, listListings, readHubUpdates, readStoryContext, searchHub, type ListListingsQuery, type StoryHubContext } from "./hub.js";
 import { createProfileKeyChecker } from "../hub/claim-profile.js";
 import { loadSignerDirectory } from "../hub/allowlist.js";
@@ -84,6 +85,8 @@ export interface DaoReaders {
   ): Promise<ToolEnvelope & Record<string, unknown>>;
   storyContext(): Promise<StoryHubContext>;
   claimStatus(query: { identity?: string }): Promise<ToolEnvelope & Record<string, unknown>>;
+  c4Markers(query: C4MarkersQuery): Promise<ReturnType<typeof listC4Markers> extends Promise<infer T> ? T : never>;
+  communityTools(): ReturnType<typeof listCommunityTools>;
   dataHealth(): Promise<ToolEnvelope & Record<string, unknown>>;
 }
 
@@ -544,6 +547,21 @@ export function createDaoReaders(
         { schema: result.schema, hubId: result.hubId, claims: result.claims, note: result.note },
         now(),
       );
+    },
+
+    async c4Markers(query) {
+      const source = hubSource();
+      const verify = claimReadOptions();
+      if (!source.repo && !source.commit && !source.manifestHash) {
+        return listC4Markers(source, new Set(), config.hubApprovalThreshold, query, undefined, verify, new Map(), now());
+      }
+      const directory = loadSignerDirectory(config.hubSignerSets);
+      const allowlist = new Set(directory.sets.flatMap((set) => [...set.publicKeys]));
+      return listC4Markers(source, allowlist, config.hubApprovalThreshold, query, directory.sets, verify, directory.labels, now());
+    },
+
+    communityTools() {
+      return listCommunityTools(now());
     },
 
     async dataHealth() {
