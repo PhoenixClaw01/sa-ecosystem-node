@@ -134,7 +134,7 @@ flowchart TD
   Y[submit_hub_update<br/>planned] -.-> D
 ```
 
-On the public node the threshold is 2 and the author's own approval counts as one of the two (`HUB_APPROVAL_THRESHOLD=2`, `HUB_ALLOW_AUTHOR_APPROVAL=true`). The author key shipped in `hub/signers.json` is Phoenix Collective (`G2PhCi6MApcuC6f5o2CDQBWDnJt9hRcozHuuN55PYisU`). Falkor (`FC1eRr99GGJZuc4KZeUivBpbSMGvjcBB839KaEfAuhcq`) supplies the second signature. GaliaMeta DAC (`EU7zwmY8QP7B9FFUUyMu1eTNkrwuj27NQkgEmNMWreq1`) is on the same allowlist and is not required for that pair. The same wallet twice counts once.
+On the public node, today a record needs 2 distinct allowlisted keys; the author's own approval counts (`HUB_APPROVAL_THRESHOLD=2`, `HUB_ALLOW_AUTHOR_APPROVAL=true`). The author key shipped in `hub/signers.json` is Phoenix Collective (`G2PhCi6MApcuC6f5o2CDQBWDnJt9hRcozHuuN55PYisU`). Falkor (`FC1eRr99GGJZuc4KZeUivBpbSMGvjcBB839KaEfAuhcq`) supplies the second signature. GaliaMeta DAC (`EU7zwmY8QP7B9FFUUyMu1eTNkrwuj27NQkgEmNMWreq1`) is on the same allowlist and is not required for that pair. The same wallet twice counts once.
 
 The node does not upload images. A curator commits a png, jpeg, or webp into the hub. `/plain/` loads only that hub-relative path, resolved to `raw.githubusercontent.com` at the pinned commit.
 

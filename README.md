@@ -8,7 +8,7 @@ This is not an ATMTA product, and the product name is not Star Atlas. It holds n
 
 The public node is [https://sa-ecosystem-node-dashboard.vercel.app](https://sa-ecosystem-node-dashboard.vercel.app) (Vercel project `sa-ecosystem-node-dashboard`, separate from the DAO Council preview). `/` on that site redirects to `/plain/`. The public hub is [sa-ecosystem-hub](https://github.com/PhoenixClaw01/sa-ecosystem-hub). Governance notes are in [phoenix-gate](https://github.com/PhoenixClaw01/phoenix-gate).
 
-This deployment uses threshold 2 with `HUB_ALLOW_AUTHOR_APPROVAL=true`, so the author's own approval counts as one of the two. The author is Phoenix Collective and the second approval is Falkor (`FC1e`). `HUB_GIT_REPO`, `HUB_GIT_COMMIT`, and `HUB_STORE_MANIFEST_HASH` are set. On 1 November 2026 the pinned commit was `f064f18db1da60c4f3e562d4064c8f344042e97e`.
+This deployment uses threshold 2 with `HUB_ALLOW_AUTHOR_APPROVAL=true`. Today a record needs 2 distinct allowlisted keys; the author's own approval counts. The author is Phoenix Collective and the second approval is Falkor (`FC1e`). `HUB_GIT_REPO`, `HUB_GIT_COMMIT`, and `HUB_STORE_MANIFEST_HASH` are set. On 1 November 2026 the pinned commit was `f064f18db1da60c4f3e562d4064c8f344042e97e`.
 
 - [Spec v1.0.0](docs/spec.md)
 - [Hosting](docs/hosting.md)
@@ -118,7 +118,7 @@ A host with the `git` binary checks out that commit. A host without it, includin
 
 ## Operator runbook
 
-This repository does not contain signing secrets. `hub/signers.json` ships with three public keys. The public deployment uses threshold 2 with `HUB_ALLOW_AUTHOR_APPROVAL=true`, so the author's own approval counts as one of the two: Phoenix Collective, plus Falkor (`FC1e`). The example config stays at threshold 1 for a local dry run. A fourth slot may be added later.
+This repository does not contain signing secrets. `hub/signers.json` ships with three public keys. The public deployment uses threshold 2 with `HUB_ALLOW_AUTHOR_APPROVAL=true`. Today a record needs 2 distinct allowlisted keys; the author's own approval counts. That pair is Phoenix Collective, plus Falkor (`FC1e`). The example config stays at threshold 1 for a local dry run. A fourth slot may be added later.
 
 | Label | Public key | Who signs | How the approval is produced |
 |---|---|---|---|
@@ -126,7 +126,7 @@ This repository does not contain signing secrets. `hub/signers.json` ships with 
 | GaliaMeta DAC | `EU7zwmY8QP7B9FFUUyMu1eTNkrwuj27NQkgEmNMWreq1` | GaliaMeta DAC wallet owner | Same `signMessage` flow |
 | Phoenix Collective (Falkor's team) | `G2PhCi6MApcuC6f5o2CDQBWDnJt9hRcozHuuN55PYisU` | Collective author | A new ed25519 key from `hub-keygen`, kept outside this repository |
 
-The public deployment is threshold `2` with `HUB_ALLOW_AUTHOR_APPROVAL=true`, so the author's own approval counts as one of the two. The author is Phoenix Collective (`G2PhCi6MApcuC6f5o2CDQBWDnJt9hRcozHuuN55PYisU`) and Falkor (`FC1eRr99GGJZuc4KZeUivBpbSMGvjcBB839KaEfAuhcq`) adds the second. GaliaMeta DAC stays on the allowlist and is not required for that pair. The same wallet twice counts once. Without `HUB_ALLOW_AUTHOR_APPROVAL`, the author's approval would not count at threshold 2, and that is not this deployment. The example config stays at threshold 1 for a local dry run: one distinct allowlisted approval is enough, including the author's own approval, and that result is `selfApproved: true` when no other key approved. Publish a store commit whose updates already have the Collective signature and Falkor's approval before raising a local node to threshold 2, then pin that commit.
+The public deployment is threshold `2` with `HUB_ALLOW_AUTHOR_APPROVAL=true`. Today a record needs 2 distinct allowlisted keys; the author's own approval counts. The author is Phoenix Collective (`G2PhCi6MApcuC6f5o2CDQBWDnJt9hRcozHuuN55PYisU`) and Falkor (`FC1eRr99GGJZuc4KZeUivBpbSMGvjcBB839KaEfAuhcq`) adds the second. GaliaMeta DAC stays on the allowlist and is not required for that pair. The same wallet twice counts once. Without `HUB_ALLOW_AUTHOR_APPROVAL`, the author's approval would not count at threshold 2, and that is not this deployment. The example config stays at threshold 1 for a local dry run: one distinct allowlisted approval is enough, including the author's own approval, and that result is `selfApproved: true` when no other key approved. Publish a store commit whose updates already have the Collective signature and Falkor's approval before raising a local node to threshold 2, then pin that commit.
 
 The public node sets `HUB_GIT_REPO` to `https://github.com/PhoenixClaw01/sa-ecosystem-hub`, `HUB_APPROVAL_THRESHOLD` to `2`, and `HUB_ALLOW_AUTHOR_APPROVAL` to `true`. On 1 November 2026 `HUB_GIT_COMMIT` was `f064f18db1da60c4f3e562d4064c8f344042e97e`, and `HUB_STORE_MANIFEST_HASH` was the sha256 of `hub-manifest.json` at that commit: `1fd4536e3a5b4176beebc04c16c53834092f519d98c0e30172862a2f24ae24f2`. Leave the three pin variables unset on a local process that should not serve the hub. Do not add a submit tool.
 
@@ -230,7 +230,7 @@ npm run sign-hub-update -- \
   --out ./update.falkor.json
 ```
 
-Repeat for the next wallet, using the file that already has the first approval as `--approve`. The public deployment sets `HUB_APPROVAL_THRESHOLD=2` and `HUB_ALLOW_AUTHOR_APPROVAL=true`: the Collective author signs, and Falkor (`FC1e`) approves. Those two approvals meet the threshold. The author's own approval counts as one of the two. GaliaMeta DAC can still approve, and is not required for that pair. A local dry run at threshold 1 still accepts one wallet.
+Repeat for the next wallet, using the file that already has the first approval as `--approve`. The public deployment sets `HUB_APPROVAL_THRESHOLD=2` and `HUB_ALLOW_AUTHOR_APPROVAL=true`: the Collective author signs, and Falkor (`FC1e`) approves. Those two approvals meet the threshold. Today a record needs 2 distinct allowlisted keys; the author's own approval counts. GaliaMeta DAC can still approve, and is not required for that pair. A local dry run at threshold 1 still accepts one wallet.
 
 The Collective agent can approve with its key file. That signature is over the same bytes:
 

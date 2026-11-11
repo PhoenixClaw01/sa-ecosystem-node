@@ -11,7 +11,7 @@
 
 > **Target policy, not what is live.** Agents sign the everyday, permissionless layer. A wallet signs only when a *player* claims something that is personally theirs.
 
-**What is live today.** Threshold 2, and the author's approval counts. The Phoenix stack's agent record key `G2Ph…` authors the 55 listing and guild records. Falkor (Phoenix steward) `FC1e…` (wallet) is the second approval. GaliaMeta `EU7z…` (wallet) is on the allowlist and unused. The verifier treats an agent record key and a wallet the same way: ed25519 on the allowlist. The count is distinct keys, not stacks.
+**What is live today.** Today a record needs 2 distinct allowlisted keys; the author's own approval counts. The Phoenix stack's agent record key `G2Ph…` authors the 55 listing and guild records. Falkor (Phoenix steward) `FC1e…` (wallet) is the second approval. GaliaMeta `EU7z…` (wallet) is on the allowlist and unused. The verifier treats an agent record key and a wallet the same way: ed25519 on the allowlist. The count is distinct keys, not stacks.
 
 **Planned (migration M0–M5), not done.** A second Phoenix agent record key replaces Falkor's wallet as the second approval on everyday records. Falkor's wallet stays for player-side records. The `agents` signer set is not in the repo yet. A cross-stack countersign is an optional trust level (`single-stack` vs `multi-stack` verified), never required. Showing that trust level is code item C2, not built. `c4-anchor`, `community-tool`, and `reputation-link` are proposed kinds. Code items C1–C7 are not built.
 
@@ -64,7 +64,7 @@ It also lets **non-players**, such as businesses, guilds and tools, be present i
 **Kinds proposed here:** `c4-anchor`, `community-tool` (pointer), `reputation-link`.
 
 **Shared rules for every row.** Rows describe the target policy. The last column says what is true today.
-- *Two-key approval (live):* threshold 2 with the author's approval counting. Two keys from the **same** stack are enough. Today those two keys are `G2Ph…` and Falkor's wallet.
+- *Two-key approval (live):* Today a record needs 2 distinct allowlisted keys; the author's own approval counts. Two keys from the **same** stack are enough. Today those two keys are `G2Ph…` and Falkor's wallet.
 - *Trust level (planned, code item C2, shown and not enforced):* `single-stack` when every approver is from one stack; `multi-stack` when another stack countersigns. The node does not compute this today. Registry cards are also proposed, not published.
 - *Rate limits (proposed):* per agent record key, per UTC day. Enforced by review until C3.
 - *Revocation (live):* an in-chain `signer-change` removal applies to later links only. The node's local revoke list (`HUB_REVOKED_SIGNERS`) is retroactive: a record that needed the key, and every later record, are rejected until re-approved. Non-retroactive revocation is code item C4 (**planned**). H2H §17.2 describes both.
@@ -148,7 +148,7 @@ So a player's **Solana-era history is about to become "the past"**. Whoever help
 |---|---|---|---|
 | **Now: Solana mainnet** | Keep `player_legacy` as the open evidence read. The proposed `reputation-link` (scoped consent: `legacy`, `fleets`, `guild`, `story`, with an unlink) is not built. Write player stories from cited mainnet evidence only. A stable **evidence pack** per opted-in player is also not built: a signed hub record that lists the source transactions and accounts (hashes and references, not prose) for the Solana-era history. | The Solana-era record is complete and checkable *before* Starbased closes. Opted-in players arrive at z.ink with a signed, portable history. | Code work; Founder merge. `reputation-link` is **planned**. |
 | **Now: z.ink testnet / PTR** | Read PTR Player Profiles through `@aephia/atlas-kit` (`identity`). A player's proposed `reputation-link` could **optionally** name their PTR profile, so the link covers both chains. Store names alongside addresses, because PTR resets (Phase 3.2) wipe state. `c4-anchor` and marker feeds against PTR systems are **proposed**, not built. | We practise the cross-chain link on the real z.ink account model, and keep it reset-proof. | Code work |
-| **Now: no chain** | Watch for zProfile developer docs, achievements (Phase 4), and the bridge docs (docs.z.ink has a bridge section). Keep `community-tools` listing docs.z.ink and z.ink. | Readiness without assumptions | — |
+| **Now: no chain** | Watch for zProfile developer docs, achievements (Phase 4), and the bridge docs (docs.z.ink has a bridge section). When the proposed community-tools feed exists, list docs.z.ink and z.ink. | Readiness without assumptions | — |
 | **At z.ink mainnet / Genesis** | (1) Add z.ink mainnet as a read source once a public RPC is published. (2) **Z1:** anchor *hashes* of consent and evidence-pack records on z.ink, if fees are as low as announced. (3) Prompt opted-in players to **re-confirm** their link from the wallet they actually use on z.ink. Assets may bridge to new accounts, so the link must be re-signed and never inferred. | The node becomes the place where "this z.ink identity = this Solana history" is stated by the player and checkable by anyone. | z.ink mainnet RPC; Founder D6 |
 | **After: if zProfile opens** | **Z2:** read zProfile (when there is an API) and let players include `zprofile:<id>` in a `reputation-link`. **Z3:** offer evidence packs to zProfile or achievements as third-party attestations, if ATMTA allows it. | Reputation flows both ways without our node becoming the authority | ATMTA's API and policy; any approach to ATMTA is Founder-only (D7) |
 
@@ -201,7 +201,7 @@ flowchart TB
 
   subgraph NODE["sa-ecosystem-node = shared source of truth"]
     REC["Signed records (hub, pinned commit)<br/>today: listings and guilds<br/>agent record key G2Ph plus Falkor wallet<br/>proposed: c4-anchor, community-tool, reputation-link"]
-    ALLOW["Approved-key allowlist<br/>today: threshold 2, author approval counts<br/>planned: trust level single-stack / multi-stack (C2)"]
+    ALLOW["Approved-key allowlist<br/>today: a record needs 2 distinct allowlisted keys; the author's own approval counts<br/>planned: trust level single-stack / multi-stack (C2)"]
     MCP["Read-only MCP (live)<br/>JSON bridge feeds are proposed"]
   end
 
@@ -232,7 +232,7 @@ flowchart TB
   PEOPLE -->|wallet signs once to opt in| REC
   REC -.->|consent hashes, planned| ANCH
   REC -.->|opt-in reputation-link, when readable| ZP
-  C4 & PLAIN --> PEOPLE
+  REND & PLAIN --> PEOPLE
 ```
 
 Solid arrows exist or are directly buildable. Dashed arrows are planned, or depend on z.ink.

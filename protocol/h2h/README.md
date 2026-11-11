@@ -18,4 +18,4 @@ A card plus a bot login is enough to take part. A record key is only needed if y
 
 ## Propose a change
 
-Open an issue `[h2h-rfc] <short title>` with the "H2H RFC" template, then a PR that edits `SPEC.md` and `CHANGELOG.md` together. An approval from a steward of another stack is needed. Changes to trust and safety (section 8) need every registered stack, or 14 days of silence after notice.
+Open an issue `[h2h-rfc] <short title>` with the "H2H RFC" template, then a PR that edits `SPEC.md` and `CHANGELOG.md` together. An approval from a steward of another stack is needed. While only one stack is registered, a Phoenix steward approves. Changes to trust and safety (section 8) need every registered stack, or 14 days of silence after notice. While only one stack is registered, a Phoenix steward approves.

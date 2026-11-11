@@ -36,7 +36,7 @@ Names and meanings. The public values are the ones set on `sa-ecosystem-node-das
 | `HUB_SIGNERS_PATH` | Single allowlist file when `HUB_SIGNER_SETS` is omitted | The function bundle includes `hub/signers.json`, a byte-for-byte copy of the repository file |
 | `HUB_SIGNER_SETS` | JSON array of `{ "id", "path", "threshold" }`. Overrides the single path | The example lists one set at threshold 1. The public threshold is the `HUB_APPROVAL_THRESHOLD` above |
 
-The author's approval on the public node is one of the two. Phoenix Collective (`G2PhCi6MApcuC6f5o2CDQBWDnJt9hRcozHuuN55PYisU`) is the author key in `hub/signers.json`. Falkor (`FC1eRr99GGJZuc4KZeUivBpbSMGvjcBB839KaEfAuhcq`) supplies the second. GaliaMeta DAC stays on the allowlist and is not required for that pair.
+Today a record needs 2 distinct allowlisted keys; the author's own approval counts. Phoenix Collective (`G2PhCi6MApcuC6f5o2CDQBWDnJt9hRcozHuuN55PYisU`) is the author key in `hub/signers.json`. Falkor (`FC1eRr99GGJZuc4KZeUivBpbSMGvjcBB839KaEfAuhcq`) supplies the second. GaliaMeta DAC stays on the allowlist and is not required for that pair.
 
 `HUB_GIT_REPO`, `HUB_GIT_COMMIT`, and `HUB_STORE_MANIFEST_HASH` are set together on the public node. Leave all three unset on a local process and the hub tools return no rows. Do not add a submit tool.
 
