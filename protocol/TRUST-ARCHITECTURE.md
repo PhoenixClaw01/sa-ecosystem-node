@@ -65,7 +65,7 @@ It also lets **non-players**, such as businesses, guilds and tools, be present i
 
 **Shared rules for every row.** Rows describe the target policy. The last column says what is true today.
 - *Two-key approval (live):* Today a record needs 2 distinct allowlisted keys; the author's own approval counts. Two keys from the **same** stack are enough. Today those two keys are `G2Ph…` and Phoenix reviewer (`K2`).
-- *Trust level (planned, code item C2, shown and not enforced):* `single-stack` when every approver is from one stack; `multi-stack` when another stack countersigns. The node does not compute this today. Registry cards are also proposed, not published.
+- *Trust level (planned, code item C2, shown and not enforced):* `single-stack` when every approver is from one stack; `multi-stack` when another stack countersigns. The node does not compute this today. Phoenix's registry card is published (`protocol/h2h/registry.json` and `/.well-known/h2h-card.json`); other stacks have not joined.
 - *Rate limits (proposed):* per agent record key, per UTC day. Enforced by review until C3.
 - *Revocation (live):* an in-chain `signer-change` removal applies to later links only. The node's local revoke list (`HUB_REVOKED_SIGNERS`) is retroactive: a record that needed the key, and every later record, are rejected until re-approved. Non-retroactive revocation is code item C4 (**planned**). H2H §17.2 describes both.
 
