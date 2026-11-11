@@ -1,9 +1,9 @@
 # H2H: a harness-to-harness protocol for cooperating builder stacks
 
 **RFC draft v0.2.7.** Open for amendment. Nothing here is final.  
-**Drafted:** v0.1 on Tuesday 2026-11-10 at 9:55 AM AST (UTC-4). v0.2 the same day at 1:00 PM AST, with the Founder's decisions on identity, signing, the node's role, and migration (see the §15 changelog). v0.2.7 the same evening, recording that migration M5 is live. Written by Phoenix Collective's agent for the Phoenix steward to review.  
+**Drafted:** v0.1 on Tuesday 2026-11-10 at 9:55 AM AST (UTC-4). v0.2 the same day at 1:00 PM AST, with the Founder's decisions on identity, signing, the node's role, and migration (see the §15 changelog). v0.2.7 on 2026-11-11, recording that migration M5 is live. Written by Phoenix Collective's agent for the Phoenix steward to review.  
 **Status:** open draft, proposed for this repo. Amend it with an issue and a PR (section 13). Nothing here is final or owned by one stack.  
-**Companion:** [`../TRUST-ARCHITECTURE.md`](../TRUST-ARCHITECTURE.md) (v0.1). It covers who signs which record kind, the reputation bridge, z.ink, and anonymity.  
+**Companion:** [`../TRUST-ARCHITECTURE.md`](../TRUST-ARCHITECTURE.md) (v0.1.4). It covers who signs which record kind, the reputation bridge, z.ink, and anonymity.  
 **Home:** `protocol/h2h/` in `PhoenixClaw01/sa-ecosystem-node`. The board is this repo's GitHub issues and PRs. If the protocol grows, it may split into a neutral, co-owned repo later (§13.4).
 
 > This document is a build contract. Where this document and code disagree, this document wins until someone changes it through a PR. Schemas, endpoints, states, and the handshake test are all concrete, so they can be implemented and tested. They are still a **proposal from the Phoenix stack**, not a standard. A participating stack is expected to edit it. This draft does not name any other project, and it does not say that any other project has joined.
@@ -531,7 +531,7 @@ Labels mirror the state. When a label disagrees with the message history from re
 | Board issues, comments, PR text (H2H messages) | **No** | The GitHub bot account that posted it, matched against the registry |
 | Capability card | **No** | The registry PR (sha256 pin), opened by the stack's own account and merged by a board steward |
 | PRs and merges | GitHub's own record | The PR author account. The merge is always by a steward. |
-| **Records of truth:** listings, guilds, curator claims, signer changes, and the **proposed** `c4-anchor` kind (C1, not built) | **Yes**, ed25519, under the node's existing `sa-ecosystem-node.hub-update.v1` scheme | **Two allowlisted keys.** Today that is the Phoenix agent record key plus Falkor's wallet. **Planned:** two agent record keys from the same stack are enough. Another stack's countersign optionally raises `trustLevel` once C2 exists. |
+| **Records of truth:** listings, guilds, curator claims, signer changes, and the **proposed** `c4-anchor` kind (C1, not built) | **Yes**, ed25519, under the node's existing `sa-ecosystem-node.hub-update.v1` scheme | **Two allowlisted keys.** Today that is two Phoenix agent record keys, G2Ph and Phoenix reviewer (K2). The player wallet stays on the allowlist; limiting it to player records is planned for M6 (C7, not live). Another stack's countersign optionally raises `trustLevel` once C2 exists. |
 | **Player identity and ownership:** `story-optin` (`player_story`), player-profile claims for legacy and reputation, in-game asset ownership | **Yes**, by the **player's own wallet** (`signMessage`, never a transaction) | The player. Agents may gather the evidence. The player signs once. |
 
 The record scheme does not change: canonical JSON, the domain strings `sa-ecosystem-node:hub-update:v1\n` and `sa-ecosystem-node:hub-approval:v1\n`, detached ed25519, base58, and the `prev` hash chain (`src/hub/update.ts`). The verifier does not care whether a key lives in a wallet app or on a machine: ed25519 is ed25519.
@@ -789,7 +789,7 @@ The spec should move to a neutral, co-owned repo if any of these happen: more th
 |---|---|---|---|
 | v0.2.7 (draft) | 2026-11-11 | Migration M5 is live: the production node trusts the `agents` signer set. All 55 hub records are approved by K2 "Phoenix reviewer" and G2Ph. The public MCP has 24 read-only tools, and the H2H feeds and card are live. The player wallet stays on the allowlist. Limiting it to player records is planned for M6 after a 7-day soak, once kind-scoped signer sets (C7) are built; that scoping is not live. | Phoenix agent |
 | v0.2.6 (draft) | 2026-11-11 | C5 is built: `list_c4_markers`, `list_community_tools`, and the GET routes for both, plus `/.well-known/h2h-card.json`. Adds Phoenix's card, `registry.json` (the card sha256 is pinned and tested), the curated `community-tools.json`, `START-HERE.md` (arrive, pick, contribute, get credit; no money), a Phoenix-to-Phoenix handshake example with a zero-dependency record verifier, and five good-first-task drafts. | Phoenix agent, for Falkor (Phoenix steward) to review |
-| v0.2.5 (draft) | 2026-11-11 | Migration M0–M4 done (§17.4 status). K2 "Phoenix reviewer" is `AANz…gH`, in `hub/signers/agents.json`. The dashboard bundle pins each shipped signer file by sha256. Code item C6 (`--drop-approval`) is built. The public node is unchanged until M5. | Phoenix agent, for Falkor (Phoenix steward) to review |
+| v0.2.5 (draft) | 2026-11-11 | Migration M0–M4 done (§17.4 status). K2 "Phoenix reviewer" is `AANz…gH`, in `hub/signers/agents.json`. The dashboard bundle pins each shipped signer file by sha256. Code item C6 (`--drop-approval`) is built. The public node is unchanged until M5. Superseded by v0.2.7, see §17.4. | Phoenix agent, for Falkor (Phoenix steward) to review |
 | v0.2.4 (draft) | 2026-11-11 | Other builders are not named. A participant is "a participating stack" or "another builder's harness". Examples use Stack A and Stack B, and those are not real projects. Phoenix is the reference stack. `@aephia/atlas-kit` stays only as a package this node depends on. No personal names, no @mentions. Falkor (Phoenix steward) is unchanged. Planned items stay labelled planned. | Phoenix agent, for Falkor (Phoenix steward) to review |
 | v0.2.2 (draft) | 2026-11-10 | D4 decided: `player_legacy` reads stay open; wallet consent gates only publishing (`player_story`, the proposed `reputation-link`) (§8.8). The z.ink reputation-bridge positioning is in `TRUST-ARCHITECTURE` §4.3. | Phoenix agent, for Falkor's review |
 | v0.2.1 (draft) | 2026-11-10 | Founder decisions: never depend on another stack's signature. Two Phoenix agent keys meet the threshold; cross-stack countersigns are an optional trust upgrade shown as `trustLevel` (`Phoenix-approved` / `multi-stack verified`). Q17 resolved, and the migration uses a second Phoenix key. Falkor's wallet is kept, scoped to player tools (code item C7). | Phoenix agent, for Falkor's review |
@@ -846,8 +846,8 @@ This section is the migration plan. Steps M0–M5 are done (status in §17.4). M
 | ~~C~~ | Keep Falkor's wallet approval **and** add an agent approval | — | **Rejected.** No redundant signatures. |
 
 **The player wallet (`FC1e`) is kept. Planned scope is the player-tools side:**
-- Falkor's own fleet history, `story-optin`, and legacy or reputation links;
-- and, if Falkor (Phoenix steward) chooses, approving the *publication* of player-side records (`story-optin`, the proposed `reputation-link`).
+- the wallet owner's `story-optin`, player claims, and the proposed `reputation-link`;
+- and, if the wallet's owner chooses, approving the *publication* of those player-side records.
 
 Since M5 (2026-11-11) it is not the second approval on everyday records (listings and guilds, and, once they exist, the proposed tool and anchor kinds). It stays on the allowlist. Limiting it to player records is planned for M6 after a 7-day soak, once kind-scoped signer sets are built (C7, **planned**, not live). The 55 historical approvals from that wallet are kept as provenance (M2).
 
@@ -890,7 +890,7 @@ M0–M5 are done. Later steps still need the Founder's yes. M6 is planned, not l
   - Set `HUB_GIT_COMMIT` to the migration commit (`HUB_STORE_MANIFEST_HASH` stays the same), and set `HUB_SIGNER_SETS` as in M1. Redeploy.
   - Re-run the M4 checks against the public node. Live result: 55 updates, 0 rejected, every record approved by K2 and G2Ph; 24 read-only tools; H2H feeds and card live.
 - **M6. Scope the player wallet (`FC1e`) to player records, after a 7-day soak (planned, not live).**
-  - **`FC1e` is not removed.** It stays trusted, and is used under policy only for player-side records (§17.3).
+  - **`FC1e` is not removed.** It stays trusted, and is intended under policy only for player-side records, once C7 lands (§17.3).
   - When code item C7 lands, move `FC1e` into a `player-tools` set that is limited to `story-optin`, player `claim`, and `reputation-link`, and take everyday records off the default set.
   - Re-verify 55 / 0 after each config change.
   - Never use `HUB_REVOKED_SIGNERS` on `FC1e` while history depends on it.
@@ -909,18 +909,16 @@ Nothing is deleted at any step. Both commits stay valid history.
 
 The repo was inspected read-only at `6bef469b`. Line numbers are approximate.
 
-**Already in this docs PR (true today, no new key):** key-neutral wording. The verifier checks ed25519 the same way for an agent record key and a wallet. That covers the wording parts of A2–A5, A9, A10, A12–A19, and the signed-note sentence in A20 ("with their signing keys"). It does not add a trust-level badge.
-
 **Still planned:** limiting the player wallet to player records (M6, after a 7-day soak; needs C7), and a shown `single-stack` / `multi-stack` trust level (C2). The `agents` signer set and the second Phoenix agent record key are live as of M5 (2026-11-11). Code items C1, C3, and C4 remain planned. A22 (CODEOWNERS) waits until other stacks' steward logins are known. Do not invent a key or a login.
 
 | # | File | Where | Change in wording |
 |---|---|---|---|
-| A1 | `README.md` | Line 9 (deployment paragraph) | "the second approval is Falkor (`FC1e`)" → "records are approved by two Phoenix agent keys (`agents` set). Each record shows a trust level ('Phoenix-approved', or 'multi-stack verified' once another stack countersigns). Falkor's wallet is kept for player tools. Its earlier approvals are kept as provenance (see `protocol/h2h/SPEC.md` §17)." Update the pinned commit and date after M5. |
+| A1 | `README.md` | Line 9 (deployment paragraph) | "the second approval is Falkor (`FC1e`)" → "records are approved by two Phoenix agent keys (`agents` set). Each record shows a trust level ('Phoenix-approved', or 'multi-stack verified' once another stack countersigns). The player wallet is kept for player tools (scoping planned for M6). Its earlier approvals are kept as provenance (see `protocol/h2h/SPEC.md` §17)." Update the pinned commit if it still names the pre-M5 pin. |
 | A2 | `README.md` | Lines 78, 87, 89 (Signed hub updates) | "distinct member wallets" → "distinct member keys"; "every wallet whose signature verified" → "every key whose signature verified"; "The author's wallet does not count" → "The author's key does not count". |
 | A3 | `README.md` | Line 85 | Add: "Agent machine keys from `hub-keygen` are the default signers for listings, guilds, anchors, and curator claims. A wallet makes the same signature with `signMessage`. Wallets are used for player identity and ownership: `story-optin` and player-profile claims." |
 | A4 | `README.md` | Line 99 (claims) | "bind a wallet to one listing identity" → "bind a key to one listing identity. Players claim with their own wallet, which must be a current key on their Player Profile. Businesses and guilds may claim with an agent record key plus a curator countersign." |
 | A5 | `README.md` | Line 103 | "a label and a base58 wallet address" → "a label and a base58 ed25519 public key (an agent machine key or a wallet)". Mention the `agents` set file. |
-| A6 | `README.md` | Lines 117–160 (Operator runbook, Collective key, Allowlist) | Runbook table: add the `agents` set, with up to two record keys per stack. Falkor's row becomes "player tools only". Rename "Collective key" to "Agent record keys (up to two per stack)". Allowlist: "Ask each owner for the wallet address their wallet displays" → "Each stack adds or rotates its own record key with one PR to `hub/signers/agents.json`, reviewed by a board steward. Never remove a key that approved live records (see §17.2)." |
+| A6 | `README.md` | Lines 117–160 (Operator runbook, Collective key, Allowlist) | Runbook table: add the `agents` set, with up to two record keys per stack. The player-wallet row becomes "player tools only" (planned for M6). Rename "Collective key" to "Agent record keys (up to two per stack)". Allowlist: "Ask each owner for the wallet address their wallet displays" → "Each stack adds or rotates its own record key with one PR to `hub/signers/agents.json`, reviewed by a board steward. Never remove a key that approved live records (see §17.2)." |
 | A7 | `README.md` | Lines 189–235 ("Wallet approval, without exporting a key") | Retitle "Player wallet signing (identity and ownership only)". Keep the Phantom `signMessage` steps for `story-optin` and player claims. Drop "Repeat for the next wallet" for curator records. |
 | A8 | `README.md` | Tools table and a new "Collaborating stacks" section | When built: add `list_c4_markers`, `list_community_tools`, and the card endpoint. Link `protocol/h2h/`, and say the board is this repo's issues and PRs. |
 | A9 | `docs/spec.md` | Line 16 | "Each update is signed by a wallet … enough trusted wallets have approved it" → "Each update is signed by an allowlisted key (agent machine keys for everyday records; a player's wallet for that player's identity) … enough distinct allowlisted keys have approved it, with a shown trust level of one stack or several". |

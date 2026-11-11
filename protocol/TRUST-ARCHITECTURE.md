@@ -250,7 +250,7 @@ Solid arrows exist or are directly buildable. Dashed arrows are planned, or depe
 | **D5** | The rate limits in §3 (numbers proposed, enforced by review until code item C3) | Accept as starting values |
 | **D6** | Pursue z.ink hash anchors (Z1) once mainnet RPC is public | Yes in principle. Revisit when there is a date. |
 | **D7** | Should we approach ATMTA or the z.ink team about zProfile read or attest access? You are the one to send it, if anyone. | Not now. Wait for their developer docs. |
-| **D8** | ~~The second key for the 55-record migration~~ **Decided:** a second Phoenix agent record key. Cross-stack countersigns are an optional trust level, never required. Falkor's wallet stays for player-side records. | Decision made. The record migration is **planned** (M0–M5), not done. |
+| **D8** | ~~The second key for the 55-record migration~~ **Decided:** a second Phoenix agent record key. Cross-stack countersigns are an optional trust level, never required. The player wallet stays for player-side records. | Decision made. M0–M5 done (M5 live 2026-11-11). Scoping the player wallet to player records is planned for M6 (C7, not live). |
 | **D9** | The "Divergence War" / Chronicles context: should it ever become part of the reputation layer? | Out of scope here |
 
 ## 8. Open questions
