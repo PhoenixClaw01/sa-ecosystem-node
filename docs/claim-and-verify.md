@@ -2,7 +2,7 @@
 
 This page is the operator and player guide, and the record spec. A person can follow the steps. An agent can follow the same steps and the field list.
 
-The node stays read-only. It does not add a signer, hold a key, or run a new hosted service. Signing happens in the claimant's wallet. Curators publish the signed file into the hub repository the same way they publish any other hub update.
+The node stays read-only. It does not add a signer, hold a key, or run a new hosted service. A player's claim is signed in the player's own wallet. Curators publish the signed file into the hub repository the same way they publish any other hub update.
 
 ## What a claim does
 
@@ -103,11 +103,11 @@ Without `--show-handles`, public claim status does not include the raw handle.
 
 A current listing, guild, or search row with an active claim shows the word `claimed` (`dashboard/plain/plain.js`). The page does not add a wallet address for that badge. X and Discord handles are not printed there.
 
-There is no self-claim button on `/plain/`. Signing happens in the claimant's wallet, on their own machine, with the commands on this page. A hub editor then commits the file. A button on the page is planned. It is not in v1.0.0.
+There is no self-claim button on `/plain/`. Signing happens with the claimant's own key (for a player, their wallet), on their own machine, with the commands on this page. A hub editor then commits the file. A button on the page is planned. It is not in v1.0.0.
 
 ```mermaid
 flowchart TD
-  A[Claimant builds claim.json<br/>with hub-claim] --> B[Wallet signs the hub-update message<br/>signMessage, not a transaction]
+  A[Claimant builds claim.json<br/>with hub-claim] --> B[Claimant key signs the hub-update message<br/>a player uses their own wallet<br/>not a transaction]
   B --> C[hub-claim attach writes the signature]
   C --> D[Hub editor commits the file<br/>with hub-add-update]
   D --> E{"Who is the subject?"}

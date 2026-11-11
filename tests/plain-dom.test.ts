@@ -67,7 +67,7 @@ describe("plain page real DOM", () => {
     expect(updates).toContain("East hall is open this week.");
     expect(updates).not.toContain("Loading");
     expect(doc.body.textContent).toContain(
-      "Signed means approved hub signers checked and published this record with their wallets.",
+      "Signed means approved hub signers checked and published this record with their signing keys.",
     );
     window.close();
   });
