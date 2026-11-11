@@ -13,6 +13,11 @@
       "includeFiles": "{ata.js,squads.js,data/treasury-cache.json,hub/signers.json,hub/signers/agents.json}"
     }
   },
+  "rewrites": [
+    { "source": "/c4-markers.json", "destination": "/api/mcp?h2h=c4-markers" },
+    { "source": "/community-tools.json", "destination": "/api/mcp?h2h=community-tools" },
+    { "source": "/.well-known/h2h-card.json", "destination": "/api/mcp?h2h=card" }
+  ],
   "redirects": [
     { "source": "/plain", "destination": "/plain/", "permanent": true }
   ],

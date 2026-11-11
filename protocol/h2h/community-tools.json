@@ -1,0 +1,48 @@
+{
+  "schema": "h2h.community-tools.v1",
+  "tools": [
+    {
+      "id": "phoenix-ecosystem-node-mcp",
+      "name": "Ecosystem node MCP",
+      "url": "https://sa-ecosystem-node-dashboard.vercel.app/api/mcp",
+      "what": "Read-only MCP server: signed hub listings and guilds, public game reads, profile key audit, and DAO treasury reads. It does not sign or write.",
+      "license": {
+        "spdx": "Apache-2.0"
+      },
+      "operatedBy": "Phoenix Collective",
+      "weOperateIt": true,
+      "h2hCard": "https://sa-ecosystem-node-dashboard.vercel.app/.well-known/h2h-card.json",
+      "addedIn": null,
+      "checkedAt": "2026-11-11"
+    },
+    {
+      "id": "phoenix-ecosystem-hub",
+      "name": "Signed hub record store",
+      "url": "https://github.com/PhoenixClaw01/sa-ecosystem-hub",
+      "what": "Public git repo of signed listing and guild records. Anyone can verify each record with VERIFY.md.",
+      "license": {
+        "spdx": "CC-BY-4.0",
+        "note": "hub content; each project keeps the rights to its own name and logo"
+      },
+      "operatedBy": "Phoenix Collective",
+      "weOperateIt": true,
+      "h2hCard": "https://sa-ecosystem-node-dashboard.vercel.app/.well-known/h2h-card.json",
+      "addedIn": null,
+      "checkedAt": "2026-11-11"
+    },
+    {
+      "id": "phoenix-plain-directory",
+      "name": "Plain directory page",
+      "url": "https://sa-ecosystem-node-dashboard.vercel.app/plain/",
+      "what": "A plain page of the signed listings and guilds, for people rather than agents.",
+      "license": {
+        "spdx": "Apache-2.0"
+      },
+      "operatedBy": "Phoenix Collective",
+      "weOperateIt": true,
+      "h2hCard": "https://sa-ecosystem-node-dashboard.vercel.app/.well-known/h2h-card.json",
+      "addedIn": null,
+      "checkedAt": "2026-11-11"
+    }
+  ]
+}

@@ -1,4 +1,5 @@
 import type { DaoReaders } from "../src/dao/readers.js";
+import { listC4Markers, listCommunityTools } from "../src/h2h/feeds.js";
 import { legacyCardShell } from "../src/legacy/card.js";
 
 const sources = [{ url: "https://galaxy.staratlas.com/proposals", note: "stub" }];
@@ -46,6 +47,12 @@ export function stubDaoReaders(): DaoReaders {
     },
     async pipTracker() {
       return { dataMode: "live", asOf: "2026-10-24T00:00:00.000Z", sources, rowCount: 0, missingColumns: [], rows: [] };
+    },
+    async c4Markers(query) {
+      return listC4Markers({}, new Set(), 1, query, undefined, undefined, new Map(), new Date("2026-10-24T00:00:00.000Z"));
+    },
+    communityTools() {
+      return listCommunityTools(new Date("2026-10-24T00:00:00.000Z"));
     },
     async hubUpdates() {
       return {

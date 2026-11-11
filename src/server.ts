@@ -28,6 +28,8 @@ export const READ_ONLY_TOOLS = [
   "list_listings",
   "search_hub",
   "claim_status",
+  "list_c4_markers",
+  "list_community_tools",
   "data_health",
   "list_proposals",
   "get_proposal_votes",

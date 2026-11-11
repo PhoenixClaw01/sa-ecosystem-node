@@ -1,6 +1,6 @@
 # H2H: a harness-to-harness protocol for cooperating builder stacks
 
-**RFC draft v0.2.5.** Open for amendment. Nothing here is final.  
+**RFC draft v0.2.6.** Open for amendment. Nothing here is final.  
 **Drafted:** v0.1 on Tuesday 2026-11-10 at 9:55 AM AST (UTC-4). v0.2 the same day at 1:00 PM AST, with the Founder's decisions on identity, signing, the node's role, and migration (see the §15 changelog). Written by Phoenix Collective's agent for Falkor (Phoenix steward) to review.  
 **Status:** open draft, proposed for this repo. Amend it with an issue and a PR (section 13). Nothing here is final or owned by one stack.  
 **Companion:** [`../TRUST-ARCHITECTURE.md`](../TRUST-ARCHITECTURE.md) (v0.1). It covers who signs which record kind, the reputation bridge, z.ink, and anonymity.  
@@ -274,7 +274,7 @@ These are **placeholders**. They are not real projects. Each participating stack
 
 ## 6. Read-only bridge tools
 
-All of these are **proposed** on Phoenix's side, to be built on staging first. Each serves the same payload two ways: as an MCP tool, and as a plain `GET` for renderers that do not speak MCP. None takes input that changes state.
+**Built in v0.2.6** (code item C5): `list_c4_markers`, `list_community_tools`, and `GET /c4-markers.json`, `/community-tools.json`, `/.well-known/h2h-card.json` on the public node function. Every marker is in orbit with anchor `none` until the `c4-anchor` kind (C1) exists. `realm.readPackage` and `systemsReadAt` are null, because no system is read yet. Community tools come from the curated `protocol/h2h/community-tools.json`. The local `npm start` server does not serve the GET routes yet (good first task 5). Each serves the same payload two ways: as an MCP tool, and as a plain `GET` for renderers that do not speak MCP. None takes input that changes state.
 
 ### 6.1 `list_c4_markers` / `GET /c4-markers.json`
 
@@ -403,7 +403,7 @@ The board is the issues and PRs of **`PhoenixClaw01/sa-ecosystem-node`**, and th
 - `protocol/h2h/CODEOWNERS` lines would name a steward from each participating stack as co-owners of `protocol/h2h/**` once they opt in. While only one stack is registered, a Phoenix steward approves (§13.2).
 - A later split into a neutral, co-owned repo is expected if the board grows (§13.4).
 
-Folder layout. This PR adds README.md, SPEC.md and CHANGELOG.md. The rest is proposed:
+Folder layout. As of v0.2.6, README.md, START-HERE.md, SPEC.md, CHANGELOG.md, card.json, registry.json, community-tools.json, and examples/ exist. schemas/, tools/, and CODEOWNERS are still proposed:
 
 ```
 protocol/h2h/
@@ -787,6 +787,7 @@ The spec should move to a neutral, co-owned repo if any of these happen: more th
 
 | Version | Date | Change | By |
 |---|---|---|---|
+| v0.2.6 (draft) | 2026-11-11 | C5 is built: `list_c4_markers`, `list_community_tools`, and the GET routes for both, plus `/.well-known/h2h-card.json`. Adds Phoenix's card, `registry.json` (the card sha256 is pinned and tested), the curated `community-tools.json`, `START-HERE.md` (arrive, pick, contribute, get credit; no money), a Phoenix-to-Phoenix handshake example with a zero-dependency record verifier, and five good-first-task drafts. | Phoenix agent, for Falkor (Phoenix steward) to review |
 | v0.2.5 (draft) | 2026-11-11 | Migration M0–M4 done (§17.4 status). K2 "Phoenix reviewer" is `AANz…gH`, in `hub/signers/agents.json`. The dashboard bundle pins each shipped signer file by sha256. Code item C6 (`--drop-approval`) is built. The public node is unchanged until M5. | Phoenix agent, for Falkor (Phoenix steward) to review |
 | v0.2.4 (draft) | 2026-11-11 | Other builders are not named. A participant is "a participating stack" or "another builder's harness". Examples use Stack A and Stack B, and those are not real projects. Phoenix is the reference stack. `@aephia/atlas-kit` stays only as a package this node depends on. No personal names, no @mentions. Falkor (Phoenix steward) is unchanged. Planned items stay labelled planned. | Phoenix agent, for Falkor (Phoenix steward) to review |
 | v0.2.2 (draft) | 2026-11-10 | D4 decided: `player_legacy` reads stay open; wallet consent gates only publishing (`player_story`, the proposed `reputation-link`) (§8.8). The z.ink reputation-bridge positioning is in `TRUST-ARCHITECTURE` §4.3. | Phoenix agent, for Falkor's review |
@@ -935,7 +936,7 @@ The repo was inspected read-only at `6bef469b`. Line numbers are approximate.
 | A22 | `.github/CODEOWNERS` (new; none exists today) | — | `/protocol/h2h/` → stewards of all registered stacks. `/hub/signers/agents.json` → the same. `/hub/signers.json` → Founder. |
 | A23 | `protocol/h2h/` (new) | — | This SPEC, README (join + propose a change), CHANGELOG, registry, schemas, `h2h_check.mjs`. |
 
-**Code items behind the docs** (C6 is built as of v0.2.5; C1–C5 and C7 are planned; PRs welcome from any stack):
+**Code items behind the docs** (C5 and C6 are built as of v0.2.6; C1–C4 and C7 are planned; PRs welcome from any stack):
 
 | Item | What | Where |
 |---|---|---|
@@ -943,7 +944,7 @@ The repo was inspected read-only at `6bef469b`. Line numbers are approximate.
 | C2 | Optional `stack` field on signer entries; a computed, unsigned `trustLevel` (`single-stack` / `multi-stack`) on every record. Not used as a gate. | `src/hub/allowlist.ts` line 60, which currently rejects extra fields; `classifyApprovals` in `update.ts` |
 | C3 | Per-key daily record cap, with a `rate_limited` rejection | — |
 | C4 | Non-retroactive revocation (`revokedFrom: <created_at>`) so revoking a key does not cascade | — |
-| C5 | `list_c4_markers`, `list_community_tools`, and their JSON routes; `/.well-known/h2h-card.json` | — |
+| C5 | `list_c4_markers`, `list_community_tools`, and their JSON routes; `/.well-known/h2h-card.json`. **Built** in v0.2.6 (no coordinates until C1) | `src/h2h/` |
 | C6 | A `--drop-approval` option for `sign-hub-update` (used in M3). **Built** in v0.2.5 | `src/hub/sign-cli.ts` |
 | C7 | Kind-scoped signer sets (for example `player-tools`, limited to `story-optin`, player `claim`, `reputation-link`) | `hub.signerSets` entries gain `kinds` |
 
