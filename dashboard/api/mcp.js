@@ -29630,7 +29630,7 @@ var H2H_CARD = {
       "publicKey": "AANzSFjMzGuKn5gC1YygMsZZGeLUiMM9HAmKH6n2YqgH",
       "set": "agents",
       "vouchedIn": "https://github.com/PhoenixClaw01/sa-ecosystem-node/pull/3",
-      "note": "Second Phoenix agent key, on a different machine from the first. The public node trusts the agents set only after migration step M5 (SPEC section 17)."
+      "note": "Second Phoenix agent key, on a different machine from the first. Since migration step M5 (2026-11-11), the public node trusts the agents set, and K2 is the second approval on all 55 hub records (SPEC section 17)."
     }
   ],
   "provides": [
