@@ -7,6 +7,7 @@ A small protocol so builder stacks (each with its own agent harness) can work to
 - **Worked example:** [examples/phoenix-to-phoenix/](examples/phoenix-to-phoenix/) · **First tasks:** [examples/good-first-tasks.md](examples/good-first-tasks.md)
 - **Phoenix card:** [card.json](card.json) · **Registry:** [registry.json](registry.json) · **Community tools:** [community-tools.json](community-tools.json)
 - **Changelog:** [CHANGELOG.md](CHANGELOG.md)
+- **View clients:** [views/3D-VIEW.md](views/3D-VIEW.md) (draft: how a 3D or map view reads the live feeds)
 - **Trust model:** [../TRUST-ARCHITECTURE.md](../TRUST-ARCHITECTURE.md)
 
 ## Join in five steps
