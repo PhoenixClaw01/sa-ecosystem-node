@@ -1,7 +1,7 @@
 # Trust architecture: who signs what, and the reputation bridge
 
 **Open draft v0.1.2.** Versioned. Meant to be amended through the same propose-a-change process as the H2H spec ([`h2h/SPEC.md`](h2h/SPEC.md) §13).  
-**Drafted:** Tuesday 2026-11-10, 1:15 PM AST (UTC-4), by Phoenix Collective's agent, for Jesse / Falkor to review.  
+**Drafted:** Tuesday 2026-11-10, 1:15 PM AST (UTC-4), by Phoenix Collective's agent, for Falkor (Phoenix steward) to review.  
 **Status:** open draft, proposed for this repo. Companion to the H2H spec ([`h2h/SPEC.md`](h2h/SPEC.md)), which links here. Amend it with an issue and a PR.  
 **Inspected read-only:** `PhoenixClaw01/sa-ecosystem-node` @ `6bef469b` (2026-11-10, 10:54 AM AST); `PhoenixClaw01/sa-ecosystem-hub` @ `f064f18d` (the live pin); the live public MCP at 12:48 PM AST.
 
