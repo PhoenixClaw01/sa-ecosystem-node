@@ -18,6 +18,7 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
+    "test:live-hub": "RUN_LIVE_HUB=1 vitest run tests/signer-set-cwd.test.ts",
     "refresh-treasury": "npm run build && node dist/dao/refresh-cli.js",
     "smoke-dao": "npm run build && node dist/dao/smoke-cli.js",
     "build:dashboard-dao": "esbuild src/dao/browser-entry.ts --bundle --format=iife --global-name=SA_DAO --platform=browser --target=es2022 --legal-comments=none --outfile=dashboard/dao.js",

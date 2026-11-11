@@ -1,3 +1,5 @@
+import { SafeClientError } from "../errors.js";
+
 /**
  * Plain GET routes for the H2H feeds, for renderers and harnesses that do not speak MCP
  * (protocol/h2h/SPEC.md sections 5.1, 6.1, 6.2). GET and HEAD only. No input changes state.
@@ -40,7 +42,24 @@ export function h2hFeedFor(request: Request): keyof H2hFeeds | null {
 export async function h2hFeedResponse(request: Request, feeds: H2hFeeds): Promise<Response | null> {
   const feed = h2hFeedFor(request);
   if (!feed) return null;
-  const body = await feeds[feed]();
+  let body: unknown;
+  try {
+    body = await feeds[feed]();
+  } catch (error) {
+    // A feed that cannot be built (for example an unreadable signer allowlist) answers 503
+    // with a short JSON error instead of a 500. Only SafeClientError text is shown.
+    const message =
+      error instanceof SafeClientError ? error.message : "This feed is unavailable right now. No data was returned.";
+    const errorText = `${JSON.stringify({ error: { code: "feed_unavailable", feed, message } }, null, 2)}\n`;
+    return new Response(request.method === "HEAD" ? null : errorText, {
+      status: 503,
+      headers: {
+        "content-type": "application/json; charset=utf-8",
+        "cache-control": "no-store",
+        "retry-after": "300",
+      },
+    });
+  }
   const text = `${JSON.stringify(body, null, 2)}\n`;
   return new Response(request.method === "HEAD" ? null : text, {
     status: 200,

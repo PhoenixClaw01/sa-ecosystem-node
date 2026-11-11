@@ -18,6 +18,8 @@ That project is separate from the DAO Council preview. Its MCP endpoint, home pa
 
     HUB_SIGNER_SETS=[{"id":"default","path":"hub/signers.json","threshold":2},{"id":"agents","path":"hub/signers/agents.json","threshold":2}]
 
+A relative `path` is looked up the same way as the default signer file: first under the working directory, then next to the code (for the dashboard bundle in `dashboard/api/`, that is `dashboard/hub/...`). On Vercel the working directory is not `dashboard/`, so this fallback is what finds the shipped copies. An absolute path is used as given. `npm run test:live-hub` checks both sets against the public hub from the repo root and from the temp directory.
+
 A record counts when one set's keys meet that set's threshold. With both sets, the pre-migration commit and the migration commit both verify, so the default set stays the rollback path. The dashboard bundle ships a byte copy of each signer file under `dashboard/hub/` and pins every copy by sha256. Edit the file under `hub/`, then run `npm run build:dashboard-mcp`. A copy that does not match its pin is refused, and no updates are returned.
 
 `npm run sign-hub-update -- --drop-approval <file> --public-key <address> [--out <file>]` removes one approval and leaves the payload, the author signature, and the other approvals as they are. Keep the removed signature as provenance outside the manifest first, as the migration does.
