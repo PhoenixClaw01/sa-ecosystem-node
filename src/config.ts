@@ -226,7 +226,13 @@ function allowedHostList(value: string | undefined): string[] {
   return hosts;
 }
 
-function signerSetList(value: string | undefined, signersPath: string, threshold: number): SignerSetConfig[] {
+function signerSetList(
+  value: string | undefined,
+  signersPath: string,
+  threshold: number,
+  moduleDir: string = path.dirname(fileURLToPath(import.meta.url)),
+  cwd: string = process.cwd(),
+): SignerSetConfig[] {
   if (!value?.trim()) return [{ id: "default", path: signersPath, threshold }];
   let parsed: unknown;
   try {
@@ -260,7 +266,7 @@ function signerSetList(value: string | undefined, signersPath: string, threshold
       }
       setThreshold = record.threshold;
     }
-    return { id: record.id, path: path.resolve(record.path.trim()), threshold: setThreshold };
+    return { id: record.id, path: resolveSignerSetPath(record.path.trim(), moduleDir, cwd), threshold: setThreshold };
   });
 }
 
@@ -473,7 +479,7 @@ function parseConfig(env: NodeJS.ProcessEnv): Config {
     hubRevokedSigners,
     hubTrustedVerifiers,
     hubSignersPath,
-    hubSignerSets: signerSetList(env.HUB_SIGNER_SETS, hubSignersPath, hubApprovalThreshold),
+    hubSignerSets: signerSetList(env.HUB_SIGNER_SETS, hubSignersPath, hubApprovalThreshold, moduleDir, process.cwd()),
     cluster: ATLAS_CLUSTER,
     host,
     port,
@@ -508,6 +514,31 @@ export function resolveHubSignersPath(explicit: string | undefined, moduleDir: s
     path.resolve(moduleDir, "../../hub/signers.json"),
     path.resolve(moduleDir, "../dashboard/hub/signers.json"),
     path.resolve(moduleDir, "../../dashboard/hub/signers.json"),
+  ];
+  for (const candidate of candidates) {
+    const file = signerCandidate(candidate);
+    if (file) return file;
+  }
+  return preferred;
+}
+
+/**
+ * A relative `HUB_SIGNER_SETS` path is found the same way as the default signer file:
+ * first under the working directory, then next to the code (the dashboard bundle lives in
+ * `dashboard/api/`, so `../hub/...` is `dashboard/hub/...`). On Vercel the working
+ * directory is not the dashboard root, so a cwd-only lookup missed the shipped copies.
+ * An absolute path is used as given. When no candidate exists, the cwd path is returned
+ * and the read fails closed later.
+ */
+export function resolveSignerSetPath(relativeOrAbsolute: string, moduleDir: string, cwd: string): string {
+  if (path.isAbsolute(relativeOrAbsolute)) return path.resolve(relativeOrAbsolute);
+  const preferred = path.resolve(cwd, relativeOrAbsolute);
+  if (signerCandidate(preferred)) return preferred;
+  const candidates = [
+    path.resolve(moduleDir, "..", relativeOrAbsolute),
+    path.resolve(moduleDir, "../..", relativeOrAbsolute),
+    path.resolve(moduleDir, "../dashboard", relativeOrAbsolute),
+    path.resolve(moduleDir, "../../dashboard", relativeOrAbsolute),
   ];
   for (const candidate of candidates) {
     const file = signerCandidate(candidate);

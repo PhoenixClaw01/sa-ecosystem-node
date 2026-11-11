@@ -119,7 +119,22 @@ function h2hFeedFor(request) {
 async function h2hFeedResponse(request, feeds) {
   const feed = h2hFeedFor(request);
   if (!feed) return null;
-  const body = await feeds[feed]();
+  let body;
+  try {
+    body = await feeds[feed]();
+  } catch (error2) {
+    const message = error2 instanceof SafeClientError ? error2.message : "This feed is unavailable right now. No data was returned.";
+    const errorText = `${JSON.stringify({ error: { code: "feed_unavailable", feed, message } }, null, 2)}
+`;
+    return new Response(request.method === "HEAD" ? null : errorText, {
+      status: 503,
+      headers: {
+        "content-type": "application/json; charset=utf-8",
+        "cache-control": "no-store",
+        "retry-after": "300"
+      }
+    });
+  }
   const text2 = `${JSON.stringify(body, null, 2)}
 `;
   return new Response(request.method === "HEAD" ? null : text2, {
@@ -372,7 +387,7 @@ function allowedHostList(value) {
   }
   return hosts;
 }
-function signerSetList(value, signersPath, threshold) {
+function signerSetList(value, signersPath, threshold, moduleDir = path.dirname(fileURLToPath(import.meta.url)), cwd = process.cwd()) {
   if (!value?.trim()) return [{ id: "default", path: signersPath, threshold }];
   let parsed;
   try {
@@ -406,7 +421,7 @@ function signerSetList(value, signersPath, threshold) {
       }
       setThreshold = record4.threshold;
     }
-    return { id: record4.id, path: path.resolve(record4.path.trim()), threshold: setThreshold };
+    return { id: record4.id, path: resolveSignerSetPath(record4.path.trim(), moduleDir, cwd), threshold: setThreshold };
   });
 }
 function readNodeConfigFile(env) {
@@ -614,7 +629,7 @@ function parseConfig(env) {
     hubRevokedSigners,
     hubTrustedVerifiers,
     hubSignersPath,
-    hubSignerSets: signerSetList(env.HUB_SIGNER_SETS, hubSignersPath, hubApprovalThreshold),
+    hubSignerSets: signerSetList(env.HUB_SIGNER_SETS, hubSignersPath, hubApprovalThreshold, moduleDir, process.cwd()),
     cluster: ATLAS_CLUSTER,
     host,
     port,
@@ -639,6 +654,22 @@ function resolveHubSignersPath(explicit, moduleDir, cwd) {
     path.resolve(moduleDir, "../../hub/signers.json"),
     path.resolve(moduleDir, "../dashboard/hub/signers.json"),
     path.resolve(moduleDir, "../../dashboard/hub/signers.json")
+  ];
+  for (const candidate of candidates) {
+    const file = signerCandidate(candidate);
+    if (file) return file;
+  }
+  return preferred;
+}
+function resolveSignerSetPath(relativeOrAbsolute, moduleDir, cwd) {
+  if (path.isAbsolute(relativeOrAbsolute)) return path.resolve(relativeOrAbsolute);
+  const preferred = path.resolve(cwd, relativeOrAbsolute);
+  if (signerCandidate(preferred)) return preferred;
+  const candidates = [
+    path.resolve(moduleDir, "..", relativeOrAbsolute),
+    path.resolve(moduleDir, "../..", relativeOrAbsolute),
+    path.resolve(moduleDir, "../dashboard", relativeOrAbsolute),
+    path.resolve(moduleDir, "../../dashboard", relativeOrAbsolute)
   ];
   for (const candidate of candidates) {
     const file = signerCandidate(candidate);
