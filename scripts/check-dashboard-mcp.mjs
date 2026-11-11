@@ -10,6 +10,17 @@ if (lstatSync(signerCopyPath).isSymbolicLink() || !signerSource.equals(readFileS
   process.exit(1);
 }
 
+const signerSetSources = ["hub/signers/agents.json"];
+const signerSetShas = [];
+for (const source of signerSetSources) {
+  const copy = path.join("dashboard", source);
+  if (lstatSync(copy).isSymbolicLink() || !readFileSync(source).equals(readFileSync(copy))) {
+    console.error(`${copy} is not a byte copy of ${source}.`);
+    process.exit(1);
+  }
+  signerSetShas.push(createHash("sha256").update(readFileSync(source)).digest("hex"));
+}
+
 const bundlePath = path.resolve("dashboard/api/mcp.js");
 const bundleText = readFileSync(bundlePath, "utf8");
 const signerSha = createHash("sha256").update(signerSource).digest("hex");
@@ -21,6 +32,16 @@ const handler = (await import(pathToFileURL(bundlePath).href)).default;
 if (globalThis.__SA_SIGNERS_SHA256 !== signerSha) {
   console.error("Bundle signer hash does not match hub/signers.json.");
   process.exit(1);
+}
+if (JSON.stringify(globalThis.__SA_SIGNER_SET_SHA256S) !== JSON.stringify(signerSetShas)) {
+  console.error("Bundle signer-set hashes do not match the shipped signer-set files.");
+  process.exit(1);
+}
+for (const sha of signerSetShas) {
+  if (bundleText.split(sha).length - 1 < 2) {
+    console.error("Bundle signer-set hash is not inlined by the esbuild define.");
+    process.exit(1);
+  }
 }
 
 const inlined = globalThis.__SA_DASHBOARD_SCRIPTS;

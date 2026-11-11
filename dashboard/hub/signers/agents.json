@@ -1,0 +1,13 @@
+{
+  "v": 1,
+  "signers": [
+    {
+      "label": "Phoenix Collective (Falkor's team)",
+      "publicKey": "G2PhCi6MApcuC6f5o2CDQBWDnJt9hRcozHuuN55PYisU"
+    },
+    {
+      "label": "Phoenix reviewer",
+      "publicKey": "AANzSFjMzGuKn5gC1YygMsZZGeLUiMM9HAmKH6n2YqgH"
+    }
+  ]
+}

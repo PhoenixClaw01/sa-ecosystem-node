@@ -7,8 +7,8 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
 import { resolveHubSignersPath } from "../src/config.js";
-import { SIGNERS_SHA256_KEY, loadSignerAllowlist } from "../src/hub/allowlist.js";
-import { embeddedSignersSha } from "../src/hub/signers-pin-bundle.js";
+import { SIGNERS_SHA256_KEY, SIGNER_SET_SHA256S_KEY, loadSignerAllowlist } from "../src/hub/allowlist.js";
+import { embeddedSignerSetShas, embeddedSignersSha } from "../src/hub/signers-pin-bundle.js";
 
 const canonical = path.resolve("hub/signers.json");
 const copy = path.resolve("dashboard/hub/signers.json");
@@ -32,7 +32,8 @@ describe("Vercel signer allowlist bundle", () => {
     const root = JSON.parse(readFileSync("vercel.json", "utf8")) as {
       functions: { "api/mcp.ts": { includeFiles: string } };
     };
-    expect(root.functions["api/mcp.ts"].includeFiles).toBe("hub/signers.json");
+    expect(root.functions["api/mcp.ts"].includeFiles).toBe("{hub/signers.json,hub/signers/agents.json}");
+    expect(dashboard.functions["api/mcp.js"].includeFiles).toContain("hub/signers/agents.json");
   });
 
   it("reads the copy from a dashboard-shaped directory and refuses a drifted or linked copy", () => {
@@ -92,6 +93,40 @@ describe("Vercel signer allowlist bundle", () => {
     expect(bundle).toContain(`globalThis.${SIGNERS_SHA256_KEY}=${JSON.stringify(sha)}`);
     expect(bundle.split(sha).length - 1).toBeGreaterThanOrEqual(2);
     expect(bundle).not.toContain("__SA_SIGNERS_SHA256_DEFINE__");
+  });
+
+  it("accepts an extra signer-set file only when its sha256 is on the bundle's signer-set list", () => {
+    const agents = path.resolve("hub/signers/agents.json");
+    const agentsCopy = path.resolve("dashboard/hub/signers/agents.json");
+    expect(Buffer.compare(readFileSync(agents), readFileSync(agentsCopy))).toBe(0);
+    expect(lstatSync(agentsCopy).isSymbolicLink()).toBe(false);
+    const primary = createHash("sha256").update(readFileSync(canonical)).digest("hex");
+    const agentsSha = createHash("sha256").update(readFileSync(agents)).digest("hex");
+    const record = globalThis as Record<string, unknown>;
+    const previous = record[SIGNERS_SHA256_KEY];
+    const previousSets = record[SIGNER_SET_SHA256S_KEY];
+    try {
+      record[SIGNERS_SHA256_KEY] = primary;
+      delete record[SIGNER_SET_SHA256S_KEY];
+      expect(() => loadSignerAllowlist(agents)).toThrow(/does not match the pinned copy/);
+      record[SIGNER_SET_SHA256S_KEY] = [agentsSha];
+      expect(loadSignerAllowlist(agents).size).toBe(2);
+      expect(loadSignerAllowlist(canonical).size).toBe(3);
+      record[SIGNER_SET_SHA256S_KEY] = ["0".repeat(64)];
+      expect(() => loadSignerAllowlist(agents)).toThrow(/does not match the pinned copy/);
+      record[SIGNER_SET_SHA256S_KEY] = ["not-a-hash"];
+      expect(() => loadSignerAllowlist(agents)).toThrow(/could not be read/);
+    } finally {
+      if (previous === undefined) delete record[SIGNERS_SHA256_KEY];
+      else record[SIGNERS_SHA256_KEY] = previous;
+      if (previousSets === undefined) delete record[SIGNER_SET_SHA256S_KEY];
+      else record[SIGNER_SET_SHA256S_KEY] = previousSets;
+    }
+    const bundle = readFileSync("dashboard/api/mcp.js", "utf8");
+    expect(bundle).toContain(`globalThis.${SIGNER_SET_SHA256S_KEY}=${JSON.stringify([agentsSha])}`);
+    expect(bundle.split(agentsSha).length - 1).toBeGreaterThanOrEqual(2);
+    expect(bundle).not.toContain("__SA_SIGNER_SET_SHA256S_DEFINE__");
+    expect(() => embeddedSignerSetShas()).toThrow(/could not be read/);
   });
 
   it("refuses a symlink or non-file signer path and a bundle pin that was not defined", () => {

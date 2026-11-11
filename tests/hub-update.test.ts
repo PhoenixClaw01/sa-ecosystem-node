@@ -358,6 +358,63 @@ describe("sign-hub-update CLI", () => {
   });
 });
 
+describe("sign-hub-update --drop-approval", () => {
+  it("removes one approval by key and keeps the payload, the author signature, and the other approvals", () => {
+    const author = signer();
+    const old = signer();
+    const next = signer();
+    const directory = mkdtempSync(path.join(tmpdir(), "hub-drop-"));
+    const body = payload(author.publicKey, { id: "drop-1" });
+    const doc = document(author, body, [author, old]);
+    const inPath = path.join(directory, "in.json");
+    const outPath = path.join(directory, "out.json");
+    writeFileSync(inPath, JSON.stringify(doc));
+
+    const dropped = runSignCli(["--drop-approval", inPath, "--public-key", old.publicKey, "--out", outPath]);
+    expect(dropped.code, dropped.stderr).toBe(0);
+    expect(dropped.stderr).toBe(`Dropped the approval by ${old.publicKey} from drop-1\n`);
+    const written = JSON.parse(readFileSync(outPath, "utf8")) as typeof doc;
+    expect(written.payload).toEqual(doc.payload);
+    expect(written.signature).toBe(doc.signature);
+    expect(written.approvals).toEqual([doc.approvals[0]]);
+
+    // Below threshold until the replacement approval is attached; then it verifies with the new key only.
+    const trusted = new Set([author.publicKey, next.publicKey]);
+    expect(verifyHubUpdates([written], trusted, 2, undefined, { allowAuthorApproval: true }).updates).toEqual([]);
+    written.approvals.push({ publicKey: next.publicKey, signature: next.approve(body) });
+    const checked = verifyHubUpdates([written], trusted, 2, undefined, { allowAuthorApproval: true });
+    expect(checked.updates.map((update) => update.approvedBy)).toEqual([[author.publicKey, next.publicKey].sort()]);
+
+    const again = runSignCli(["--drop-approval", outPath, "--public-key", old.publicKey]);
+    expect(again.code).toBe(1);
+    expect(again.stderr).toMatch(/no approval/);
+    expect(runSignCli(["--drop-approval", inPath]).code).toBe(1);
+    expect(runSignCli(["--drop-approval", inPath, "--public-key", old.publicKey, "--signature", "x"]).code).toBe(1);
+  });
+
+  it("refuses a document whose author signature does not verify", () => {
+    const author = signer();
+    const old = signer();
+    const directory = mkdtempSync(path.join(tmpdir(), "hub-drop-bad-"));
+    const doc = document(author, payload(author.publicKey, { id: "drop-2" }), [author, old]);
+    doc.payload.body = "changed";
+    const inPath = path.join(directory, "in.json");
+    writeFileSync(inPath, JSON.stringify(doc));
+    const result = runSignCli(["--drop-approval", inPath, "--public-key", old.publicKey]);
+    expect(result.code).toBe(1);
+    expect(result.stderr).toMatch(/could not be verified/);
+  });
+});
+
+describe("agents signer set", () => {
+  it("ships hub/signers/agents.json with the two Phoenix agent record keys", () => {
+    const keys = loadSignerAllowlist(path.resolve("hub/signers/agents.json"));
+    expect([...keys]).toEqual(["G2PhCi6MApcuC6f5o2CDQBWDnJt9hRcozHuuN55PYisU", "AANzSFjMzGuKn5gC1YygMsZZGeLUiMM9HAmKH6n2YqgH"]);
+    const labels = parseHubSigners(JSON.parse(readFileSync("hub/signers/agents.json", "utf8"))).map((entry) => entry.label);
+    expect(labels).toEqual(["Phoenix Collective (Falkor's team)", "Phoenix reviewer"]);
+  });
+});
+
 describe("hub manifest filename", () => {
   it("writes hub-manifest.json and reads manifest.json only when that default is missing", async () => {
     const scratch = mkdtempSync(path.join(tmpdir(), "hub-manifest-name-"));

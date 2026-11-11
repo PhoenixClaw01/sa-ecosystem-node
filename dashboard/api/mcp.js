@@ -1,5 +1,6 @@
 globalThis.__SA_DASHBOARD_SCRIPTS={"ata.js":"/* Hand-written Solana associated-token-account (ATA) derivation. No dependencies.\n   Works in the browser (window.SA_ATA) and in Node 18+ (module.exports).\n   ATA = findProgramAddress([owner, tokenProgram, mint], associatedTokenProgram).\n   Uses SHA-256 from Web Crypto and a BigInt ed25519 \"is this point on the curve\" check. */\n(function (root) {\n  \"use strict\";\n  var ALPHABET = \"123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz\";\n  var TOKEN_PROGRAM = \"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA\";\n  var ATA_PROGRAM = \"ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL\";\n\n  function b58decode(s) {\n    var zeros = 0;\n    while (zeros < s.length && s[zeros] === \"1\") zeros++;\n    var bytes = []; /* little-endian accumulator */\n    for (var i = zeros; i < s.length; i++) {\n      var carry = ALPHABET.indexOf(s[i]);\n      if (carry < 0) throw new Error(\"Not base58: \" + s);\n      for (var j = 0; j < bytes.length; j++) { carry += bytes[j] * 58; bytes[j] = carry & 0xff; carry >>= 8; }\n      while (carry) { bytes.push(carry & 0xff); carry >>= 8; }\n    }\n    var out = new Uint8Array(zeros + bytes.length);\n    for (var k = 0; k < bytes.length; k++) out[zeros + k] = bytes[bytes.length - 1 - k];\n    return out;\n  }\n\n  function b58encode(bytes) {\n    var digits = [0];\n    for (var i = 0; i < bytes.length; i++) {\n      var carry = bytes[i];\n      for (var j = 0; j < digits.length; j++) { carry += digits[j] << 8; digits[j] = carry % 58; carry = (carry / 58) | 0; }\n      while (carry) { digits.push(carry % 58); carry = (carry / 58) | 0; }\n    }\n    var out = \"\", k = 0;\n    for (; k < bytes.length && bytes[k] === 0; k++) out += \"1\";\n    if (k === bytes.length) return out;\n    for (var d = digits.length - 1; d >= 0; d--) out += ALPHABET[digits[d]];\n    return out;\n  }\n\n  function key32(s) {\n    var b = b58decode(s);\n    if (b.length !== 32) throw new Error(\"Not a 32-byte Solana address: \" + s);\n    return b;\n  }\n\n  /* ed25519 field math */\n  var P = (1n << 255n) - 19n;\n  var D = (-121665n * inv(121666n)) % P;\n  var SQRT_M1 = pow(2n, (P - 1n) / 4n);\n  function mod(a) { var r = a % P; return r < 0n ? r + P : r; }\n  function pow(b, e) { var r = 1n; b = mod(b); while (e > 0n) { if (e & 1n) r = (r * b) % P; b = (b * b) % P; e >>= 1n; } return r; }\n  function inv(a) { return pow(mod(a), P - 2n); }\n\n  /* Same rule as curve25519-dalek CompressedEdwardsY::decompress (what Solana uses): on curve iff x^2 = u/v has a root. */\n  function isOnCurve(bytes) {\n    var y = 0n;\n    for (var i = 31; i >= 0; i--) y = (y << 8n) | BigInt(i === 31 ? bytes[i] & 0x7f : bytes[i]);\n    y = mod(y);\n    var y2 = (y * y) % P;\n    var u = mod(y2 - 1n);\n    var v = mod(D * y2 + 1n);\n    var v3 = (v * v % P) * v % P;\n    var v7 = (v3 * v3 % P) * v % P;\n    var x = (u * v3 % P) * pow(u * v7 % P, (P - 5n) / 8n) % P;\n    var vx2 = (v * x % P) * x % P;\n    if (vx2 === u) return true;\n    if (vx2 === mod(-u)) return true; /* x * sqrt(-1) is the root */\n    return false;\n  }\n\n  function concat(parts) {\n    var len = parts.reduce(function (n, p) { return n + p.length; }, 0);\n    var out = new Uint8Array(len), o = 0;\n    parts.forEach(function (p) { out.set(p, o); o += p.length; });\n    return out;\n  }\n\n  function subtle() {\n    var c = (typeof globalThis !== \"undefined\" && globalThis.crypto) || null;\n    if (!c || !c.subtle) throw new Error(\"Web Crypto (crypto.subtle) is not available here.\");\n    return c.subtle;\n  }\n\n  async function findProgramAddress(seeds, programId) {\n    var prog = key32(programId);\n    var marker = new TextEncoder().encode(\"ProgramDerivedAddress\");\n    for (var bump = 255; bump >= 0; bump--) {\n      var data = concat(seeds.concat([new Uint8Array([bump]), prog, marker]));\n      var hash = new Uint8Array(await subtle().digest(\"SHA-256\", data));\n      if (!isOnCurve(hash)) return { address: b58encode(hash), bump: bump };\n    }\n    throw new Error(\"No PDA found.\");\n  }\n\n  async function associatedTokenAddress(owner, mint, tokenProgram) {\n    var r = await findProgramAddress([key32(owner), key32(tokenProgram || TOKEN_PROGRAM), key32(mint)], ATA_PROGRAM);\n    return r.address;\n  }\n\n  var api = { associatedTokenAddress: associatedTokenAddress, findProgramAddress: findProgramAddress, isOnCurve: isOnCurve,\n    b58decode: b58decode, b58encode: b58encode, TOKEN_PROGRAM: TOKEN_PROGRAM, ATA_PROGRAM: ATA_PROGRAM };\n  if (typeof module !== \"undefined\" && module.exports) module.exports = api;\n  if (root) root.SA_ATA = api;\n})(typeof window !== \"undefined\" ? window : (typeof globalThis !== \"undefined\" ? globalThis : null));\n","squads.js":"/* Hand-written, read-only decoder for Squads Protocol v3 multisig accounts. No dependencies.\n   Manual decode validated against live accounts.\n   Needs ata.js (SA_ATA.findProgramAddress, b58encode/b58decode). Works in the browser (window.SA_SQUADS) and Node 18+.\n\n   Ms (discriminator 4676096cfed71f78): threshold u16 @8, authorityIndex u16 @10, transactionIndex u32 @12,\n     msChangeIndex u32 @16, bump u8 @20, createKey Pubkey @21, allowExternalExecute bool @53, keys Vec<Pubkey> @54.\n   MsTransaction (discriminator b69768d8ff01139d): creator @8, ms @40, transactionIndex u32 @72, authorityIndex u32 @76,\n     authorityBump u8 @80, status u8 @81, instructionIndex u8 @82, bump u8 @83, approved Vec<Pubkey> @84,\n     rejected Vec<Pubkey>, cancelled Vec<Pubkey>, executedIndex u8.\n   Vault PDA: [\"squad\", ms, u32 LE index, \"authority\"]. Transaction PDA: [\"squad\", ms, u32 LE index, \"transaction\"]. */\n(function (root) {\n  \"use strict\";\n  var ATA = (typeof module !== \"undefined\" && module.exports && typeof require === \"function\") ? require(\"./ata.js\") : root.SA_ATA;\n  var PROGRAM = \"SMPLecH534NA9acpos4G6x7uf3LWbCAwZQE9e8ZekMu\";\n  var MS_DISC = \"4676096cfed71f78\";\n  var TX_DISC = \"b69768d8ff01139d\";\n  var STATUS = [\"Draft\", \"Active\", \"ExecuteReady\", \"Executed\", \"Rejected\", \"Cancelled\"];\n\n  function b64(s) {\n    if (typeof atob === \"function\") {\n      var bin = atob(s), out = new Uint8Array(bin.length);\n      for (var i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);\n      return out;\n    }\n    return new Uint8Array(Buffer.from(s, \"base64\"));\n  }\n  function hex(bytes) { return Array.prototype.map.call(bytes, function (b) { return (\"0\" + b.toString(16)).slice(-2); }).join(\"\"); }\n  function u16(d, o) { return d[o] | (d[o + 1] << 8); }\n  function u32(d, o) { return (d[o] | (d[o + 1] << 8) | (d[o + 2] << 16)) + d[o + 3] * 16777216; }\n  function key(d, o) { return ATA.b58encode(d.subarray(o, o + 32)); }\n  function need(d, n) { if (d.length < n) throw new Error(\"account data too short\"); }\n\n  function decodeMs(d) {\n    if (hex(d.subarray(0, 8)) !== MS_DISC) throw new Error(\"not a Squads v3 multisig account\");\n    need(d, 58);\n    var n = u32(d, 54), members = [];\n    need(d, 58 + n * 32);\n    for (var i = 0; i < n; i++) members.push(key(d, 58 + i * 32));\n    return {\n      threshold: u16(d, 8), authorityIndex: u16(d, 10), transactionIndex: u32(d, 12), msChangeIndex: u32(d, 16),\n      createKey: key(d, 21), allowExternalExecute: !!d[53], members: members\n    };\n  }\n\n  function decodeMsTx(d) {\n    if (hex(d.subarray(0, 8)) !== TX_DISC) throw new Error(\"not a Squads v3 transaction account\");\n    need(d, 88);\n    var o = 84;\n    function vec() {\n      need(d, o + 4); var n = u32(d, o); o += 4; var r = [];\n      need(d, o + n * 32);\n      for (var i = 0; i < n; i++) { r.push(key(d, o)); o += 32; }\n      return r;\n    }\n    var approved = vec(), rejected = vec(), cancelled = vec();\n    return {\n      creator: key(d, 8), ms: key(d, 40), transactionIndex: u32(d, 72), authorityIndex: u32(d, 76),\n      status: STATUS[d[81]] || (\"unknown(\" + d[81] + \")\"), instructionIndex: d[82],\n      approved: approved, rejected: rejected, cancelled: cancelled, executedIndex: d.length > o ? d[o] : null\n    };\n  }\n\n  function le32(n) { return new Uint8Array([n & 0xff, (n >>> 8) & 0xff, (n >>> 16) & 0xff, (n >>> 24) & 0xff]); }\n  var enc = new TextEncoder();\n  async function pda(ms, index, kind, program) {\n    var r = await ATA.findProgramAddress([enc.encode(\"squad\"), ATA.b58decode(ms), le32(index), enc.encode(kind)], program || PROGRAM);\n    return r.address;\n  }\n  function vaultAddress(ms, index, program) { return pda(ms, index, \"authority\", program); }\n  function transactionAddress(ms, index, program) { return pda(ms, index, \"transaction\", program); }\n\n  var api = { PROGRAM: PROGRAM, STATUS: STATUS, decodeMs: decodeMs, decodeMsTx: decodeMsTx, b64: b64,\n    vaultAddress: vaultAddress, transactionAddress: transactionAddress };\n  if (typeof module !== \"undefined\" && module.exports) module.exports = api;\n  if (root) root.SA_SQUADS = api;\n})(typeof window !== \"undefined\" ? window : (typeof globalThis !== \"undefined\" ? globalThis : null));\n"};
 globalThis.__SA_SIGNERS_SHA256="f31b789ad84771a3601b7675a60167b259f6108eb1dc3563b821e58a9cde7874";
+globalThis.__SA_SIGNER_SET_SHA256S=["0266cbaa26d823f5c2e622bd73da3a1d9f8e1dac74c27e790b62dcc25876f675"];
 /* Generated by npm run build:dashboard-mcp. Do not edit. */
 var __defProp = Object.defineProperty;
 var __export = (target, all) => {
@@ -31109,6 +31110,18 @@ function embeddedSignersSha() {
   }
   return value;
 }
+function embeddedSignerSetShas() {
+  let value;
+  try {
+    value = JSON.parse('["0266cbaa26d823f5c2e622bd73da3a1d9f8e1dac74c27e790b62dcc25876f675"]');
+  } catch {
+    value = void 0;
+  }
+  if (!Array.isArray(value) || value.some((entry) => typeof entry !== "string" || !/^[0-9a-f]{64}$/.test(entry))) {
+    throw new SafeClientError("The signer allowlist could not be read. No updates were returned.");
+  }
+  return [...value];
+}
 
 // src/hub/allowlist.ts
 var MAX_SIGNER_BYTES = 64 * 1024;
@@ -31169,11 +31182,21 @@ function parseHubSigners(value) {
   return signers;
 }
 var SIGNERS_SHA256_KEY = "__SA_SIGNERS_SHA256";
+var SIGNER_SET_SHA256S_KEY = "__SA_SIGNER_SET_SHA256S";
 function pinnedSignersSha() {
   const embedded = embeddedSignersSha();
   const value = embedded ?? globalThis[SIGNERS_SHA256_KEY];
   if (value === void 0 || value === null) return null;
   if (typeof value !== "string" || !/^[0-9a-f]{64}$/.test(value)) {
+    throw new SafeClientError("The signer allowlist could not be read. No updates were returned.");
+  }
+  return value;
+}
+function pinnedSignerSetShas() {
+  const embedded = embeddedSignerSetShas();
+  const value = embedded ?? globalThis[SIGNER_SET_SHA256S_KEY];
+  if (value === void 0 || value === null) return [];
+  if (!Array.isArray(value) || value.some((entry) => typeof entry !== "string" || !/^[0-9a-f]{64}$/.test(entry))) {
     throw new SafeClientError("The signer allowlist could not be read. No updates were returned.");
   }
   return value;
@@ -31208,8 +31231,11 @@ function readSignerFile(filePath) {
     throw new SafeClientError("The signer allowlist could not be read. No updates were returned.");
   }
   const expected = pinnedSignersSha();
-  if (expected !== null && createHash3("sha256").update(bytes).digest("hex") !== expected) {
-    throw new SafeClientError("The signer allowlist does not match the pinned copy. No updates were returned.");
+  if (expected !== null) {
+    const actual = createHash3("sha256").update(bytes).digest("hex");
+    if (actual !== expected && !pinnedSignerSetShas().includes(actual)) {
+      throw new SafeClientError("The signer allowlist does not match the pinned copy. No updates were returned.");
+    }
   }
   let parsed;
   try {

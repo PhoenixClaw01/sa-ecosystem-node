@@ -1,6 +1,6 @@
 # H2H: a harness-to-harness protocol for cooperating builder stacks
 
-**RFC draft v0.2.4.** Open for amendment. Nothing here is final.  
+**RFC draft v0.2.5.** Open for amendment. Nothing here is final.  
 **Drafted:** v0.1 on Tuesday 2026-11-10 at 9:55 AM AST (UTC-4). v0.2 the same day at 1:00 PM AST, with the Founder's decisions on identity, signing, the node's role, and migration (see the §15 changelog). Written by Phoenix Collective's agent for Falkor (Phoenix steward) to review.  
 **Status:** open draft, proposed for this repo. Amend it with an issue and a PR (section 13). Nothing here is final or owned by one stack.  
 **Companion:** [`../TRUST-ARCHITECTURE.md`](../TRUST-ARCHITECTURE.md) (v0.1). It covers who signs which record kind, the reputation bridge, z.ink, and anonymity.  
@@ -303,7 +303,7 @@ Input (MCP): `{ "kind"?: "listing"|"guild"|"all", "anchored"?: boolean, "stream"
       "category": "developers_and_tools",
       "status": "available",
       "signer": "G2Ph…",
-      "approvedBy": ["G2Ph…", "<planned K2>"],  // two Phoenix keys; K2 is planned (M1) and is not on the allowlist yet
+      "approvedBy": ["AANz…", "G2Ph…"],  // two Phoenix keys; K2 (AANz…) is in the agents set file, not yet used by the public node (M5)
       "signedMeaning": "Signed by Phoenix Collective (Falkor's team). This signature means that signer published this listing. It does not move money, and this node never handles payment.",
       "recordHash": "<sha256 of the listing payload>",
       "placement": "above-system",              // "above-system" | "orbit"
@@ -787,6 +787,7 @@ The spec should move to a neutral, co-owned repo if any of these happen: more th
 
 | Version | Date | Change | By |
 |---|---|---|---|
+| v0.2.5 (draft) | 2026-11-11 | Migration M0–M4 done (§17.4 status). K2 "Phoenix reviewer" is `AANz…gH`, in `hub/signers/agents.json`. The dashboard bundle pins each shipped signer file by sha256. Code item C6 (`--drop-approval`) is built. The public node is unchanged until M5. | Phoenix agent, for Falkor (Phoenix steward) to review |
 | v0.2.4 (draft) | 2026-11-11 | Other builders are not named. A participant is "a participating stack" or "another builder's harness". Examples use Stack A and Stack B, and those are not real projects. Phoenix is the reference stack. `@aephia/atlas-kit` stays only as a package this node depends on. No personal names, no @mentions. Falkor (Phoenix steward) is unchanged. Planned items stay labelled planned. | Phoenix agent, for Falkor (Phoenix steward) to review |
 | v0.2.2 (draft) | 2026-11-10 | D4 decided: `player_legacy` reads stay open; wallet consent gates only publishing (`player_story`, the proposed `reputation-link`) (§8.8). The z.ink reputation-bridge positioning is in `TRUST-ARCHITECTURE` §4.3. | Phoenix agent, for Falkor's review |
 | v0.2.1 (draft) | 2026-11-10 | Founder decisions: never depend on another stack's signature. Two Phoenix agent keys meet the threshold; cross-stack countersigns are an optional trust upgrade shown as `trustLevel` (`Phoenix-approved` / `multi-stack verified`). Q17 resolved, and the migration uses a second Phoenix key. Falkor's wallet is kept, scoped to player tools (code item C7). | Phoenix agent, for Falkor's review |
@@ -836,7 +837,7 @@ This section is a plan only. Nothing has been changed.
 
 | Option | Second approval | Trust level shown | Status |
 |---|---|---|---|
-| **B: chosen** | A second Phoenix agent record key `K2`, "Phoenix reviewer", generated with `hub-keygen` on a **different machine** from `G2Ph` | `single-stack`, "Phoenix-approved" | **Chosen. Planned** (migration M1). The key is not in the repo yet. |
+| **B: chosen** | A second Phoenix agent record key `K2`, "Phoenix reviewer", generated with `hub-keygen` on a **different machine** from `G2Ph` | `single-stack`, "Phoenix-approved" | **Chosen.** K2 is `AANzSFjMzGuKn5gC1YygMsZZGeLUiMM9HAmKH6n2YqgH`, made on a different machine from `G2Ph` on 2026-11-11. It is in `hub/signers/agents.json` (M1). The public node does not trust it until M5. |
 | A: optional upgrade, later | Any participating stack **appends** its countersign after re-verifying records it cares about | `multi-stack`, "multi-stack verified" | Never required. **Planned** display (code item C2). Can happen record by record, at any time, with no re-signing. |
 | ~~C~~ | Keep Falkor's wallet approval **and** add an agent approval | — | **Rejected.** No redundant signatures. |
 
@@ -849,6 +850,15 @@ After migration M5 it stops approving everyday records (listings, guilds, and, o
 ### 17.4 Steps
 
 Every step needs the Founder's yes. M5 is a production change.
+
+**Status (2026-11-11):**
+- M0–M4 are done.
+- The public node is unchanged: it still pins `f064f18d` with one default set.
+- M5 waits for the Founder's yes.
+- M0: hub tag `pre-agent-migration` → `f064f18d`, with the baseline saved (55 / 0).
+- M1: `hub/signers/agents.json` and the multi-file signer pin in the dashboard bundle.
+- M2 + M3: hub draft PR `agent-key-migration`. K2 signed the exact approval bytes on its own machine; only signatures left that machine.
+- M4: run against the dashboard bundle and the local node (no staging deploy). `agents` only gives 55 / 0 with `[AANz…, G2Ph…]`. Without K2 it gives 0 / 55 (`below_threshold`). The manifest sha256 and all 55 payloads are unchanged, and the 55 FC1e provenance signatures verify. Rollback `f064f18d` gives 55 / 0.
 
 - **M0. Freeze and baseline.**
   - No new hub commits during the migration.
@@ -925,7 +935,7 @@ The repo was inspected read-only at `6bef469b`. Line numbers are approximate.
 | A22 | `.github/CODEOWNERS` (new; none exists today) | — | `/protocol/h2h/` → stewards of all registered stacks. `/hub/signers/agents.json` → the same. `/hub/signers.json` → Founder. |
 | A23 | `protocol/h2h/` (new) | — | This SPEC, README (join + propose a change), CHANGELOG, registry, schemas, `h2h_check.mjs`. |
 
-**Code items behind the docs** (planned; none of C1–C7 is in the code today; PRs welcome from any stack):
+**Code items behind the docs** (C6 is built as of v0.2.5; C1–C5 and C7 are planned; PRs welcome from any stack):
 
 | Item | What | Where |
 |---|---|---|
@@ -934,7 +944,7 @@ The repo was inspected read-only at `6bef469b`. Line numbers are approximate.
 | C3 | Per-key daily record cap, with a `rate_limited` rejection | — |
 | C4 | Non-retroactive revocation (`revokedFrom: <created_at>`) so revoking a key does not cascade | — |
 | C5 | `list_c4_markers`, `list_community_tools`, and their JSON routes; `/.well-known/h2h-card.json` | — |
-| C6 | A `--drop-approval` option for `sign-hub-update` (used in M3) | — |
+| C6 | A `--drop-approval` option for `sign-hub-update` (used in M3). **Built** in v0.2.5 | `src/hub/sign-cli.ts` |
 | C7 | Kind-scoped signer sets (for example `player-tools`, limited to `story-optin`, player `claim`, `reputation-link`) | `hub.signerSets` entries gain `kinds` |
 
 Tool descriptions in `src/dao/register.ts` (around lines 266 and 312) and `src/dao/hub.ts` (around line 178) already say "key", or correctly say "wallet" for player claims. They need no change, apart from C2 wording once it lands.
