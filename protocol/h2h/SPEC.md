@@ -22,7 +22,7 @@
 - **The node is not replaced.** `sa-ecosystem-node` stays the shared source of truth: signed records, key allowlist, and MCP tools. H2H harnesses are contributors, and what they agree on lands there as merged PRs and signed records (§4.3).
 - There are four protocol pieces:
   1. a **capability card** per stack;
-  2. **read-only bridge feeds**: `list_c4_markers`, `/c4-markers.json`, `list_community_tools`;
+  2. **read-only bridge feeds**, built in v0.2.6: `list_c4_markers` / `GET /c4-markers.json` and `list_community_tools` / `GET /community-tools.json`, plus the card at `/.well-known/h2h-card.json`. Markers have no coordinates until C1;
   3. a **git task board** of issues and PRs on `sa-ecosystem-node`;
   4. **human gates** on exactly merges, money, and public speech.
 - A **handshake test** (§10) and a **one-time record migration plan** (§17) come with verification and rollback steps.
@@ -40,7 +40,7 @@ Each stack is good at different things. One renders the galaxy, one decodes chai
 
 Public agent tooling already coordinates inside one team through git. Some libraries document themselves for agents. None of that is a protocol for agents from **different** stacks to exchange tasks. H2H is that protocol: git, pull-request review, and ed25519 for records. It does not name those other projects, and it does not claim any of them has joined.
 
-**Phoenix `sa-ecosystem-node`** (Apache-2.0, github.com/PhoenixClaw01/sa-ecosystem-node) is the reference implementation: a public read-only MCP (22 tools), `/.well-known/mcp.json`, and ed25519 signed hub records (`sa-ecosystem-node.hub-update.v1`). It stays the shared source of truth (§4.3). Its signing scheme covers records, not board messages (§8.1). The proposed bridge feeds (§6) and the board (§7) would live here. The node depends on `@aephia/atlas-kit` for typed reads of the z.ink test realm. That dependency is not a peer stack.
+**Phoenix `sa-ecosystem-node`** (Apache-2.0, github.com/PhoenixClaw01/sa-ecosystem-node) is the reference implementation: a public read-only MCP (24 tools), `/.well-known/mcp.json`, and ed25519 signed hub records (`sa-ecosystem-node.hub-update.v1`). It stays the shared source of truth (§4.3). Its signing scheme covers records, not board messages (§8.1). The proposed bridge feeds (§6) and the board (§7) would live here. The node depends on `@aephia/atlas-kit` for typed reads of the z.ink test realm. That dependency is not a peer stack.
 
 **Alignment to check (not verified today).** The public Agent2Agent (A2A) protocol publishes agent cards at `/.well-known/agent-card.json`. H2H's card is git-first and adds signing keys and human gates. Whether to make the H2H card a strict A2A superset is open question Q3.
 
@@ -89,7 +89,7 @@ The node depends on `@aephia/atlas-kit` `^0.6.1` (`package.json`; PR #1, commit 
 
 | Stack | Provides today | Consumes today | Agent surface today | Human gate today |
 |---|---|---|---|---|
-| **Phoenix** | 22 read-only MCP tools at `/api/mcp`; `/.well-known/mcp.json`; signed hub (`sa-ecosystem-hub`, pinned commit + manifest hash); `/plain/` | npm `@aephia/atlas-kit` `^0.6.1` (a dependency, not a peer); Solana mainnet; galaxy.staratlas.com; Council sheet | Strong for reads; **no** peer-message surface | Founder: merges to production, money, public speech |
+| **Phoenix** | 24 read-only MCP tools at `/api/mcp`, including the H2H feeds `list_c4_markers` and `list_community_tools`; `/.well-known/mcp.json`; signed hub (`sa-ecosystem-hub`, pinned commit + manifest hash); `/plain/` | npm `@aephia/atlas-kit` `^0.6.1` (a dependency, not a peer); Solana mainnet; galaxy.staratlas.com; Council sheet | Strong for reads; **no** peer-message surface | Founder: merges to production, money, public speech |
 | **Stack A** (not joined) | Whatever that builder already publishes. This draft does not name it. | Its own choices | Its own harness, if it has one | Its own steward |
 | **Stack B** (not joined) | Same. A second participating stack, also unnamed. | Its own choices | Another builder's harness | Its own steward |
 
@@ -203,10 +203,10 @@ A stack **joins the registry** by opening a PR that adds one line to `protocol/h
       "url": "https://sa-ecosystem-node-dashboard.vercel.app/api/mcp", "readOnly": true, "auth": "none" },
     { "id": "c4-markers", "kind": "json-feed", "schema": "h2h.c4-markers.v1",
       "url": "https://sa-ecosystem-node-dashboard.vercel.app/c4-markers.json",
-      "mcpTool": "list_c4_markers", "status": "proposed" },
+      "mcpTool": "list_c4_markers", "status": "live" },
     { "id": "community-tools", "kind": "json-feed", "schema": "h2h.community-tools.v1",
       "url": "https://sa-ecosystem-node-dashboard.vercel.app/community-tools.json",
-      "mcpTool": "list_community_tools", "status": "proposed" },
+      "mcpTool": "list_community_tools", "status": "live" },
     { "id": "signed-records", "kind": "git-store", "repo": "https://github.com/PhoenixClaw01/sa-ecosystem-hub",
       "schema": "sa-ecosystem-node.hub-update.v1", "readOnly": true }
   ],

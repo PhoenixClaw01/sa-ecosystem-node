@@ -76,7 +76,7 @@ Use Node built-ins only (no new dependency).
 
 **Lane:** `code-proposal` · **Size:** small
 
-**What:** The three H2H GET routes (`/c4-markers.json`, `/community-tools.json`, `/.well-known/h2h-card.json`) are served by the public Vercel function today, through `src/h2h/routes.ts`. The local HTTP server (`src/http.ts`, `npm start`) still returns 404 for them. Wire the same `h2hFeedResponse` into `src/http.ts` so a self-hosted node serves them too. Keep the server read-only, and keep every other non-MCP path returning 404.
+**What:** The three H2H GET routes (`/c4-markers.json`, `/community-tools.json`, `/.well-known/h2h-card.json`) are served by the public Vercel function through `src/h2h/routes.ts`. The local HTTP server (`src/http.ts`, `npm start`) does not serve them and returns 404. Wire the same `h2hFeedResponse` into `src/http.ts` so a self-hosted node serves them too. Keep the server read-only, and keep every other non-MCP path returning 404.
 
 **Acceptance:**
 - A test starts the local server and gets 200 with the right `schema` from each of the three paths.
