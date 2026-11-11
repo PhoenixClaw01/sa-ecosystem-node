@@ -810,7 +810,7 @@ Other public projects were read while drafting and are not named here. Nothing i
 
 ## 17. Migration: how records are signed today, and a one-time move to agent keys
 
-This section is a plan only. Nothing has been changed.
+This section is the migration plan. Steps M0–M4 are done (status in §17.4). M5, the production switch, has not run yet and needs the Founder's yes.
 
 ### 17.1 How the existing records are signed today (facts, read-only)
 
