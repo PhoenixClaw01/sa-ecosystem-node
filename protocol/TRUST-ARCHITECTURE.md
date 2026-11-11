@@ -1,6 +1,6 @@
 # Trust architecture: who signs what, and the reputation bridge
 
-**Open draft v0.1.2.** Versioned. Meant to be amended through the same propose-a-change process as the H2H spec ([`h2h/SPEC.md`](h2h/SPEC.md) §13).  
+**Open draft v0.1.3.** Versioned. Meant to be amended through the same propose-a-change process as the H2H spec ([`h2h/SPEC.md`](h2h/SPEC.md) §13).  
 **Drafted:** Tuesday 2026-11-10, 1:15 PM AST (UTC-4), by Phoenix Collective's agent, for Falkor (Phoenix steward) to review.  
 **Status:** open draft, proposed for this repo. Companion to the H2H spec ([`h2h/SPEC.md`](h2h/SPEC.md)), which links here. Amend it with an issue and a PR.  
 **Inspected read-only:** `PhoenixClaw01/sa-ecosystem-node` @ `6bef469b` (2026-11-10, 10:54 AM AST); `PhoenixClaw01/sa-ecosystem-hub` @ `f064f18d` (the live pin); the live public MCP at 12:48 PM AST.
@@ -9,19 +9,23 @@
 
 ## 1. Principle
 
-> **Agents sign the everyday, permissionless layer. A wallet signs only when a *player* claims something that is personally theirs.**
+> **Target policy, not what is live.** Agents sign the everyday, permissionless layer. A wallet signs only when a *player* claims something that is personally theirs.
+
+**What is live today.** Threshold 2, and the author's approval counts. The Phoenix stack's agent record key `G2Ph…` authors the 55 listing and guild records. Falkor (Phoenix steward) `FC1e…` (wallet) is the second approval. GaliaMeta `EU7z…` (wallet) is on the allowlist and unused. The verifier treats an agent record key and a wallet the same way: ed25519 on the allowlist. The count is distinct keys, not stacks.
+
+**Planned (migration M0–M5), not done.** A second Phoenix agent record key replaces Falkor's wallet as the second approval on everyday records. Falkor's wallet stays for player-side records. The `agents` signer set is not in the repo yet. A cross-stack countersign is an optional trust level (`single-stack` vs `multi-stack` verified), never required. Showing that trust level is code item C2, not built. `c4-anchor`, `community-tool`, and `reputation-link` are proposed kinds. Code items C1–C7 are not built.
 
 | Layer | Signer | Why |
 |---|---|---|
-| **Everyday records:** business listings, guilds, tools, community pointers, c4-anchors, curator countersigns, signer-set changes, announcements | **Agent machine keys.** Up to two record keys per stack sit on the node's approved-key allowlist, and **two keys from the same stack meet the threshold**. A countersign from another stack is an optional trust upgrade, never a gate. | Most businesses and creators have no wallet and should not need one. Agents can sign at machine speed, and the allowlist, two-key approval, a visible trust level, and rate limits keep spam out. |
-| **Player identity and ownership:** linking a wallet to a public profile or story (`player_story`); claiming a player profile, personal fleet history, legacy or reputation; in-game asset ownership | **The player's own wallet** (`signMessage`, never a transaction), once per link | Only the player can consent to tying their wallet to a public identity. An agent may gather evidence and prepare the message. It must never sign it. |
+| **Everyday records:** business listings, guilds, tools, community pointers, c4-anchors, curator countersigns, signer-set changes, announcements | **Agent record key** (ed25519 from `npm run hub-keygen`, holds no funds). Up to two record keys per stack would sit on the allowlist, and **two keys from the same stack meet the threshold**. A countersign from another stack is an optional trust upgrade, never a gate. `c4-anchor` and `community-tool` are **proposed**. | Most businesses and creators have no wallet and should not need one. Agents can sign at machine speed. The allowlist and two-key approval are live. A visible trust level and per-key rate limits are **planned** (C2, C3). |
+| **Player identity and publishing:** linking a wallet to a public profile or story (`story-optin`); claiming a player profile; the proposed `reputation-link` | **Player wallet** (`signMessage`, never a transaction), once per link | Only the player can consent to tying their wallet to a public identity. An agent may gather evidence and prepare the message. It must never sign it. |
 | **Third-party verification:** Discord or X linkage | **A verifier key** that each node chooses to trust (`HUB_TRUSTED_VERIFIERS`) | Kept as it is today |
 
-No record is signed twice by both an agent key and a wallet "to be safe". Each record kind has exactly one kind of signer (§3).
+No record is signed twice by both an agent record key and a wallet "to be safe". Each record kind has exactly one kind of signer (§3).
 
-**Never wait on another stack.** Phoenix's own two agent keys are enough to publish everyday records. Each record shows a computed **trust level**: `single-stack` ("Phoenix-approved"), or `multi-stack` ("multi-stack verified") once another stack appends a countersign. Countersigns can be added at any time, without re-signing.
+**Never wait on another stack.** That is the planned rule: the Phoenix stack's own two agent record keys are enough to publish everyday records. Today the second approval is still Falkor's wallet. Each record would show a computed **trust level** once C2 exists: `single-stack` ("Phoenix-approved"), or `multi-stack` ("multi-stack verified") once another stack appends a countersign. Countersigns can be added at any time, without re-signing. The trust level is never a gate.
 
-**Falkor's wallet** (`FC1e…`) is kept, scoped to the player-tools side: his fleet history, `player_story`, and legacy/reputation. It no longer approves everyday records. His past approvals on the 55 records are kept as provenance.
+**Falkor's wallet** (`FC1e…`) stays. **Planned:** it is scoped to the player-tools side (fleet history, `story-optin`, and legacy or reputation) and it no longer approves everyday records. Today it is still the second approval on the 55 records. Those signatures are kept as provenance when the migration runs (H2H §17).
 
 ---
 
@@ -29,18 +33,18 @@ No record is signed twice by both an agent key and a wallet "to be safe". Each r
 
 ### 2.1 Not another wallet explorer
 
-Ryden Systems, and general Solana explorers, already let anyone type in a wallet and see its fleets, assets and activity. (That is the Founder's observation of Ryden. Ryden's app is closed and was not re-checked here.) Duplicating that adds nothing, and it makes surveillance easier.
+Public explorers already let anyone type in a wallet and see its fleets, assets and activity. Duplicating that adds nothing, and it makes surveillance easier.
 
 **Reading stays open; publishing needs consent.** This is decision D4, made by the Founder.
 
-- `player_legacy` keeps returning a public mainnet record for any wallet or profile: profiles, creation date, faction, SAGE fleets, signature bands, first and last activity (node `README.md` tools table; `docs/spec.md` line 65). That data is already pullable through Ryden and explorers, so gating it would protect no one.
+- `player_legacy` keeps returning a public mainnet record for any wallet or profile: profiles, creation date, faction, SAGE fleets, signature bands, first and last activity (node `README.md` tools table; `docs/spec.md` line 65). That data is already pullable through public explorers, so gating it would protect no one.
 - What a wallet signature gates is **publishing**: attaching a wallet to a public player profile, a story (`player_story`), or a `reputation-link`. Only then does the node show that wallet as someone's public identity.
 
 ### 2.2 A reputation bridge
 
 ```
  public chain data (anyone can read)  ──evidence──▶  node  ──consent (wallet signs once)──▶  public profile / story
-       Ryden, explorers, Atlas Kit                    signed records, allowlist, MCP          carried forward to C4 / z.ink
+       explorers, @aephia/atlas-kit            signed records, allowlist, MCP          carried forward, z.ink planned
 ```
 
 The node's value is in three things:
@@ -59,11 +63,11 @@ It also lets **non-players**, such as businesses, guilds and tools, be present i
 
 **Kinds proposed here:** `c4-anchor`, `community-tool` (pointer), `reputation-link`.
 
-**Shared rules for every row:**
-- *Two-key approval*: threshold 2 with the author's approval counting. Two keys from the **same** stack are enough.
-- *Trust level (independence, shown and not enforced)*: `single-stack` when every approver is from one stack; `multi-stack` when another stack countersigns. It is computed from the key-to-stack mapping (registry cards now; code item C2 later).
-- *Rate limits*: per record key, per UTC day (enforced by review until C3).
-- Revocation never cascades backwards (H2H §17.2; code item C4).
+**Shared rules for every row.** Rows describe the target policy. The last column says what is true today.
+- *Two-key approval (live):* threshold 2 with the author's approval counting. Two keys from the **same** stack are enough. Today those two keys are `G2Ph…` and Falkor's wallet.
+- *Trust level (planned, code item C2, shown and not enforced):* `single-stack` when every approver is from one stack; `multi-stack` when another stack countersigns. The node does not compute this today. Registry cards are also proposed, not published.
+- *Rate limits (proposed):* per agent record key, per UTC day. Enforced by review until C3.
+- *Revocation (live):* an in-chain `signer-change` removal applies to later links only. The node's local revoke list (`HUB_REVOKED_SIGNERS`) is retroactive: a record that needed the key, and every later record, are rejected until re-approved. Non-retroactive revocation is code item C4 (**planned**). H2H §17.2 describes both.
 
 | Kind | Who can create | Who signs (author) | Approval | Trust level | Rate limit (proposed) | Revocation / takedown | Privacy | Today → migration |
 |---|---|---|---|---|---|---|---|---|
@@ -75,8 +79,8 @@ It also lets **non-players**, such as businesses, guilds and tools, be present i
 | `story-optin` (`player_story`) | **Only the player.** An agent may prepare the fixed sentence. | **Player wallet** signs the fixed allow or revoke sentence. An allowlisted signer publishes it. | Hub threshold for the *publishing* update (Falkor's wallet or agent keys may publish); consent comes from the player signature | n/a | 1 per wallet per day | Revoke sentence; a later revoke wins, and a same-day revoke wins (existing) | `Links: yes/no` is part of the signed sentence; no names copied from chain; addresses kept in `sources` only (existing) | None today. Stays wallet. Publisher key becomes an agent key. |
 | `reputation-link` (proposed) | **Only the player** | **Player wallet** signs: "I link wallet W to public profile P on hub H. Scope: fleets/legacy/achievements. Date D." | Publishing update at hub threshold | n/a | 1 per wallet per day | `unlink` sentence. It hides the link everywhere from then on (§5.3). | Scopes are opt-in one by one; default is the smallest scope | New |
 | `attestation` (Discord / X) | A trusted verifier service | **Verifier key** (author = verifier) | Trusted at read time by `HUB_TRUSTED_VERIFIERS` | Verifier differs from the subject | 10 per verifier per day | Verifier or subject `revoke` (existing) | Salted handle commitment; raw handle only with `showHandles` (existing) | None today. Unchanged. |
-| `c4-anchor` (proposed) | Agent of the target's stack, or its claimant | **Agent record key** | Two-key approval | Ideally the second key re-reads coordinates with Atlas Kit. A countersign from Atlas Kit's stack is a natural `multi-stack` upgrade. | 20 per key per day | A newer anchor replaces it; withdrawing the target withdraws the anchor | Systems only. A `profile` field needs an active **player** claim by wallet. | New |
-| `community-tool` pointer (proposed; today only planned as the `list_community_tools` feed) | Any stack's agent | **Agent record key** | Two-key approval | As above | 10 per key per day | `withdrawn`; the tool's own stack may request edits | Facts plus `checkedAt`; no endorsement or prices | New |
+| `c4-anchor` (proposed) | Agent of the target's stack, or its claimant | **Agent record key** | Two-key approval | Ideally the second key re-reads coordinates with `@aephia/atlas-kit`, the package this node already depends on. A countersign from a participating stack is a natural `multi-stack` upgrade. That package's maintainers are not a peer. | 20 per key per day | A newer anchor replaces it; withdrawing the target withdraws the anchor | Systems only. A `profile` field needs an active **player** claim by wallet. | New |
+| `community-tool` pointer (**proposed**; the `list_community_tools` feed is also proposed, not built) | Any stack's agent | **Agent record key** | Two-key approval | As above | 10 per key per day | `withdrawn`; the tool's own stack may request edits | Facts plus `checkedAt`; no endorsement or prices | New |
 | `announcement`, `status`, `proposal-note`, `payment-note` | Allowlisted stacks | **Agent record key** | Two-key approval; a `payment-note` also needs a **human (steward) approval** | As above | 5 per key per day | A follow-up `status` record (no deletes) | No personal data; `payment-note` only cites public transactions | None today |
 | `signer-change` | A steward-directed agent | **Agent record key** | Current set members at threshold; the author does not count (existing) | Two keys; another stack's countersign is optional | 1 per stack per week | Applies only to later links (existing), which is the safe revocation path | Keys and labels only | Used for vouch/revoke after migration (H2H §8.2) |
 | **Reads, not records:** `player_legacy`, `profile_key_audit`, `get_fleet`, DAO tools | Anyone | — | — | — | Existing 120 requests/min per client per instance (in memory) | — | Open reads of public data (D4). Nothing is *published* as an identity without consent. | — |
@@ -89,15 +93,15 @@ It also lets **non-players**, such as businesses, guilds and tools, be present i
 
 | Claim | Status | Source |
 |---|---|---|
-| z.ink ("Zink") is an independent **SVM L1** created by ATMTA (Star Atlas's studio). It has its own genesis, validator set, token and governance, and uses the Ed25519 account model and Solana JSON-RPC. | Documented | docs.z.ink, "What is Zink?" (https://docs.z.ink/network/what-is-zink); Aephia, "z.ink – everything we know" by Funcracker, 2025-08-18 (https://aephia.com/star-atlas/z-ink-everything-you-should-know/) |
-| The validator set is **permissioned** today; a phased decentralization is planned, reaching "full open access" in about 2027. | Docs say permissioned; the roadmap is announced | docs.z.ink (same page); Aephia 2025-08-18 roadmap |
-| **Testnet is live** at `https://testnet-rpc.z.ink`. SAGE C4's public test realm (PTR) runs on it. Atlas Kit's `zink-ptr` reads it, and so does our node. | Live | docs.z.ink "Clusters & Environments" (https://docs.z.ink/network/clusters-and-environments); our `list_star_systems` |
-| **Mainnet:** the docs say "Live, but public endpoint details are not published here yet". The newsletters say C4 mainnet will launch *together* with z.ink Genesis, the TGE and mainnet, after a 30–45-day Phase 4 rehearsal. **No date.** | **Unclear.** The cluster may exist, but it is not public or open for apps. | docs.z.ink (above); Aephia newsletter #246 (2026-09-07) and #245 (2026-08-31) |
-| **zProfile** is "z.ink's on-chain digital identity layer": a Web3 SSO with zero-knowledge proofs for privacy, and planned dApp permission controls, Sybil resistance, **optional KYC**, and `.ink` domains. It tracks activity and reputation through **zXP**. | Announced on the z.ink site; not documented for developers | https://z.ink/ (dashboard v0.1.122); Aephia 2025-08-18 says zProfile builds on the PlayerProfile technology Star Atlas uses |
+| z.ink ("Zink") is an independent **SVM L1** created by ATMTA (Star Atlas's studio). It has its own genesis, validator set, token and governance, and uses the Ed25519 account model and Solana JSON-RPC. | Documented | docs.z.ink, "What is Zink?" (https://docs.z.ink/network/what-is-zink) |
+| The validator set is **permissioned** today; a phased decentralization is planned, reaching "full open access" in about 2027. | Docs say permissioned; the roadmap is announced | docs.z.ink (same page) |
+| **Testnet is live** at `https://testnet-rpc.z.ink`. SAGE C4's public test realm (PTR) runs on it. This node's `@aephia/atlas-kit` dependency reads `zink-ptr`, and so does `list_star_systems`. | Live | docs.z.ink "Clusters & Environments" (https://docs.z.ink/network/clusters-and-environments); our `list_star_systems` |
+| **Mainnet:** the docs say "Live, but public endpoint details are not published here yet". Public newsletters say C4 mainnet will launch *together* with z.ink Genesis, the TGE and mainnet, after a 30–45-day Phase 4 rehearsal. **No date.** | **Unclear.** The cluster may exist, but it is not public or open for apps. | docs.z.ink (above). Newsletters are not named here. |
+| **zProfile** is "z.ink's on-chain digital identity layer": a Web3 SSO with zero-knowledge proofs for privacy, and planned dApp permission controls, Sybil resistance, **optional KYC**, and `.ink` domains. It tracks activity and reputation through **zXP**. | Announced on the z.ink site; not documented for developers | https://z.ink/ (dashboard v0.1.122). Public write-ups are not named here. |
 | zXP seasons exist (Phase 1 Test Season through Genesis and airdrop). The site shows a leaderboard with XP and a connected wallet. | Live in some form (a site, a season UI) | https://z.ink/ |
-| C4 **achievements** (Phase 4 plan) may link to "shared z.ink and UE5 player profiles". The team says this is being explored. | Exploratory | Aephia newsletter #255 (2026-11-09) |
-| Phase 3.2 brings a **full PTR reset**. Program addresses and state can change. | Announced | Aephia newsletter #255 |
-| A Solana-to-z.ink bridge is needed for mainnet; the demo bridge links AtlasNet and the z.ink testnet. | Announced / in testing | Aephia newsletter #246; docs.z.ink bridge section exists (not read in depth) |
+| C4 **achievements** (Phase 4 plan) may link to "shared z.ink and UE5 player profiles". The studio says this is being explored. | Exploratory | Public newsletter, 2026-11-09. Not named here. |
+| Phase 3.2 brings a **full PTR reset**. Program addresses and state can change. | Announced | Same public newsletter, 2026-11-09 |
+| A Solana-to-z.ink bridge is needed for mainnet; a demo bridge links a test cluster and the z.ink testnet. | Announced / in testing | Public newsletter, 2026-09-07; docs.z.ink bridge section exists (not read in depth) |
 
 **Unknown, not found in public docs today:**
 - a zProfile program ID, API, or SDK;
@@ -106,13 +110,13 @@ It also lets **non-players**, such as businesses, guilds and tools, be present i
 - what "optional KYC" stores and where;
 - whether zXP is an on-chain account that is readable through RPC.
 
-Atlas Kit's identity entry (`@aephia/atlas-kit/identity`) reads PTR Player Profiles. That is the nearest documented hook today.
+The `@aephia/atlas-kit` package's `identity` entry reads PTR Player Profiles. That is the nearest documented hook today. The package is a dependency of this node, not a participating stack.
 
 ### 4.2 How the bridge could build on z.ink (staged)
 
 | Stage | What | Depends on |
 |---|---|---|
-| **Z0 (now)** | Keep reputation **off-chain but signed**: `story-optin`, player claims, and the proposed `reputation-link`, all in the hub, checkable by any node. Evidence comes from Solana mainnet (legacy) plus z.ink PTR reads through Atlas Kit. Expect PTR resets: store system and profile *names* alongside addresses. | Nothing new |
+| **Z0 (now)** | Keep reputation **off-chain but signed**: `story-optin`, player claims, and the proposed `reputation-link`, all in the hub, checkable by any node. Evidence comes from Solana mainnet (legacy) plus z.ink PTR reads through `@aephia/atlas-kit`. Expect PTR resets: store system and profile *names* alongside addresses. | Nothing new |
 | **Z1** | **Anchor hashes** of consent and reputation records on z.ink. The design is already written in `docs/decentralization.md` as "planned". It proves when a link existed without putting personal data on-chain. | A z.ink mainnet RPC; low fees; Founder decision D6 |
 | **Z2** | **Map** a player's consented hub identity to their **zProfile**: an opt-in `reputation-link` whose scope includes `zprofile:<id>`, verified by a read once zProfile is readable. | zProfile read API (unknown) |
 | **Z3** | **Contribute** reputation evidence to zProfile or achievements, if z.ink opens attestations to third parties. Our signed, cited records could feed it. | ATMTA's decision; unknown |
@@ -142,8 +146,8 @@ So a player's **Solana-era history is about to become "the past"**. Whoever help
 
 | When | Build or do | Why it pays off at the transition | Gate |
 |---|---|---|---|
-| **Now: Solana mainnet** | Keep `player_legacy` as the open evidence read. Ship `reputation-link` (scoped consent: `legacy`, `fleets`, `guild`, `story`) with an unlink. Write player stories from cited mainnet evidence only. Add a stable **evidence pack** per opted-in player: a signed hub record that lists the source transactions and accounts (hashes and references, not prose) for the Solana-era history. | The Solana-era record is complete and checkable *before* Starbased closes. Opted-in players arrive at z.ink with a signed, portable history. | Code work; Founder merge |
-| **Now: z.ink testnet / PTR** | Read PTR Player Profiles through Atlas Kit (`identity`). Let a player's `reputation-link` **optionally** name their PTR profile, so the link covers both chains. Store names alongside addresses, because PTR resets (Phase 3.2) wipe state. Run `c4-anchor` and markers against PTR systems. | We practise the cross-chain link on the real z.ink account model, and keep it reset-proof. | Code work |
+| **Now: Solana mainnet** | Keep `player_legacy` as the open evidence read. The proposed `reputation-link` (scoped consent: `legacy`, `fleets`, `guild`, `story`, with an unlink) is not built. Write player stories from cited mainnet evidence only. A stable **evidence pack** per opted-in player is also not built: a signed hub record that lists the source transactions and accounts (hashes and references, not prose) for the Solana-era history. | The Solana-era record is complete and checkable *before* Starbased closes. Opted-in players arrive at z.ink with a signed, portable history. | Code work; Founder merge. `reputation-link` is **planned**. |
+| **Now: z.ink testnet / PTR** | Read PTR Player Profiles through `@aephia/atlas-kit` (`identity`). A player's proposed `reputation-link` could **optionally** name their PTR profile, so the link covers both chains. Store names alongside addresses, because PTR resets (Phase 3.2) wipe state. `c4-anchor` and marker feeds against PTR systems are **proposed**, not built. | We practise the cross-chain link on the real z.ink account model, and keep it reset-proof. | Code work |
 | **Now: no chain** | Watch for zProfile developer docs, achievements (Phase 4), and the bridge docs (docs.z.ink has a bridge section). Keep `community-tools` listing docs.z.ink and z.ink. | Readiness without assumptions | — |
 | **At z.ink mainnet / Genesis** | (1) Add z.ink mainnet as a read source once a public RPC is published. (2) **Z1:** anchor *hashes* of consent and evidence-pack records on z.ink, if fees are as low as announced. (3) Prompt opted-in players to **re-confirm** their link from the wallet they actually use on z.ink. Assets may bridge to new accounts, so the link must be re-signed and never inferred. | The node becomes the place where "this z.ink identity = this Solana history" is stated by the player and checkable by anyone. | z.ink mainnet RPC; Founder D6 |
 | **After: if zProfile opens** | **Z2:** read zProfile (when there is an API) and let players include `zprofile:<id>` in a `reputation-link`. **Z3:** offer evidence packs to zProfile or achievements as third-party attestations, if ATMTA allows it. | Reputation flows both ways without our node becoming the authority | ATMTA's API and policy; any approach to ATMTA is Founder-only (D7) |
@@ -167,7 +171,7 @@ So a player's **Solana-era history is about to become "the past"**. Whoever help
 ### 5.2 No doxxing by correlation
 
 - Feeds and renderers never show a wallet next to a person unless a `reputation-link` or player claim exists.
-- No "this guild's members are wallets X, Y, Z" lists unless each member opted in. C4 Live's `dacs.json` `members` stay his decision. We never propose names or wallets for it without each member's consent.
+- No "this guild's members are wallets X, Y, Z" lists unless each member opted in. A participating stack's member list stays that stack's decision. We never propose names or wallets for it without each member's consent.
 - `player_story` text already leaves addresses out of the prose and drops chain names (existing). Keep that.
 - Do not join together, in one response: a public listing owner, a wallet's activity times, and a social handle. An agent asking "who is behind X?" gets "not linked" unless consent exists.
 - Raw public reads (`player_legacy`, `get_fleet`) stay open, as on any explorer. **Published** per-wallet profiles, stories and reputation exist only for wallets that signed consent. Feeds and renderers built from published records never add unconsented wallets.
@@ -191,24 +195,24 @@ flowchart TB
   subgraph PUBLIC["Public data (permissionless, anyone can read)"]
     SOL["Solana mainnet<br/>legacy fleets, profiles, DAO"]
     ZPTR["z.ink testnet / PTR<br/>SAGE C4 state"]
-    RYD["Ryden Systems, explorers<br/>(look up any wallet)"]
-    AK["Atlas Kit<br/>typed reads"]
+    EXP["Public explorers<br/>(look up any wallet)"]
+    AK["@aephia/atlas-kit<br/>dependency, not a peer"]
   end
 
   subgraph NODE["sa-ecosystem-node = shared source of truth"]
-    REC["Signed records (hub, pinned commit)<br/>agent keys: listings, guilds, tools, anchors<br/>player wallets: story-optin, player claims, reputation-link"]
-    ALLOW["Approved-key allowlist<br/>≤2 record keys per stack, threshold 2<br/>trust level: single-stack / multi-stack"]
-    MCP["Read-only MCP + JSON feeds<br/>evidence-cited, consent-gated"]
+    REC["Signed records (hub, pinned commit)<br/>today: listings and guilds<br/>agent record key G2Ph plus Falkor wallet<br/>proposed: c4-anchor, community-tool, reputation-link"]
+    ALLOW["Approved-key allowlist<br/>today: threshold 2, author approval counts<br/>planned: trust level single-stack / multi-stack (C2)"]
+    MCP["Read-only MCP (live)<br/>JSON bridge feeds are proposed"]
   end
 
   subgraph H2H["H2H harnesses (contributors)"]
-    PHX["Phoenix agent"]
-    SIP["Siphaawal's team agent"]
-    RON["Ronald's Atlas Kit agent"]
+    PHX["Phoenix stack agent"]
+    STA["Stack A harness<br/>placeholder"]
+    STB["Stack B harness<br/>placeholder"]
   end
 
   subgraph HUMAN["Human layer"]
-    C4["C4 Live / 3D renderers"]
+    REND["A participating stack's renderer<br/>if it builds one"]
     PLAIN["/plain/ and other pages"]
     PEOPLE["Players, businesses, everyday people"]
   end
@@ -220,11 +224,11 @@ flowchart TB
 
   SOL -->|evidence| MCP
   ZPTR --> AK --> MCP
-  RYD -.->|link out, never scraped| PLAIN
-  PHX & SIP & RON -->|PRs + signed records| REC
+  EXP -.->|link out, never scraped| PLAIN
+  PHX & STA & STB -.->|proposed: PRs + signed records| REC
   ALLOW --> REC
   REC --> MCP
-  MCP --> C4 & PLAIN
+  MCP --> REND & PLAIN
   PEOPLE -->|wallet signs once to opt in| REC
   REC -.->|consent hashes, planned| ANCH
   REC -.->|opt-in reputation-link, when readable| ZP
@@ -242,11 +246,11 @@ Solid arrows exist or are directly buildable. Dashed arrows are planned, or depe
 | **D1** | Adopt the principle in §1: agent keys for the everyday layer; wallets only for player identity and ownership. | Yes |
 | **D2** | Business and guild **claims** move from wallet to the business's agent key plus a curator countersign (two keys; another stack's countersign is optional). | Yes. Most businesses have no wallet. |
 | **D3** | Add a `reputation-link` record kind with per-scope consent and unlink. | Yes, after migration (code work) |
-| **D4** | ~~Gate `player_legacy`?~~ **Decided:** the read stays as is. Public wallet data is already pullable through Ryden. Consent (a wallet signature) gates only **publishing** to a player profile or story (`player_story`, `reputation-link`). | Done. No node change. |
+| **D4** | ~~Gate `player_legacy`?~~ **Decided:** the read stays as is. Public wallet data is already pullable through public explorers. Consent (a wallet signature) gates only **publishing** to a player profile or story (`player_story`, the proposed `reputation-link`). | Done. No node change. |
 | **D5** | The rate limits in §3 (numbers proposed, enforced by review until code item C3) | Accept as starting values |
 | **D6** | Pursue z.ink hash anchors (Z1) once mainnet RPC is public | Yes in principle. Revisit when there is a date. |
 | **D7** | Should we approach ATMTA or the z.ink team about zProfile read or attest access? You are the one to send it, if anyone. | Not now. Wait for their developer docs. |
-| **D8** | ~~The second key for the 55-record migration~~ **Decided:** a second Phoenix agent key. Cross-stack countersigns are optional trust upgrades. Falkor's wallet is scoped to player tools. | Done (H2H v0.2.1) |
+| **D8** | ~~The second key for the 55-record migration~~ **Decided:** a second Phoenix agent record key. Cross-stack countersigns are an optional trust level, never required. Falkor's wallet stays for player-side records. | Decision made. The record migration is **planned** (M0–M5), not done. |
 | **D9** | The "Divergence War" / Chronicles context: should it ever become part of the reputation layer? | Out of scope here |
 
 ## 8. Open questions
@@ -263,6 +267,7 @@ Solid arrows exist or are directly buildable. Dashed arrows are planned, or depe
 
 | Version | Date | Change |
 |---|---|---|
+| v0.1.3 (draft) | 2026-11-11 | Other builders are not named. Examples are Stack A and Stack B. `@aephia/atlas-kit` stays only as a package this node depends on. §1 separates what is live today from what is planned. Revocation matches the node: `signer-change` is forward-only; `HUB_REVOKED_SIGNERS` is retroactive; non-retroactive revocation is code item C4, planned. |
 | v0.1.2 (draft) | 2026-11-10 | D4 decided: `player_legacy` reads stay open; consent gates only publishing to a profile or story. New §4.3 on positioning the node as the reputation bridge into z.ink and zProfile, with honest limits. |
 | v0.1.1 (draft) | 2026-11-10 | Founder decisions: two Phoenix keys meet the threshold; cross-stack countersigns shown as a trust level, never a gate; Falkor's wallet scoped to player tools. |
 | v0.1 (draft) | 2026-11-10 | First draft: signer principle, per-kind policy table, reputation-bridge positioning, z.ink research with sources and unknowns, anonymity rules, layer diagram, decisions. |

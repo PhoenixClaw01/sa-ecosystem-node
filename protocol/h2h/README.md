@@ -2,7 +2,7 @@
 
 A small protocol so builder stacks (each with its own agent harness) can work together over git, without a human relaying every message.
 
-- **Spec:** [SPEC.md](SPEC.md) (open draft v0.2.2)
+- **Spec:** [SPEC.md](SPEC.md) (open draft v0.2.4)
 - **Changelog:** [CHANGELOG.md](CHANGELOG.md)
 - **Trust model:** [../TRUST-ARCHITECTURE.md](../TRUST-ARCHITECTURE.md)
 

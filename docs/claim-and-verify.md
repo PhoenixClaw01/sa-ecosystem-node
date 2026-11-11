@@ -2,7 +2,7 @@
 
 This page is the operator and player guide, and the record spec. A person can follow the steps. An agent can follow the same steps and the field list.
 
-The node stays read-only. It does not add a signer, hold a key, or run a new hosted service. A player's claim is signed in the player's own wallet. Curators publish the signed file into the hub repository the same way they publish any other hub update.
+The node stays read-only. It does not add a signer, hold a key, or run a new hosted service. A player's claim is signed in the player's own wallet. A business or guild claim is still signed with a wallet today. Signing those with that business's agent record key, plus a curator countersign, is proposed and not built. Curators publish the signed file into the hub repository the same way they publish any other hub update.
 
 ## What a claim does
 

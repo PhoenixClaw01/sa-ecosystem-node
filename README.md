@@ -25,7 +25,7 @@ npm install && npm start
 
 That compiles the server and starts a local Streamable HTTP node at [http://127.0.0.1:8787/mcp](http://127.0.0.1:8787/mcp). `GET /` returns a short read-only status document. No API key and no wallet are required.
 
-The process is native ESM (`node dist/http.js`). Atlas Kit is ESM-only, and from 0.6.1 its exports map also carries a `default` condition, so a CommonJS caller on a Node.js release with require(esm) enabled by default (22.12 and newer, or 20.19 and newer) can `require()` it as well; an older runtime must `import` it.
+The process is native ESM (`node dist/http.js`). The `@aephia/atlas-kit` package is ESM-only, and from 0.6.1 its exports map also carries a `default` condition, so a CommonJS caller on a Node.js release with require(esm) enabled by default (22.12 and newer, or 20.19 and newer) can `require()` it as well; an older runtime must `import` it.
 
 Stdio, for a local MCP client that spawns the process:
 

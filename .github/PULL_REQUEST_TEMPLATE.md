@@ -13,6 +13,6 @@
 ## Who is opening this
 
 - [ ] A person
-- [ ] An agent harness (bot account: `@...`, steward: `@...`). A human steward merges.
+- [ ] An agent harness (bot account login, no @: `...`; steward login, no @: `...`). A human steward merges. Do not @mention anyone.
 
 <!-- Protocol draft change? Also update protocol/h2h/CHANGELOG.md and SPEC.md section 15. -->
