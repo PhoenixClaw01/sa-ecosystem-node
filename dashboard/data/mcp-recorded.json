@@ -296,7 +296,7 @@
       "ok": true,
       "output": {
         "dataMode": "cached",
-        "asOf": "2026-11-11T06:14:06.125Z",
+        "asOf": "2026-11-11T14:20:29.704Z",
         "sources": [
           {
             "url": "https://star-atlas-dao.gitbook.io/knowledge-base/overview/treasury",
@@ -357,7 +357,7 @@
           "DAO Treasury ATLAS rows are complete only after the vault-wallet backfill and the ATLAS-account outflow sample both pass. The sample is not a fetch of every fee drip."
         ],
         "cache": {
-          "generatedAt": "2026-11-11T06:14:06.125Z",
+          "generatedAt": "2026-11-11T14:20:29.704Z",
           "rpc": "https://solana-rpc.publicnode.com/ then https://api.mainnet-beta.solana.com/",
           "atlasScanReachedEnd": false,
           "atlasOutflowSample": "holds"
@@ -372,7 +372,7 @@
       "ok": true,
       "output": {
         "dataMode": "cached",
-        "asOf": "2026-11-11T06:14:06.125Z",
+        "asOf": "2026-11-11T14:20:29.704Z",
         "sources": [
           {
             "url": "https://star-atlas-dao.gitbook.io/knowledge-base/overview/treasury",
@@ -501,7 +501,7 @@
           "Internal means the counterparty is the other published wallet. Unattributed means the counterparty amounts did not add up, and those amounts are not folded into inflows or outflows."
         ],
         "cache": {
-          "generatedAt": "2026-11-11T06:14:06.125Z",
+          "generatedAt": "2026-11-11T14:20:29.704Z",
           "rpc": "https://solana-rpc.publicnode.com/ then https://api.mainnet-beta.solana.com/",
           "atlasScanReachedEnd": false,
           "atlasOutflowSample": "holds"
@@ -518,7 +518,7 @@
       "ok": true,
       "output": {
         "dataMode": "cached",
-        "asOf": "2026-11-11T06:14:06.125Z",
+        "asOf": "2026-11-11T14:20:29.704Z",
         "sources": [
           {
             "url": "https://star-atlas-dao.gitbook.io/knowledge-base/overview/treasury",
@@ -734,7 +734,7 @@
           "Other series replay parsed post-balances. A series is omitted when its backfill is incomplete unless allowPartial is set."
         ],
         "cache": {
-          "generatedAt": "2026-11-11T06:14:06.125Z",
+          "generatedAt": "2026-11-11T14:20:29.704Z",
           "rpc": "https://solana-rpc.publicnode.com/ then https://api.mainnet-beta.solana.com/",
           "atlasScanReachedEnd": false,
           "atlasOutflowSample": "holds"
@@ -749,7 +749,7 @@
       "ok": true,
       "output": {
         "dataMode": "cached",
-        "asOf": "2026-11-11T06:14:06.125Z",
+        "asOf": "2026-11-11T14:20:29.704Z",
         "sources": [
           {
             "url": "https://star-atlas-dao.gitbook.io/knowledge-base/overview/treasury",
@@ -873,9 +873,9 @@
           "rule": "5% of the Ecosystem Fund ATLAS balance after the last refill transaction (PIP-23 section c)."
         },
         "balances": {
-          "asOf": "2026-11-11T06:13:47.196Z",
+          "asOf": "2026-11-11T14:18:54.662Z",
           "dataMode": "cached",
-          "treasuryAtlas": "828614381.06442836",
+          "treasuryAtlas": "828798452.25067671",
           "ecosystemFundAtlas": "285654680.00000001",
           "treasuryUsdc": "209921.579904",
           "ecosystemFundUsdc": "0",
@@ -888,7 +888,7 @@
         "nextQuarter": {
           "date": "2026-12-31",
           "onOrAbout": true,
-          "evaluatedOn": "2026-11-11T06:13:47.196Z",
+          "evaluatedOn": "2026-11-11T14:18:54.662Z",
           "note": "The date is the next published quarter mark. Amounts use cached balances as of the balance timestamp, not a prediction of that date.",
           "atlasRefill": {
             "due": false,
@@ -926,7 +926,7 @@
           "source": "pip23"
         },
         "cache": {
-          "generatedAt": "2026-11-11T06:14:06.125Z",
+          "generatedAt": "2026-11-11T14:20:29.704Z",
           "rpc": "https://solana-rpc.publicnode.com/"
         }
       },
