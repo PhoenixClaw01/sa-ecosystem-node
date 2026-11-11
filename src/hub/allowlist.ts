@@ -4,7 +4,7 @@ import { closeSync, constants, fstatSync, openSync, readSync } from "node:fs";
 import type { SignerSetConfig } from "../config.js";
 import { SafeClientError } from "../errors.js";
 import { base58Decode, base58Encode } from "./base58.js";
-import { embeddedSignersSha } from "./signers-pin.js";
+import { embeddedSignerSetShas, embeddedSignersSha } from "./signers-pin.js";
 import type { SignerSet } from "./update.js";
 
 const MAX_SIGNER_BYTES = 64 * 1024;
@@ -94,6 +94,8 @@ export function formatHubSignerEntry(label: string, publicKey: string): string {
  * The node process has no embedded hash and reads the operator's file.
  */
 export const SIGNERS_SHA256_KEY = "__SA_SIGNERS_SHA256";
+/** Set by the dashboard bundle: sha256 of each extra signer-set file it ships (for example hub/signers/agents.json). */
+export const SIGNER_SET_SHA256S_KEY = "__SA_SIGNER_SET_SHA256S";
 
 function pinnedSignersSha(): string | null {
   const embedded = embeddedSignersSha();
@@ -103,6 +105,20 @@ function pinnedSignersSha(): string | null {
     throw new SafeClientError("The signer allowlist could not be read. No updates were returned.");
   }
   return value;
+}
+
+/**
+ * Hashes of the extra signer-set files a bundle ships. Only read when a primary pin exists.
+ * A node process with no pin reads the operator's files and has no extras.
+ */
+function pinnedSignerSetShas(): string[] {
+  const embedded = embeddedSignerSetShas();
+  const value = embedded ?? (globalThis as Record<string, unknown>)[SIGNER_SET_SHA256S_KEY];
+  if (value === undefined || value === null) return [];
+  if (!Array.isArray(value) || value.some((entry) => typeof entry !== "string" || !/^[0-9a-f]{64}$/.test(entry))) {
+    throw new SafeClientError("The signer allowlist could not be read. No updates were returned.");
+  }
+  return value as string[];
 }
 
 function readSignerBytes(filePath: string): Buffer {
@@ -136,8 +152,11 @@ function readSignerFile(filePath: string): HubSigner[] {
     throw new SafeClientError("The signer allowlist could not be read. No updates were returned.");
   }
   const expected = pinnedSignersSha();
-  if (expected !== null && createHash("sha256").update(bytes).digest("hex") !== expected) {
-    throw new SafeClientError("The signer allowlist does not match the pinned copy. No updates were returned.");
+  if (expected !== null) {
+    const actual = createHash("sha256").update(bytes).digest("hex");
+    if (actual !== expected && !pinnedSignerSetShas().includes(actual)) {
+      throw new SafeClientError("The signer allowlist does not match the pinned copy. No updates were returned.");
+    }
   }
   let parsed: unknown;
   try {

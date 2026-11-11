@@ -2,7 +2,7 @@
   "rewrites": [{ "source": "/mcp", "destination": "/api/mcp" }],
   "functions": {
     "api/mcp.ts": {
-      "includeFiles": "hub/signers.json"
+      "includeFiles": "{hub/signers.json,hub/signers/agents.json}"
     }
   },
   "env": {

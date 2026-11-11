@@ -29,6 +29,7 @@ const USAGE = [
   "Usage: npm run sign-hub-update -- --keypair <file> (--payload <file> | --approve <file>) [--out <file>]",
   "       npm run sign-hub-update -- --print-approval <file>",
   "       npm run sign-hub-update -- --approve <file> --public-key <address> --signature <signature> [--out <file>]",
+  "       npm run sign-hub-update -- --drop-approval <file> --public-key <address> [--out <file>]",
 ].join("\n");
 
 function fail(message: string): { code: number; stdout: string; stderr: string } {
@@ -164,6 +165,24 @@ export function attachWalletApproval(document: unknown, publicKey: string, signa
   };
 }
 
+/**
+ * Remove one approval by public key. The payload, the author signature, and every other approval stay as they are.
+ * Used when an approval is replaced (for example the agent-key migration in protocol/h2h/SPEC.md section 17).
+ * Keep the removed signature as provenance outside the manifest before you drop it.
+ */
+export function dropHubApproval(document: unknown, publicKey: string): SignedHubDocument {
+  const parsed = parseSignedHubDocument(document);
+  if (!parsed || !authorSignatureValid(parsed.payload, parsed.signature)) {
+    throw new Error("The signed update could not be verified. Nothing was written.");
+  }
+  const address = canonicalAddress(publicKey);
+  const kept = parsed.approvals.filter((approval) => approval.publicKey !== address);
+  if (kept.length === parsed.approvals.length) {
+    throw new Error("This key has no approval on the update. Nothing was written.");
+  }
+  return { payload: parsed.payload, signature: parsed.signature, approvals: kept };
+}
+
 /** Exact bytes for a wallet to sign. The author signature must already verify. */
 export function approvalMessageLines(document: unknown): { hex: string; utf8: string } {
   const parsed = parseSignedHubDocument(document);
@@ -201,6 +220,7 @@ export function runSignCli(argv: readonly string[]): { code: number; stdout: str
   let printApproval = "";
   let publicKey = "";
   let signature = "";
+  let dropPath = "";
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
     const next = argv[index + 1];
@@ -212,8 +232,22 @@ export function runSignCli(argv: readonly string[]): { code: number; stdout: str
     else if (arg === "--print-approval") printApproval = next;
     else if (arg === "--public-key") publicKey = next;
     else if (arg === "--signature") signature = next;
+    else if (arg === "--drop-approval") dropPath = next;
     else return fail(USAGE);
     index += 1;
+  }
+
+  if (dropPath) {
+    if (!publicKey || signature || keyPath || payloadPath || approvePath || printApproval) return fail(USAGE);
+    try {
+      const dropped = dropHubApproval(readJson(dropPath), publicKey);
+      const text = `${JSON.stringify(dropped, null, 2)}\n`;
+      if (outPath) writeFileSync(outPath, text);
+      return { code: 0, stdout: outPath ? "" : text, stderr: `Dropped the approval by ${publicKey.trim()} from ${dropped.payload.id}\n` };
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "The approval could not be dropped.";
+      return fail(message.length > 300 ? "The approval could not be dropped." : message);
+    }
   }
 
   const walletApproval = Boolean(publicKey || signature);

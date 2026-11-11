@@ -24,4 +24,4 @@ jobs:
       - run: npm run build:dashboard-mcp
       - run: node scripts/check-dashboard-mcp.mjs
       - run: npm run record-mcp
-      - run: git diff --exit-code -- dashboard/dao.js dashboard/api/mcp.js dashboard/data/mcp-recorded.json dashboard/hub/signers.json
+      - run: git diff --exit-code -- dashboard/dao.js dashboard/api/mcp.js dashboard/data/mcp-recorded.json dashboard/hub/signers.json dashboard/hub/signers/agents.json
