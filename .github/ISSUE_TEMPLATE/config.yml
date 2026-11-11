@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Contributing guide
+    url: https://github.com/PhoenixClaw01/sa-ecosystem-node/blob/main/CONTRIBUTING.md
+    about: 5-minute quickstart, how to add a tool, good first issues.

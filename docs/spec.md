@@ -13,8 +13,8 @@ One public, read-only program. People open a web page. AI assistants call the sa
 It does three jobs:
 
 1. **Read public game and DAO data.** Star systems and fleets come from the z.ink test realm. Treasury balances, proposals, votes, and revenue come from public Solana mainnet and public galaxy JSON. A player lookup reads public mainnet accounts.
-2. **Read a signed hub.** Updates live in a public git repository. Each update is signed by a wallet. The public node shows an update only when the signature checks pass and enough trusted wallets have approved it.
-3. **Show that hub on a page.** A request for `/` on [https://sa-ecosystem-node-dashboard.vercel.app](https://sa-ecosystem-node-dashboard.vercel.app) redirects to `/plain/`. `/plain/` shows listings, groups, hub updates, search results, and a player lookup as a card grid: one column on phones, two columns from 48rem, three from 68.75rem, and four on very wide screens from 93.75rem (`dashboard/plain/plain.css`). Cards in the grid start collapsed (`<details>` with no `open` attribute). Listings, groups, hub updates, and search each have Expand all, Collapse all, category filter chips, and a sort of A-Z, Newest, or Category (`dashboard/plain/plain.js`). The sort starts at A-Z. Groups are the guild rows from `hub_updates`. The page calls same-origin `/api/mcp` for `list_listings`, `hub_updates`, `search_hub`, `player_legacy`, and `player_story`. Under Listings there is one signed note, "What does signed mean?": "Signed means approved hub signers checked and published this record with their wallets. It is not an endorsement, it is not proof of ownership, and it does not move money. The business is responsible for its own offer." The one payment line is: "This page does not take payment. Offers link to each business's own page." Each card can show the word Signed. `signedMeaning` is a field on `list_listings` results. The page does not print that field on each card.
+2. **Read a signed hub.** Updates live in a public git repository. Each update is signed by an allowlisted ed25519 key (an agent machine key or a wallet; a player's own wallet for that player's records). The public node shows an update only when the signature checks pass and enough distinct allowlisted keys have approved it.
+3. **Show that hub on a page.** A request for `/` on [https://sa-ecosystem-node-dashboard.vercel.app](https://sa-ecosystem-node-dashboard.vercel.app) redirects to `/plain/`. `/plain/` shows listings, groups, hub updates, search results, and a player lookup as a card grid: one column on phones, two columns from 48rem, three from 68.75rem, and four on very wide screens from 93.75rem (`dashboard/plain/plain.css`). Cards in the grid start collapsed (`<details>` with no `open` attribute). Listings, groups, hub updates, and search each have Expand all, Collapse all, category filter chips, and a sort of A-Z, Newest, or Category (`dashboard/plain/plain.js`). The sort starts at A-Z. Groups are the guild rows from `hub_updates`. The page calls same-origin `/api/mcp` for `list_listings`, `hub_updates`, `search_hub`, `player_legacy`, and `player_story`. Under Listings there is one signed note, "What does signed mean?": "Signed means approved hub signers checked and published this record with their signing keys. It is not an endorsement, it is not proof of ownership, and it does not move money. The business is responsible for its own offer." The one payment line is: "This page does not take payment. Offers link to each business's own page." Each card can show the word Signed. `signedMeaning` is a field on `list_listings` results. The page does not print that field on each card.
 
 The server does not sign, does not send transactions, and does not hold keys or funds. There is no submit button and no moderation queue in this version.
 
@@ -49,7 +49,7 @@ Solid lines are live. Dashed lines are planned and are not in this version. The 
 | MCP | [https://sa-ecosystem-node-dashboard.vercel.app/api/mcp](https://sa-ecosystem-node-dashboard.vercel.app/api/mcp) |
 | Discovery | [https://sa-ecosystem-node-dashboard.vercel.app/.well-known/mcp.json](https://sa-ecosystem-node-dashboard.vercel.app/.well-known/mcp.json) |
 
-`/plain/` shows listings, groups, hub updates, search results, and a player lookup as a card grid: one column on phones, two columns from 48rem, three from 68.75rem, and four on very wide screens from 93.75rem (`dashboard/plain/plain.css`). Cards in the grid start collapsed (`<details>` with no `open` attribute). Listings, groups, hub updates, and search each have Expand all, Collapse all, category filter chips, and a sort of A-Z, Newest, or Category (`dashboard/plain/plain.js`). The sort starts at A-Z. Groups are the guild rows from `hub_updates`. The page calls same-origin `/api/mcp` for `list_listings`, `hub_updates`, `search_hub`, `player_legacy`, and `player_story`. Under Listings there is one signed note, "What does signed mean?": "Signed means approved hub signers checked and published this record with their wallets. It is not an endorsement, it is not proof of ownership, and it does not move money. The business is responsible for its own offer." The one payment line is: "This page does not take payment. Offers link to each business's own page." Each card can show the word Signed. `signedMeaning` is a field on `list_listings` results. The page does not print that field on each card. No API key.
+`/plain/` shows listings, groups, hub updates, search results, and a player lookup as a card grid: one column on phones, two columns from 48rem, three from 68.75rem, and four on very wide screens from 93.75rem (`dashboard/plain/plain.css`). Cards in the grid start collapsed (`<details>` with no `open` attribute). Listings, groups, hub updates, and search each have Expand all, Collapse all, category filter chips, and a sort of A-Z, Newest, or Category (`dashboard/plain/plain.js`). The sort starts at A-Z. Groups are the guild rows from `hub_updates`. The page calls same-origin `/api/mcp` for `list_listings`, `hub_updates`, `search_hub`, `player_legacy`, and `player_story`. Under Listings there is one signed note, "What does signed mean?": "Signed means approved hub signers checked and published this record with their signing keys. It is not an endorsement, it is not proof of ownership, and it does not move money. The business is responsible for its own offer." The one payment line is: "This page does not take payment. Offers link to each business's own page." Each card can show the word Signed. `signedMeaning` is a field on `list_listings` results. The page does not print that field on each card. No API key.
 
 Checked on 1 November 2026: `initialize` returned server `sa-ecosystem-node` version `1.0.0`, and `tools/list` returned the 22 tools below. Every one has `readOnlyHint: true`.
 
@@ -123,8 +123,8 @@ A listing is a file in the hub repository. The public page does not accept the f
 
 ```mermaid
 flowchart TD
-  A[Author writes the listing JSON] --> B[Author signs the hub-update message<br/>with their wallet]
-  B --> C[A second allowlisted wallet signs<br/>the hub-approval message]
+  A[Author writes the listing JSON] --> B[Author signs the hub-update message<br/>with their record key]
+  B --> C[A second allowlisted key signs<br/>the hub-approval message]
   C --> D[hub-add-update commits the file<br/>and the manifest in the hub repo]
   D --> E[That commit is pushed]
   E --> F[The public node is pinned to the commit<br/>and the manifest hash]
@@ -134,7 +134,7 @@ flowchart TD
   Y[submit_hub_update<br/>planned] -.-> D
 ```
 
-On the public node the threshold is 2 and the author's own approval counts as one of the two (`HUB_APPROVAL_THRESHOLD=2`, `HUB_ALLOW_AUTHOR_APPROVAL=true`). The author key shipped in `hub/signers.json` is Phoenix Collective (`G2PhCi6MApcuC6f5o2CDQBWDnJt9hRcozHuuN55PYisU`). Falkor (`FC1eRr99GGJZuc4KZeUivBpbSMGvjcBB839KaEfAuhcq`) supplies the second signature. GaliaMeta DAC (`EU7zwmY8QP7B9FFUUyMu1eTNkrwuj27NQkgEmNMWreq1`) is on the same allowlist and is not required for that pair. The same wallet twice counts once.
+On the public node, today a record needs 2 distinct allowlisted keys; the author's own approval counts (`HUB_APPROVAL_THRESHOLD=2`, `HUB_ALLOW_AUTHOR_APPROVAL=true`). The author key shipped in `hub/signers.json` is Phoenix Collective (`G2PhCi6MApcuC6f5o2CDQBWDnJt9hRcozHuuN55PYisU`). Falkor (`FC1eRr99GGJZuc4KZeUivBpbSMGvjcBB839KaEfAuhcq`) supplies the second signature. GaliaMeta DAC (`EU7zwmY8QP7B9FFUUyMu1eTNkrwuj27NQkgEmNMWreq1`) is on the same allowlist and is not required for that pair. The same wallet twice counts once.
 
 The node does not upload images. A curator commits a png, jpeg, or webp into the hub. `/plain/` loads only that hub-relative path, resolved to `raw.githubusercontent.com` at the pinned commit.
 
@@ -166,7 +166,7 @@ Canonical JSON sorts keys and has no whitespace. The author signs the UTF-8 byte
 
 An allowlisted update is returned only when the author signature matches a trusted signer set, enough distinct approvals from that set are present, and the update links the hash chain. The author signature is not itself an approval. At threshold 1 the author's own approval counts, and the row has `selfApproved: true` when that key is the only approver. At threshold 2 or higher the author's approval counts only when `HUB_ALLOW_AUTHOR_APPROVAL` is true. A `signer-change` never counts the author.
 
-`signedBy` lists the author and every wallet whose signature verified. `approvedBy` lists only the wallets whose approvals counted.
+`signedBy` lists the author and every key whose signature verified. `approvedBy` lists only the keys whose approvals counted.
 
 `HUB_REVOKED_SIGNERS` is a local list of public keys. It takes effect when the process loads config. An approval from a revoked key does not count. An update whose only valid approvals are from revoked keys is `revoked_signer`. Revoking a whole signer group is not implemented.
 
@@ -190,7 +190,7 @@ Kind `guild`, object `guild`. This is not a listing stream. Fields: `name` (at m
 
 ### Story opt-in
 
-Kind `story-optin`, object `storyOptIn`: `action` (`allow` or `revoke`), `wallet`, `date` (`YYYY-MM-DD`), `signature` (the player's detached signature, base58).
+Kind `story-optin`, object `storyOptIn`: `action` (`allow` or `revoke`), `wallet`, `date` (`YYYY-MM-DD`), `signature` (the player's detached signature, base58). A story opt-in is signed only by the player's own wallet. An agent may prepare the message and the evidence, but never signs it for the player.
 
 Allow sentence, links yes or no:
 
@@ -206,7 +206,7 @@ Revoke sentence:
 
 ### Claim and attestation
 
-Kind `claim` binds one wallet to one listing id or one guild name. Kind `attestation` is a verifier's statement about Discord or X. Neither kind is returned by `hub_updates`. `claim_status` returns the claim state. The field list, the states, and the commands are in [claim-and-verify.md](claim-and-verify.md).
+Kind `claim` binds one public key (for a player, their own wallet) to one listing id or one guild name. Kind `attestation` is a verifier's statement about Discord or X. Neither kind is returned by `hub_updates`. `claim_status` returns the claim state. The field list, the states, and the commands are in [claim-and-verify.md](claim-and-verify.md).
 
 ## Wallets the treasury tools read
 
@@ -242,7 +242,7 @@ Nothing in this section is an MCP tool, a route, or a button in v1.0.0. The type
 | Self-claim button on `/plain/` | A person signs a claim with the `hub-claim` command. A hub editor commits that file. The page has no claim form |
 | Weekly pack, embed widget, and a DAO-tier feed for an ATMTA-hosted dashboard | Not built. `/plain/` is the public page |
 | Application form and a roster of approved ecosystems per category | `list_categories` returns ids and `members: "unknown"` |
-| Scoped, expiring agent key delegated by an ecosystem wallet | Not implemented. The author signs with the key that matches `author` |
+| Agent record keys vouched per stack (one PR to a signer-set file), a shown trust level (`single-stack` / `multi-stack`), per-key rate limits, kind-scoped signer sets | Not implemented. Drafted in [protocol/TRUST-ARCHITECTURE.md](../protocol/TRUST-ARCHITECTURE.md) and [protocol/h2h/SPEC.md](../protocol/h2h/SPEC.md) Appendix A (code items C1–C7). No wallet delegation is planned. The author signs with the key that matches `author` |
 | Revoking a whole signer group in one step | `HUB_REVOKED_SIGNERS` drops individual public keys when the process loads config |
 | Cloudflare Workers entry | Not included. The hub reader and the HTTP server use Node APIs. See [hosting.md](hosting.md) |
 | Moving this repository to a Council-owned GitHub organization | The public source repository is `PhoenixClaw01/sa-ecosystem-node` |
