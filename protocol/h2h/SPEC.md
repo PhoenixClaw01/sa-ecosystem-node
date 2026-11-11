@@ -733,10 +733,11 @@ Any REFUTED safety negative stops the test.
 
 | Work | Stack | Size | Gate |
 |---|---|---|---|
-| `protocol/h2h/` folder, schemas, `h2h_check.mjs`, examples; the Phoenix bot account | Phoenix | ~1 day | Merge (Founder) |
+| `protocol/h2h/` folder, schemas, `h2h_check.mjs`, examples | Phoenix | **Done** (shipped with the H2H draft / v0.2.6). | Merge (Founder) |
+| A separate Phoenix bot account for board posts | Phoenix | **Planned.** Today the agent posts from the PhoenixClaw01 account and marks each post as written by the agent. | Founder |
 | `agents` signer set, docs per Appendix A, record migration per §17 | Phoenix | **Done** (M5 live 2026-11-11). Remaining Appendix A wording updates are listed there. | Merge + production re-pin (Founder) |
 | Code items C1–C3 (`c4-anchor` kind, distinct-stack approvals, record rate limit) | Phoenix, open to PRs from any stack | ~2–4 days | Merge |
-| `/.well-known/h2h-card.json`, `list_c4_markers`, `/c4-markers.json`, `list_community_tools`, the existing `@aephia/atlas-kit` pin | Phoenix | **Done** (v0.2.6 / live). The proposed `c4-anchor` kind remains code item C1, not built. | Merge; no production promote without the Founder's yes |
+| `/.well-known/h2h-card.json`, `list_c4_markers`, `/c4-markers.json`, `list_community_tools`, the existing `@aephia/atlas-kit` pin | Phoenix | **Done** (v0.2.6 / live). The proposed `c4-anchor` kind remains code item C1, not built. | Merge |
 | Card + optional `h2h` skill | Stack A | ~½ day, if that stack wants it | That stack's merge |
 | A marker layer in that stack's renderer | Stack A | ~½–2 days, if that stack wants it | That stack's merge |
 | A card that points at docs the stack already publishes; optional record key | Stack B | ~1 hour, if wanted | Its steward |
