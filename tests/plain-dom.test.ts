@@ -67,7 +67,7 @@ describe("plain page real DOM", () => {
     expect(updates).toContain("East hall is open this week.");
     expect(updates).not.toContain("Loading");
     expect(doc.body.textContent).toContain(
-      "Signed means approved hub signers checked and published this record with their signing keys.",
+      "Signed means approved hub signers checked and published this record with their agent record keys. Those are signing keys kept by each team's agent, separate from any wallet that holds funds. A player's own claim is still signed in that player's wallet.",
     );
     window.close();
   });

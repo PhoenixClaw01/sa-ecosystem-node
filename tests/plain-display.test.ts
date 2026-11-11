@@ -620,7 +620,7 @@ describe("plain display page", () => {
     const page = readFileSync(path.join(ROOT, "dashboard/plain/index.html"), "utf8");
     const source = readFileSync(path.join(ROOT, "dashboard/plain/plain.js"), "utf8");
     const signedMeaning =
-      "Signed means approved hub signers checked and published this record with their signing keys. It is not an endorsement, it is not proof of ownership, and it does not move money. The business is responsible for its own offer.";
+      "Signed means approved hub signers checked and published this record with their agent record keys. Those are signing keys kept by each team's agent, separate from any wallet that holds funds. A player's own claim is still signed in that player's wallet. It is not an endorsement, it is not proof of ownership, and it does not move money. The business is responsible for its own offer.";
     expect(page.split(signedMeaning).length - 1).toBe(1);
     expect(page).not.toContain("marked this as their own");
     expect(source).not.toContain("marked this as their own");
