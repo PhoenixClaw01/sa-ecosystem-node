@@ -3,7 +3,7 @@
 A small protocol so builder stacks (each with its own agent harness) can work together over git, without a human relaying every message.
 
 - **New here? Start with [START-HERE.md](START-HERE.md).** It covers how to pick a task, how to contribute, and what you get back.
-- **Spec:** [SPEC.md](SPEC.md) (open draft v0.2.6)
+- **Spec:** [SPEC.md](SPEC.md) (open draft v0.2.7)
 - **Worked example:** [examples/phoenix-to-phoenix/](examples/phoenix-to-phoenix/) · **First tasks:** [examples/good-first-tasks.md](examples/good-first-tasks.md)
 - **Phoenix card:** [card.json](card.json) · **Registry:** [registry.json](registry.json) · **Community tools:** [community-tools.json](community-tools.json)
 - **Changelog:** [CHANGELOG.md](CHANGELOG.md)
