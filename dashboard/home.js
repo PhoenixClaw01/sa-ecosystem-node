@@ -1,6 +1,6 @@
 // Front page: what powers the DAO. Live, same-origin, read-only MCP calls only.
 // A failed read shows "Data unavailable" and no number. Nothing here is invented.
-import { callOutput, createClient, groupDecimal, PROTOCOL_VERSION, renderTreasury } from "./playground/playground.js";
+import { callOutput, createClient, groupDecimal, PROTOCOL_VERSION, renderTreasury, UNAVAILABLE } from "./playground/playground.js";
 
 /** Heading of the featured tools section. Change this one line to rename it. */
 export const FEATURED_HEADING = "Built by the ecosystem";
@@ -23,9 +23,9 @@ function clear(node) {
   while (node && node.firstChild) node.removeChild(node.firstChild);
 }
 
-function unavailable(doc, host, what, error) {
+function unavailable(doc, host) {
   clear(host);
-  host.appendChild(el(doc, "div", "banner bad", `Data unavailable: the live ${what} read failed (${error.message}). No figure is shown.`));
+  host.appendChild(el(doc, "div", "banner bad", UNAVAILABLE));
 }
 
 /** Exact decimal addition on strings, so totals are never rounded floats. */
@@ -65,22 +65,32 @@ export function revenueMonths(output, limit = MONTHS_SHOWN) {
   const rows = months.map((month) => {
     const bySource = {};
     let total = "0";
+    let unsummable = false;
     for (const row of Array.isArray(month?.sources) ? month.sources : []) {
       const name = String(row?.segmentation ?? "Other");
       names.add(name);
-      const value = typeof row?.usdcValue === "string" ? row.usdcValue : null;
-      if (value === null) continue;
-      bySource[name] = bySource[name] === undefined ? value : addDecimal(bySource[name], value);
-      total = addDecimal(total, value) ?? total;
+      const value = row?.usdcValue;
+      if (typeof value !== "string") {
+        unsummable = true;
+        continue;
+      }
+      const nextSource = bySource[name] === undefined ? value : addDecimal(bySource[name], value);
+      const nextTotal = addDecimal(total, value);
+      if (nextSource === null || nextTotal === null) {
+        unsummable = true;
+        continue;
+      }
+      bySource[name] = nextSource;
+      total = nextTotal;
     }
-    return { period: String(month?.period ?? "").slice(0, 7), bySource, total };
+    return { period: String(month?.period ?? "").slice(0, 7), bySource, total, unsummable };
   });
   rows.sort((a, b) => (a.period < b.period ? 1 : a.period > b.period ? -1 : 0));
   return { names: [...names].sort(), rows: rows.slice(0, limit) };
 }
 
 export function renderRevenue(doc, host, output) {
-  if (output instanceof Error) return unavailable(doc, host, "revenue", output);
+  if (output instanceof Error) return unavailable(doc, host);
   clear(host);
   const bySource = Array.isArray(output?.bySource) ? output.bySource : [];
   if (bySource.length === 0) {
@@ -115,8 +125,11 @@ export function renderRevenue(doc, host, output) {
   for (const row of rows) {
     const tr = el(doc, "tr");
     tr.appendChild(el(doc, "td", null, row.period));
-    for (const name of names) tr.appendChild(el(doc, "td", "num", row.bySource[name] === undefined ? "—" : formatUsd(row.bySource[name])));
-    tr.appendChild(el(doc, "td", "num", formatUsd(row.total)));
+    for (const name of names) {
+      const cell = row.unsummable ? UNAVAILABLE : row.bySource[name] === undefined ? "—" : formatUsd(row.bySource[name]);
+      tr.appendChild(el(doc, "td", "num", cell));
+    }
+    tr.appendChild(el(doc, "td", "num", row.unsummable ? UNAVAILABLE : formatUsd(row.total)));
     body.appendChild(tr);
   }
   table.appendChild(body);
@@ -127,7 +140,7 @@ export function renderRevenue(doc, host, output) {
 export function renderGalaxyLine(doc, host, output) {
   clear(host);
   if (output instanceof Error) {
-    host.appendChild(el(doc, "p", "warn-text", `Data unavailable: the live Atlas Kit read failed (${output.message}).`));
+    host.appendChild(el(doc, "p", "warn-text", UNAVAILABLE));
     return;
   }
   const systems = typeof output?.total === "number" ? output.total : null;
@@ -143,7 +156,7 @@ export function renderGalaxyLine(doc, host, output) {
 export function renderToolCount(doc, host, listed) {
   clear(host);
   if (listed instanceof Error) {
-    host.appendChild(el(doc, "p", "warn-text", `Data unavailable: tools/list failed (${listed.message}).`));
+    host.appendChild(el(doc, "p", "warn-text", UNAVAILABLE));
     return;
   }
   host.appendChild(el(doc, "p", "hint", `Live: this node serves ${listed.length} read-only tools right now.`));

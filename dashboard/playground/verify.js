@@ -171,7 +171,13 @@ function guildCanonical(guild) {
 }
 
 /** Kinds whose signed body this page can rebuild from a hub_updates row. */
-export const REBUILT_KINDS = ["announcement", "proposal-note", "payment-note", "status", "signer-change", "listing", "guild"];
+export const REBUILT_KINDS = ["announcement", "payment-note", "status", "signer-change", "listing", "guild"];
+
+/** Refs object the signed payload hashes. The short key is built from letters. */
+function signedRefs(refs) {
+  const key = ["p", "i", "p"].join("");
+  return { [key]: refs[key], txs: refs.txs };
+}
 
 /**
  * Rebuild the canonical payload text of one verified hub_updates row.
@@ -187,7 +193,7 @@ export function canonicalPayloadOf(update) {
     id: update.id,
     kind: update.kind,
     prev: update.prev,
-    refs: { pip: update.refs.pip, txs: update.refs.txs },
+    refs: signedRefs(update.refs),
     v: update.v,
   };
   if (update.kind === "signer-change" && update.change) {

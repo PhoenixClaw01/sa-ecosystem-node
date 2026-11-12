@@ -10,7 +10,7 @@
   "functions": {
     "api/mcp.js": {
       "maxDuration": 25,
-      "includeFiles": "{ata.js,squads.js,data/treasury-cache.json,hub/signers.json,hub/signers/agents.json}"
+      "includeFiles": "{data/treasury-cache.json,hub/signers.json,hub/signers/agents.json}"
     }
   },
   "rewrites": [

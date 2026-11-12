@@ -63,7 +63,7 @@
     <section id="treasury" class="view">
       <div class="view-head">
         <h2>Treasury and Ecosystem Fund</h2>
-        <p class="hint">Read live from <span class="mono">treasury_balances</span> and <span class="mono">ecofund_limit</span> on every load. If a call fails, the panel says so and shows no number for it.</p>
+        <p class="hint">Read live from <span class="mono">treasury_balances</span> and <span class="mono">ecofund_limit</span> on every load. If a read fails, a cached figure is standing in for the live read, or a figure is missing, the panel says Data unavailable and shows no number.</p>
         <button type="button" id="pg-treasury-refresh" class="pg-button">Read again</button>
       </div>
       <div id="pg-treasury" class="chain-host" aria-live="polite"><p class="hint">Waiting for the tool list…</p></div>
@@ -87,7 +87,7 @@
   </main>
 
   <footer>
-    <p>Unofficial community preview. Inspired by Star Atlas. This page does not move money. Missing figures show as —.</p>
+    <p>Unofficial community preview. Inspired by Star Atlas. This page does not move money. A missing or failed figure says Data unavailable and shows no number.</p>
   </footer>
   <script type="module" src="/playground/boot.js"></script>
 </body>

@@ -13,7 +13,6 @@ import {
   connectSnippets,
   DESCRIPTION_OVERRIDES,
   endpointFor,
-  HIDDEN_TOOLS,
   fieldsFor,
   groupDecimal,
   isRunnable,
@@ -226,8 +225,74 @@ describe("playground page", () => {
     const { doc } = playgroundDoc();
     const host = doc.getElementById("pg-treasury")!;
     renderTreasury(doc, host, new Error("HTTP 503 from /mcp"), new Error("HTTP 503 from /mcp"));
-    expect(host.textContent).toContain("Live call failed (treasury_balances)");
-    expect(host.textContent).toContain("Live call failed (ecofund_limit)");
+    expect(host.textContent).toBe("Data unavailable");
+    expect(host.querySelectorAll(".kpi")).toHaveLength(0);
+  });
+
+  it("shows Data unavailable and no cached amount when the live balance read failed", () => {
+    const { doc } = playgroundDoc();
+    const host = doc.getElementById("pg-treasury")!;
+    renderTreasury(
+      doc,
+      host,
+      {
+        dataMode: "cached",
+        asOf: "2026-11-01T00:00:00.000Z",
+        liveError: "HTTP 503 from the balance read",
+        wallets: [{ name: "DAO Treasury", sol: { amount: "777001.5" }, tokens: [{ symbol: "ATLAS", amount: "777001" }, { symbol: "USDC", amount: "777001" }] }],
+      },
+      {
+        dataMode: "cached",
+        asOf: "2026-11-01T00:00:00.000Z",
+        figureInForce: { perPipLimitAtlas: "10" },
+        lastRefill: { amount: "5", time: "2026-07-08T21:29:16.000Z" },
+        nextQuarter: { date: "2026-12-31", onOrAbout: true },
+      },
+    );
+    expect(host.textContent).toBe("Data unavailable");
+    expect(host.querySelectorAll(".kpi")).toHaveLength(0);
+    expect(host.textContent).not.toContain("777001");
+  });
+
+  it("shows Data unavailable and no amount when the fund cache is not populated", () => {
+    const { doc } = playgroundDoc();
+    const host = doc.getElementById("pg-treasury")!;
+    renderTreasury(
+      doc,
+      host,
+      {
+        dataMode: "live",
+        asOf: "2026-11-12T00:00:00.000Z",
+        liveError: null,
+        wallets: [{ name: "DAO Treasury", sol: { amount: "1.5" }, tokens: [{ symbol: "ATLAS", amount: "424242" }, { symbol: "USDC", amount: "50" }] }],
+      },
+      { populated: false, dataMode: "cached", asOf: "2026-11-12T00:00:00.000Z", note: "The treasury cache is not yet populated. No figures were invented.", figureInForce: { perPipLimitAtlas: "999" } },
+    );
+    expect(host.textContent).toBe("Data unavailable");
+    expect(host.textContent).not.toContain("424242");
+    expect(host.textContent).not.toContain("999");
+    expect(host.querySelectorAll(".kpi")).toHaveLength(0);
+  });
+
+  it("shows Data unavailable when any treasury figure is missing", () => {
+    const { doc } = playgroundDoc();
+    const host = doc.getElementById("pg-treasury")!;
+    renderTreasury(
+      doc,
+      host,
+      {
+        dataMode: "live",
+        liveError: null,
+        wallets: [{ name: "DAO Treasury", sol: { amount: "1.5" }, tokens: [{ symbol: "ATLAS", amount: "100" }] }],
+      },
+      {
+        figureInForce: { perPipLimitAtlas: "10" },
+        lastRefill: { amount: "5", time: "2026-07-08T00:00:00.000Z" },
+        nextQuarter: { date: "2026-12-31" },
+      },
+    );
+    expect(host.textContent).toBe("Data unavailable");
+    expect(host.textContent).not.toContain("100");
     expect(host.querySelectorAll(".kpi")).toHaveLength(0);
   });
 
@@ -251,12 +316,11 @@ describe("playground page", () => {
     const result = await bindPage(doc, { fetch: fakeFetch, location: window.location, view: window });
     expect(calls.every((call) => call.url === "https://preview.example/mcp")).toBe(true);
     expect([...result.allowed].sort()).toEqual(["ecofund_limit", "search_hub", "treasury_balances"]);
-    expect(doc.querySelectorAll(".pg-tool")).toHaveLength(4);
-    const writeCard = doc.querySelector('[data-tool="write_thing"]')!;
-    expect(writeCard.querySelector("form")).toBeNull();
-    expect(doc.getElementById("pg-status")!.textContent).toContain("4 shown of 4, 3 marked read-only");
+    expect(doc.querySelectorAll(".pg-tool")).toHaveLength(3);
+    expect(doc.querySelector('[data-tool="write_thing"]')).toBeNull();
+    expect(doc.getElementById("pg-status")!.textContent).toContain("3 shown of 4 (1 hidden on this page), 3 marked read-only");
     const treasury = doc.getElementById("pg-treasury")!;
-    expect(treasury.textContent).toContain("Live call failed (treasury_balances)");
+    expect(treasury.textContent).toBe("Data unavailable");
     expect(treasury.querySelectorAll(".kpi")).toHaveLength(0);
     expect(doc.getElementById("pg-connect-url")!.textContent).toBe("https://preview.example/mcp");
     expect(doc.getElementById("pg-connect-config")!.textContent).toContain('"url": "https://preview.example/mcp"');
@@ -288,10 +352,131 @@ describe("playground page", () => {
     expect(tools.every((tool) => isRunnable(tool))).toBe(true);
     for (const tool of tools) expect(Array.isArray(fieldsFor(tool.inputSchema))).toBe(true);
   }, 60_000);
+
+  it("disables the tamper checkbox while a verify is in flight and drops a result if it changed", async () => {
+    const { window, doc } = playgroundDoc();
+    const { row } = signedListing();
+    let release: () => void = () => {};
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const subtle = {
+      async digest(algorithm: string, data: Uint8Array) {
+        await gate;
+        return crypto.subtle.digest(algorithm, data);
+      },
+      importKey: crypto.subtle.importKey.bind(crypto.subtle),
+      verify: crypto.subtle.verify.bind(crypto.subtle),
+    };
+    const tools = [
+      { name: "hub_updates", description: "Records.", inputSchema: { type: "object", properties: {} }, annotations: { readOnlyHint: true, destructiveHint: false } },
+      { name: "treasury_balances", description: "Balances.", inputSchema: { type: "object", properties: {} }, annotations: { readOnlyHint: true, destructiveHint: false } },
+      { name: "ecofund_limit", description: "Limit.", inputSchema: { type: "object", properties: {} }, annotations: { readOnlyHint: true, destructiveHint: false } },
+    ];
+    const fakeFetch = async (_url: string, init: { body: string }) => {
+      const body = JSON.parse(init.body);
+      if (body.method === "tools/list") return new Response(sse({ jsonrpc: "2.0", id: body.id, result: { tools } }));
+      if (body.method === "tools/call" && body.params.name === "hub_updates") {
+        return new Response(sse({ jsonrpc: "2.0", id: body.id, result: { structuredContent: { updates: [row] }, content: [] } }));
+      }
+      return new Response("no", { status: 503 });
+    };
+    await bindPage(doc, { fetch: fakeFetch, location: window.location, view: window, subtle });
+    const load = doc.getElementById("pg-records-load") as unknown as { disabled: boolean; click(): void };
+    load.click();
+    for (let i = 0; i < 50 && load.disabled; i += 1) await new Promise((resolve) => setTimeout(resolve, 10));
+    const tamper = doc.getElementById("pg-tamper") as unknown as { checked: boolean; disabled: boolean };
+    const verify = doc.getElementById("pg-verify") as unknown as { disabled: boolean; click(): void };
+    expect(verify.disabled).toBe(false);
+    tamper.checked = true;
+    verify.click();
+    expect(tamper.disabled).toBe(true);
+    expect(verify.disabled).toBe(true);
+    tamper.checked = false;
+    release();
+    for (let i = 0; i < 50 && (tamper.disabled || verify.disabled); i += 1) await new Promise((resolve) => setTimeout(resolve, 10));
+    expect(tamper.disabled).toBe(false);
+    expect(verify.disabled).toBe(false);
+    expect(doc.getElementById("pg-verdict")!.textContent).toBe("");
+  });
 });
 
 describe("playground hide list", () => {
   const WORDING = /\bPIPs?\b|PIP-\d|Council|\bvot(e|es|ing|ers?)\b|proposal/i;
+  const HIDDEN_TOOLS = ["pip_tracker", "list_proposals", "get_proposal_votes"];
+  const DISCLOSURE = "Inspired by Star Atlas. Unofficial community read. This node is not affiliated with ATMTA, holds no funds, and holds no game or Council keys.";
+
+  function expectNoWording(doc: { body: { textContent: string | null; innerHTML: string } }) {
+    const text = String(doc.body.textContent);
+    expect(text.match(new RegExp(`.{0,60}(${WORDING.source}).{0,60}`, "i"))?.[0] ?? null).toBeNull();
+    expect(doc.body.innerHTML).not.toMatch(WORDING);
+  }
+
+  function toolPayload(name: string) {
+    if (name === "treasury_balances") {
+      return {
+        disclaimer: DISCLOSURE,
+        readOnly: true,
+        dataMode: "live",
+        asOf: "2026-11-12T00:00:00.000Z",
+        liveError: null,
+        sources: [{ url: "https://example.invalid/a", note: "PIP-23 names the same two wallets." }],
+        wallets: [{ name: "DAO Treasury", sol: { amount: "1.5" }, tokens: [{ symbol: "ATLAS", amount: "100" }, { symbol: "USDC", amount: "50" }] }],
+      };
+    }
+    if (name === "ecofund_limit") {
+      return {
+        disclaimer: DISCLOSURE,
+        readOnly: true,
+        dataMode: "cached",
+        asOf: "2026-11-12T00:00:00.000Z",
+        figureInForce: { perPipLimitAtlas: "10", source: "pip23" },
+        currentPerPipLimit: { amount: "10", rule: "5% of the balance (PIP-23 section c)." },
+        lastRefill: { amount: "5", time: "2026-07-08T21:29:16.000Z", detection: "PIP-23 refill noted by the Council." },
+        nextQuarter: { date: "2026-12-31", note: "PIP-23 quarter." },
+        rule: { pip: "PIP-23", perPipLimit: "No Ecosystem Fund PIP shall exceed 5%." },
+        councilOverride: { label: "Council" },
+        remainingAfterUnpaidPips: { reason: "PIP-23 does not publish unpaid PIP amounts." },
+      };
+    }
+    if (name === "dao_overview") {
+      return {
+        disclaimer: DISCLOSURE,
+        readOnly: true,
+        sections: [
+          { name: "proposals", ok: true, data: { proposals: [{ title: "A proposal", voteData: { Yes: { count: "1" } } }] } },
+          { name: "treasury_balances", ok: true },
+        ],
+      };
+    }
+    if (name === "data_health") {
+      return {
+        disclaimer: DISCLOSURE,
+        readOnly: true,
+        dataMode: "live",
+        asOf: "2026-11-12T00:00:00.000Z",
+        sources: [{ note: "Council sheet probe." }],
+        checks: [
+          { source: "council_sheet", ok: true, error: null },
+          { source: "galaxy_proposals", ok: false, error: "Galaxy proposals failed." },
+        ],
+      };
+    }
+    if (name === "hub_updates") {
+      const { row } = signedListing();
+      return {
+        disclaimer: DISCLOSURE,
+        readOnly: true,
+        dataMode: "live",
+        asOf: "2026-11-12T00:00:00.000Z",
+        updates: [
+          { kind: "proposal-note", id: "note-1", body: "This proposal needs a vote.", refs: { pip: "PIP-9", txs: [] }, author: "x" },
+          { ...row, refs: { ...row.refs, pip: "PIP-1" } },
+        ],
+      };
+    }
+    return { disclaimer: DISCLOSURE, readOnly: true, dataMode: "live", asOf: "2026-11-12T00:00:00.000Z" };
+  }
 
   it("hides the three governance tools, counts honestly, and renders no such wording from the real tool list", async () => {
     const handler = (await import(pathToFileURL(path.join(ROOT, "dashboard/api/mcp.js")).href)).default;
@@ -301,7 +486,8 @@ describe("playground hide list", () => {
       const body = JSON.parse(init.body);
       if (body.method === "tools/call") {
         names.push(body.params.name);
-        return new Response("upstream down", { status: 503 });
+        const payload = toolPayload(body.params.name);
+        return new Response(sse({ jsonrpc: "2.0", id: body.id, result: { structuredContent: payload, content: [{ type: "text", text: JSON.stringify(payload) }] } }));
       }
       return handler.fetch(new Request(url, { method: "POST", headers: { "content-type": "application/json", accept: "application/json, text/event-stream" }, body: init.body }));
     };
@@ -316,11 +502,48 @@ describe("playground hide list", () => {
     }
     expect(doc.querySelectorAll(".pg-tool")).toHaveLength(total - HIDDEN_TOOLS.length);
     expect(doc.getElementById("pg-status")!.textContent).toContain(`${total - HIDDEN_TOOLS.length} shown of ${total} (${HIDDEN_TOOLS.length} hidden on this page)`);
-    const text = String(doc.body.textContent);
-    expect(text.match(new RegExp(`.{0,60}(${WORDING.source}).{0,60}`, "i"))?.[0] ?? null).toBeNull();
-    expect(doc.body.innerHTML).not.toMatch(WORDING);
+    expectNoWording(doc);
+    (doc.getElementById("pg-records-load") as unknown as { click(): void }).click();
+    for (let i = 0; i < 50 && doc.getElementById("pg-records-load")!.hasAttribute("disabled"); i += 1) {
+      await new Promise((resolve) => setTimeout(resolve, 10));
+    }
+    expect(doc.getElementById("pg-record-pick")!.textContent).toContain("listing-dock-bakery");
+    expect(doc.getElementById("pg-record-pick")!.textContent).not.toContain("note-1");
+    expectNoWording(doc);
+    for (const form of doc.querySelectorAll(".pg-tool form")) {
+      for (const input of form.querySelectorAll("input, select, textarea")) {
+        const named = input as unknown as { value: string; tagName: string; getAttribute(name: string): string | null };
+        if (!named.getAttribute("name")) continue;
+        if (named.tagName === "SELECT") {
+          const option = [...input.querySelectorAll("option")].find((item) => item.getAttribute("value"));
+          if (option) named.value = option.getAttribute("value") ?? "";
+        } else if (named.tagName === "TEXTAREA") {
+          named.value = (named.getAttribute("placeholder") ?? "").includes("{") ? "{}" : "[]";
+        } else if (named.getAttribute("type") === "number") {
+          named.value = "1";
+        } else {
+          named.value = "dockdockdockdockdockdockdockdock";
+        }
+      }
+      const button = form.querySelector("button") as unknown as { disabled: boolean };
+      form.dispatchEvent(new window.Event("submit", { bubbles: true, cancelable: true }));
+      for (let i = 0; i < 50 && button.disabled; i += 1) await new Promise((resolve) => setTimeout(resolve, 10));
+      expectNoWording(doc);
+    }
+    for (const tool of result.shown as { name: string }[]) {
+      if (!isRunnable(tool)) continue;
+      expect(names, tool.name).toContain(tool.name);
+    }
     expect(names.every((name) => !HIDDEN_TOOLS.includes(name))).toBe(true);
   }, 60_000);
+
+  it("does not ship the governance words or a denylist that spells them", () => {
+    const served = ["index.html", "playground.js", "verify.js", "boot.js"].map((name) => readFileSync(path.join(PLAYGROUND, name), "utf8")).join("\n");
+    expect(served).not.toMatch(WORDING);
+    for (const word of ["pip_tracker", "list_proposals", "get_proposal_votes", "councilOverride", "unpaidPips", "proposal-note"]) {
+      expect(served).not.toContain(word);
+    }
+  });
 
   it("keeps hidden tools and fields out of presentTools without touching the input", () => {
     const tools = [
@@ -448,7 +671,7 @@ describe("front page portal", () => {
     await bindHome(doc, { fetch: fakeFetch, location: window.location, view: window });
     expect(doc.getElementById("featured-heading")!.textContent).toBe(FEATURED_HEADING);
     for (const id of ["revenue-host", "atlas-kit-live", "playground-live", "treasury-host"]) {
-      expect(doc.getElementById(id)!.textContent, id).toMatch(/Data unavailable|Live call failed/);
+      expect(doc.getElementById(id)!.textContent, id).toBe("Data unavailable");
       expect(doc.getElementById(id)!.textContent, id).not.toMatch(/\$\d/);
     }
     expect(doc.querySelectorAll(".kpi")).toHaveLength(0);
@@ -481,6 +704,23 @@ describe("front page portal", () => {
     expect(frame.getAttribute("sandbox")).toBe("allow-scripts allow-same-origin");
   });
 
+  it("renders Data unavailable for a month whose source rows have no usdcValue string", async () => {
+    const { renderRevenue } = await import("../dashboard/home.js");
+    const { doc } = homeDoc();
+    const host = doc.getElementById("revenue-host")!;
+    renderRevenue(doc, host, {
+      dataMode: "live",
+      asOf: "2026-11-12T00:00:00.000Z",
+      bySource: [{ segmentation: "Marketplace Fees", mint: "USDC", amount: "3", usdcValue: "3", months: 1 }],
+      months: [{ period: "2026-04-01", sources: [{ segmentation: "Marketplace Fees", mint: "USDC", amount: "3" }] }],
+    });
+    const table = host.querySelector("tbody")!;
+    expect(table.textContent).toContain("Data unavailable");
+    expect(table.textContent).not.toContain("$0.00");
+    expect(table.textContent).not.toMatch(/\$\d/);
+    expect(host.textContent).not.toContain("$0.00");
+  });
+
   it("serves / under a strict policy that frames only the 3D view", () => {
     const vercel = JSON.parse(readFileSync(path.join(ROOT, "dashboard/vercel.json"), "utf8"));
     for (const source of ["/", "/index.html"]) {
@@ -497,9 +737,11 @@ describe("front page portal", () => {
       .split("\n")
       .map((line) => line.trim())
       .filter((line) => line && !line.startsWith("#"));
-    for (const name of ["app.js", "chain.js", "config.js", "dao.js", "tracker.csv", "balances.json"]) expect(ignore).toContain(name);
+    for (const name of ["app.js", "chain.js", "config.js", "dao.js", "tracker.csv", "balances.json", "ata.js", "squads.js"]) expect(ignore).toContain(name);
     const vercel = JSON.parse(readFileSync(path.join(ROOT, "dashboard/vercel.json"), "utf8"));
     const included = String(vercel.functions["api/mcp.js"].includeFiles).replace(/[{}]/g, "").split(",");
+    expect(included).not.toContain("ata.js");
+    expect(included).not.toContain("squads.js");
     for (const file of [...included, "api/mcp.js", "index.html", "home.js", "home.css", "styles.css", "playground", "plain", ".well-known"]) {
       expect(ignore.some((entry) => entry === file || file.startsWith(`${entry}/`)), file).toBe(false);
     }

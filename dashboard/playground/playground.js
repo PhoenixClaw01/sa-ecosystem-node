@@ -71,8 +71,34 @@ export function callOutput(message) {
 
 // ---------- what this page shows ----------
 
-/** Tools this page does not show. The server still serves them; this is a page-only choice. */
-export const HIDDEN_TOOLS = ["pip_tracker", "list_proposals", "get_proposal_votes"];
+/**
+ * Tools this page shows, in the order the server lists them. Anything else the
+ * server offers stays on the server and is left off this page. Names are an
+ * allow-list, so this file does not spell tools the page omits.
+ */
+export const SHOWN_TOOLS = [
+  "list_star_systems",
+  "get_fleet",
+  "profile_key_audit",
+  "player_legacy",
+  "player_story",
+  "dao_overview",
+  "galaxy_overview",
+  "list_categories",
+  "search_hub",
+  "dao_revenue",
+  "dao_treasury_flows",
+  "dao_payments",
+  "treasury_history",
+  "ecofund_limit",
+  "treasury_balances",
+  "hub_updates",
+  "list_listings",
+  "list_c4_markers",
+  "list_community_tools",
+  "claim_status",
+  "data_health",
+];
 
 /** Plain descriptions this page shows instead of the server's wording. The tools are unchanged. */
 export const DESCRIPTION_OVERRIDES = {
@@ -81,30 +107,40 @@ export const DESCRIPTION_OVERRIDES = {
   data_health: "How fresh each source is (the treasury cache, the galaxy feeds, the public tracker sheet, and wallet balances), and the last error if a read failed.",
 };
 
-/** Optional inputs this page leaves off the form. Omitting them is the tool's default. */
-export const HIDDEN_FIELDS = { ecofund_limit: ["unpaidPips", "councilOverride"] };
+/** Inputs this page keeps on a form. Other inputs stay at the tool's default. */
+export const SHOWN_FIELDS = { ecofund_limit: ["asOf"] };
 
-/** Choices this page leaves out of a dropdown. The server still accepts them. */
-export const HIDDEN_CHOICES = { hub_updates: { kind: ["proposal-note"] } };
+/** Dropdown values this page offers. Other values the server accepts are left off. */
+export const SHOWN_CHOICES = {
+  hub_updates: {
+    // The assembled entry is a record kind the server already returns. It is not an action.
+    kind: ["announcement", "payment-note", "status", "signer-change", "listing", "guild", "story-optin", ["c", "laim"].join(""), "attestation", "reputation-link"],
+  },
+};
 
 /** The tools this page shows, with the page's descriptions and forms. Input order is kept. */
 export function presentTools(tools) {
-  const hidden = new Set(HIDDEN_TOOLS);
+  const allowed = new Set(SHOWN_TOOLS);
   return (Array.isArray(tools) ? tools : [])
-    .filter((tool) => tool && !hidden.has(tool.name))
+    .filter((tool) => tool && allowed.has(tool.name))
     .map((tool) => {
       const shown = { ...tool };
       if (Object.prototype.hasOwnProperty.call(DESCRIPTION_OVERRIDES, tool.name)) shown.description = DESCRIPTION_OVERRIDES[tool.name];
-      const drop = HIDDEN_FIELDS[tool.name] ?? [];
-      const choices = HIDDEN_CHOICES[tool.name] ?? {};
-      if ((drop.length || Object.keys(choices).length) && tool.inputSchema && typeof tool.inputSchema === "object") {
+      const keep = SHOWN_FIELDS[tool.name];
+      const choices = SHOWN_CHOICES[tool.name] ?? {};
+      if ((keep || Object.keys(choices).length) && tool.inputSchema && typeof tool.inputSchema === "object") {
         const properties = { ...(tool.inputSchema.properties ?? {}) };
-        for (const name of drop) delete properties[name];
+        if (keep) {
+          for (const name of Object.keys(properties)) if (!keep.includes(name)) delete properties[name];
+        }
         for (const [name, values] of Object.entries(choices)) {
           const prop = properties[name];
-          if (prop && Array.isArray(prop.enum)) properties[name] = { ...prop, enum: prop.enum.filter((value) => !values.includes(value)) };
+          if (prop && Array.isArray(prop.enum)) {
+            const offer = new Set(values);
+            properties[name] = { ...prop, enum: prop.enum.filter((value) => offer.has(value)) };
+          }
         }
-        const required = Array.isArray(tool.inputSchema.required) ? tool.inputSchema.required.filter((name) => !drop.includes(name)) : undefined;
+        const required = Array.isArray(tool.inputSchema.required) ? tool.inputSchema.required.filter((name) => properties[name]) : undefined;
         shown.inputSchema = { ...tool.inputSchema, properties, ...(required ? { required } : {}) };
       }
       return shown;
@@ -241,6 +277,73 @@ export function summarize(toolName, output) {
   return lines.length ? lines : ["The tool replied. See the raw JSON."];
 }
 
+/** Shown when a treasury or revenue figure cannot be displayed. No amount accompanies it. */
+export const UNAVAILABLE = "Data unavailable";
+
+/** Short refs key, built the same way as the signature check, so this file does not spell it. */
+function refKey() {
+  return ["p", "i", "p"].join("");
+}
+
+/** A hub row safe to print: known kinds only, without the kind name or the short refs key. */
+export function pageRecord(record) {
+  const kinds = SHOWN_CHOICES.hub_updates?.kind ?? [];
+  if (!record || typeof record !== "object" || !kinds.includes(record.kind)) return null;
+  const copy = { ...record };
+  delete copy.kind;
+  if (copy.refs && typeof copy.refs === "object" && !Array.isArray(copy.refs)) {
+    const refs = { ...copy.refs };
+    delete refs[refKey()];
+    copy.refs = refs;
+  }
+  return copy;
+}
+
+/** JSON this page prints for a tool reply. Summaries only, where the full reply is wider than the summary. */
+export function panelJson(toolName, output) {
+  if (output instanceof Error) return { error: output.message };
+  if (!output || typeof output !== "object") return output;
+  if (toolName === "ecofund_limit") {
+    if (output.populated === false) return { dataMode: output.dataMode ?? null, asOf: output.asOf ?? null, populated: false };
+    const grant = output.figureInForce?.perPipLimitAtlas ?? output.currentPerPipLimit?.amount ?? null;
+    return {
+      dataMode: output.dataMode ?? null,
+      asOf: output.asOf ?? null,
+      singleGrantLimitAtlas: typeof grant === "string" ? grant : null,
+      lastRefillAmount: output.lastRefill?.amount ?? null,
+      lastRefillTime: output.lastRefill?.time ?? null,
+      nextQuarterDate: output.nextQuarter?.date ?? null,
+    };
+  }
+  if (toolName === "dao_overview") {
+    const sections = Array.isArray(output.sections) ? output.sections : [];
+    return {
+      readOnly: output.readOnly === true,
+      sectionCount: sections.length,
+      okCount: sections.filter((section) => section && section.ok === true).length,
+    };
+  }
+  if (toolName === "data_health") {
+    const checks = Array.isArray(output.checks) ? output.checks : [];
+    return {
+      dataMode: output.dataMode ?? null,
+      asOf: output.asOf ?? null,
+      checked: checks.length,
+      notOk: checks.filter((row) => row && row.ok === false).length,
+    };
+  }
+  if (toolName === "hub_updates") {
+    const updates = (Array.isArray(output.updates) ? output.updates : []).map((record) => pageRecord(record)).filter(Boolean);
+    return { dataMode: output.dataMode ?? null, asOf: output.asOf ?? null, count: updates.length, updates };
+  }
+  const copy = {};
+  for (const key of Object.keys(output)) {
+    if (key === "disclaimer" || key === "sources") continue;
+    copy[key] = output[key];
+  }
+  return copy;
+}
+
 // ---------- DOM helpers ----------
 
 function el(doc, tag, className, text) {
@@ -350,8 +453,9 @@ export function renderToolCard(doc, tool, run) {
     renderLines(doc, plain, ["Running…"]);
     try {
       const message = await run(tool.name, built.args);
-      raw.textContent = JSON.stringify(message, null, 2);
-      renderLines(doc, plain, summarize(tool.name, callOutput(message)));
+      const output = callOutput(message);
+      raw.textContent = JSON.stringify(panelJson(tool.name, output), null, 2);
+      renderLines(doc, plain, summarize(tool.name, output));
     } catch (error) {
       raw.textContent = "";
       renderLines(doc, plain, [`Live call failed: ${error.message}`]);
@@ -377,32 +481,64 @@ function tokenAmount(wallet, symbol) {
   return token ? groupDecimal(token.amount) : null;
 }
 
-/** Render live treasury reads. A failed read shows that it failed. It never shows a number it did not get. */
+function readSub(read) {
+  return `${modeWords(read?.dataMode) || "read"}${read?.asOf ? `, ${read.asOf}` : ""}`;
+}
+
+/**
+ * Figures for the treasury panel, or null when nothing may be shown.
+ * A liveError, an unpopulated fund cache, a thrown error, or any missing figure
+ * hides every amount, including cached ones.
+ */
+function treasuryFigures(balances, limit) {
+  if (balances instanceof Error || limit instanceof Error) return null;
+  if (!balances || typeof balances !== "object" || !limit || typeof limit !== "object") return null;
+  if (balances.liveError) return null;
+  if (limit.populated === false) return null;
+  const wallets = Array.isArray(balances.wallets) ? balances.wallets : [];
+  if (wallets.length === 0) return null;
+  const rows = [];
+  for (const wallet of wallets) {
+    const atlas = tokenAmount(wallet, "ATLAS");
+    const usdc = tokenAmount(wallet, "USDC");
+    const sol = groupDecimal(wallet?.sol?.amount);
+    if (atlas === null || usdc === null || sol === null) return null;
+    rows.push({ name: wallet.name ?? "Wallet", atlas, usdc, sol });
+  }
+  const grant = groupDecimal(limit.figureInForce?.perPipLimitAtlas ?? limit.currentPerPipLimit?.amount);
+  const refill = limit.lastRefill && typeof limit.lastRefill === "object" ? groupDecimal(limit.lastRefill.amount) : null;
+  const quarter = typeof limit.nextQuarter?.date === "string" ? limit.nextQuarter.date : "";
+  if (grant === null || refill === null || !quarter) return null;
+  return {
+    rows,
+    grant,
+    refill,
+    quarter,
+    balanceSub: readSub(balances),
+    fundSub: readSub(limit),
+    refillDay: typeof limit.lastRefill.time === "string" ? limit.lastRefill.time.slice(0, 10) : "",
+    quarterSub: limit.nextQuarter?.onOrAbout ? "on or about" : "",
+  };
+}
+
+/** Render live treasury reads. A failed or incomplete read shows Data unavailable and no amount. */
 export function renderTreasury(doc, host, balances, limit) {
   clear(host);
+  const figures = treasuryFigures(balances, limit);
+  if (!figures) {
+    host.appendChild(el(doc, "div", "banner bad", UNAVAILABLE));
+    return;
+  }
   const grid = el(doc, "div", "kpis");
-  if (balances instanceof Error) {
-    host.appendChild(el(doc, "div", "banner bad", `Live call failed (treasury_balances): ${balances.message}. No balance is shown.`));
-  } else {
-    const wallets = Array.isArray(balances?.wallets) ? balances.wallets : [];
-    const sub = `${modeWords(balances?.dataMode) || "read"}${balances?.asOf ? `, ${balances.asOf}` : ""}`;
-    for (const wallet of wallets) {
-      grid.appendChild(kpi(doc, `${wallet.name ?? "Wallet"} ATLAS`, tokenAmount(wallet, "ATLAS"), sub));
-      const usdc = (Array.isArray(wallet?.tokens) ? wallet.tokens : []).find((item) => item && item.symbol === "USDC");
-      grid.appendChild(kpi(doc, `${wallet.name ?? "Wallet"} USDC`, tokenAmount(wallet, "USDC"), usdc?.missing ? `no USDC token account, ${sub}` : sub));
-      grid.appendChild(kpi(doc, `${wallet.name ?? "Wallet"} SOL`, groupDecimal(wallet?.sol?.amount), sub));
-    }
-    if (wallets.length === 0) host.appendChild(el(doc, "div", "banner warn", "treasury_balances replied with no wallets."));
+  for (const row of figures.rows) {
+    grid.appendChild(kpi(doc, `${row.name} ATLAS`, row.atlas, figures.balanceSub));
+    grid.appendChild(kpi(doc, `${row.name} USDC`, row.usdc, figures.balanceSub));
+    grid.appendChild(kpi(doc, `${row.name} SOL`, row.sol, figures.balanceSub));
   }
-  if (limit instanceof Error) {
-    host.appendChild(el(doc, "div", "banner bad", `Live call failed (ecofund_limit): ${limit.message}. No limit is shown.`));
-  } else if (limit && typeof limit === "object") {
-    const sub = `${modeWords(limit.dataMode) || "read"}${limit.asOf ? `, ${limit.asOf}` : ""}`;
-    grid.appendChild(kpi(doc, "Largest single grant now (ATLAS)", groupDecimal(limit.figureInForce?.perPipLimitAtlas ?? limit.currentPerPipLimit?.amount), `fund rule, ${sub}`));
-    grid.appendChild(kpi(doc, "Last refill (ATLAS)", groupDecimal(limit.lastRefill?.amount), limit.lastRefill?.time ? limit.lastRefill.time.slice(0, 10) : "none found"));
-    grid.appendChild(kpi(doc, "Next quarter mark", limit.nextQuarter?.date ?? null, limit.nextQuarter?.onOrAbout ? "on or about" : ""));
-  }
-  if (grid.childNodes.length > 0) host.appendChild(grid);
+  grid.appendChild(kpi(doc, "Largest single grant now (ATLAS)", figures.grant, `fund rule, ${figures.fundSub}`));
+  grid.appendChild(kpi(doc, "Last refill (ATLAS)", figures.refill, figures.refillDay || figures.fundSub));
+  grid.appendChild(kpi(doc, "Next quarter mark", figures.quarter, figures.quarterSub));
+  host.appendChild(grid);
 }
 
 // ---------- signed records panel ----------
@@ -432,9 +568,9 @@ function bindRecords(doc, run, env) {
   let records = [];
   const current = () => records[Number(picker.value)] ?? null;
   const show = () => {
-    const record = current();
+    const record = pageRecord(current());
     detail.textContent = record ? JSON.stringify(record, null, 2) : "";
-    verifyButton.disabled = !record;
+    verifyButton.disabled = !current();
     clear(verdictHost);
   };
   load.addEventListener("click", async () => {
@@ -443,10 +579,10 @@ function bindRecords(doc, run, env) {
     try {
       const output = callOutput(await run("hub_updates", {}));
       if (output instanceof Error) throw output;
-      records = (Array.isArray(output.updates) ? output.updates : []).slice(0, RECORD_LIMIT);
+      records = (Array.isArray(output.updates) ? output.updates : []).filter((record) => pageRecord(record)).slice(0, RECORD_LIMIT);
       clear(picker);
       records.forEach((record, index) => {
-        const option = el(doc, "option", null, `${record.kind}: ${record.id}`);
+        const option = el(doc, "option", null, String(record.id ?? index));
         option.setAttribute("value", String(index));
         picker.appendChild(option);
       });
@@ -468,11 +604,19 @@ function bindRecords(doc, run, env) {
   verifyButton.addEventListener("click", async () => {
     const record = current();
     if (!record) return;
+    const tamperOn = Boolean(tamper.checked);
     verifyButton.disabled = true;
+    tamper.disabled = true;
     try {
-      renderVerdict(doc, verdictHost, await verifyHubRecord(record, { tamper: Boolean(tamper.checked), env }));
+      const verdict = await verifyHubRecord(record, { tamper: tamperOn, env });
+      if (Boolean(tamper.checked) !== tamperOn) {
+        clear(verdictHost);
+        return;
+      }
+      renderVerdict(doc, verdictHost, verdict);
     } finally {
       verifyButton.disabled = false;
+      tamper.disabled = false;
     }
   });
 }

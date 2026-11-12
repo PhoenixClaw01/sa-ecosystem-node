@@ -1,6 +1,9 @@
 # Kept in the repo for tests and history, not served.
 # The earlier DAO dashboard page scripts and their data.
+# ata.js and squads.js are inlined into api/mcp.js, so the function does not need them on disk.
 app.js
+ata.js
+squads.js
 chain.js
 config.js
 dao.js
