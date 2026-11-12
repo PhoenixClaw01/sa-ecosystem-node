@@ -1,0 +1,466 @@
+import { generateKeyPairSync, sign } from "node:crypto";
+import { readFileSync } from "node:fs";
+import path from "node:path";
+import { fileURLToPath, pathToFileURL } from "node:url";
+
+import { Window } from "happy-dom";
+import { describe, expect, it } from "vitest";
+
+import {
+  bindPage,
+  buildArguments,
+  callOutput,
+  connectSnippets,
+  endpointFor,
+  fieldsFor,
+  groupDecimal,
+  isRunnable,
+  renderTreasury,
+  summarize,
+} from "../dashboard/playground/playground.js";
+import {
+  base58Decode,
+  canonicalPayloadOf,
+  flipOneByte,
+  precheckProblem,
+  verifyEd25519,
+  verifyHubRecord,
+} from "../dashboard/playground/verify.js";
+import { base58Encode } from "../src/hub/base58.js";
+import { verifyEd25519Detached } from "../src/hub/ed25519-verify.js";
+import { canonicalHubPayload, hubUpdateHash, hubUpdateSigningMessage, type HubUpdatePayload } from "../src/hub/update.js";
+
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const PLAYGROUND = path.join(ROOT, "dashboard/playground");
+
+function rawPublicKey(publicKey: ReturnType<typeof generateKeyPairSync>["publicKey"]): Uint8Array {
+  const der = publicKey.export({ format: "der", type: "spki" }) as Buffer;
+  return new Uint8Array(der.subarray(der.length - 32));
+}
+
+function signedListing() {
+  const { publicKey, privateKey } = generateKeyPairSync("ed25519");
+  const author = base58Encode(rawPublicKey(publicKey));
+  const payload: HubUpdatePayload = {
+    v: 1,
+    id: "listing-dock-bakery-2026-11",
+    created_at: "2026-11-01T00:00:00.000Z",
+    author,
+    kind: "listing",
+    body: "Listing: Dock Bakery.",
+    refs: { pip: null, txs: [] },
+    prev: null,
+    listing: {
+      stream: "irl",
+      category: "ip_and_business",
+      title: "Dock Bakery",
+      owner: "Dock Bakery",
+      url: "https://example.com/bakery",
+      offerText: "Fresh loaves on weekday mornings.",
+      status: "available",
+      asOf: "2026-10-31",
+      expiresAt: "2027-01-29",
+      image: { url: "logos/bakery.png", alt: "Dock Bakery logo", link: "https://example.com/bakery" },
+      listingId: "dock-bakery",
+    },
+  } as HubUpdatePayload;
+  const signature = base58Encode(new Uint8Array(sign(null, Buffer.from(hubUpdateSigningMessage(payload)), privateKey)));
+  // The shape hub_updates serves: payload fields plus derived fields the signature does not cover.
+  const row = {
+    ...payload,
+    listing: { ...payload.listing, image: { ...payload.listing!.image, src: "https://raw.githubusercontent.com/x/y/z/logos/bakery.png" } },
+    verified: true,
+    hash: hubUpdateHash(payload),
+    signature,
+    signer: author,
+    signerAllowlist: "allowed",
+    approvalCount: 2,
+    signedBy: [author],
+    approvedBy: [author],
+    selfApproved: false,
+  };
+  return { payload, row };
+}
+
+describe("playground signature check", () => {
+  it("rebuilds the exact canonical payload the server signs", () => {
+    const { payload, row } = signedListing();
+    expect(canonicalPayloadOf(row)).toBe(canonicalHubPayload(payload));
+  });
+
+  it("passes a real record and fails the same record with one byte flipped", async () => {
+    const { row } = signedListing();
+    const good = await verifyHubRecord(row);
+    expect(good.status).toBe("pass");
+    const bad = await verifyHubRecord(row, { tamper: true });
+    expect(bad.status).toBe("fail");
+    expect(typeof bad.flipped).toBe("number");
+  });
+
+  it("does not claim pass or fail when the rebuilt bytes do not match the record hash", async () => {
+    const { row } = signedListing();
+    const edited = { ...row, body: "Listing: someone else." };
+    const verdict = await verifyHubRecord(edited);
+    expect(verdict.status).toBe("unchecked");
+    const unknown = await verifyHubRecord({ ...row, kind: "claim" });
+    expect(unknown.status).toBe("unchecked");
+  });
+
+  it("refuses small-order keys and R values the way the server does", async () => {
+    const identity = new Uint8Array(32);
+    identity[0] = 1;
+    const zeroSignature = new Uint8Array(64);
+    zeroSignature.set(identity, 0);
+    const message = new TextEncoder().encode("anything");
+    expect(verifyEd25519Detached(message, zeroSignature, identity)).toBe(false);
+    expect(precheckProblem(identity, zeroSignature)).toMatch(/small-order/);
+    expect((await verifyEd25519(message, zeroSignature, identity)).ok).toBe(false);
+    const torsion = Uint8Array.from(Buffer.from("26e8958fc2b227b045c3f489f2ef98f0d5dfac05d3c63339b13802886d53fc85", "hex"));
+    expect(precheckProblem(torsion, zeroSignature)).toMatch(/small-order/);
+  });
+
+  it("agrees with the server verifier on a valid, a non-canonical S, and a wrong-message case", async () => {
+    const { publicKey, privateKey } = generateKeyPairSync("ed25519");
+    const key = rawPublicKey(publicKey);
+    const message = new TextEncoder().encode("hello");
+    const signature = new Uint8Array(sign(null, Buffer.from(message), privateKey));
+    const highS = new Uint8Array(signature);
+    highS.fill(0xff, 32);
+    const other = new TextEncoder().encode("hellp");
+    for (const [msg, sig] of [[message, signature], [message, highS], [other, signature]] as const) {
+      expect((await verifyEd25519(msg, sig, key)).ok).toBe(verifyEd25519Detached(msg, sig, key));
+    }
+  });
+
+  it("flips exactly one byte and decodes base58 like the server", () => {
+    const bytes = new Uint8Array([1, 2, 3, 4]);
+    const { bytes: out, index } = flipOneByte(bytes);
+    expect([...out].filter((value, i) => value !== bytes[i])).toHaveLength(1);
+    expect(index).toBe(2);
+    const sample = base58Encode(new Uint8Array([0, 0, 5, 250, 7]));
+    expect([...base58Decode(sample)]).toEqual([0, 0, 5, 250, 7]);
+  });
+});
+
+describe("playground forms and summaries", () => {
+  const schema = {
+    type: "object",
+    properties: {
+      limit: { type: "integer", minimum: 1, maximum: 500 },
+      direction: { type: "string", enum: ["in", "out", "all"] },
+      allowPartial: { type: "boolean" },
+      unpaidPips: { type: "array", items: { type: "object" } },
+      query: { type: "string", maxLength: 80 },
+    },
+    required: ["query"],
+  };
+
+  it("builds fields from an input schema", () => {
+    const fields = fieldsFor(schema);
+    expect(fields.map((field: { name: string; kind: string }) => `${field.name}:${field.kind}`)).toEqual([
+      "limit:number",
+      "direction:choice",
+      "allowPartial:boolean",
+      "unpaidPips:json",
+      "query:text",
+    ]);
+  });
+
+  it("leaves empty optional fields out and checks types", () => {
+    const fields = fieldsFor(schema);
+    expect(buildArguments(fields, { query: "dock" })).toEqual({ args: { query: "dock" } });
+    expect(buildArguments(fields, { query: "dock", limit: "5", allowPartial: "false", direction: "out", unpaidPips: "[]" })).toEqual({
+      args: { query: "dock", limit: 5, allowPartial: false, direction: "out", unpaidPips: [] },
+    });
+    expect(buildArguments(fields, {}).error).toMatch(/query is required/);
+    expect(buildArguments(fields, { query: "x", limit: "1.5" }).error).toMatch(/whole number/);
+    expect(buildArguments(fields, { query: "x", direction: "sideways" }).error).toMatch(/one of/);
+    expect(buildArguments(fields, { query: "x", unpaidPips: "{}" }).error).toMatch(/JSON list/);
+  });
+
+  it("only runs tools the server marks read-only", () => {
+    expect(isRunnable({ annotations: { readOnlyHint: true, destructiveHint: false } })).toBe(true);
+    expect(isRunnable({ annotations: { readOnlyHint: false } })).toBe(false);
+    expect(isRunnable({ annotations: { readOnlyHint: true, destructiveHint: true } })).toBe(false);
+    expect(isRunnable({})).toBe(false);
+  });
+
+  it("groups digits without rounding them up", () => {
+    expect(groupDecimal("829357368.45296781")).toBe("829,357,368.45…");
+    expect(groupDecimal("0")).toBe("0");
+    expect(groupDecimal("1234.5")).toBe("1,234.5");
+    expect(groupDecimal("not a number")).toBeNull();
+  });
+
+  it("summarizes only what the reply says", () => {
+    const lines = summarize("treasury_balances", {
+      readOnly: true,
+      dataMode: "live",
+      asOf: "2026-11-12T00:00:00.000Z",
+      wallets: [{ name: "DAO Treasury", sol: { amount: "1.5" }, tokens: [{ symbol: "USDC", amount: "10" }] }],
+    });
+    expect(lines.join(" ")).toContain("DAO Treasury holds 1.5 SOL, 10 USDC.");
+    expect(lines.join(" ")).toContain("a live read");
+    expect(summarize("x", new Error("boom"))[0]).toContain("boom");
+    expect(callOutput({ error: { message: "nope" } })).toBeInstanceOf(Error);
+    expect(callOutput({ result: { isError: true, content: [{ type: "text", text: "bad input" }] } }).message).toBe("bad input");
+  });
+});
+
+function playgroundDoc(url = "https://preview.example/playground/") {
+  const html = readFileSync(path.join(PLAYGROUND, "index.html"), "utf8").replace(/<script[\s\S]*?<\/script>/gi, "");
+  const window = new Window({ url, settings: { disableJavaScriptEvaluation: true, disableJavaScriptFileLoading: true } });
+  window.document.write(html);
+  return { window, doc: window.document };
+}
+
+function sse(message: unknown): string {
+  return `event: message\ndata: ${JSON.stringify(message)}\n\n`;
+}
+
+describe("playground page", () => {
+  it("never shows a treasury number when the live calls fail", () => {
+    const { doc } = playgroundDoc();
+    const host = doc.getElementById("pg-treasury")!;
+    renderTreasury(doc, host, new Error("HTTP 503 from /mcp"), new Error("HTTP 503 from /mcp"));
+    expect(host.textContent).toContain("Live call failed (treasury_balances)");
+    expect(host.textContent).toContain("Live call failed (ecofund_limit)");
+    expect(host.querySelectorAll(".kpi")).toHaveLength(0);
+  });
+
+  it("binds to same-origin /mcp, lists tools, runs only read-only ones, and reports failed treasury reads", async () => {
+    const { window, doc } = playgroundDoc();
+    const calls: { url: string; body: { method: string; params?: { name?: string } } }[] = [];
+    const tools = [
+      { name: "treasury_balances", description: "Balances.", inputSchema: { type: "object", properties: {} }, annotations: { readOnlyHint: true, destructiveHint: false } },
+      { name: "ecofund_limit", description: "Limit.", inputSchema: { type: "object", properties: {} }, annotations: { readOnlyHint: true, destructiveHint: false } },
+      { name: "search_hub", description: "Search.", inputSchema: { type: "object", properties: { query: { type: "string" } }, required: ["query"] }, annotations: { readOnlyHint: true } },
+      { name: "write_thing", description: "Writes.", inputSchema: { type: "object", properties: {} }, annotations: { readOnlyHint: false } },
+    ];
+    const fakeFetch = async (url: string, init: { body: string }) => {
+      const body = JSON.parse(init.body);
+      calls.push({ url, body });
+      if (body.method === "initialize") return new Response(sse({ jsonrpc: "2.0", id: body.id, result: { serverInfo: { name: "sa-ecosystem-node", version: "1.0.0" } } }));
+      if (body.method === "notifications/initialized") return new Response("", { status: 202 });
+      if (body.method === "tools/list") return new Response(sse({ jsonrpc: "2.0", id: body.id, result: { tools } }));
+      return new Response("upstream down", { status: 503 });
+    };
+    const result = await bindPage(doc, { fetch: fakeFetch, location: window.location, view: window });
+    expect(calls.every((call) => call.url === "https://preview.example/mcp")).toBe(true);
+    expect([...result.allowed].sort()).toEqual(["ecofund_limit", "search_hub", "treasury_balances"]);
+    expect(doc.querySelectorAll(".pg-tool")).toHaveLength(4);
+    const writeCard = doc.querySelector('[data-tool="write_thing"]')!;
+    expect(writeCard.querySelector("form")).toBeNull();
+    expect(doc.getElementById("pg-status")!.textContent).toContain("4 tools, 3 marked read-only");
+    const treasury = doc.getElementById("pg-treasury")!;
+    expect(treasury.textContent).toContain("Live call failed (treasury_balances)");
+    expect(treasury.querySelectorAll(".kpi")).toHaveLength(0);
+    expect(doc.getElementById("pg-connect-url")!.textContent).toBe("https://preview.example/mcp");
+    expect(doc.getElementById("pg-connect-config")!.textContent).toContain('"url": "https://preview.example/mcp"');
+    expect(calls.filter((call) => call.body.method === "tools/call").map((call) => call.body.params?.name).sort()).toEqual(["ecofund_limit", "treasury_balances"]);
+  });
+
+  it("derives every connect URL from the page origin", () => {
+    const snippets = connectSnippets(new URL("https://node.example/playground/"));
+    expect(snippets.url).toBe("https://node.example/mcp");
+    expect(snippets.curl).toContain("https://node.example/mcp");
+    expect(snippets.card).toBe("https://node.example/.well-known/h2h-card.json");
+    expect(endpointFor(new URL("http://localhost:3000/x"))).toBe("http://localhost:3000/mcp");
+  });
+
+  it("lists the real bundle's tools, all marked read-only", async () => {
+    const handler = (await import(pathToFileURL(path.join(ROOT, "dashboard/api/mcp.js")).href)).default;
+    const response = await handler.fetch(
+      new Request("https://preview.example/api/mcp", {
+        method: "POST",
+        headers: { "content-type": "application/json", accept: "application/json, text/event-stream" },
+        body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "tools/list", params: {} }),
+      }),
+    );
+    const text = await response.text();
+    const line = text.split("\n").find((entry: string) => entry.startsWith("data:"));
+    const listed = JSON.parse(line ? line.slice(5) : text);
+    const tools = listed.result.tools as { name: string; inputSchema: unknown }[];
+    expect(tools.length).toBeGreaterThanOrEqual(24);
+    expect(tools.every((tool) => isRunnable(tool))).toBe(true);
+    for (const tool of tools) expect(Array.isArray(fieldsFor(tool.inputSchema))).toBe(true);
+  }, 60_000);
+});
+
+describe("playground files", () => {
+  const files = ["index.html", "playground.js", "verify.js", "boot.js", "playground.css"].map((name) => [name, readFileSync(path.join(PLAYGROUND, name), "utf8")] as const);
+
+  it("hardcodes no deployment host and writes no HTML from data", () => {
+    for (const [name, text] of files) {
+      expect(text, name).not.toMatch(/vercel\.app|https?:\/\/[a-z0-9-]+\.vercel/i);
+      if (name.endsWith(".js")) expect(text, name).not.toMatch(/innerHTML|outerHTML|insertAdjacentHTML|document\.write|eval\(|new Function/);
+    }
+  });
+
+  it("offers no write, claim, sign, or payment action", () => {
+    const source = files.filter(([name]) => name.endsWith(".js")).map(([, text]) => text).join("\n");
+    expect(source).not.toMatch(/signMessage|signTransaction|sendTransaction|privateKey|secretKey|"sign"\]/);
+    expect(source).not.toMatch(/"(claim|attest|hub-claim|hub-attest)"/);
+  });
+
+  it("is linked from the dashboard nav and the plain page, and served with a strict CSP", () => {
+    const dashboard = readFileSync(path.join(ROOT, "dashboard/index.html"), "utf8");
+    const plain = readFileSync(path.join(ROOT, "dashboard/plain/index.html"), "utf8");
+    const vercel = JSON.parse(readFileSync(path.join(ROOT, "dashboard/vercel.json"), "utf8"));
+    expect(dashboard).toMatch(/<nav class="topbar"[\s\S]*href="\/playground\/"[\s\S]*<\/nav>/);
+    expect(plain).toContain('href="/playground/"');
+    const header = vercel.headers.find((entry: { source: string }) => entry.source === "/playground/(.*)");
+    const csp = header.headers.find((entry: { key: string }) => entry.key === "Content-Security-Policy").value as string;
+    expect(csp).toContain("connect-src 'self'");
+    expect(csp).toContain("script-src 'self'");
+    expect(vercel.redirects).toContainEqual({ source: "/playground", destination: "/playground/", permanent: true });
+  });
+});
+
+describe("front page portal", () => {
+  const home = readFileSync(path.join(ROOT, "dashboard/index.html"), "utf8");
+  const homeJs = readFileSync(path.join(ROOT, "dashboard/home.js"), "utf8");
+  const playgroundHtml = readFileSync(path.join(PLAYGROUND, "index.html"), "utf8");
+
+  function homeDoc() {
+    const html = home.replace(/<script[\s\S]*?<\/script>/gi, "");
+    const window = new Window({ url: "https://preview.example/", settings: { disableJavaScriptEvaluation: true, disableJavaScriptFileLoading: true } });
+    window.document.write(html);
+    return { window, doc: window.document };
+  }
+
+  it("links the featured tools and every node tool, with one module script and no inline code", () => {
+    for (const href of [
+      "/playground/",
+      "/playground/#records",
+      "/plain/",
+      "/playground/#tool-claim_status",
+      "/playground/#tool-hub_updates",
+      "/.well-known/h2h-card.json",
+      "/playground/#connect",
+      "https://ses.aephia.com/C4Live/",
+      "https://github.com/Aephia/atlas-kit",
+      "https://x.com/Siphaawal",
+      "https://github.com/ttdonovan/sa-forge-signer",
+      "https://ttdonovan.github.io/sa-forge-signer/",
+      "https://ttdonovan.github.io/sa-forge-signer/llms.txt",
+    ]) {
+      expect(home).toContain(`href="${href}"`);
+    }
+    expect(home.match(/<script/g)).toHaveLength(1);
+    expect(home).toContain('<script type="module" src="/home.js"></script>');
+    expect(home).not.toMatch(/\son\w+=|\sstyle=|<iframe/);
+    expect(home).toContain("Unofficial, self-hosted; review its");
+    expect(home).not.toMatch(/audited|reviewed by us|we reviewed/i);
+  });
+
+  it("carries no governance, funding-request, or partnership copy", () => {
+    for (const text of [home, playgroundHtml, homeJs]) {
+      expect(text).not.toMatch(/\bPIPs?\b|PIP-\d|Council|\bvot(e|es|ing)\b|proposal|budget/i);
+      expect(text).not.toMatch(/\bpartner|co-builder|in collaboration|endorsed by|\bofficial/i);
+    }
+  });
+
+  it("keeps the featured heading in one constant", async () => {
+    const { FEATURED_HEADING } = await import("../dashboard/home.js");
+    expect(typeof FEATURED_HEADING).toBe("string");
+    expect(home).toMatch(/<h2 id="featured-heading"><\/h2>/);
+    expect(homeJs.split(JSON.stringify(FEATURED_HEADING)).length - 1).toBe(1);
+  });
+
+  it("adds decimal strings exactly and groups revenue by month, newest first", async () => {
+    const { addDecimal, revenueMonths } = await import("../dashboard/home.js");
+    expect(addDecimal("0.1", "0.2")).toBe("0.3");
+    expect(addDecimal("733442.58604847", "167384.223915")).toBe("900826.80996347");
+    expect(addDecimal("x", "1")).toBeNull();
+    const { formatUsd } = await import("../dashboard/home.js");
+    expect(formatUsd("4005.009")).toBe("$4,005.01");
+    expect(formatUsd("0.004")).toBe("$0.00");
+    expect(formatUsd("999.995")).toBe("$1,000.00");
+    expect(formatUsd("nope")).toBe("—");
+    const { names, rows } = revenueMonths({
+      months: [
+        { period: "2026-01-01", sources: [{ segmentation: "Game Activity", usdcValue: "10" }, { segmentation: "Marketplace Fees", usdcValue: "2.5" }] },
+        { period: "2026-02-01", sources: [{ segmentation: "Game Activity", usdcValue: "1" }, { segmentation: "Game Activity", usdcValue: "1" }] },
+      ],
+    });
+    expect(names).toEqual(["Game Activity", "Marketplace Fees"]);
+    expect(rows.map((row: { period: string; total: string }) => `${row.period}=${row.total}`)).toEqual(["2026-02=2", "2026-01=12.5"]);
+  });
+
+  it("shows Data unavailable and no figure when every live read fails", async () => {
+    const { bindHome, FEATURED_HEADING } = await import("../dashboard/home.js");
+    const { window, doc } = homeDoc();
+    const fakeFetch = async () => new Response("down", { status: 503 });
+    await bindHome(doc, { fetch: fakeFetch, location: window.location, view: window });
+    expect(doc.getElementById("featured-heading")!.textContent).toBe(FEATURED_HEADING);
+    for (const id of ["revenue-host", "atlas-kit-live", "playground-live", "treasury-host"]) {
+      expect(doc.getElementById(id)!.textContent, id).toMatch(/Data unavailable|Live call failed/);
+      expect(doc.getElementById(id)!.textContent, id).not.toMatch(/\$\d/);
+    }
+    expect(doc.querySelectorAll(".kpi")).toHaveLength(0);
+  });
+
+  it("renders live revenue rows and loads the 3D view only after a click", async () => {
+    const { bindHome } = await import("../dashboard/home.js");
+    const { window, doc } = homeDoc();
+    const revenue = {
+      dataMode: "live",
+      asOf: "2026-11-12T00:00:00.000Z",
+      bySource: [{ segmentation: "Marketplace Fees", mint: "USDC", amount: "1234.5", usdcValue: "1234.5", months: 3 }],
+      months: [{ period: "2026-10-01", sources: [{ segmentation: "Marketplace Fees", mint: "USDC", amount: "100", usdcValue: "100" }] }],
+    };
+    const fakeFetch = async (_url: string, init: { body: string }) => {
+      const body = JSON.parse(init.body);
+      if (body.method === "tools/call" && body.params.name === "dao_revenue") {
+        return new Response(sse({ jsonrpc: "2.0", id: body.id, result: { structuredContent: revenue, content: [] } }));
+      }
+      return new Response("down", { status: 503 });
+    };
+    await bindHome(doc, { fetch: fakeFetch, location: window.location, view: window });
+    const host = doc.getElementById("revenue-host")!;
+    expect(host.textContent).toContain("$1,234.50");
+    expect(host.textContent).toContain("2026-10");
+    expect(doc.querySelector("iframe")).toBeNull();
+    (doc.getElementById("c4-load") as unknown as { click(): void }).click();
+    const frame = doc.querySelector("iframe")!;
+    expect(frame.getAttribute("src")).toBe("https://ses.aephia.com/C4Live/");
+    expect(frame.getAttribute("sandbox")).toBe("allow-scripts allow-same-origin");
+  });
+
+  it("serves / under a strict policy that frames only the 3D view", () => {
+    const vercel = JSON.parse(readFileSync(path.join(ROOT, "dashboard/vercel.json"), "utf8"));
+    for (const source of ["/", "/index.html"]) {
+      const rule = vercel.headers.find((entry: { source: string }) => entry.source === source);
+      const csp = rule.headers.find((entry: { key: string }) => entry.key === "Content-Security-Policy").value as string;
+      expect(csp).toContain("connect-src 'self'");
+      expect(csp).toContain("frame-src https://ses.aephia.com");
+      expect(csp).not.toMatch(/unsafe-inline|unsafe-eval/);
+    }
+  });
+
+  it("keeps the earlier page's scripts out of the deploy but not the function's files", () => {
+    const ignore = readFileSync(path.join(ROOT, "dashboard/.vercelignore"), "utf8")
+      .split("\n")
+      .map((line) => line.trim())
+      .filter((line) => line && !line.startsWith("#"));
+    for (const name of ["app.js", "chain.js", "config.js", "dao.js", "tracker.csv", "balances.json"]) expect(ignore).toContain(name);
+    const vercel = JSON.parse(readFileSync(path.join(ROOT, "dashboard/vercel.json"), "utf8"));
+    const included = String(vercel.functions["api/mcp.js"].includeFiles).replace(/[{}]/g, "").split(",");
+    for (const file of [...included, "api/mcp.js", "index.html", "home.js", "home.css", "styles.css", "playground", "plain", ".well-known"]) {
+      expect(ignore.some((entry) => entry === file || file.startsWith(`${entry}/`)), file).toBe(false);
+    }
+  });
+
+  it("opens a linked tool card from the URL hash", async () => {
+    const { window, doc } = playgroundDoc("https://preview.example/playground/#tool-claim_status");
+    const tools = [{ name: "claim_status", description: "Claims.", inputSchema: { type: "object", properties: {} }, annotations: { readOnlyHint: true } }];
+    const fakeFetch = async (_url: string, init: { body: string }) => {
+      const body = JSON.parse(init.body);
+      if (body.method === "tools/list") return new Response(JSON.stringify({ jsonrpc: "2.0", id: body.id, result: { tools } }));
+      return new Response("no", { status: 503 });
+    };
+    await bindPage(doc, { fetch: fakeFetch, location: window.location, view: window });
+    expect(doc.getElementById("tool-claim_status")!.hasAttribute("open")).toBe(true);
+  });
+});

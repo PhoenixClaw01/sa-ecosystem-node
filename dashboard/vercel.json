@@ -20,7 +20,8 @@
     { "source": "/mcp", "destination": "/api/mcp" }
   ],
   "redirects": [
-    { "source": "/plain", "destination": "/plain/", "permanent": true }
+    { "source": "/plain", "destination": "/plain/", "permanent": true },
+    { "source": "/playground", "destination": "/playground/", "permanent": true }
   ],
   "headers": [
     {
@@ -46,6 +47,33 @@
         {
           "key": "Content-Security-Policy",
           "value": "default-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; object-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' https://raw.githubusercontent.com; font-src 'self'; connect-src 'self'"
+        }
+      ]
+    },
+    {
+      "source": "/playground/(.*)",
+      "headers": [
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; object-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'self'"
+        }
+      ]
+    },
+    {
+      "source": "/",
+      "headers": [
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; object-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'self'; frame-src https://ses.aephia.com"
+        }
+      ]
+    },
+    {
+      "source": "/index.html",
+      "headers": [
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; object-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'self'; frame-src https://ses.aephia.com"
         }
       ]
     }

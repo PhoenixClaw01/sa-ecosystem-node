@@ -44,7 +44,7 @@ Solid lines are live. Dashed lines are planned and are not in this version. The 
 |---|---|
 | Vercel project | `sa-ecosystem-node-dashboard`. This project is separate from the DAO Council preview |
 | Site | [https://sa-ecosystem-node-dashboard.vercel.app](https://sa-ecosystem-node-dashboard.vercel.app) |
-| Home | `PUBLIC_HOME=plain` makes `/` and `/index.html` answer 302 to `/plain/` (`dashboard/middleware.js`) |
+| Home | `/` serves the DAO dashboard front page (`dashboard/index.html`). `/playground/` is the live MCP Playground |
 | Reading page | `/plain/` is indexable. It has no `noindex` tag and no `X-Robots-Tag` |
 | MCP | [https://sa-ecosystem-node-dashboard.vercel.app/api/mcp](https://sa-ecosystem-node-dashboard.vercel.app/api/mcp) |
 | Discovery | [https://sa-ecosystem-node-dashboard.vercel.app/.well-known/mcp.json](https://sa-ecosystem-node-dashboard.vercel.app/.well-known/mcp.json) |
@@ -245,7 +245,7 @@ Each request has a 20 second timeout (`REQUEST_TIMEOUT_MS` in `src/public-mcp.ts
 
 ## Run it yourself
 
-[hosting.md](hosting.md) covers a laptop, Docker, stdio for Claude Desktop and Cursor, and other hosts. A local `npm start` serves MCP at `http://127.0.0.1:8787/mcp`. `GET /` on that process is a status document. It does not redirect to `/plain/`, because `PUBLIC_HOME` is read only by the dashboard middleware.
+[hosting.md](hosting.md) covers a laptop, Docker, stdio for Claude Desktop and Cursor, and other hosts. A local `npm start` serves MCP at `http://127.0.0.1:8787/mcp`. `GET /` on that process is a status document. It does not serve the dashboard front page.
 
 Anyone can run a node. Nodes do not share a database. Two nodes agree on hub rows when they pin the same commit, the same manifest hash, and the same signer rules. They can differ on treasury history until both have refreshed the cache.
 
