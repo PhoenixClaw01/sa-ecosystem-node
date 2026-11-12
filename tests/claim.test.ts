@@ -1,4 +1,4 @@
-import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdtempSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 
@@ -29,6 +29,14 @@ import {
 } from "../src/hub/update.js";
 import { PLAYER_PROFILE_PROGRAM_ID, PROFILE_DISCRIMINATOR, PROFILE_KEY_OFFSET, PROFILE_KEY_STRIDE } from "../src/legacy/programs.js";
 import { runAttestCli } from "../src/hub/attest-cli.js";
+import { listenLoopback, LOOPBACK_HOST, runPlayerFlowCli } from "../src/hub/player-flow-cli.js";
+import {
+  buildPlayerAttestationDraft,
+  buildPlayerClaimDraft,
+  readyPlayerPack,
+  writePlayerPack,
+} from "../src/hub/player-discord-flow.js";
+import { createPlayerExchange, exchangeListenTarget } from "../src/hub/player-exchange.js";
 import { discordAuthorizeUrl, discordIdentify, discordVerifierConfig } from "../src/hub/verifier/discord-oauth.js";
 import { bindAttestationState } from "../src/hub/verifier/proof.js";
 import { fetchPostedCode, postContainsCode } from "../src/hub/verifier/x-proof.js";
@@ -1448,6 +1456,377 @@ describe("red-team regressions", () => {
     );
     expect(peak).toBeGreaterThan(1);
     expect(peak).toBeLessThanOrEqual(CLAIM_PROFILE_CONCURRENCY);
+  });
+});
+
+const DISCORD_ACCOUNT = "123456789012345678";
+const PLAYER_FIELDS = {
+  hub: HUB,
+  listingId: "booth-north",
+  nonce: "nonce-1111",
+  expiresAt: "2027-04-01T00:00:00.000Z",
+  createdAt: "2026-10-31T00:00:00.000Z",
+};
+
+function playerFields(wallet: string, profile: string) {
+  return { ...PLAYER_FIELDS, wallet, profile };
+}
+
+function discordProofFor(wallet: string, nonce = PLAYER_FIELDS.nonce) {
+  const salt = "salt-value-1";
+  return {
+    v: 1 as const,
+    method: "discord" as const,
+    account: DISCORD_ACCOUNT,
+    salt,
+    wallet,
+    nonce,
+    state: bindAttestationState({ wallet, nonce, salt }),
+  };
+}
+
+function signUtf8(secret: Uint8Array, utf8: string): string {
+  return base58Encode(nacl.sign.detached(new TextEncoder().encode(utf8), secret));
+}
+
+describe("player discord claim flow", () => {
+  it("keeps Discord off the public server and leaves a stock node unchanged", () => {
+    const roots = ["src/server.ts", "src/http.ts", "src/handler.ts", "src/runtime.ts", "src/public-mcp.ts", "src/public-mcp-entry.ts"];
+    for (const file of roots) {
+      const text = readFileSync(file, "utf8");
+      expect(text).not.toContain("discord-oauth");
+      expect(text).not.toContain("player-exchange");
+      expect(text).not.toContain("player-flow");
+      expect(text).not.toContain("player-discord-flow");
+    }
+    const bundle = readFileSync("dashboard/api/mcp.js", "utf8");
+    expect(bundle).not.toContain("oauth2/token");
+    expect(bundle).not.toContain("DISCORD_CLIENT_SECRET");
+    expect(discordVerifierConfig({})).toBeNull();
+    expect(exchangeListenTarget("http://127.0.0.1:8788/discord")).toEqual({
+      host: "127.0.0.1",
+      port: 8788,
+      callbackPath: "/discord",
+    });
+    expect(exchangeListenTarget("https://example.com/discord")).toBeNull();
+    expect(exchangeListenTarget("http://localhost:8788/discord")).toBeNull();
+  });
+
+  it("binds the exchange listener to loopback", async () => {
+    const bound = await listenLoopback(0, async () => new Response("ok"));
+    expect(bound.address).toBe(LOOPBACK_HOST);
+    await bound.close();
+  });
+
+  it("writes a signed claim and player attestation only after a profile match", async () => {
+    const player = signer();
+    const profile = signer();
+    const fields = playerFields(player.publicKey, profile.publicKey);
+    const proof = discordProofFor(player.publicKey);
+    const claim = buildPlayerClaimDraft(fields);
+    expect(claim).not.toBeNull();
+    const attestation = buildPlayerAttestationDraft({
+      proof,
+      hub: fields.hub,
+      issuedAt: fields.createdAt,
+      expiresAt: fields.expiresAt,
+      prev: hubUpdateHash(claim!.payload),
+    });
+    expect(attestation).not.toBeNull();
+    expect(JSON.stringify(attestation)).not.toContain(`"${DISCORD_ACCOUNT}"`);
+    expect(JSON.stringify(attestation)).not.toContain(proof.salt);
+    const packed = readyPlayerPack({
+      fields,
+      proof,
+      claimSignature: signUtf8(player.secret, claim!.message.utf8),
+      attestationSignature: signUtf8(player.secret, attestation!.message.utf8),
+      profile: "match",
+    });
+    expect(packed.ok).toBe(true);
+    if (!packed.ok) return;
+    const directory = mkdtempSync(path.join(tmpdir(), "player-pack-"));
+    const files = writePlayerPack(directory, packed.pack);
+    expect(files).toEqual(["claim.signed.json", "attest.signed.json", "proof.json"]);
+    const claimText = readFileSync(path.join(directory, "claim.signed.json"), "utf8");
+    const attestText = readFileSync(path.join(directory, "attest.signed.json"), "utf8");
+    expect(claimText).not.toContain(DISCORD_ACCOUNT);
+    expect(attestText).not.toContain(DISCORD_ACCOUNT);
+    expect(attestText).not.toContain(proof.salt);
+    expect(readFileSync(path.join(directory, "proof.json"), "utf8")).toContain(DISCORD_ACCOUNT);
+    const checked = verifyHubUpdates(
+      [JSON.parse(claimText), JSON.parse(attestText)],
+      new Set<string>(),
+      1,
+      undefined,
+      { hubId: HUB, now: NOW },
+    );
+    expect(checked.rejected).toEqual([]);
+    const resolved = await resolveClaimDirectory(checked.updates, {
+      hubId: HUB,
+      now: NOW,
+      trustedVerifiers: new Set(),
+      profile: async () => "match",
+    });
+    expect(resolved.claims[0]?.state).toBe("active");
+    expect(resolved.claims[0]?.profile).toBe("match");
+    expect(resolved.claims[0]?.discord).toBe("self-attested, unverified");
+
+    const mismatch = readyPlayerPack({
+      fields,
+      proof,
+      claimSignature: signUtf8(player.secret, claim!.message.utf8),
+      attestationSignature: signUtf8(player.secret, attestation!.message.utf8),
+      profile: "mismatch",
+    });
+    expect(mismatch).toEqual({ ok: false, reason: "profile_mismatch" });
+    const unavailable = readyPlayerPack({
+      fields,
+      proof,
+      claimSignature: packed.pack.claim.signature,
+      attestationSignature: packed.pack.attestation.signature,
+      profile: "unavailable",
+    });
+    expect(unavailable).toEqual({ ok: false, reason: "profile_unavailable" });
+  });
+
+  it("chains a verifier attestation after the player signature when the profile matches", async () => {
+    const player = signer();
+    const verifier = signer();
+    const profile = signer();
+    const fields = playerFields(player.publicKey, profile.publicKey);
+    const proof = discordProofFor(player.publicKey);
+    const out = mkdtempSync(path.join(tmpdir(), "player-verifier-"));
+    const proofPath = path.join(out, "proof.json");
+    writeFileSync(proofPath, JSON.stringify(proof));
+    const keyPath = path.join(out, "verifier.json");
+    writeFileSync(keyPath, JSON.stringify(Array.from(verifier.secret)));
+    const claim = buildPlayerClaimDraft(fields);
+    const attestation = buildPlayerAttestationDraft({
+      proof,
+      hub: fields.hub,
+      issuedAt: fields.createdAt,
+      expiresAt: fields.expiresAt,
+      prev: hubUpdateHash(claim!.payload),
+    });
+    const ready = path.join(out, "ready");
+    const result = await runPlayerFlowCli(
+      [
+        "pack",
+        "--wallet",
+        player.publicKey,
+        "--hub",
+        fields.hub,
+        "--listing-id",
+        fields.listingId,
+        "--profile",
+        profile.publicKey,
+        "--nonce",
+        fields.nonce,
+        "--expires",
+        fields.expiresAt,
+        "--created-at",
+        fields.createdAt,
+        "--claim-signature",
+        signUtf8(player.secret, claim!.message.utf8),
+        "--attest-signature",
+        signUtf8(player.secret, attestation!.message.utf8),
+        "--proof-file",
+        proofPath,
+        "--verifier-key",
+        keyPath,
+        "--verifier-id",
+        "hub-verifier",
+        "--out",
+        ready,
+      ],
+      { profile: { async walletIsProfileKey() { return "match"; } } },
+    );
+    expect(result.code, result.stderr).toBe(0);
+    expect(result.stdout).toContain('"published":false');
+    const names = readdirSync(ready).sort();
+    expect(names).toEqual(["attest.signed.json", "attest.verifier.signed.json", "claim.signed.json", "proof.json"]);
+    const docs = names.filter((name) => name.endsWith(".signed.json")).map((name) => JSON.parse(readFileSync(path.join(ready, name), "utf8")));
+    const checked = verifyHubUpdates(docs, new Set<string>(), 1, undefined, { hubId: HUB, now: NOW });
+    expect(checked.rejected).toEqual([]);
+    const resolved = await resolveClaimDirectory(checked.updates, {
+      hubId: HUB,
+      now: NOW,
+      trustedVerifiers: new Set([verifier.publicKey]),
+      profile: async () => "match",
+    });
+    expect(resolved.claims[0]?.discord).toBe("verified");
+    expect(readFileSync(path.join(ready, "attest.verifier.signed.json"), "utf8")).not.toContain(DISCORD_ACCOUNT);
+    expect(readFileSync(keyPath, "utf8")).not.toBe(readFileSync(path.join(ready, "attest.verifier.signed.json"), "utf8"));
+  });
+
+  it("refuses to publish from the loopback exchange and keeps the client secret there", async () => {
+    const player = signer();
+    const profile = signer();
+    const out = mkdtempSync(path.join(tmpdir(), "player-exchange-"));
+    const seen: string[] = [];
+    const opened = createPlayerExchange({
+      env: {
+        DISCORD_CLIENT_ID: "123456789012345678",
+        DISCORD_CLIENT_SECRET: "test-secret-value",
+        DISCORD_REDIRECT_URI: "http://127.0.0.1:8788/discord",
+      },
+      outDir: out,
+      now: () => NOW.getTime(),
+      profile: { async walletIsProfileKey() { return "match"; } },
+      fetchImpl: (async (input, init) => {
+        const url = String(input);
+        seen.push(url);
+        const raw = init?.body;
+        const body = typeof raw === "string" ? raw : raw instanceof URLSearchParams ? raw.toString() : "";
+        if (url.includes("oauth2/token")) expect(body).toContain("client_secret=test-secret-value");
+        expect(url).not.toContain("test-secret-value");
+        if (url.includes("oauth2/token")) {
+          return new Response(JSON.stringify({ access_token: "token-value", scope: "identify" }), { status: 200 });
+        }
+        return new Response(JSON.stringify({ id: DISCORD_ACCOUNT }), { status: 200 });
+      }) as typeof fetch,
+    });
+    expect(opened.ok).toBe(true);
+    if (!opened.ok) return;
+    const headers = { "content-type": "application/json", "x-player-flow": "1", origin: "http://127.0.0.1:8788" };
+    const begun = await opened.handle(new Request("http://127.0.0.1:8788/begin", {
+      method: "POST",
+      headers,
+      body: JSON.stringify(playerFields(player.publicKey, profile.publicKey)),
+    }));
+    const started = (await begun.json()) as { authorizeUrl?: string };
+    expect(begun.status).toBe(200);
+    expect(started.authorizeUrl).toContain("scope=identify");
+    expect(started.authorizeUrl).not.toContain("guilds");
+    expect(started.authorizeUrl).not.toContain("test-secret-value");
+    const state = new URL(started.authorizeUrl ?? "").searchParams.get("state") ?? "";
+    const callback = await opened.handle(new Request(`http://127.0.0.1:8788/discord?code=code-1234&state=${encodeURIComponent(state)}`));
+    expect(callback.status).toBe(302);
+    const session = new URL(callback.headers.get("location") ?? "", "http://127.0.0.1:8788").searchParams.get("session");
+    const messages = await opened.handle(new Request("http://127.0.0.1:8788/messages", {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ session }),
+    }));
+    const drafts = (await messages.json()) as {
+      wallet: string;
+      claim: { message: { utf8: string } };
+      attestation: { message: { utf8: string } };
+    };
+    expect(messages.status).toBe(200);
+    expect(JSON.stringify(drafts)).not.toContain(DISCORD_ACCOUNT);
+    expect(JSON.stringify(drafts)).not.toContain("test-secret-value");
+    expect(JSON.stringify(drafts)).not.toContain("token-value");
+    const finished = await opened.handle(new Request("http://127.0.0.1:8788/finish", {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        session,
+        claimSignature: signUtf8(player.secret, drafts.claim.message.utf8),
+        attestationSignature: signUtf8(player.secret, drafts.attestation.message.utf8),
+      }),
+    }));
+    const result = (await finished.json()) as { published: boolean; profile: string; files: string[]; note: string };
+    expect(finished.status).toBe(200);
+    expect(result.published).toBe(false);
+    expect(result.profile).toBe("match");
+    expect(result.files).toContain("claim.signed.json");
+    expect(JSON.stringify(result)).not.toContain(DISCORD_ACCOUNT);
+    expect(JSON.stringify(result)).not.toContain("test-secret-value");
+    expect(seen.some((url) => url.includes("oauth2/token"))).toBe(true);
+    const cross = await opened.handle(new Request("http://127.0.0.1:8788/finish", {
+      method: "POST",
+      headers: { ...headers, origin: "https://example.com" },
+      body: JSON.stringify({ session, claimSignature: "x", attestationSignature: "y" }),
+    }));
+    expect(cross.status).toBe(403);
+
+    const blocked = createPlayerExchange({
+      env: {
+        DISCORD_CLIENT_ID: "123456789012345678",
+        DISCORD_CLIENT_SECRET: "test-secret-value",
+        DISCORD_REDIRECT_URI: "https://example.com/discord",
+      },
+      outDir: out,
+      profile: { async walletIsProfileKey() { return "match"; } },
+    });
+    expect(blocked.ok).toBe(false);
+    if (!blocked.ok) expect(blocked.reason).toMatch(/127\.0\.0\.1/);
+    const disabled = await runPlayerFlowCli(["exchange", "--out", out], { env: {} });
+    expect(disabled.code).toBe(1);
+    expect(disabled.stderr).toMatch(/disabled/);
+    expect(readdirSync(out)).toEqual(["attest.signed.json", "claim.signed.json", "proof.json"]);
+  });
+
+  it("does not write files when the profile does not match", async () => {
+    const player = signer();
+    const profile = signer();
+    const out = mkdtempSync(path.join(tmpdir(), "player-mismatch-"));
+    const fields = playerFields(player.publicKey, profile.publicKey);
+    const proof = discordProofFor(player.publicKey);
+    const claim = buildPlayerClaimDraft(fields);
+    const attestation = buildPlayerAttestationDraft({
+      proof,
+      hub: fields.hub,
+      issuedAt: fields.createdAt,
+      expiresAt: fields.expiresAt,
+      prev: hubUpdateHash(claim!.payload),
+    });
+    const proofPath = path.join(out, "incoming-proof.json");
+    writeFileSync(proofPath, JSON.stringify(proof));
+    const result = await runPlayerFlowCli(
+      [
+        "pack",
+        "--wallet",
+        player.publicKey,
+        "--hub",
+        fields.hub,
+        "--listing-id",
+        fields.listingId,
+        "--profile",
+        profile.publicKey,
+        "--nonce",
+        fields.nonce,
+        "--expires",
+        fields.expiresAt,
+        "--created-at",
+        fields.createdAt,
+        "--claim-signature",
+        signUtf8(player.secret, claim!.message.utf8),
+        "--attest-signature",
+        signUtf8(player.secret, attestation!.message.utf8),
+        "--proof-file",
+        proofPath,
+        "--out",
+        path.join(out, "ready"),
+      ],
+      { profile: { async walletIsProfileKey() { return "mismatch"; } } },
+    );
+    expect(result.code).toBe(1);
+    expect(result.stderr).toMatch(/Nothing was written/);
+    expect(readdirSync(out)).toEqual(["incoming-proof.json"]);
+    const prepare = runPlayerFlowCli([
+      "prepare",
+      "--wallet",
+      player.publicKey,
+      "--hub",
+      "https://github.com/Owner/Repo.git",
+      "--listing-id",
+      fields.listingId,
+      "--profile",
+      profile.publicKey,
+      "--nonce",
+      fields.nonce,
+      "--expires",
+      fields.expiresAt,
+      "--created-at",
+      fields.createdAt,
+    ]);
+    const prepared = await prepare;
+    expect(prepared.code).toBe(0);
+    const drafted = JSON.parse(prepared.stdout) as { message: { utf8: string } };
+    expect(drafted.message.utf8).toBe(buildPlayerClaimDraft({ ...fields, hub: "https://github.com/Owner/Repo.git" })?.message.utf8);
+    expect(prepared.stderr).toMatch(/Nothing was published/);
   });
 });
 

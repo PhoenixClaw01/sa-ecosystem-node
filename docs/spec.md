@@ -33,7 +33,7 @@ flowchart LR
   Q[Moderation queue<br/>planned] -.-> A[Council wallet or Squads<br/>planned]
   A -.-> K[(Solana or z.ink anchor<br/>planned)]
   S[submit_hub_update<br/>planned] -.-> Q
-  B[Self-claim button<br/>planned] -.-> P
+  B["/plain/claim/ collects a signature<br/>and does not publish"] --> P
 ```
 
 Solid lines are live. Dashed lines are planned and are not in this version. The planned list is at the end of this page.
@@ -134,7 +134,7 @@ flowchart TD
   E --> F[The public node is pinned to the commit<br/>and the manifest hash]
   F --> G[list_listings checks the pin,<br/>the signatures, and the threshold]
   G --> H["/plain/ calls list_listings<br/>and shows the row"]
-  X[Self-claim button on /plain/<br/>planned] -.-> H
+  X["/plain/claim/ signed file<br/>a hub editor still commits it"] -.-> D
   Y[submit_hub_update<br/>planned] -.-> D
 ```
 
@@ -243,7 +243,7 @@ Nothing in this section is an MCP tool, a route, or a button in v1.0.0. The type
 | Moderation queue | No queue. An update is public when it is in the pinned commit and the signature checks pass |
 | Council wallet or Squads signature as the approval | Approval is a detached signature from the node's allowlist (`hub/signers.json`), at the configured threshold. Squads in this version is a read-only decode of the two published treasury multisigs |
 | On-chain anchors for update hashes, on Solana mainnet or z.ink | The pin is the git commit plus the manifest sha256. There is no memo and no anchor account |
-| Self-claim button on `/plain/` | A person signs a claim with the `hub-claim` command. A hub editor commits that file. The page has no claim form |
+| Submitting a claim from `/plain/claim/` without a hub editor | `/plain/claim/` collects the wallet signature and does not publish. A hub editor still commits the file. `POST /submit` remains 404 |
 | Weekly pack, embed widget, and a DAO-tier feed for an ATMTA-hosted dashboard | Not built. `/plain/` is the public page |
 | Application form and a roster of approved ecosystems per category | `list_categories` returns ids and `members: "unknown"` |
 | Agent record keys vouched per stack (one PR to a signer-set file), a shown trust level (`single-stack` / `multi-stack`), per-key rate limits, kind-scoped signer sets | Not implemented. Drafted in [protocol/TRUST-ARCHITECTURE.md](../protocol/TRUST-ARCHITECTURE.md) and [protocol/h2h/SPEC.md](../protocol/h2h/SPEC.md) Appendix A (code items C1–C7). No wallet delegation is planned. The author signs with the key that matches `author` |

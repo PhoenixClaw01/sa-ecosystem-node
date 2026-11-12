@@ -68,7 +68,9 @@ These are not hub pins. They have the same meaning on every host:
 | `MAX_REQUEST_BYTES`, `MAX_RESPONSE_BYTES` | Default 524288 (512 KiB) each |
 | `NODE_CONFIG` | Path of the config file. Default `node.config.json` |
 
-`DISCORD_CLIENT_ID`, `DISCORD_CLIENT_SECRET`, and `DISCORD_REDIRECT_URI` belong to the optional operator command `npm run hub-attest`. The public server does not import that module (`src/hub/verifier/discord-oauth.ts`). Leave the secret off the public project. Do not commit it.
+`DISCORD_CLIENT_ID`, `DISCORD_CLIENT_SECRET`, and `DISCORD_REDIRECT_URI` belong to the optional operator commands `npm run hub-attest` and `npm run hub-player`. The public server does not import that module (`src/hub/verifier/discord-oauth.ts`) or the player exchange (`src/hub/player-exchange.ts`). Leave all three unset and a stock node does not change. Leave the secret off the public project. Do not commit it.
+
+`npm run hub-player -- exchange` listens on `127.0.0.1` only, and only when `DISCORD_REDIRECT_URI` is `http://127.0.0.1:<port>/<path>`. An https redirect still works with `hub-attest discord-url` and `discord-code`. It does not start a public listener. The exchange does not publish a hub file and does not read or write `HUB_SIGNER_SETS`. The operator steps are in [claim-and-verify.md](claim-and-verify.md). An agent does not create the Discord application and does not paste the secret.
 
 ## Local HTTP
 

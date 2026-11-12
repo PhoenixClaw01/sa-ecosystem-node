@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <title>Claim a player listing</title>
+  <link rel="icon" href="/plain/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/plain/plain.css">
+  <link rel="stylesheet" href="/plain/claim/claim.css">
+</head>
+<body>
+  <a class="skip" href="#content">Skip to content</a>
+  <header class="page-head">
+    <h1>Claim a player listing</h1>
+    <p class="what">Sign a player claim in your wallet. This page does not publish it.</p>
+  </header>
+  <main id="content">
+    <p><a class="back" href="/plain/">Back to listings</a></p>
+    <p id="claim-status">A hub editor commits the signed file. Discord identify runs on the operator machine, not on this page.</p>
+    <form id="claim-form" action="#content" method="post">
+      <label>Wallet <input id="wallet" name="wallet" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="44"></label>
+      <label>Hub <input id="hub" name="hub" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="200" placeholder="https://github.com/owner/repo"></label>
+      <label>Listing id <input id="listing-id" name="listing-id" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="80"></label>
+      <label>Player profile <input id="profile" name="profile" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="44"></label>
+      <label>Nonce <input id="nonce" name="nonce" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="80"></label>
+      <label>Expires <input id="expires" name="expires" autocomplete="off" spellcheck="false" maxlength="24" placeholder="2027-04-01T00:00:00.000Z"></label>
+      <label>Created <input id="created-at" name="created-at" autocomplete="off" spellcheck="false" maxlength="24" placeholder="2026-10-31T00:00:00.000Z"></label>
+      <label>Show handles <input id="show-handles" name="show-handles" type="checkbox"></label>
+      <button type="button" id="prepare">Prepare the message</button>
+      <button type="button" id="sign-claim" disabled>Sign the claim</button>
+    </form>
+    <h2>Claim message</h2>
+    <pre id="claim-message"></pre>
+    <pre id="claim-file"></pre>
+    <h2>Discord attestation</h2>
+    <p>Load the proof file from the operator exchange. It stays in this browser. It is not uploaded. The raw Discord id is not written into the attestation.</p>
+    <label>Proof file <input id="proof-file" type="file" accept="application/json,.json"></label>
+    <button type="button" id="sign-attestation" disabled>Sign the attestation</button>
+    <pre id="attestation-message"></pre>
+    <pre id="attestation-file"></pre>
+    <p>The Player Profile check runs on the operator machine before these files are ready to commit. This page does not send them.</p>
+  </main>
+  <footer>
+    <p>Unofficial community preview. Inspired by Star Atlas. This page does not move money.</p>
+  </footer>
+  <script type="module" src="/plain/claim/claim.js"></script>
+</body>
+</html>

@@ -30,7 +30,8 @@
     "hub-store-init": "npm run build && node dist/hub/store-init-cli.js",
     "hub-add-update": "npm run build && node dist/hub/add-update-cli.js",
     "hub-claim": "npm run build && node dist/hub/claim-cli.js",
-    "hub-attest": "npm run build && node dist/hub/attest-cli.js"
+    "hub-attest": "npm run build && node dist/hub/attest-cli.js",
+    "hub-player": "npm run build && node dist/hub/player-flow-cli.js"
   },
   "dependencies": {
     "@aephia/atlas-kit": "^0.6.1",

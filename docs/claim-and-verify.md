@@ -103,7 +103,9 @@ Without `--show-handles`, public claim status does not include the raw handle.
 
 A current listing, guild, or search row with an active claim shows the word `claimed` (`dashboard/plain/plain.js`). The page does not add a wallet address for that badge. X and Discord handles are not printed there.
 
-There is no self-claim button on `/plain/`. Signing happens with the claimant's own key (for a player, their wallet), on their own machine, with the commands on this page. A hub editor then commits the file. A button on the page is planned. It is not in v1.0.0.
+`/plain/claim/` collects a player signature in the browser. It prepares the claim message, and, when the player loads a proof file from the operator machine, the attestation message. The player signs each one with their wallet (`signMessage`, not a transaction). The page shows the signed JSON. It does not upload it, it does not call Discord, and it does not publish to the hub. A hub editor still commits the file.
+
+The same files can be built on the operator machine with `npm run hub-player`. Discord identify for that command listens on `127.0.0.1` only. The client secret stays on that machine.
 
 ```mermaid
 flowchart TD
@@ -116,7 +118,7 @@ flowchart TD
   F --> H[claim_status state active]
   G --> H
   H --> I["/plain/ shows the word claimed<br/>on that row"]
-  J[Self-claim button on /plain/<br/>planned] -.-> A
+  K["/plain/claim/ or hub-player<br/>collects the wallet signature<br/>and does not publish"] -.-> A
 ```
 
 ## What `claim_status` returns
@@ -193,11 +195,14 @@ Or `hub.trustedVerifiers` in `node.config.json`. Same shape as `HUB_REVOKED_SIGN
 
 ## Operator: optional Discord verifier
 
-This module is not part of the public server. Leave the variables unset and nothing changes.
+This module is not part of the public server. Leave the variables unset and nothing changes. The public page does not import it.
 
-1. Create a Discord application and a redirect URL on your own machine, such as `http://127.0.0.1:8788/discord`.
-2. Set `DISCORD_CLIENT_ID`, `DISCORD_CLIENT_SECRET`, and `DISCORD_REDIRECT_URI` together. Do not commit the secret.
-3. The authorize URL asks for the `identify` scope only.
+These steps stay with the operator. An agent does not create the Discord application, does not paste the secret, and does not set it on the public host.
+
+1. Create a Discord application. Add a redirect on your own machine, such as `http://127.0.0.1:8788/discord`. Do not add a bot, a webhook, or a send path. The scope this repo requests is `identify` only.
+2. Set `DISCORD_CLIENT_ID`, `DISCORD_CLIENT_SECRET`, and `DISCORD_REDIRECT_URI` together on the operator machine. Leave all three unset on the public project. Do not commit the secret.
+3. Optionally set `HUB_TRUSTED_VERIFIERS` to the verifier public key when a node should show that attestation as `verified`. An empty list is the default. A player-signed attestation stays `self-attested, unverified` until a trusted verifier signs one.
+4. Loopback redirects stay valid. `npm run hub-player -- exchange` listens only when the redirect is `http://127.0.0.1:<port>/<path>`. An `https` redirect still works with `discord-url` and `discord-code`. It does not open a public listener.
 
 ```bash
 npm run hub-attest -- discord-url --wallet <subject> --nonce <nonce>
@@ -206,6 +211,18 @@ npm run hub-attest -- build --proof-file proof.json --wallet <subject> --nonce <
 ```
 
 `discord-url` binds the OAuth state to that wallet and nonce. `discord-code` checks the state matches, then writes a proof file with the verified account id and the salt. `build` refuses to run without that proof file. A raw Discord id is not a public handle. `--show-handle` is ignored for a numeric Discord id. The subject's claim must already have set `showHandles` or the node rejects an attestation that includes a handle.
+
+The player command does the same identify exchange on loopback, then asks the wallet to sign the claim and the attestation. It reads the Player Profile before it writes files. A mismatch or an unfinished read writes nothing.
+
+```bash
+npm run hub-player -- exchange --out ./player-files
+```
+
+Open `http://127.0.0.1:8788/` (the port is the one in `DISCORD_REDIRECT_URI`). The page writes `claim.signed.json`, `attest.signed.json`, and `proof.json` into `--out`. Commit the two signed files with `hub-add-update`. Leave `proof.json` on the operator machine. The command does not publish, and it does not change signer sets.
+
+`attest.signed.json` is signed by the player. It shows as `self-attested, unverified`. Pass `--verifier-key` and `--verifier-id` on the operator machine to also write `attest.verifier.signed.json`. That file is signed by the verifier key. It shows as `verified` only where `HUB_TRUSTED_VERIFIERS` includes that key. The verifier key file stays on the operator machine.
+
+`npm run hub-player -- check --wallet <address> --profile <address>` prints `match`, `mismatch`, or `unavailable` and writes nothing. `pack` takes the two signatures and the proof file and applies the same profile check before it writes.
 
 ## Operator: X posted-code proof
 
@@ -244,7 +261,6 @@ Local verify checks the signature and, with `--hub`, the hub id. The node still 
 
 These are not in v1.0.0. The commands and the `claim_status` tool on this page are built.
 
-- A self-claim button on `/plain/`. The page shows the word `claimed`. It does not collect a wallet signature.
-- A submit route that accepts a claim without a hub editor committing the file. `POST /submit` on the Node server is 404. `submit_hub_update` is not an MCP tool.
+- A submit route that accepts a claim without a hub editor committing the file. `/plain/claim/` collects a signature and does not publish. `POST /submit` on the Node server is 404. `submit_hub_update` is not an MCP tool.
 - An on-chain anchor for a claim. The claim counts when it is in the pinned hub commit and the rules on this page pass.
 - Council or Squads as the countersign authority. Today a countersign is the node's allowlisted approval threshold (`npm run sign-hub-update -- --approve`). The claimant's own signature is not that approval.
