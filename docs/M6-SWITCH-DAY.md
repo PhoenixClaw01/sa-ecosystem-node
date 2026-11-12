@@ -4,6 +4,8 @@ This file is the switch plan. It is not applied. The production node still trust
 
 `claim` in `kinds` counts only when the action is `claim` and the subject is `player`. Revoke and resolve are outside that scope. A wallet can still revoke its own claim.
 
+A set with no `kinds` field, or a missing `kinds` value, is unscoped and counts for every record kind. A scoped set that does not list `signer-change` in its `kinds` cannot be rotated in-chain: a `signer-change` targeting that set is rejected as `untrusted_set`. The planned `player-tools` set is in that position. Rotate its keys only by an env or file change (retroactive — re-check the chain first), or add `signer-change` to that set's `kinds` before it needs a rotation.
+
 ## Exact value
 
 Agents stays unscoped at threshold 2. Player-tools is threshold 1 and limited to `story-optin`, player `claim`, and `reputation-link`.
