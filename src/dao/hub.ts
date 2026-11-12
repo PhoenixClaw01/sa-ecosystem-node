@@ -23,6 +23,7 @@ import {
   selectOptedInWallets,
   type SearchHit,
 } from "../hub/search.js";
+import { reputationLinkConsent, shownReputationLinkHashes } from "../hub/reputation-link.js";
 import { normalizeHubRepo, storyOptInConsent } from "../hub/story-optin.js";
 import { loadPinnedHubStore, type LoadedHubStore } from "../hub/store.js";
 import { createTtlCache } from "../legacy/cache.js";
@@ -164,8 +165,9 @@ export async function readHubUpdates(
     profile: options?.profile,
   });
   const stamped = stampClaimed(selectPublicUpdates(checked.updates, directory.picks), directory);
+  const today = utcDateStamp(options?.now ?? new Date());
   const updates = withLogoSrc(
-    withStoryConsent(kind ? stamped.filter((update) => update.kind === kind) : stamped, hubId),
+    withStoryConsent(kind ? stamped.filter((update) => update.kind === kind) : stamped, hubId, today),
     imagePin(source),
   );
   const rejected = options?.rejectedKind
@@ -203,11 +205,30 @@ function stampClaimed(updates: readonly VerifiedHubUpdate[], directory: ClaimDir
   });
 }
 
-/** Marks each story-optin. Other kinds are unchanged. The check is the player signature against this hub. */
-export function withStoryConsent(updates: readonly VerifiedHubUpdate[], hubId: string): VerifiedHubUpdate[] {
+/**
+ * Marks each story-optin and reputation-link.
+ * Other kinds are unchanged. The check is the player signature against this hub.
+ * `linkShown` is the scope still on display after unlink, the daily cap, and future dates.
+ * `today` is the UTC day. It defaults to the current day.
+ */
+export function withStoryConsent(
+  updates: readonly VerifiedHubUpdate[],
+  hubId: string,
+  today: string = utcDateStamp(new Date()),
+): VerifiedHubUpdate[] {
+  const shown = shownReputationLinkHashes(updates, { hubId, today });
   return updates.map((update) => {
-    if (update.kind !== "story-optin" || !update.storyOptIn) return update;
-    return { ...update, consent: storyOptInConsent(update.storyOptIn, hubId) };
+    if (update.kind === "story-optin" && update.storyOptIn) {
+      return { ...update, consent: storyOptInConsent(update.storyOptIn, hubId) };
+    }
+    if (update.kind === "reputation-link" && update.reputationLink) {
+      return {
+        ...update,
+        consent: reputationLinkConsent(update.reputationLink, hubId),
+        linkShown: shown.has(update.hash),
+      };
+    }
+    return update;
   });
 }
 

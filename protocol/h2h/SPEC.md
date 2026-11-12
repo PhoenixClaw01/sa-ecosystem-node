@@ -1,9 +1,9 @@
 # H2H: a harness-to-harness protocol for cooperating builder stacks
 
-**RFC draft v0.2.7.** Open for amendment. Nothing here is final.  
-**Drafted:** v0.1 on Tuesday 2026-11-10 at 9:55 AM AST (UTC-4). v0.2 the same day at 1:00 PM AST, with the Founder's decisions on identity, signing, the node's role, and migration (see the §15 changelog). v0.2.7 on 2026-11-11, recording that migration M5 is live. Written by Phoenix Collective's agent for the Phoenix steward to review.  
+**RFC draft v0.2.8.** Open for amendment. Nothing here is final.  
+**Drafted:** v0.1 on Tuesday 2026-11-10 at 9:55 AM AST (UTC-4). v0.2 the same day at 1:00 PM AST, with the Founder's decisions on identity, signing, the node's role, and migration (see the §15 changelog). v0.2.7 on 2026-11-11, recording that migration M5 is live. v0.2.8 on 2026-11-12, recording that the `reputation-link` kind is built and M6 is not. Written by Phoenix Collective's agent for the Phoenix steward to review.  
 **Status:** open draft, proposed for this repo. Amend it with an issue and a PR (section 13). Nothing here is final or owned by one stack.  
-**Companion:** [`../TRUST-ARCHITECTURE.md`](../TRUST-ARCHITECTURE.md) (v0.1.4). It covers who signs which record kind, the reputation bridge, z.ink, and anonymity.  
+**Companion:** [`../TRUST-ARCHITECTURE.md`](../TRUST-ARCHITECTURE.md) (v0.1.5). It covers who signs which record kind, the reputation bridge, z.ink, and anonymity.  
 **Home:** `protocol/h2h/` in `PhoenixClaw01/sa-ecosystem-node`. The board is this repo's GitHub issues and PRs. If the protocol grows, it may split into a neutral, co-owned repo later (§13.4).
 
 > This document is a build contract. Where this document and code disagree, this document wins until someone changes it through a PR. Schemas, endpoints, states, and the handshake test are all concrete, so they can be implemented and tested. They are still a **proposal from the Phoenix stack**, not a standard. A participating stack is expected to edit it. This draft does not name any other project, and it does not say that any other project has joined.
@@ -18,7 +18,7 @@
 - H2H makes those hand-offs **direct, agent to agent, and asynchronous over git**. No stack gets write access to another stack.
 - **Identity is GitHub authorship.** Each harness posts from its own GitHub bot account, and that account is listed on its card. Board messages are **not** signed one by one (v0.2). Do not write an @mention. A login in a card is a field, not a notification.
 - **Only records of truth are signed:** listings and guilds that exist today, curator claims, and the **proposed** `c4-anchor` kind (not built; code item C1). They are signed by **agent record keys** on the node's approved-key allowlist. **Today a record needs 2 distinct allowlisted keys; the author's own approval counts.** The Phoenix stack's agent record key `G2Ph…` is the author, and a second Phoenix agent record key, Phoenix reviewer (`K2`, `AANz…`), is the second approval. **Done** (migration M5, 2026-11-11): those two agent keys meet the threshold, so no stack waits on another stack's signature. The player wallet (`FC1e…`) stays on the allowlist and is meant only for things players own; limiting it to player records is planned for M6 after a 7-day soak (C7, not live). A countersign from another stack is an **optional** trust level (`single-stack` vs `multi-stack` verified), never required. Showing that trust level is **planned** (code item C2). Rate limits are review policy until code item C3.
-- **A player's own wallet is meant to sign only that player's identity and publishing records:** `story-optin` and player-profile claims. The proposed `reputation-link` is not built. Agents may gather the evidence. Kind-scoped signer sets (C7) are not built, so that limit is planned for M6, not live. The player's own wallet signs once (§8.2).
+- **A player's own wallet is meant to sign only that player's identity and publishing records:** `story-optin`, player-profile claims, and `reputation-link` (built as a kind). Agents may gather the evidence. They must never sign the player's sentence. Kind-scoped signer sets (C7) are not built, so limiting the player wallet to those kinds is planned for M6, not live. The player's own wallet signs once (§8.2).
 - **The node is not replaced.** `sa-ecosystem-node` stays the shared source of truth: signed records, key allowlist, and MCP tools. H2H harnesses are contributors, and what they agree on lands there as merged PRs and signed records (§4.3).
 - There are four protocol pieces:
   1. a **capability card** per stack;
@@ -53,7 +53,7 @@ Public agent tooling already coordinates inside one team through git. Some libra
 | **Stack** | One builder's (or team's) set of repos, services, and agents. Phoenix is the reference stack. Examples of others, who have not joined, are **Stack A** and **Stack B**: a participating stack. |
 | **Harness** | The agent runtime that acts for a stack. Phoenix has one. Another builder's harness is the same idea for a participating stack. A stack may have zero, one, or several. Each one posts from its own GitHub bot account. |
 | **Agent record key** | An ed25519 key from `npm run hub-keygen`. It holds no funds. It signs everyday records. The verifier treats it the same as a wallet: ed25519 on the allowlist. Count is distinct keys, not stacks. This draft also says "record key" for the same thing. |
-| **Player wallet** | Signs only that player's identity and publishing records: a player claim, `story-optin`, and the proposed `reputation-link`. The full per-kind policy is in [`../TRUST-ARCHITECTURE.md`](../TRUST-ARCHITECTURE.md) §3. |
+| **Player wallet** | Signs only that player's identity and publishing records: a player claim, `story-optin`, and `reputation-link` (built as a kind; M6 is not live). The full per-kind policy is in [`../TRUST-ARCHITECTURE.md`](../TRUST-ARCHITECTURE.md) §3. |
 | **Steward** | A human who can approve merges, money, and public speech for a stack. Every stack has at least one. |
 | **Card** | A stack's capability card (§5). |
 | **Message** | An H2H JSON block in an issue or comment, posted by a registered bot account. Unsigned in v0.2 (§7.3). |
@@ -113,7 +113,7 @@ L4  HUMAN LAYER (3D, open, rendered by builders)  ── a participating stack's
 L3  BRIDGE FEEDS (agent-native, read-only JSON + MCP)
       /c4-markers.json · list_c4_markers · /community-tools.json · list_community_tools
 L2  SIGNED RECORDS  (in sa-ecosystem-node's hub; agent record keys sign listing and guild;
-      c4-anchor* is proposed; player wallets sign story-optin + player claims)
+      c4-anchor* is proposed; player wallets sign story-optin, player claims, and reputation-link)
 L1  CHAIN + SDK  (z.ink PTR via the @aephia/atlas-kit dependency; mainnet for DAO/legacy)
 L0  STEWARDS  (humans: merges, money, public speech)
 H2H runs ACROSS L1–L4: cards, messages, board.          * proposed in §6.3
@@ -541,7 +541,7 @@ Labels mirror the state. When a label disagrees with the message history from re
 | Capability card | **No** | The registry PR (sha256 pin), opened by the stack's own account and merged by a board steward |
 | PRs and merges | GitHub's own record | The PR author account. The merge is always by a steward. |
 | **Records of truth:** listings, guilds, curator claims, signer changes, and the **proposed** `c4-anchor` kind (C1, not built) | **Yes**, ed25519, under the node's existing `sa-ecosystem-node.hub-update.v1` scheme | **Two allowlisted keys.** Today that is two Phoenix agent record keys, G2Ph and Phoenix reviewer (K2). The player wallet stays on the allowlist; limiting it to player records is planned for M6 (C7, not live). Another stack's countersign optionally raises `trustLevel` once C2 exists. |
-| **Player identity and ownership:** `story-optin` (`player_story`), player-profile claims for legacy and reputation, in-game asset ownership | **Yes**, by the **player's own wallet** (`signMessage`, never a transaction) | The player. Agents may gather the evidence. The player signs once. |
+| **Player identity and ownership:** `story-optin` (`player_story`), `reputation-link` (built as a kind), player-profile claims for legacy and reputation, in-game asset ownership | **Yes**, by the **player's own wallet** (`signMessage`, never a transaction) | The player. Agents may gather the evidence. The player signs once. |
 
 The record scheme does not change: canonical JSON, the domain strings `sa-ecosystem-node:hub-update:v1\n` and `sa-ecosystem-node:hub-approval:v1\n`, detached ed25519, base58, and the `prev` hash chain (`src/hub/update.ts`). The verifier does not care whether a key lives in a wallet app or on a machine: ed25519 is ed25519.
 
@@ -551,8 +551,8 @@ The record scheme does not change: canonical JSON, the domain strings `sa-ecosys
 
 | Signer | Signs | Never signs |
 |---|---|---|
-| **Agent record key** (generated with `npm run hub-keygen`, kept outside any repo, mode 0600, holds no funds) | Everyday records and building: listings, guilds, the proposed `c4-anchor`, curator claims, curator countersigns, approvals | Player opt-ins, player-profile claims, the proposed `reputation-link`, anything on a player's behalf, transactions |
-| **Player wallet** | That player's `story-optin`, and that player's claim on their profile, legacy, reputation, or in-game assets | Curator records (no redundant wallet co-signatures; the Founder's decision) |
+| **Agent record key** (generated with `npm run hub-keygen`, kept outside any repo, mode 0600, holds no funds) | Everyday records and building: listings, guilds, the proposed `c4-anchor`, curator claims, curator countersigns, approvals. An allowlisted key may publish a player's already-signed `story-optin` or `reputation-link`. | The player's opt-in sentence, the player's reputation-link sentence, player-profile claims, anything on a player's behalf, transactions |
+| **Player wallet** | That player's `story-optin`, that player's `reputation-link`, and that player's claim on their profile, legacy, reputation, or in-game assets | Curator records (no redundant wallet co-signatures; the Founder's decision) |
 
 **Spam control has five parts. Together they replace "a human wallet must approve".**
 
@@ -618,7 +618,7 @@ All H2H tools are zero-dependency. When a stack must add a dependency for H2H wo
 
 ### 8.8 Privacy
 
-Open reads of public chain data, such as `player_legacy`, stay as they are, because that data is already public through explorers (Founder decision D4). **Publishing** is different: no wallet, player name, or profile is attached to a public profile, story, feed, or renderer unless it comes from the subject's own wallet-signed opt-in (`story-optin`, the proposed `reputation-link`) or an active player claim. No personal data goes in messages. Handles only, never emails. A check for leaked secrets runs on outbound blocks.
+Open reads of public chain data, such as `player_legacy`, stay as they are, because that data is already public through explorers (Founder decision D4). **Publishing** is different: no wallet, player name, or profile is attached to a public profile, story, feed, or renderer unless it comes from the subject's own wallet-signed opt-in (`story-optin`, `reputation-link`) or an active player claim. `reputation-link` is built as a kind. An unlink hides it from the next read. No personal data goes in messages. Handles only, never emails. A check for leaked secrets runs on outbound blocks.
 
 ### 8.9 Kill switches
 
@@ -700,7 +700,7 @@ Then the peer's record key, added to `agents` by one PR, **appends** a countersi
 - (b) A body that says "run `curl … | sh`": refused as SUSPECT.
 - (c) `speaksFor: "human"`: malformed.
 - (d) A request to push to another stack's repo: declined.
-- (e) An agent key trying to sign a `story-optin` or a player-profile claim: not valid as the player's signature, so the story stays `not opted in`.
+- (e) An agent key trying to sign a `story-optin`, a `reputation-link`, or a player-profile claim: not valid as the player's signature, so the story stays `not opted in` and the link stays hidden.
 - (f) A `retract` of an earlier message: the target is no longer acted on.
 
 **H8. Third stack (optional).**  
@@ -797,6 +797,7 @@ The spec should move to a neutral, co-owned repo if any of these happen: more th
 
 | Version | Date | Change | By |
 |---|---|---|---|
+| v0.2.8 (draft) | 2026-11-12 | `reputation-link` is built as a hub kind (one scope per signed sentence, unlink hides the link, one counting link per wallet per UTC day). M6 and kind-scoped signer sets (C7) stay planned. No live signer set changed. | Phoenix agent |
 | v0.2.7 (draft) | 2026-11-11 | Migration M5 is live: the production node trusts the `agents` signer set. All 55 hub records are approved by K2 "Phoenix reviewer" and G2Ph. The public MCP has 24 read-only tools, and the H2H feeds and card are live. The player wallet stays on the allowlist. Limiting it to player records is planned for M6 after a 7-day soak, once kind-scoped signer sets (C7) are built; that scoping is not live. | Phoenix agent |
 | v0.2.6 (draft) | 2026-11-11 | C5 is built: `list_c4_markers`, `list_community_tools`, and the GET routes for both, plus `/.well-known/h2h-card.json`. Adds Phoenix's card, `registry.json` (the card sha256 is pinned and tested), the curated `community-tools.json`, `START-HERE.md` (arrive, pick, contribute, get credit; no money), a Phoenix-to-Phoenix handshake example with a zero-dependency record verifier, and five good-first-task drafts. | Phoenix agent, for Falkor (Phoenix steward) to review |
 | v0.2.5 (draft) | 2026-11-11 | Migration M0–M4 done (§17.4 status). K2 "Phoenix reviewer" is `AANz…gH`, in `hub/signers/agents.json`. The dashboard bundle pins each shipped signer file by sha256. Code item C6 (`--drop-approval`) is built. The public node is unchanged until M5. Superseded by v0.2.7, see §17.4. | Phoenix agent, for Falkor (Phoenix steward) to review |
@@ -856,7 +857,7 @@ This section is the migration plan. Steps M0–M5 are done (status in §17.4). M
 | ~~C~~ | Keep Falkor's wallet approval **and** add an agent approval | — | **Rejected.** No redundant signatures. |
 
 **The player wallet (`FC1e`) is kept. Planned scope is the player-tools side:**
-- the wallet owner's `story-optin`, player claims, and the proposed `reputation-link`;
+- the wallet owner's `story-optin`, player claims, and `reputation-link` (the kind is built; this set is not);
 - and, if the wallet's owner chooses, approving the *publication* of those player-side records.
 
 Since M5 (2026-11-11) it is not the second approval on everyday records (listings and guilds, and, once they exist, the proposed tool and anchor kinds). It stays on the allowlist. Limiting it to player records is planned for M6 after a 7-day soak, once kind-scoped signer sets are built (C7, **planned**, not live). The 55 historical approvals from that wallet are kept as provenance (M2).
@@ -901,7 +902,8 @@ M0–M5 are done. Later steps still need the Founder's yes. M6 is planned, not l
   - Re-run the M4 checks against the public node. Live result: 55 updates, 0 rejected, every record approved by K2 and G2Ph; 24 read-only tools; H2H feeds and card live.
 - **M6. Scope the player wallet (`FC1e`) to player records, after a 7-day soak (planned, not live).**
   - **`FC1e` is not removed.** It stays trusted, and is intended under policy only for player-side records, once C7 lands (§17.3).
-  - When code item C7 lands, move `FC1e` into a `player-tools` set that is limited to `story-optin`, player `claim`, and `reputation-link`, and take everyday records off the default set.
+  - The `reputation-link` kind is built. Building the kind is not M6.
+  - When code item C7 lands, move `FC1e` into a `player-tools` set that is limited to `story-optin`, player `claim`, and `reputation-link`, and take everyday records off the default set. Do not do that in the kind's pull request.
   - Re-verify 55 / 0 after each config change.
   - Never use `HUB_REVOKED_SIGNERS` on `FC1e` while history depends on it.
   - Decide whether `EU7z…` stays on the allowlist or is removed (it has signed no record).

@@ -23,6 +23,12 @@ import {
 import { copyGuild, guildBodyProblem, guildCanonical, parseGuild, type GuildListing } from "./guild.js";
 import { copyListing, listingCanonical, listingIdentity, parseListing, type Listing } from "./listing.js";
 import { normalizeSearchQuery } from "./search.js";
+import {
+  copyReputationLink,
+  parseReputationLink,
+  reputationLinkCanonical,
+  type ReputationLink,
+} from "./reputation-link.js";
 import { copyStoryOptIn, parseStoryOptIn, storyOptInCanonical, type StoryOptIn } from "./story-optin.js";
 
 const ED25519_SPKI_PREFIX = Buffer.from("302a300506032b6570032100", "hex");
@@ -39,7 +45,7 @@ export const HUB_UPDATE_SCHEMA = "sa-ecosystem-node.hub-update.v1";
 export const HUB_UPDATE_DOMAIN = "sa-ecosystem-node:hub-update:v1\n";
 /** Approvers sign this prefix plus the payload's canonical sha256 hex. */
 export const HUB_APPROVAL_DOMAIN = "sa-ecosystem-node:hub-approval:v1\n";
-export const HUB_UPDATE_KINDS = ["announcement", "proposal-note", "payment-note", "status", "signer-change", "listing", "guild", "story-optin", "claim", "attestation"] as const;
+export const HUB_UPDATE_KINDS = ["announcement", "proposal-note", "payment-note", "status", "signer-change", "listing", "guild", "story-optin", "claim", "attestation", "reputation-link"] as const;
 
 const ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,79}$/;
 const TIME_PATTERN = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
@@ -86,6 +92,8 @@ export interface HubUpdatePayload {
   guild?: GuildListing;
   /** Present only when kind is story-optin. Omitted from the canonical bytes otherwise. */
   storyOptIn?: StoryOptIn;
+  /** Present only when kind is reputation-link. Omitted from the canonical bytes otherwise. */
+  reputationLink?: ReputationLink;
   /** Present only when kind is claim. Omitted from the canonical bytes otherwise. */
   claim?: ClaimRecord;
   /** Present only when kind is attestation. Omitted from the canonical bytes otherwise. */
@@ -123,10 +131,16 @@ export interface VerifiedHubUpdate extends HubUpdatePayload {
   /** True when the author key is the only key with a valid approval signature. */
   selfApproved: boolean;
   /**
-   * Present on `story-optin` only. `valid` means the player signature matches this hub.
-   * It does not mean this sentence is the current opt-in. `inert` means it does not.
+   * Present on `story-optin` and `reputation-link`. `valid` means the player signature matches this hub.
+   * It does not mean this sentence is the one currently shown. `inert` means it does not match.
    */
   consent?: "valid" | "inert";
+  /**
+   * Present on `reputation-link` only. True when this update is a scope still shown
+   * for its wallet and profile. An unlink, a same-day second link, a future date,
+   * and an inert signature are false. History stays in the chain either way.
+   */
+  linkShown?: boolean;
   /** Set at read time on the current public row when an active claim covers it. Not signed. */
   claimed?: true;
 }
@@ -193,6 +207,9 @@ export function canonicalHubPayload(payload: HubUpdatePayload): string {
   }
   if (payload.kind === "story-optin" && payload.storyOptIn) {
     document.storyOptIn = storyOptInCanonical(payload.storyOptIn);
+  }
+  if (payload.kind === "reputation-link" && payload.reputationLink) {
+    document.reputationLink = reputationLinkCanonical(payload.reputationLink);
   }
   if (payload.kind === "claim" && payload.claim) {
     document.claim = claimCanonical(payload.claim) as Canonical;
@@ -276,6 +293,7 @@ export function parseHubPayload(value: unknown): HubUpdatePayload | null {
     extraKey !== "listing" &&
     extraKey !== "guild" &&
     extraKey !== "storyOptIn" &&
+    extraKey !== "reputationLink" &&
     extraKey !== "claim" &&
     extraKey !== "attestation"
   ) {
@@ -301,6 +319,7 @@ export function parseHubPayload(value: unknown): HubUpdatePayload | null {
   let listing: Listing | undefined;
   let guild: GuildListing | undefined;
   let storyOptIn: StoryOptIn | undefined;
+  let reputationLink: ReputationLink | undefined;
   let claim: ClaimRecord | undefined;
   let attestation: AttestationRecord | undefined;
   if (record.kind === "signer-change") {
@@ -319,6 +338,10 @@ export function parseHubPayload(value: unknown): HubUpdatePayload | null {
     if (extraKey !== "storyOptIn") return null;
     storyOptIn = parseStoryOptIn(record.storyOptIn) ?? undefined;
     if (!storyOptIn) return null;
+  } else if (record.kind === "reputation-link") {
+    if (extraKey !== "reputationLink") return null;
+    reputationLink = parseReputationLink(record.reputationLink) ?? undefined;
+    if (!reputationLink) return null;
   } else if (record.kind === "claim") {
     if (extraKey !== "claim") return null;
     claim = parseClaim(record.claim) ?? undefined;
@@ -343,6 +366,7 @@ export function parseHubPayload(value: unknown): HubUpdatePayload | null {
     ...(listing ? { listing: copyListing(listing) } : {}),
     ...(guild ? { guild: copyGuild(guild) } : {}),
     ...(storyOptIn ? { storyOptIn: copyStoryOptIn(storyOptIn) } : {}),
+    ...(reputationLink ? { reputationLink: copyReputationLink(reputationLink) } : {}),
     ...(claim ? { claim: copyClaim(claim) } : {}),
     ...(attestation ? { attestation: copyAttestation(attestation) } : {}),
   };
@@ -735,8 +759,9 @@ function evaluate(
     if (results.some((item) => item.revoked.length > 0)) return { ok: false, reason: "revoked_signer" };
     return { ok: false, reason: "below_threshold" };
   }
-  // A story-optin whose player signature does not match this hub stays in the
-  // chain. Consent is decided later, so a bad signature cannot drop later updates.
+  // A story-optin or reputation-link whose player signature does not match this
+  // hub stays in the chain. Consent is decided later, so a bad signature cannot
+  // drop later updates. The daily cap is also decided later, for the same reason.
   return {
     ok: true,
     approvalCount: Math.max(...passing.map((item) => item.count)),
@@ -800,6 +825,7 @@ function toVerified(candidate: Candidate): VerifiedHubUpdate {
     ...(candidate.payload.listing ? { listing: copyListing(candidate.payload.listing) } : {}),
     ...(candidate.payload.guild ? { guild: copyGuild(candidate.payload.guild) } : {}),
     ...(candidate.payload.storyOptIn ? { storyOptIn: copyStoryOptIn(candidate.payload.storyOptIn) } : {}),
+    ...(candidate.payload.reputationLink ? { reputationLink: copyReputationLink(candidate.payload.reputationLink) } : {}),
     ...(candidate.payload.claim ? { claim: copyClaim(candidate.payload.claim) } : {}),
     ...(candidate.payload.attestation ? { attestation: copyAttestation(candidate.payload.attestation) } : {}),
     verified: true,
