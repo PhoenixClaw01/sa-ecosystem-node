@@ -1,6 +1,7 @@
-import { createHash, createPublicKey, verify as cryptoVerify } from "node:crypto";
+import { createHash } from "node:crypto";
 
 import { base58Decode } from "./base58.js";
+import { verifyEd25519Detached } from "./ed25519-verify.js";
 import {
   attestationCanonical,
   copyAttestation,
@@ -31,8 +32,6 @@ import {
 } from "./reputation-link.js";
 import { copyStoryOptIn, parseStoryOptIn, storyOptInCanonical, type StoryOptIn } from "./story-optin.js";
 
-const ED25519_SPKI_PREFIX = Buffer.from("302a300506032b6570032100", "hex");
-const ED25519_PUBLIC_KEY_LENGTH = 32;
 const ED25519_SIGNATURE_LENGTH = 64;
 
 /**
@@ -403,7 +402,7 @@ export function parseSignedHubDocument(value: unknown): SignedHubDocument | null
 
 export function authorSignatureValid(payload: HubUpdatePayload, signature: string): boolean {
   try {
-    return verifyDetached(hubUpdateSigningMessage(payload), base58Decode(signature), base58Decode(payload.author));
+    return verifyEd25519Detached(hubUpdateSigningMessage(payload), base58Decode(signature), base58Decode(payload.author));
   } catch {
     return false;
   }
@@ -411,22 +410,7 @@ export function authorSignatureValid(payload: HubUpdatePayload, signature: strin
 
 export function approvalSignatureValid(payload: HubUpdatePayload, publicKey: string, signature: string): boolean {
   try {
-    return verifyDetached(hubApprovalSigningMessage(payload), base58Decode(signature), base58Decode(publicKey));
-  } catch {
-    return false;
-  }
-}
-
-function verifyDetached(message: Uint8Array, signature: Uint8Array, publicKey: Uint8Array): boolean {
-  if (publicKey.length !== ED25519_PUBLIC_KEY_LENGTH) return false;
-  if (signature.length !== ED25519_SIGNATURE_LENGTH) return false;
-  try {
-    const key = createPublicKey({
-      key: Buffer.concat([ED25519_SPKI_PREFIX, Buffer.from(publicKey)]),
-      format: "der",
-      type: "spki",
-    });
-    return cryptoVerify(null, message, key, signature);
+    return verifyEd25519Detached(hubApprovalSigningMessage(payload), base58Decode(signature), base58Decode(publicKey));
   } catch {
     return false;
   }
@@ -585,7 +569,7 @@ function classifyApprovals(
     } catch {
       continue;
     }
-    if (!verifyDetached(message, signature, publicKey)) continue;
+    if (!verifyEd25519Detached(message, signature, publicKey)) continue;
     if (revoked.has(approval.publicKey)) revokedKeys.push(approval.publicKey);
     else counted.push(approval.publicKey);
   }
@@ -606,7 +590,7 @@ function authorIsOnlyApprover(payload: HubUpdatePayload, approvals: readonly Hub
     } catch {
       continue;
     }
-    if (!verifyDetached(message, signature, publicKey)) continue;
+    if (!verifyEd25519Detached(message, signature, publicKey)) continue;
     keys.push(approval.publicKey);
   }
   return keys.length === 1 && keys[0] === payload.author;
@@ -641,7 +625,7 @@ function walletsThatSigned(payload: HubUpdatePayload, approvals: readonly HubApp
     } catch {
       continue;
     }
-    if (!verifyDetached(message, signature, publicKey)) continue;
+    if (!verifyEd25519Detached(message, signature, publicKey)) continue;
     keys.add(approval.publicKey);
   }
   return [...keys].sort();

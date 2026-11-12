@@ -24711,12 +24711,71 @@ function isProofMethod(value) {
 }
 
 // src/hub/update.ts
-import { createHash, createPublicKey as createPublicKey3, verify as cryptoVerify3 } from "node:crypto";
+import { createHash } from "node:crypto";
+
+// src/hub/ed25519-verify.ts
+import { createPublicKey, verify as cryptoVerify } from "node:crypto";
+var ED25519_SPKI_PREFIX = Buffer.from("302a300506032b6570032100", "hex");
+var FIELD_PRIME = (1n << 255n) - 19n;
+var GROUP_ORDER = (1n << 252n) + 27742317777372353535851937790883648493n;
+var SMALL_ORDER_Y = [
+  "0000000000000000000000000000000000000000000000000000000000000000",
+  "0100000000000000000000000000000000000000000000000000000000000000",
+  "26e8958fc2b227b045c3f489f2ef98f0d5dfac05d3c63339b13802886d53fc05",
+  "c7176a703d4dd84fba3c0b760d10670f2a2053fa2c39ccc64ec7fd7792ac037a",
+  "ecffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f",
+  "edffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f",
+  "eeffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f"
+].map((hex) => Buffer.from(hex, "hex"));
+function readLittleEndian(bytes) {
+  let value = 0n;
+  for (let index = 0; index < bytes.length; index += 1) {
+    value |= BigInt(bytes[index] ?? 0) << 8n * BigInt(index);
+  }
+  return value;
+}
+function isCanonicalEd25519Point(point) {
+  if (point.length !== 32) return false;
+  return (readLittleEndian(point) & (1n << 255n) - 1n) < FIELD_PRIME;
+}
+function isSmallOrderEd25519Point(point) {
+  if (point.length !== 32) return false;
+  const last = (point[31] ?? 0) & 127;
+  for (const candidate of SMALL_ORDER_Y) {
+    if (candidate[31] !== last) continue;
+    let matches = true;
+    for (let index = 0; index < 31; index += 1) {
+      if (point[index] !== candidate[index]) {
+        matches = false;
+        break;
+      }
+    }
+    if (matches) return true;
+  }
+  return false;
+}
+function pointAccepted(point) {
+  return isCanonicalEd25519Point(point) && !isSmallOrderEd25519Point(point);
+}
+function verifyEd25519Detached(message, signature, publicKey) {
+  if (publicKey.length !== 32 || signature.length !== 64) return false;
+  if (!pointAccepted(publicKey)) return false;
+  if (!pointAccepted(signature.subarray(0, 32))) return false;
+  if (readLittleEndian(signature.subarray(32)) >= GROUP_ORDER) return false;
+  try {
+    const key = createPublicKey({
+      key: Buffer.concat([ED25519_SPKI_PREFIX, Buffer.from(publicKey)]),
+      format: "der",
+      type: "spki"
+    });
+    return cryptoVerify(null, message, key, signature);
+  } catch {
+    return false;
+  }
+}
 
 // src/hub/story-optin.ts
-import { createPublicKey, verify as cryptoVerify } from "node:crypto";
 import { isIP as isIP2 } from "node:net";
-var ED25519_SPKI_PREFIX = Buffer.from("302a300506032b6570032100", "hex");
 var DATE_PATTERN2 = /^\d{4}-\d{2}-\d{2}$/;
 var ADDRESS_PATTERN = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
 var HUB_ID_PATTERN = /^https:\/\/[a-z0-9](?:[a-z0-9.-]*[a-z0-9])?(?::[0-9]{1,5})?(?:\/[a-z0-9._-]+)+$/;
@@ -24819,17 +24878,7 @@ function verifyMessage(message, opt) {
   } catch {
     return false;
   }
-  if (publicKey.length !== 32 || signature.length !== 64) return false;
-  try {
-    const key = createPublicKey({
-      key: Buffer.concat([ED25519_SPKI_PREFIX, Buffer.from(publicKey)]),
-      format: "der",
-      type: "spki"
-    });
-    return cryptoVerify(null, new TextEncoder().encode(message), key, signature);
-  } catch {
-    return false;
-  }
+  return verifyEd25519Detached(new TextEncoder().encode(message), signature, publicKey);
 }
 var RESERVED_HOST_SUFFIXES = ["local", "internal", "home.arpa", "lan", "localdomain", "test", "example", "invalid", "localhost"];
 function blockedHubHost(host) {
@@ -27197,8 +27246,6 @@ function validAddress2(value) {
 }
 
 // src/hub/reputation-link.ts
-import { createPublicKey as createPublicKey2, verify as cryptoVerify2 } from "node:crypto";
-var ED25519_SPKI_PREFIX2 = Buffer.from("302a300506032b6570032100", "hex");
 var DATE_PATTERN3 = /^\d{4}-\d{2}-\d{2}$/;
 var ADDRESS_PATTERN5 = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
 var HUB_ID_PATTERN2 = /^https:\/\/[a-z0-9](?:[a-z0-9.-]*[a-z0-9])?(?::[0-9]{1,5})?(?:\/[a-z0-9._-]+)+$/;
@@ -27343,17 +27390,7 @@ function verifyMessage2(message, link) {
   } catch {
     return false;
   }
-  if (publicKey.length !== 32 || signature.length !== 64) return false;
-  try {
-    const key = createPublicKey2({
-      key: Buffer.concat([ED25519_SPKI_PREFIX2, Buffer.from(publicKey)]),
-      format: "der",
-      type: "spki"
-    });
-    return cryptoVerify2(null, new TextEncoder().encode(message), key, signature);
-  } catch {
-    return false;
-  }
+  return verifyEd25519Detached(new TextEncoder().encode(message), signature, publicKey);
 }
 function validWallet2(value) {
   if (!ADDRESS_PATTERN5.test(value)) return false;
@@ -27386,8 +27423,6 @@ function validDate2(value) {
 }
 
 // src/hub/update.ts
-var ED25519_SPKI_PREFIX3 = Buffer.from("302a300506032b6570032100", "hex");
-var ED25519_PUBLIC_KEY_LENGTH = 32;
 var ED25519_SIGNATURE_LENGTH = 64;
 var HUB_UPDATE_SCHEMA = "sa-ecosystem-node.hub-update.v1";
 var HUB_UPDATE_DOMAIN = "sa-ecosystem-node:hub-update:v1\n";
@@ -27609,21 +27644,7 @@ function parseSignedHubDocument(value) {
 }
 function authorSignatureValid(payload, signature) {
   try {
-    return verifyDetached(hubUpdateSigningMessage(payload), base58Decode(signature), base58Decode(payload.author));
-  } catch {
-    return false;
-  }
-}
-function verifyDetached(message, signature, publicKey) {
-  if (publicKey.length !== ED25519_PUBLIC_KEY_LENGTH) return false;
-  if (signature.length !== ED25519_SIGNATURE_LENGTH) return false;
-  try {
-    const key = createPublicKey3({
-      key: Buffer.concat([ED25519_SPKI_PREFIX3, Buffer.from(publicKey)]),
-      format: "der",
-      type: "spki"
-    });
-    return cryptoVerify3(null, message, key, signature);
+    return verifyEd25519Detached(hubUpdateSigningMessage(payload), base58Decode(signature), base58Decode(payload.author));
   } catch {
     return false;
   }
@@ -27699,7 +27720,7 @@ function classifyApprovals(payload, approvals, allowlist, excludeAuthor, revoked
     } catch {
       continue;
     }
-    if (!verifyDetached(message, signature, publicKey)) continue;
+    if (!verifyEd25519Detached(message, signature, publicKey)) continue;
     if (revoked.has(approval.publicKey)) revokedKeys.push(approval.publicKey);
     else counted.push(approval.publicKey);
   }
@@ -27718,7 +27739,7 @@ function authorIsOnlyApprover(payload, approvals) {
     } catch {
       continue;
     }
-    if (!verifyDetached(message, signature, publicKey)) continue;
+    if (!verifyEd25519Detached(message, signature, publicKey)) continue;
     keys.push(approval.publicKey);
   }
   return keys.length === 1 && keys[0] === payload.author;
@@ -27747,7 +27768,7 @@ function walletsThatSigned(payload, approvals) {
     } catch {
       continue;
     }
-    if (!verifyDetached(message, signature, publicKey)) continue;
+    if (!verifyEd25519Detached(message, signature, publicKey)) continue;
     keys.add(approval.publicKey);
   }
   return [...keys].sort();

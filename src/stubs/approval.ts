@@ -1,5 +1,4 @@
-import nacl from "tweetnacl";
-
+import { verifyEd25519Detached } from "../hub/ed25519-verify.js";
 import type { HubUpdateSubmission } from "./hub-update.js";
 
 /**
@@ -53,11 +52,5 @@ export function verifyEd25519Signature(input: {
   signature: Uint8Array;
   publicKey: Uint8Array;
 }): boolean {
-  if (input.publicKey.length !== nacl.sign.publicKeyLength) return false;
-  if (input.signature.length !== nacl.sign.signatureLength) return false;
-  try {
-    return nacl.sign.detached.verify(input.message, input.signature, input.publicKey);
-  } catch {
-    return false;
-  }
+  return verifyEd25519Detached(input.message, input.signature, input.publicKey);
 }
