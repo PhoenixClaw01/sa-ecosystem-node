@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <title>MCP Playground</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/playground/playground.css">
+</head>
+<body>
+  <nav class="topbar" aria-label="Playground sections">
+    <div class="brand"><span class="brand-mark" aria-hidden="true">▲</span><span>MCP Playground</span><span class="badge">READ-ONLY</span></div>
+    <div class="tabs">
+      <a href="#tools" class="tab">Tools</a>
+      <a href="#records" class="tab">Signed records</a>
+      <a href="#treasury" class="tab">Treasury</a>
+      <a href="#connect" class="tab">Connect your agent</a>
+      <a href="/" class="tab">Home</a>
+    </div>
+  </nav>
+
+  <header class="page-head">
+    <h1>MCP Playground</h1>
+    <p class="lede">Every tool this node serves, called live from your browser against this same site. All tools here only read. Nothing on this page signs, claims, pays, or changes anything.</p>
+    <div id="pg-status" class="banner" aria-live="polite">Connecting to the MCP…</div>
+  </header>
+
+  <main>
+    <section id="tools" class="view">
+      <div class="view-head">
+        <h2>Tools</h2>
+        <p class="hint">The list comes from <span class="mono">tools/list</span>. Each form is built from that tool's input schema. Run sends one <span class="mono">tools/call</span>. The plain-English notes only restate what the reply says. The raw JSON is beside them.</p>
+      </div>
+      <div id="pg-tools" class="pg-tools"><p class="hint">Loading tools…</p></div>
+    </section>
+
+    <section id="records" class="view">
+      <div class="view-head">
+        <h2>Signed records</h2>
+        <p class="hint">Load the signed hub records from <span class="mono">hub_updates</span>, pick one, and check its ed25519 signature in this browser. The page rebuilds the signed bytes, confirms they hash to the record's hash, and refuses small-order and non-canonical keys before it verifies. Turn on tamper to flip one byte and watch the check fail. This checks the author signature only, not the node's allowlist or approval count.</p>
+      </div>
+      <div class="card-like note-card">
+        <div class="pg-row">
+          <button type="button" id="pg-records-load" class="pg-button">Load signed records</button>
+          <label for="pg-record-pick" class="pg-inline">Record</label>
+          <select id="pg-record-pick" disabled></select>
+        </div>
+        <p id="pg-records-status" class="hint" aria-live="polite">Nothing loaded yet.</p>
+        <div class="pg-row">
+          <button type="button" id="pg-verify" class="pg-button" disabled>Verify this signature</button>
+          <label class="usd-toggle"><input type="checkbox" id="pg-tamper"> Tamper: flip one byte of the signed bytes first</label>
+        </div>
+        <div id="pg-verdict" aria-live="polite"></div>
+        <details class="pg-detail">
+          <summary>Record JSON</summary>
+          <pre id="pg-record-detail" class="mcp-record pg-raw"></pre>
+        </details>
+      </div>
+    </section>
+
+    <section id="treasury" class="view">
+      <div class="view-head">
+        <h2>Treasury and Ecosystem Fund</h2>
+        <p class="hint">Read live from <span class="mono">treasury_balances</span> and <span class="mono">ecofund_limit</span> on every load. If a read fails, a cached figure is standing in for the live read, or a figure is missing, the panel says Data unavailable and shows no number.</p>
+        <button type="button" id="pg-treasury-refresh" class="pg-button">Read again</button>
+      </div>
+      <div id="pg-treasury" class="chain-host" aria-live="polite"><p class="hint">Waiting for the tool list…</p></div>
+    </section>
+
+    <section id="connect" class="view">
+      <div class="view-head">
+        <h2>Connect your agent</h2>
+        <p class="hint">Public, read-only, no API key. The address below is this site's own <span class="mono">/mcp</span> route (Streamable HTTP).</p>
+      </div>
+      <div class="card-like note-card">
+        <p>Endpoint: <span id="pg-connect-url" class="mono mcp-url">/mcp</span></p>
+        <h3 class="sub-head">MCP client config</h3>
+        <pre id="pg-connect-config" class="mcp-record"></pre>
+        <h3 class="sub-head">Try it from a terminal</h3>
+        <pre id="pg-connect-curl" class="mcp-record"></pre>
+        <p>H2H card: <a id="pg-card-link" href="/.well-known/h2h-card.json">/.well-known/h2h-card.json</a></p>
+        <p class="hint">This node only reads. An agent that also signs SAGE C4 transactions needs its own signer. One option is <a href="https://github.com/ttdonovan/sa-forge-signer" rel="noopener noreferrer">sa-forge-signer</a> by ttdonovan (<a href="https://ttdonovan.github.io/sa-forge-signer/llms.txt" rel="noopener noreferrer">llms.txt</a>): unofficial and self-hosted; review its <a href="https://ttdonovan.github.io/sa-forge-signer/security.html" rel="noopener noreferrer">security chapter</a> before use.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Unofficial community preview. Inspired by Star Atlas. This page does not move money. A missing or failed figure says Data unavailable and shows no number.</p>
+  </footer>
+  <script type="module" src="/playground/boot.js"></script>
+</body>
+</html>

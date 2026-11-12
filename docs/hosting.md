@@ -34,7 +34,6 @@ Names and meanings. The public values are the ones set on `sa-ecosystem-node-das
 
 | Name | Meaning | On the public node |
 |---|---|---|
-| `PUBLIC_HOME` | Read by `dashboard/middleware.js` only. The value `plain` answers `/` and `/index.html` with 302 to `/plain/`. Any other value, including unset, serves the file at that path. The MCP server does not read this variable. `GET /` on `npm start` stays the status document | `plain` |
 | `HUB_GIT_REPO` | Public `https` git URL, no username, password, query, or hash. An absolute local path is accepted for a test on your own machine | `https://github.com/PhoenixClaw01/sa-ecosystem-hub` |
 | `HUB_GIT_COMMIT` | Full 40-character lowercase hex commit. The node refuses the hub read if checkout is not this commit | `f064f18db1da60c4f3e562d4064c8f344042e97e` (the commit in live hub-relative logo URLs that day) |
 | `HUB_STORE_MANIFEST` | Path of the manifest inside the commit. Unset reads `hub-manifest.json`, then `manifest.json` only if the first file is missing. Set, it selects that one path | Unset in the example. The public pin matches `hub-manifest.json` at the commit above |
@@ -123,13 +122,13 @@ The process is still read-only: unknown paths return 404, the body cap is `maxRe
 
 The live public node is project `sa-ecosystem-node-dashboard`. It is separate from the DAO Council preview. Root Directory is `dashboard`. Production branch is `main`. The install command is empty. The function is the committed bundle `dashboard/api/mcp.js` (`npm run build:dashboard-mcp`). `dashboard/vercel.json` includes `hub/signers.json` with the function. That file is a byte-for-byte copy of the repository `hub/signers.json`. The build embeds that file's sha256 in the bundle. The function hashes the allowlist it loads and refuses a mismatch, which is the check that runs when only the bundled copy is on disk. `dashboard/vercel.json` and the root `vercel.json` set `TRUST_PROXY=1` because Vercel overwrites `X-Forwarded-For`. The rate limiter on that function is in memory on each instance. The function has no `git` binary. A pinned hub whose `HUB_GIT_REPO` is a public `github.com` URL is downloaded at `HUB_GIT_COMMIT` over HTTPS. Any other git host still needs `git`, which the Docker image has.
 
-`PUBLIC_HOME=plain` on that project redirects `/` and `/index.html` to `/plain/` with status 302. `/plain/` is the indexable reading page. MCP is `https://sa-ecosystem-node-dashboard.vercel.app/api/mcp`. Discovery is `https://sa-ecosystem-node-dashboard.vercel.app/.well-known/mcp.json`. The function `maxDuration` is 25 seconds. Each MCP request stops at 20 seconds so the client gets a clean timeout. Node.js for the dashboard package is 22.
+`/` on that project is the DAO dashboard front page. `/playground/` is the live MCP Playground. `/plain/` is the indexable reading page. MCP is `https://sa-ecosystem-node-dashboard.vercel.app/api/mcp`. Discovery is `https://sa-ecosystem-node-dashboard.vercel.app/.well-known/mcp.json`. The function `maxDuration` is 25 seconds. Each MCP request stops at 20 seconds so the client gets a clean timeout. Node.js for the dashboard package is 22.
 
 Someone else can deploy their own copy of that same dashboard project:
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/PhoenixClaw01/sa-ecosystem-node&root-directory=dashboard)
 
-A copy does not inherit the public project's environment. Set `PUBLIC_HOME` and the `HUB_*` variables yourself if you want the same home page and the same hub pin.
+A copy does not inherit the public project's environment. Set the `HUB_*` variables yourself if you want the same hub pin.
 
 A repo-root Vercel project still uses `api/mcp.ts` and the root `vercel.json` rewrite of `/mcp`. That is not the live public node. The live project uses Root Directory `dashboard`.
 

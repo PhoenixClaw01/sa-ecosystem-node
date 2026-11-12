@@ -3,203 +3,134 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Star Atlas DAO Dashboard — Preview</title>
+  <meta name="referrer" content="no-referrer">
+  <title>Star Atlas DAO Dashboard</title>
   <link rel="icon" href="data:,">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/playground/playground.css">
+  <link rel="stylesheet" href="/home.css">
 </head>
 <body>
   <nav class="topbar" aria-label="Dashboard sections">
-    <div class="brand"><span class="brand-mark" aria-hidden="true">▲</span><span>Star Atlas DAO</span><span class="badge">PREVIEW</span></div>
-    <div class="tabs" id="tabs">
-      <a href="#payments" class="tab active">PIP Payments</a>
-      <a href="#council" class="tab">Council</a>
-      <a href="#limit" class="tab">Ecosystem Fund</a>
-      <a href="#balances" class="tab">Balance Sheet</a>
-      <a href="#results" class="tab">PIP Results</a>
-      <a href="#history" class="tab">Treasury History</a>
-      <a href="#community" class="tab">Galaxy at a glance</a>
+    <div class="brand"><span class="brand-mark" aria-hidden="true">▲</span><span>Star Atlas DAO</span><span class="badge">READ-ONLY</span></div>
+    <div class="tabs">
       <a href="#revenue" class="tab">Revenue</a>
-      <a href="#health" class="tab">Data Health</a>
-      <a href="#ask" class="tab">Ask the MCP</a>
-      <a href="#sources" class="tab">Sources</a>
+      <a href="#featured" class="tab">Ecosystem tools</a>
+      <a href="#treasury" class="tab">Treasury</a>
+      <a href="#tools" class="tab">More tools</a>
+      <a href="/playground/" class="tab">MCP Playground</a>
+      <a href="/playground/#connect" class="tab">Connect your agent</a>
     </div>
   </nav>
 
   <header class="page-head">
-    <h1>DAO Dashboard</h1>
-    <p class="lede">Live Star Atlas DAO data, served by the read-only Star Atlas DAO MCP. Figures come from the Council PIP Tracker, the DAO wallets, Galaxy, and the treasury history cache. <a href="#ask">Ask the MCP</a>.</p>
-    <div id="source-banner" class="banner">Loading…</div>
+    <h1>What powers the DAO</h1>
+    <p class="lede">Where the Star Atlas DAO's revenue comes from, what its wallets hold right now, and the open-source tools the ecosystem builds around it. Every figure is read live from a public source when you open the page. If a read fails, the page says "Data unavailable" and shows no number.</p>
   </header>
 
   <main>
-    <section id="payments" class="view">
-      <div class="view-head">
-        <h2>PIP Payment Tracker</h2>
-        <p class="hint">How much has been paid to funded PIPs, how much is still owed, and how many payment milestones are done. Totals add up the payment columns on the Tracker tab.</p>
-      </div>
-      <div class="kpis" id="payment-grid"></div>
-      <h3 class="sub-head">Per PIP (passed PIPs with a funding amount)</h3>
-      <div class="table-wrap card-like" id="payment-table"></div>
-      <h3 class="sub-head">Monthly treasury flows</h3>
-      <p class="hint">Inflows and outflows from the published treasury cache. External, internal, and withheld rows are separate. Cached numbers carry the cache timestamp.</p>
-      <div id="flows-host" class="chain-host"><p class="hint">Loading the treasury cache…</p></div>
-      <h3 class="sub-head">On-chain payment ledger</h3>
-      <p class="hint">External outflows from that same cache. Internal transfers and SOL network fees are left out. Each row links to Solscan.</p>
-      <div id="ledger-host" class="chain-host"><p class="hint">Loading the treasury cache…</p></div>
-      <h3 class="sub-head">Payment to PIP</h3>
-      <div id="match-host" class="chain-host"><p class="hint">Matching starts once the cache is complete.</p></div>
-    </section>
-
-    <section id="council" class="view">
-      <div class="view-head">
-        <h2>Council Dashboard</h2>
-        <p class="hint">Counts and averages worked out on this page from Tracker columns. The sheet has no single "accomplishments" or "average" column, so each tile says exactly which column it uses.</p>
-      </div>
-      <div class="kpis" id="council-grid"></div>
-      <h3 class="sub-head">By Council term (SAC Term column)</h3>
-      <div class="table-wrap card-like" id="term-table"></div>
-      <details class="card-like sheet-summary" id="sheet-summary-wrap">
-        <summary>Tracker term summary</summary>
-        <p class="hint">The Tracker tab also has a small summary block to the right of the main table. It is printed here exactly as written. It may count differently from the computed table above.</p>
-        <div class="table-wrap" id="sheet-summary"></div>
-      </details>
-    </section>
-
-    <section id="limit" class="view">
-      <div class="view-head">
-        <h2>Ecosystem Fund Limit</h2>
-        <p class="hint">Council figures for the current limit, then the PIP-23 calculation from the treasury cache. Where that text is silent, the figure shows as —.</p>
-      </div>
-      <div class="kpis" id="limit-grid"></div>
-      <h3 class="sub-head">Calculated from PIP-23</h3>
-      <div id="ecofund-host" class="chain-host"><p class="hint">Loading the treasury cache…</p></div>
-    </section>
-
-    <section id="balances" class="view">
-      <div class="view-head">
-        <h2>Balance Sheet</h2>
-        <p class="hint">What the DAO wallets hold right now. A tile that cannot be read shows the cached figure.</p>
-        <button type="button" id="balance-refresh" class="vote-load">Refresh balances</button>
-        <label class="usd-toggle"><input type="checkbox" id="usd-toggle"> Approximate USD, off unless this is checked. A missing price stays —.</label>
-      </div>
-      <div id="rpc-note" class="banner warn" style="display:none;margin-bottom:0.8rem"></div>
-      <div id="wallet-cards" class="wallets"></div>
-      <div class="mcp-slot" data-mcp-panel="balances"></div>
-      <div id="multisig-other-wrap" style="display:none">
-        <h3 class="sub-head">Other multisigs</h3>
-        <div id="multisig-cards" class="wallets"></div>
-      </div>
-      <p class="hint">Other Council multisigs are listed once their addresses are published.</p>
-      <div class="mcp-slot" data-mcp-panel="multisigs"></div>
-      <h3 class="sub-head">Payment history</h3>
-      <div class="card-like note-card">
-        <p>Monthly flows and the on-chain payment ledger are on <a href="#payments">PIP Payments</a>. They come from the treasury history cache, refreshed every few hours. A failed live read shows the cached figure.</p>
-      </div>
-    </section>
-
-    <section id="results" class="view">
-      <div class="view-head">
-        <h2>PIP Results Tracker</h2>
-        <p class="hint" id="results-note">Every numbered PIP on the Tracker. Yes, No, and Abstain are the sheet figures. A missing figure shows as —.</p>
-      </div>
-      <div class="table-wrap card-like" id="results-table"></div>
-      <h3 class="sub-head">On-chain votes</h3>
-      <p class="hint">Yes, No, and Abstain from Galaxy. Voting power is abbreviated. A missing total shows as —.</p>
-      <div id="galaxy-host" class="chain-host"><p class="hint">Loading galaxy proposals…</p></div>
-    </section>
-
-    <section id="history" class="view">
-      <div class="view-head">
-        <h2>DAO Treasury History</h2>
-        <p class="hint">The chart below is the published treasury cache. Ryden's graph stays a separate link. Its numbers are not copied.</p>
-      </div>
-      <div id="history-host" class="chain-host"><p class="hint">Loading the treasury cache…</p></div>
-      <div class="card-like note-card">
-        <p><strong>Ryden DAO treasury graph</strong> (external site, opens in a new tab):<br><a id="ryden-link" href="#" target="_blank" rel="noopener noreferrer"></a></p>
-      </div>
-    </section>
-
-    <section id="community" class="view">
-      <div class="view-head">
-        <h2>Galaxy at a glance</h2>
-        <p class="hint"><a href="https://www.npmjs.com/package/@aephia/atlas-kit" target="_blank" rel="noopener noreferrer">Game data from Atlas Kit</a>.</p>
-        <p class="hint">Served by the same read-only <a href="#ask">MCP</a>.</p>
-      </div>
-      <div class="kpis" id="community-grid"></div>
-    </section>
-
     <section id="revenue" class="view">
       <div class="view-head">
-        <h2>Revenue by source</h2>
-        <p class="hint">Monthly DAO income in USDC, from the Star Atlas Galaxy treasury feed.</p>
+        <h2>DAO revenue</h2>
+        <p class="hint">Revenue by source and by month, from the public Star Atlas Galaxy treasury feed (the same feed behind govern.staratlas.com/treasury), read through this node's <span class="mono">dao_revenue</span> tool.</p>
       </div>
-      <div id="revenue-host" class="chain-host"><p class="hint">Loading galaxy revenue…</p></div>
+      <div id="revenue-host" class="chain-host" aria-live="polite"><p class="hint">Reading revenue live…</p></div>
     </section>
 
-    <section id="health" class="view">
+    <section id="featured" class="view">
       <div class="view-head">
-        <h2>Data Health</h2>
-        <p class="hint">Freshness and errors for each source this page actually read. A source that was not checked stays blank.</p>
+        <h2 id="featured-heading"></h2>
+        <p class="hint">Public tools made by people in the ecosystem, shown side by side with this node's own playground. Each is credited to its creator and links out to the original. Listing a tool here does not mean any affiliation or endorsement.</p>
       </div>
-      <div id="health-host" class="chain-host"><p class="hint">Waiting for the page to finish its reads…</p></div>
+      <div class="featured-grid">
+        <article class="featured card-like">
+          <h3 class="featured-title">Atlas Kit</h3>
+          <p class="featured-by">By the <a href="https://github.com/Aephia/atlas-kit" rel="noopener noreferrer">Aephia contributors</a>. Apache-2.0.</p>
+          <p>An open TypeScript toolkit for reading the SAGE C4 game on the z.ink chain: star systems, starbases, fleets, and more. This node uses it for its game reads.</p>
+          <div id="atlas-kit-live" aria-live="polite"><p class="hint">Reading the galaxy live…</p></div>
+          <p class="featured-links"><a href="https://www.npmjs.com/package/@aephia/atlas-kit" rel="noopener noreferrer">npm</a> · <a href="https://github.com/Aephia/atlas-kit" rel="noopener noreferrer">GitHub</a></p>
+        </article>
+        <article class="featured card-like">
+          <h3 class="featured-title">C4 Live</h3>
+          <p class="featured-by">By <a href="https://x.com/Siphaawal" rel="noopener noreferrer">Siphaawal</a>, published on Aephia's site.</p>
+          <p>The whole SAGE C4 galaxy as one interactive 3D view, with data read from the chain. It is a separate site and loads only if you ask for it.</p>
+          <button type="button" id="c4-load" class="pg-button">Load the 3D view here</button>
+          <div id="c4-frame" class="c4-frame-host"></div>
+          <p class="featured-links"><a href="https://ses.aephia.com/C4Live/" rel="noopener noreferrer">Open C4 Live</a> · <a href="https://x.com/Siphaawal/status/2119581960481775745" rel="noopener noreferrer">Announcement</a></p>
+        </article>
+        <article class="featured card-like">
+          <h3 class="featured-title">sa-forge-signer</h3>
+          <p class="featured-by">By <a href="https://github.com/ttdonovan" rel="noopener noreferrer">ttdonovan</a>. Unlicense (public domain).</p>
+          <p>A thin, self-hosted signer for agents playing SAGE C4 on Z.ink. It signs over a CLI, HTTP, or MCP, with checks before signing, a session-key path, and an audit log.</p>
+          <p class="warn-text">Unofficial, self-hosted; review its <a href="https://ttdonovan.github.io/sa-forge-signer/security.html" rel="noopener noreferrer">security chapter</a> before use. This site does not run it, bundle it, or check it.</p>
+          <p class="featured-links"><a href="https://github.com/ttdonovan/sa-forge-signer" rel="noopener noreferrer">Repository</a> · <a href="https://ttdonovan.github.io/sa-forge-signer/" rel="noopener noreferrer">Docs</a> · <a href="https://ttdonovan.github.io/sa-forge-signer/llms.txt" rel="noopener noreferrer">llms.txt</a></p>
+        </article>
+        <article class="featured card-like">
+          <h3 class="featured-title">MCP Playground</h3>
+          <p class="featured-by">This node, <a href="https://github.com/PhoenixClaw01/sa-ecosystem-node" rel="noopener noreferrer">sa-ecosystem-node</a>. Apache-2.0.</p>
+          <p>Every tool this node serves, runnable live from your browser, with the raw reply beside a plain-English note. Includes a signature check you can run yourself.</p>
+          <div id="playground-live" aria-live="polite"><p class="hint">Counting tools live…</p></div>
+          <p class="featured-links"><a href="/playground/">Open the playground</a> · <a href="/playground/#records">Check a signature</a></p>
+        </article>
+      </div>
     </section>
 
-    <section id="ask" class="view">
+    <section id="treasury" class="view">
       <div class="view-head">
-        <h2>Ask the MCP</h2>
+        <h2>Treasury and Ecosystem Fund</h2>
+        <p class="hint">The DAO Treasury and Ecosystem Fund wallets, read live from Solana mainnet through <span class="mono">treasury_balances</span>. The fund's single-grant limit and refills come from <span class="mono">ecofund_limit</span>, which uses the published treasury cache.</p>
       </div>
-      <div class="card-like note-card">
-        <h3 class="sub-head">Connect your agent</h3>
-        <p class="hint">Read-only. No API key.</p>
-        <pre class="mcp-record">{
-  "mcpServers": {
-    "sa-dao": {
-      "url": "https://sa-ecosystem-node-dashboard.vercel.app/api/mcp"
-    }
-  }
-}</pre>
+      <div id="treasury-host" class="chain-host" aria-live="polite"><p class="hint">Reading the wallets live…</p></div>
+    </section>
+
+    <section id="tools" class="view">
+      <div class="view-head">
+        <h2>More tools on this node</h2>
       </div>
-      <h3 class="sub-head">Tools</h3>
-      <ul class="tool-list">
-        <li><span class="mono">dao_overview</span> Treasury balances, a short proposal list, and data-health checks.</li>
-        <li><span class="mono">list_proposals</span> Galaxy proposals with status, dates, and published vote totals.</li>
-        <li><span class="mono">get_proposal_votes</span> Vote count and voting power for one proposal.</li>
-        <li><span class="mono">dao_revenue</span> Monthly DAO revenue by source from Galaxy.</li>
-        <li><span class="mono">dao_treasury_flows</span> Monthly inflows and outflows for the DAO wallets.</li>
-        <li><span class="mono">dao_payments</span> Payment ledger of treasury outflows, each row linking to Solscan.</li>
-        <li><span class="mono">treasury_history</span> Treasury balance over time from the published cache.</li>
-        <li><span class="mono">ecofund_limit</span> Ecosystem Fund limit and refills from PIP-23.</li>
-        <li><span class="mono">treasury_balances</span> Current SOL, ATLAS, and USDC balances of the two DAO wallets.</li>
-        <li><span class="mono">pip_tracker</span> PIP payments and milestones from the Council Tracker.</li>
-        <li><span class="mono">hub_updates</span> Published hub updates, when a public feed is configured.</li>
-        <li><span class="mono">data_health</span> How fresh each source is, and the last error if a read failed.</li>
-      </ul>
-      <h3 class="sub-head">Public game data</h3>
-      <ul class="tool-list">
-        <li><span class="mono">list_star_systems</span> Star systems from the public test realm.</li>
-        <li><span class="mono">get_fleet</span> One public fleet, or the fleets on a player profile.</li>
-        <li><span class="mono">profile_key_audit</span> Keys on a player profile, with permissions and risk flags.</li>
-        <li><span class="mono">galaxy_overview</span> Star systems with starbases and an activity summary.</li>
-        <li><span class="mono">list_categories</span> The ecosystem category ids this server publishes.</li>
-      </ul>
+      <div class="home-grid">
+        <a class="home-card card-like" href="/playground/#records">
+          <span class="home-card-title">Check a signature</span>
+          <span class="home-card-text">Load a signed record and check its signature right in your browser. Flip one byte to watch the check fail.</span>
+        </a>
+        <a class="home-card card-like" href="/plain/">
+          <span class="home-card-title">Listings, groups, and players</span>
+          <span class="home-card-text">Signed listings and groups from the shared hub, search, and a player's public record in everyday words.</span>
+        </a>
+        <a class="home-card card-like" href="/playground/#tool-claim_status">
+          <span class="home-card-title">Player claims</span>
+          <span class="home-card-text">Look up whether a listing has been claimed. Read-only here. A player makes a claim with their own wallet. This site never holds anyone's keys.</span>
+        </a>
+        <a class="home-card card-like" href="/playground/#tool-hub_updates">
+          <span class="home-card-title">Reputation links</span>
+          <span class="home-card-text">Read the signed records where a player links their own wallet to this hub for one scope, such as their legacy or fleets. Only the player signs. Pick the reputation-link kind. Read-only.</span>
+        </a>
+        <a class="home-card card-like" href="/.well-known/h2h-card.json">
+          <span class="home-card-title">Agent card (H2H)</span>
+          <span class="home-card-text">A small JSON card that tells other agents what this node offers and where its feeds are.</span>
+        </a>
+        <a class="home-card card-like" href="/playground/#connect">
+          <span class="home-card-title">Connect your agent</span>
+          <span class="home-card-text">Copy a ready config that points any MCP client at this site's <span class="mono">/mcp</span>. No API key. Agents that also sign C4 transactions need their own signer, such as sa-forge-signer above.</span>
+        </a>
+      </div>
     </section>
 
     <section id="sources" class="view">
       <div class="view-head">
-        <h2>Sources</h2>
+        <h2>Data sources</h2>
       </div>
-      <div class="card-like note-card" id="sources-body"></div>
+      <ul class="tool-list">
+        <li>Revenue: <a href="https://galaxy.staratlas.com/dao/treasury" rel="noopener noreferrer">galaxy.staratlas.com/dao/treasury</a>, the public feed behind <a href="https://govern.staratlas.com/treasury" rel="noopener noreferrer">govern.staratlas.com/treasury</a>.</li>
+        <li>Wallets: Solana mainnet public RPC, DAO Treasury <a class="mono" href="https://solscan.io/account/CuwnarNh7FEqZMmffFjRyWj54RecyS7zwFg1CxfzNudi" rel="noopener noreferrer">Cuwn…Nudi</a> and Ecosystem Fund <a class="mono" href="https://solscan.io/account/BxKehkp298nQunu8BWxh5U6VvfphFyjEB3t7USst7Uag" rel="noopener noreferrer">BxKe…7Uag</a>.</li>
+        <li>Game: the z.ink test realm, read with Atlas Kit.</li>
+        <li>Treasury history over time is also charted by <a href="https://ryden.systems/_vibes/dao_treasury_graph.html" rel="noopener noreferrer">Ryden Systems</a> from the same two wallets. Its numbers are not copied here.</li>
+      </ul>
     </section>
   </main>
 
   <footer>
-    <p>Unofficial community dashboard. Missing figures show as —.</p>
+    <p>Unofficial community dashboard. Inspired by Star Atlas. Not affiliated with ATMTA or with the creators of the tools listed above. This site does not sign, hold funds, or take payment. Missing figures show as —.</p>
   </footer>
-  <script src="config.js"></script>
-  <script src="ata.js"></script>
-  <script src="squads.js"></script>
-  <script src="dao.js"></script>
-  <script src="app.js"></script>
-  <script src="chain.js"></script>
+  <script type="module" src="/home.js"></script>
 </body>
 </html>

@@ -14,7 +14,7 @@ It does three jobs:
 
 1. **Read public game and DAO data.** Star systems and fleets come from the z.ink test realm. Treasury balances, proposals, votes, and revenue come from public Solana mainnet and public galaxy JSON. A player lookup reads public mainnet accounts.
 2. **Read a signed hub.** Updates live in a public git repository. Each update is signed by an allowlisted ed25519 key (an agent machine key or a wallet; a player's own wallet for that player's records). The public node shows an update only when the signature checks pass and enough distinct allowlisted keys have approved it.
-3. **Show that hub on a page.** A request for `/` on [https://sa-ecosystem-node-dashboard.vercel.app](https://sa-ecosystem-node-dashboard.vercel.app) redirects to `/plain/`. `/plain/` shows listings, groups, hub updates, search results, and a player lookup as a card grid: one column on phones, two columns from 48rem, three from 68.75rem, and four on very wide screens from 93.75rem (`dashboard/plain/plain.css`). Cards in the grid start collapsed (`<details>` with no `open` attribute). Listings, groups, hub updates, and search each have Expand all, Collapse all, category filter chips, and a sort of A-Z, Newest, or Category (`dashboard/plain/plain.js`). The sort starts at A-Z. Groups are the guild rows from `hub_updates`. The page calls same-origin `/api/mcp` for `list_listings`, `hub_updates`, `search_hub`, `player_legacy`, and `player_story`. Under Listings there is one signed note, "What does signed mean?": "Signed means approved hub signers checked and published this record with their signing keys. It is not an endorsement, it is not proof of ownership, and it does not move money. The business is responsible for its own offer." The one payment line is: "This page does not take payment. Offers link to each business's own page." Each card can show the word Signed. `signedMeaning` is a field on `list_listings` results. The page does not print that field on each card.
+3. **Show that hub on a page.** A request for `/` on [https://sa-ecosystem-node-dashboard.vercel.app](https://sa-ecosystem-node-dashboard.vercel.app) serves `dashboard/index.html`, the DAO dashboard front page: live revenue, treasury and Ecosystem Fund figures, and the node's other tools, from same-origin `/mcp`. A failed read says "Data unavailable" and shows no figure. There is no redirect. `/plain/` shows listings, groups, hub updates, search results, and a player lookup as a card grid: one column on phones, two columns from 48rem, three from 68.75rem, and four on very wide screens from 93.75rem (`dashboard/plain/plain.css`). Cards in the grid start collapsed (`<details>` with no `open` attribute). Listings, groups, hub updates, and search each have Expand all, Collapse all, category filter chips, and a sort of A-Z, Newest, or Category (`dashboard/plain/plain.js`). The sort starts at A-Z. Groups are the guild rows from `hub_updates`. The page calls same-origin `/api/mcp` for `list_listings`, `hub_updates`, `search_hub`, `player_legacy`, and `player_story`. Under Listings there is one signed note, "What does signed mean?": "Signed means approved hub signers checked and published this record with their signing keys. It is not an endorsement, it is not proof of ownership, and it does not move money. The business is responsible for its own offer." The one payment line is: "This page does not take payment. Offers link to each business's own page." Each card can show the word Signed. `signedMeaning` is a field on `list_listings` results. The page does not print that field on each card.
 
 The server does not sign, does not send transactions, and does not hold keys or funds. There is no submit button and no moderation queue in this version.
 
@@ -28,7 +28,7 @@ flowchart LR
   G --> N[sa-ecosystem-node<br/>24 read-only tools]
   C --> N
   H --> N
-  N --> P["/plain/ page"]
+  N --> P["/ front page and /plain/"]
   N --> M[MCP clients]
   Q[Moderation queue<br/>planned] -.-> A[Council wallet or Squads<br/>planned]
   A -.-> K[(Solana or z.ink anchor<br/>planned)]
@@ -44,7 +44,7 @@ Solid lines are live. Dashed lines are planned and are not in this version. The 
 |---|---|
 | Vercel project | `sa-ecosystem-node-dashboard`. This project is separate from the DAO Council preview |
 | Site | [https://sa-ecosystem-node-dashboard.vercel.app](https://sa-ecosystem-node-dashboard.vercel.app) |
-| Home | `PUBLIC_HOME=plain` makes `/` and `/index.html` answer 302 to `/plain/` (`dashboard/middleware.js`) |
+| Home | `/` serves the DAO dashboard front page (`dashboard/index.html`). `/playground/` is the live MCP Playground |
 | Reading page | `/plain/` is indexable. It has no `noindex` tag and no `X-Robots-Tag` |
 | MCP | [https://sa-ecosystem-node-dashboard.vercel.app/api/mcp](https://sa-ecosystem-node-dashboard.vercel.app/api/mcp) |
 | Discovery | [https://sa-ecosystem-node-dashboard.vercel.app/.well-known/mcp.json](https://sa-ecosystem-node-dashboard.vercel.app/.well-known/mcp.json) |
@@ -245,7 +245,7 @@ Each request has a 20 second timeout (`REQUEST_TIMEOUT_MS` in `src/public-mcp.ts
 
 ## Run it yourself
 
-[hosting.md](hosting.md) covers a laptop, Docker, stdio for Claude Desktop and Cursor, and other hosts. A local `npm start` serves MCP at `http://127.0.0.1:8787/mcp`. `GET /` on that process is a status document. It does not redirect to `/plain/`, because `PUBLIC_HOME` is read only by the dashboard middleware.
+[hosting.md](hosting.md) covers a laptop, Docker, stdio for Claude Desktop and Cursor, and other hosts. A local `npm start` serves MCP at `http://127.0.0.1:8787/mcp`. `GET /` on that process is a status document. It does not serve the dashboard front page.
 
 Anyone can run a node. Nodes do not share a database. Two nodes agree on hub rows when they pin the same commit, the same manifest hash, and the same signer rules. They can differ on treasury history until both have refreshed the cache.
 
