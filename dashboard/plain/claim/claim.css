@@ -1,0 +1,18 @@
+form#claim-form {
+  display: grid;
+  gap: 0.75rem;
+  max-width: 40rem;
+}
+
+form#claim-form label {
+  display: grid;
+  gap: 0.25rem;
+}
+
+#claim-message,
+#attestation-message,
+#claim-file,
+#attestation-file {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
