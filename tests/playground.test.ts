@@ -16,6 +16,7 @@ import {
   fieldsFor,
   groupDecimal,
   isRunnable,
+  panelJson,
   presentTools,
   renderTreasury,
   summarize,
@@ -405,11 +406,20 @@ describe("playground hide list", () => {
   const WORDING = /\bPIPs?\b|PIP-\d|Council|\bvot(e|es|ing|ers?)\b|proposal/i;
   const HIDDEN_TOOLS = ["pip_tracker", "list_proposals", "get_proposal_votes"];
   const DISCLOSURE = "Inspired by Star Atlas. Unofficial community read. This node is not affiliated with ATMTA, holds no funds, and holds no game or Council keys.";
+  /** Third-party guild free text. It stays verbatim and is the only wording this page may show. */
+  const GUILD_FREE_TEXT = ["head of council", "The Pirate Council Rules", "Leaders: The Council"];
+  const CENTRE_NOTE = "Lore reference only. Not a Council record. No one signs on the Council's behalf. Renderer decides the label.";
+
+  function withoutGuildFreeText(text: string) {
+    return GUILD_FREE_TEXT.reduce((rest, phrase) => rest.split(phrase).join(""), text);
+  }
 
   function expectNoWording(doc: { body: { textContent: string | null; innerHTML: string } }) {
-    const text = String(doc.body.textContent);
+    const text = withoutGuildFreeText(String(doc.body.textContent));
+    const html = withoutGuildFreeText(doc.body.innerHTML);
     expect(text.match(new RegExp(`.{0,60}(${WORDING.source}).{0,60}`, "i"))?.[0] ?? null).toBeNull();
-    expect(doc.body.innerHTML).not.toMatch(WORDING);
+    expect(html).not.toMatch(WORDING);
+    expect(doc.body.innerHTML).not.toContain("Not a Council record");
   }
 
   function toolPayload(name: string) {
@@ -462,6 +472,16 @@ describe("playground hide list", () => {
         ],
       };
     }
+    if (name === "list_c4_markers") {
+      return {
+        disclaimer: DISCLOSURE,
+        readOnly: true,
+        generatedAt: "2026-11-12T00:00:00.000Z",
+        centre: { kind: "centre", label: null, note: CENTRE_NOTE },
+        note: "Markers are the current signed listings and guild listings. Every marker is placement orbit with anchor none.",
+        markers: [{ id: "guild:guild-east-hall", kind: "guild", title: "The Pirate Council Rules", placement: "orbit", anchor: { status: "none", how: null } }],
+      };
+    }
     if (name === "hub_updates") {
       const { row } = signedListing();
       return {
@@ -470,6 +490,13 @@ describe("playground hide list", () => {
         dataMode: "live",
         asOf: "2026-11-12T00:00:00.000Z",
         updates: [
+          {
+            kind: "guild",
+            id: "guild-east-hall",
+            body: "Leaders: The Council",
+            guild: { name: "The Pirate Council Rules", description: "head of council", links: ["https://example.invalid/rules"] },
+            refs: { pip: null, txs: [] },
+          },
           { kind: "proposal-note", id: "note-1", body: "This proposal needs a vote.", refs: { pip: "PIP-9", txs: [] }, author: "x" },
           { ...row, refs: { ...row.refs, pip: "PIP-1" } },
         ],
@@ -509,6 +536,7 @@ describe("playground hide list", () => {
     }
     expect(doc.getElementById("pg-record-pick")!.textContent).toContain("listing-dock-bakery");
     expect(doc.getElementById("pg-record-pick")!.textContent).not.toContain("note-1");
+    for (const phrase of GUILD_FREE_TEXT) expect(doc.body.textContent, phrase).toContain(phrase);
     expectNoWording(doc);
     for (const form of doc.querySelectorAll(".pg-tool form")) {
       for (const input of form.querySelectorAll("input, select, textarea")) {
@@ -539,10 +567,22 @@ describe("playground hide list", () => {
 
   it("does not ship the governance words or a denylist that spells them", () => {
     const served = ["index.html", "playground.js", "verify.js", "boot.js"].map((name) => readFileSync(path.join(PLAYGROUND, name), "utf8")).join("\n");
+    const css = [path.join(ROOT, "dashboard/styles.css"), path.join(ROOT, "dashboard/home.css"), path.join(PLAYGROUND, "playground.css")]
+      .map((file) => readFileSync(file, "utf8"))
+      .join("\n");
     expect(served).not.toMatch(WORDING);
+    expect(css).not.toMatch(WORDING);
     for (const word of ["pip_tracker", "list_proposals", "get_proposal_votes", "councilOverride", "unpaidPips", "proposal-note"]) {
       expect(served).not.toContain(word);
     }
+    const markers = toolPayload("list_c4_markers");
+    const panel = JSON.stringify(panelJson("list_c4_markers", markers));
+    const summary = summarize("list_c4_markers", markers).join(" ");
+    expect(panel).not.toContain(CENTRE_NOTE);
+    expect(panel).not.toContain("Not a Council record");
+    expect(panel).toContain("The Pirate Council Rules");
+    expect(summary).not.toMatch(WORDING);
+    expect(withoutGuildFreeText(panel)).not.toMatch(WORDING);
   });
 
   it("keeps hidden tools and fields out of presentTools without touching the input", () => {

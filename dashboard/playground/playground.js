@@ -336,6 +336,21 @@ export function panelJson(toolName, output) {
     const updates = (Array.isArray(output.updates) ? output.updates : []).map((record) => pageRecord(record)).filter(Boolean);
     return { dataMode: output.dataMode ?? null, asOf: output.asOf ?? null, count: updates.length, updates };
   }
+  if (toolName === "list_c4_markers") {
+    const markers = Array.isArray(output.markers) ? output.markers : [];
+    return {
+      dataMode: output.dataMode ?? null,
+      asOf: output.asOf ?? output.generatedAt ?? null,
+      markerCount: markers.length,
+      markers: markers.map((marker) => ({
+        id: marker?.id ?? null,
+        kind: marker?.kind ?? null,
+        title: marker?.title ?? null,
+        placement: marker?.placement ?? null,
+        anchor: marker?.anchor?.status ?? null,
+      })),
+    };
+  }
   const copy = {};
   for (const key of Object.keys(output)) {
     if (key === "disclaimer" || key === "sources") continue;
