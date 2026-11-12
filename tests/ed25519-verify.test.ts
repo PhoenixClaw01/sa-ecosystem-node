@@ -106,4 +106,41 @@ describe("strict ed25519 verification", () => {
     };
     expect(matchStoryConsent(story, HUB)).toEqual({ showLinks: true });
   });
+
+  it("rejects every 8-point torsion encoding, both sign bits, including non-canonical y", () => {
+    const message = new TextEncoder().encode("consent");
+    const signature = zeroSignature();
+    const pair = nacl.sign.keyPair();
+    const honest = nacl.sign.detached(message, pair.secretKey);
+    expect(verifyEd25519Detached(message, honest, pair.publicKey)).toBe(true);
+
+    // Eight subgroup points, sign bit clear, plus the sign-bit encodings of each.
+    // y = p and y = p + 1 are the extra non-canonical encodings of y = 0 and y = 1.
+    const yValues = [
+      "0000000000000000000000000000000000000000000000000000000000000000",
+      "0100000000000000000000000000000000000000000000000000000000000000",
+      "26e8958fc2b227b045c3f489f2ef98f0d5dfac05d3c63339b13802886d53fc05",
+      "c7176a703d4dd84fba3c0b760d10670f2a2053fa2c39ccc64ec7fd7792ac037a",
+      "ecffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f",
+      "edffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f",
+      "eeffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f",
+    ];
+    const encodings: Uint8Array[] = [];
+    for (const hex of yValues) {
+      const clear = Buffer.from(hex, "hex");
+      const flipped = Buffer.from(clear);
+      flipped[31] = (flipped[31] ?? 0) ^ 0x80;
+      encodings.push(clear, flipped);
+    }
+    expect(encodings).toHaveLength(14);
+    for (const point of encodings) {
+      expect(point).toHaveLength(32);
+      const smallOrNonCanonical = !isCanonicalEd25519Point(point) || isSmallOrderEd25519Point(point);
+      expect(smallOrNonCanonical).toBe(true);
+      expect(verifyEd25519Detached(message, signature, point)).toBe(false);
+      const withSmallR = new Uint8Array(honest);
+      withSmallR.set(point, 0);
+      expect(verifyEd25519Detached(message, withSmallR, pair.publicKey)).toBe(false);
+    }
+  });
 });
