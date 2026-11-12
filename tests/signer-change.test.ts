@@ -9,6 +9,7 @@ import { describe, expect, it } from "vitest";
 
 import { readHubUpdates } from "../src/dao/hub.js";
 import { base58Encode } from "../src/hub/base58.js";
+import { resolveClaimDirectory } from "../src/hub/claim-resolve.js";
 import { runSignCli } from "../src/hub/sign-cli.js";
 import {
   HUB_APPROVAL_DOMAIN,
@@ -77,13 +78,16 @@ function document(author: Wallet, body: HubUpdatePayload, approvers: Wallet[]) {
   };
 }
 
-function setsOf(groups: { id: string; threshold: number; members: Wallet[] }[]): SignerSet[] {
+function setsOf(groups: { id: string; threshold: number; members: Wallet[]; kinds?: readonly string[] }[]): SignerSet[] {
   return groups.map((group) => ({
     id: group.id,
     threshold: group.threshold,
     publicKeys: new Set(group.members.map((member) => member.publicKey)),
+    ...(group.kinds ? { kinds: [...group.kinds] } : {}),
   }));
 }
+
+const PLAYER_TOOLS_KINDS = ["story-optin", "claim", "reputation-link"] as const;
 
 function git(cwd: string, args: string[]): string {
   const result = spawnSync(
@@ -256,5 +260,157 @@ describe("signer-change updates", () => {
     );
     expect(alone.updates).toEqual([]);
     expect(alone.rejected).toEqual([{ id: "cli", reason: "below_threshold" }]);
+  });
+});
+
+describe("kind-scoped signer sets", () => {
+  const hub = "https://github.com/owner/repo";
+  const now = new Date("2026-10-31T12:00:00.000Z");
+
+  function claimRecord(
+    wallet: string,
+    over: {
+      action: "claim" | "revoke" | "resolve";
+      subject: "player" | "guild" | "business";
+      identity: { type: "listing"; listingId: string } | { type: "guild"; name: string };
+      nonce: string;
+      targetId?: string;
+      resolveId?: string;
+    },
+  ): NonNullable<HubUpdatePayload["claim"]> {
+    return {
+      action: over.action,
+      wallet,
+      hubId: hub,
+      nonce: over.nonce,
+      expiresAt: "2027-04-01T00:00:00.000Z",
+      subject: over.subject,
+      identity: over.identity,
+      ...(over.targetId ? { targetId: over.targetId } : {}),
+      ...(over.resolveId ? { resolveId: over.resolveId } : {}),
+    };
+  }
+
+  function linked(
+    author: Wallet,
+    id: string,
+    createdAt: string,
+    prev: string | null,
+    claim: NonNullable<HubUpdatePayload["claim"]>,
+    approvers: Wallet[] = [],
+  ) {
+    const payload: HubUpdatePayload = {
+      v: 1,
+      id,
+      created_at: createdAt,
+      author: author.publicKey,
+      kind: "claim",
+      body: "One claim record.",
+      refs: { pip: null, txs: [] },
+      prev,
+      claim,
+    };
+    return { payload, doc: document(author, payload, approvers) };
+  }
+
+  it("keeps a set with no kinds counting for every kind", () => {
+    const author = signer();
+    const left = signer();
+    const right = signer();
+    const unscoped = setsOf([{ id: "default", threshold: 2, members: [author, left, right] }]);
+    const body: HubUpdatePayload = {
+      v: 1,
+      id: "note-1",
+      created_at: "2026-10-24T02:00:00.000Z",
+      author: author.publicKey,
+      kind: "announcement",
+      body: "Hello",
+      refs: { pip: null, txs: [] },
+      prev: null,
+    };
+    const checked = verifyHubUpdates([document(author, body, [left, right])], new Set(), 2, unscoped);
+    expect(checked.rejected).toEqual([]);
+    expect(checked.updates).toHaveLength(1);
+    expect(unscoped[0]?.kinds).toBeUndefined();
+  });
+
+  it("rejects player-tools revoke and resolve of player, guild, and business claims", async () => {
+    const player = signer();
+    const business = signer();
+    const guild = signer();
+    const tools = signer();
+    const scoped = setsOf([{ id: "player-tools", threshold: 1, members: [tools], kinds: PLAYER_TOOLS_KINDS }]);
+    const playerIdentity = { type: "listing" as const, listingId: "booth-player" };
+    const businessIdentity = { type: "listing" as const, listingId: "booth-north" };
+    const guildIdentity = { type: "guild" as const, name: "East Hall" };
+
+    const playerClaim = linked(player, "player-claim", "2026-10-31T00:00:00.000Z", null, claimRecord(player.publicKey, {
+      action: "claim", subject: "player", identity: playerIdentity, nonce: "player-1111",
+    }));
+    const businessClaim = linked(business, "business-claim", "2026-10-31T01:00:00.000Z", hubUpdateHash(playerClaim.payload), claimRecord(business.publicKey, {
+      action: "claim", subject: "business", identity: businessIdentity, nonce: "business-11",
+    }));
+    const guildClaim = linked(guild, "guild-claim", "2026-10-31T02:00:00.000Z", hubUpdateHash(businessClaim.payload), claimRecord(guild.publicKey, {
+      action: "claim", subject: "guild", identity: guildIdentity, nonce: "guild-11111",
+    }));
+    const toolsClaim = linked(tools, "tools-claim", "2026-10-31T03:00:00.000Z", hubUpdateHash(guildClaim.payload), claimRecord(tools.publicKey, {
+      action: "claim", subject: "player", identity: { type: "listing", listingId: "booth-tools" }, nonce: "tools-11111",
+    }));
+    const selfOther = linked(tools, "self-other-revoke", "2026-10-31T04:00:00.000Z", hubUpdateHash(toolsClaim.payload), claimRecord(tools.publicKey, {
+      action: "revoke", subject: "player", identity: playerIdentity, nonce: "self-other1", targetId: "player-claim",
+    }));
+    const parent = hubUpdateHash(selfOther.payload);
+    const playerRevoke = linked(tools, "player-revoke", "2026-10-31T05:00:00.000Z", parent, claimRecord(player.publicKey, {
+      action: "revoke", subject: "player", identity: playerIdentity, nonce: "player-revoke", targetId: "player-claim",
+    }), [tools]);
+    const playerResolve = linked(tools, "player-resolve", "2026-10-31T05:00:00.000Z", parent, claimRecord(player.publicKey, {
+      action: "resolve", subject: "player", identity: playerIdentity, nonce: "player-resolve", resolveId: "player-claim",
+    }), [tools]);
+    const businessRevoke = linked(tools, "business-revoke", "2026-10-31T05:00:00.000Z", parent, claimRecord(business.publicKey, {
+      action: "revoke", subject: "business", identity: businessIdentity, nonce: "biz-revoke11", targetId: "business-claim",
+    }), [tools]);
+    const guildResolve = linked(tools, "guild-resolve", "2026-10-31T05:00:00.000Z", parent, claimRecord(guild.publicKey, {
+      action: "resolve", subject: "guild", identity: guildIdentity, nonce: "guild-resolve", resolveId: "guild-claim",
+    }), [tools]);
+
+    const checked = verifyHubUpdates(
+      [playerClaim.doc, businessClaim.doc, guildClaim.doc, toolsClaim.doc, selfOther.doc, playerRevoke.doc, playerResolve.doc, businessRevoke.doc, guildResolve.doc],
+      new Set(),
+      1,
+      scoped,
+    );
+    expect(checked.updates.map((update) => update.id)).toEqual([
+      "player-claim",
+      "business-claim",
+      "guild-claim",
+      "tools-claim",
+      "self-other-revoke",
+    ]);
+    expect(checked.updates.find((update) => update.id === "self-other-revoke")?.signerAllowlist).toBe("self");
+    expect(checked.rejected).toEqual([
+      { id: "business-revoke", reason: "unknown_signer" },
+      { id: "guild-resolve", reason: "unknown_signer" },
+      { id: "player-resolve", reason: "unknown_signer" },
+      { id: "player-revoke", reason: "unknown_signer" },
+    ]);
+
+    const directory = await resolveClaimDirectory(checked.updates, { hubId: hub, now, profile: async () => "match" });
+    expect(directory.claims.find((row) => row.updateId === "player-claim")?.state).toBe("needs_profile");
+    expect(directory.claims.find((row) => row.updateId === "tools-claim")?.state).toBe("needs_profile");
+    expect(directory.claims.find((row) => row.updateId === "business-claim")?.state).toBe("pending_countersign");
+    expect(directory.claims.find((row) => row.updateId === "guild-claim")?.state).toBe("pending_countersign");
+
+    const open = setsOf([{ id: "default", threshold: 1, members: [tools] }]);
+    const openClaim = linked(business, "business-claim", "2026-10-31T01:00:00.000Z", null, claimRecord(business.publicKey, {
+      action: "claim", subject: "business", identity: businessIdentity, nonce: "business-11",
+    }));
+    const openRevoke = linked(tools, "business-revoke", "2026-10-31T05:00:00.000Z", hubUpdateHash(openClaim.payload), claimRecord(business.publicKey, {
+      action: "revoke", subject: "business", identity: businessIdentity, nonce: "biz-revoke11", targetId: "business-claim",
+    }), [tools]);
+    const admitted = verifyHubUpdates([openClaim.doc, openRevoke.doc], new Set(), 1, open);
+    expect(admitted.rejected).toEqual([]);
+    expect(admitted.updates.find((update) => update.id === "business-revoke")?.signerAllowlist).toBe("allowed");
+    const opened = await resolveClaimDirectory(admitted.updates, { hubId: hub, now, profile: async () => "match" });
+    expect(opened.claims.find((row) => row.updateId === "business-claim")?.state).toBe("revoked");
   });
 });

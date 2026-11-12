@@ -12,8 +12,10 @@ import {
   loadConfig,
   redactRpcUrl,
   resolveTreasuryCachePath,
+  SIGNER_SET_KINDS,
 } from "../src/config.js";
 import { publicErrorMessage } from "../src/errors.js";
+import { HUB_UPDATE_KINDS } from "../src/hub/update.js";
 
 describe("config", () => {
   it("uses public RPC defaults", () => {
@@ -202,6 +204,23 @@ describe("config", () => {
     }
     writeFileSync(file, JSON.stringify({ v: 1, hub: { revokeSignerGroup: ["default"] } }));
     expect(() => loadConfig({ NODE_CONFIG: file })).toThrow(/not allowed/);
+  });
+
+  it("accepts kinds on a signer set and leaves an omitted list unscoped", () => {
+    for (const kind of HUB_UPDATE_KINDS) expect(SIGNER_SET_KINDS).toContain(kind);
+    const scoped = loadConfig({
+      HUB_SIGNER_SETS: JSON.stringify([
+        { id: "player-tools", path: "hub/signers/player-tools.json", threshold: 1, kinds: ["story-optin", "claim", "reputation-link"] },
+      ]),
+    });
+    expect(scoped.hubSignerSets[0]?.kinds).toEqual(["story-optin", "claim", "reputation-link"]);
+    const plain = loadConfig({});
+    expect(plain.hubSignerSets).toHaveLength(1);
+    expect(plain.hubSignerSets[0]?.id).toBe("default");
+    expect(plain.hubSignerSets[0]?.kinds).toBeUndefined();
+    expect(plain.hubRevokedSigners).toEqual([]);
+    expect(() => loadConfig({ HUB_SIGNER_SETS: JSON.stringify([{ id: "default", path: "hub/signers.json", kinds: [] }]) })).toThrow(/kinds list/);
+    expect(() => loadConfig({ HUB_SIGNER_SETS: JSON.stringify([{ id: "default", path: "hub/signers.json", kinds: ["nope"] }]) })).toThrow(/kind that is not allowed/);
   });
 
   it("strips query secrets from echoed RPC URLs", () => {
