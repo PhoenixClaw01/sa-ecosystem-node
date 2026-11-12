@@ -77,10 +77,34 @@ export interface Config {
   maxResponseBytes: number;
 }
 
+/**
+ * Kind names a signer set may list. Every current hub update kind is allowed.
+ * `c4-anchor`, `community-tool`, and `reputation-link` are proposed kinds a set
+ * may name before those records exist. `claim` counts only for a player claim
+ * (`action` is `claim` and `subject` is `player`), not a revoke or resolve.
+ */
+export const SIGNER_SET_KINDS = [
+  "announcement",
+  "proposal-note",
+  "payment-note",
+  "status",
+  "signer-change",
+  "listing",
+  "guild",
+  "story-optin",
+  "claim",
+  "attestation",
+  "c4-anchor",
+  "community-tool",
+  "reputation-link",
+] as const;
+
 export interface SignerSetConfig {
   id: string;
   path: string;
   threshold: number;
+  /** Omitted means this set counts for every record kind. */
+  kinds?: readonly string[];
 }
 
 function httpUrl(value: string | undefined, fallback: string, name: string): string {
@@ -248,8 +272,8 @@ function signerSetList(
     if (!item || typeof item !== "object" || Array.isArray(item)) throw new Error("HUB_SIGNER_SETS has a signer set that is not an object.");
     const record = item as Record<string, unknown>;
     const keys = Object.keys(record);
-    if (keys.some((key) => key !== "id" && key !== "path" && key !== "threshold")) {
-      throw new Error("HUB_SIGNER_SETS has a field that is not id, path, or threshold.");
+    if (keys.some((key) => key !== "id" && key !== "path" && key !== "threshold" && key !== "kinds")) {
+      throw new Error("HUB_SIGNER_SETS has a field that is not id, path, threshold, or kinds.");
     }
     if (typeof record.id !== "string" || !SET_ID_PATTERN.test(record.id)) {
       throw new Error("HUB_SIGNER_SETS has a signer set id that is not allowed.");
@@ -266,8 +290,33 @@ function signerSetList(
       }
       setThreshold = record.threshold;
     }
-    return { id: record.id, path: resolveSignerSetPath(record.path.trim(), moduleDir, cwd), threshold: setThreshold };
+    const kinds = signerSetKinds(record.kinds);
+    return {
+      id: record.id,
+      path: resolveSignerSetPath(record.path.trim(), moduleDir, cwd),
+      threshold: setThreshold,
+      ...(kinds ? { kinds } : {}),
+    };
   });
+}
+
+function signerSetKinds(value: unknown): string[] | undefined {
+  if (value === undefined) return undefined;
+  if (!Array.isArray(value) || value.length < 1 || value.length > 20) {
+    throw new Error("HUB_SIGNER_SETS has a kinds list that is not 1 to 20 kind names.");
+  }
+  const allowed = new Set<string>(SIGNER_SET_KINDS);
+  const seen = new Set<string>();
+  const kinds: string[] = [];
+  for (const item of value) {
+    if (typeof item !== "string" || !allowed.has(item)) {
+      throw new Error("HUB_SIGNER_SETS has a kind that is not allowed.");
+    }
+    if (seen.has(item)) throw new Error("HUB_SIGNER_SETS repeats a kind.");
+    seen.add(item);
+    kinds.push(item);
+  }
+  return kinds;
 }
 
 function readNodeConfigFile(env: NodeJS.ProcessEnv): NodeJS.ProcessEnv {

@@ -10,7 +10,7 @@ if (lstatSync(signerCopyPath).isSymbolicLink() || !signerSource.equals(readFileS
   process.exit(1);
 }
 
-const signerSetSources = ["hub/signers/agents.json"];
+const signerSetSources = ["hub/signers/agents.json", "hub/signers/player-tools.json"];
 const signerSetShas = [];
 for (const source of signerSetSources) {
   const copy = path.join("dashboard", source);

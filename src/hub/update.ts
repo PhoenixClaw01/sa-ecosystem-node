@@ -52,11 +52,17 @@ export type HubUpdateKind = (typeof HUB_UPDATE_KINDS)[number];
 
 const SET_ID_PATTERN = /^[a-z0-9][a-z0-9_-]{0,63}$/;
 
-/** One allowlist a node has chosen to trust. Membership can change only inside verifyHubUpdates. */
+/**
+ * One allowlist a node has chosen to trust. Membership can change only inside verifyHubUpdates.
+ * `kinds`, when set, limits the set to those record kinds. Omitted, the set counts for every kind.
+ * The kind `claim` counts only for a player claim: `action` is `claim` and `subject` is `player`.
+ * A revoke or resolve is not in that scope. A wallet still revokes its own claim on the author-equals-wallet path.
+ */
 export interface SignerSet {
   id: string;
   threshold: number;
   publicKeys: ReadonlySet<string>;
+  kinds?: readonly string[];
 }
 
 /** Adding or removing one public key in a named signer set. */
@@ -433,6 +439,7 @@ interface MutableSignerSet {
   id: string;
   threshold: number;
   publicKeys: Set<string>;
+  kinds?: readonly string[];
 }
 
 type Policy =
@@ -531,7 +538,23 @@ function cloneSets(sets: readonly SignerSet[]): MutableSignerSet[] {
     id: set.id,
     threshold: set.threshold,
     publicKeys: new Set(set.publicKeys),
+    ...(set.kinds ? { kinds: [...set.kinds] } : {}),
   }));
+}
+
+/**
+ * A set with no `kinds` counts for every record. A listed kind matches that record kind.
+ * `claim` matches only `action: "claim"` with `subject: "player"`.
+ * Revoke and resolve stay off this scope, including a player-subject revoke of another claim.
+ */
+function signerSetCovers(set: { kinds?: readonly string[] }, payload: HubUpdatePayload): boolean {
+  if (!set.kinds) return true;
+  return set.kinds.some((kind) => {
+    if (kind === "claim") {
+      return payload.kind === "claim" && payload.claim?.action === "claim" && payload.claim.subject === "player";
+    }
+    return kind === payload.kind;
+  });
 }
 
 interface ApprovalSplit {
@@ -628,7 +651,7 @@ function countersignOf(
   sets: readonly MutableSignerSet[],
   revoked: ReadonlySet<string>,
 ): { met: boolean; count: number; approvedBy: string[] } {
-  const results = sets.map((set) => {
+  const results = sets.filter((set) => signerSetCovers(set, candidate.payload)).map((set) => {
     const split = classifyApprovals(candidate.payload, candidate.approvals, set.publicKeys, true, revoked);
     return { ...split, count: split.counted.length, met: split.counted.length >= set.threshold };
   });
@@ -694,7 +717,9 @@ function evaluate(
       return selfAdmission(signedBy);
     }
   }
-  const memberships = sets.filter((set) => set.publicKeys.has(candidate.payload.author));
+  const memberships = sets.filter(
+    (set) => signerSetCovers(set, candidate.payload) && set.publicKeys.has(candidate.payload.author),
+  );
   if (memberships.length === 0) {
     if (candidate.payload.kind === "listing" && candidate.payload.listing) {
       const key = listingIdentity(candidate.payload.listing);
@@ -757,7 +782,7 @@ function evaluateSignerChange(
   if (!change) return { ok: false, reason: "malformed" };
   if (change.op === "add" && change.publicKey === candidate.payload.author) return { ok: false, reason: "self_add" };
   const set = sets.find((item) => item.id === change.set);
-  if (!set) return { ok: false, reason: "untrusted_set" };
+  if (!set || !signerSetCovers(set, candidate.payload)) return { ok: false, reason: "untrusted_set" };
   if (!set.publicKeys.has(candidate.payload.author)) return { ok: false, reason: "unknown_signer" };
   if (change.op === "add" && set.publicKeys.has(change.publicKey)) return { ok: false, reason: "replay" };
   if (change.op === "remove" && !set.publicKeys.has(change.publicKey)) return { ok: false, reason: "replay" };
@@ -829,7 +854,10 @@ function toVerified(candidate: Candidate): VerifiedHubUpdate {
  * `revokedSigners` do not count. If every valid approval is from a revoked
  * key, the reason is `revoked_signer`. An empty allowlist rejects every
  * update. A repeated approver counts once. Accepted signer-changes update
- * that set before the next link is checked.
+ * that set before the next link is checked. A set with `kinds` counts only for
+ * those kinds, and its approvals are ignored for every other kind. `claim` in
+ * that list counts only when the action is `claim` and the subject is `player`.
+ * A set without `kinds` counts for every kind.
  */
 export function verifyHubUpdates(
   documents: readonly unknown[],

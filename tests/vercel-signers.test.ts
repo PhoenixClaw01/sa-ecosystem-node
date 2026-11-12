@@ -32,8 +32,11 @@ describe("Vercel signer allowlist bundle", () => {
     const root = JSON.parse(readFileSync("vercel.json", "utf8")) as {
       functions: { "api/mcp.ts": { includeFiles: string } };
     };
-    expect(root.functions["api/mcp.ts"].includeFiles).toBe("{hub/signers.json,hub/signers/agents.json}");
+    expect(root.functions["api/mcp.ts"].includeFiles).toBe(
+      "{hub/signers.json,hub/signers/agents.json,hub/signers/player-tools.json}",
+    );
     expect(dashboard.functions["api/mcp.js"].includeFiles).toContain("hub/signers/agents.json");
+    expect(dashboard.functions["api/mcp.js"].includeFiles).toContain("hub/signers/player-tools.json");
   });
 
   it("reads the copy from a dashboard-shaped directory and refuses a drifted or linked copy", () => {
@@ -122,8 +125,12 @@ describe("Vercel signer allowlist bundle", () => {
       if (previousSets === undefined) delete record[SIGNER_SET_SHA256S_KEY];
       else record[SIGNER_SET_SHA256S_KEY] = previousSets;
     }
+    const playerTools = path.resolve("hub/signers/player-tools.json");
+    const playerToolsCopy = path.resolve("dashboard/hub/signers/player-tools.json");
+    expect(Buffer.compare(readFileSync(playerTools), readFileSync(playerToolsCopy))).toBe(0);
+    const playerToolsSha = createHash("sha256").update(readFileSync(playerTools)).digest("hex");
     const bundle = readFileSync("dashboard/api/mcp.js", "utf8");
-    expect(bundle).toContain(`globalThis.${SIGNER_SET_SHA256S_KEY}=${JSON.stringify([agentsSha])}`);
+    expect(bundle).toContain(`globalThis.${SIGNER_SET_SHA256S_KEY}=${JSON.stringify([agentsSha, playerToolsSha])}`);
     expect(bundle.split(agentsSha).length - 1).toBeGreaterThanOrEqual(2);
     expect(bundle).not.toContain("__SA_SIGNER_SET_SHA256S_DEFINE__");
     expect(() => embeddedSignerSetShas()).toThrow(/could not be read/);
