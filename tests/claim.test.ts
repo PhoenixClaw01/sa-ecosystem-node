@@ -22,6 +22,7 @@ import type { Listing } from "../src/hub/listing.js";
 import {
   HUB_APPROVAL_DOMAIN,
   HUB_UPDATE_DOMAIN,
+  authorSignatureValid,
   canonicalHubPayload,
   hubUpdateHash,
   verifyHubUpdates,
@@ -34,6 +35,7 @@ import {
   buildPlayerAttestationDraft,
   buildPlayerClaimDraft,
   readyPlayerPack,
+  signedHubDocument,
   writePlayerPack,
 } from "../src/hub/player-discord-flow.js";
 import { createPlayerExchange, exchangeListenTarget } from "../src/hub/player-exchange.js";
@@ -1921,3 +1923,37 @@ describe("player discord claim flow", () => {
   });
 });
 
+
+const ZERO_SIGNATURE = "1".repeat(64);
+const REDTEAM_HUB = "https://github.com/phoenixclaw01/sa-ecosystem-hub";
+const REDTEAM_PROFILE = "GmaDrppBC7P5ARKV8g3djiwP89vz1jLK23V2GBjuAEGB";
+const REDTEAM_SMALL_ORDER_AUTHORS = [
+  { wallet: "11111111111111111111111111111111", nonce: "nonce-0000" },
+  { wallet: "3ctC68zTqpRDQShoondiQKDHwZDAUjRyxiPNdg8cD6Pe", nonce: "nonce-0006" },
+  { wallet: "H242rsh5hzpvDdct56PG5YPQbKUT37EmySQLoQqrYUJr", nonce: "nonce-0012" },
+] as const;
+
+describe("small-order claim authors", () => {
+  it("rejects an all-1 signature on the red-team small-order wallets", () => {
+    expect(base58Decode(ZERO_SIGNATURE)).toEqual(new Uint8Array(64));
+    for (const { wallet, nonce } of REDTEAM_SMALL_ORDER_AUTHORS) {
+      const draft = buildPlayerClaimDraft({
+        wallet,
+        hub: REDTEAM_HUB,
+        listingId: "booth-north",
+        profile: REDTEAM_PROFILE,
+        nonce,
+        expiresAt: "2027-04-01T00:00:00.000Z",
+        createdAt: "2026-10-31T00:00:00.000Z",
+      });
+      expect(draft).not.toBeNull();
+      expect(draft?.payload.author).toBe(wallet);
+      expect(draft?.payload.claim?.nonce).toBe(nonce);
+      expect(draft?.payload.claim?.identity).toEqual({ type: "listing", listingId: "booth-north" });
+      expect(draft?.payload.claim?.playerProfile).toBe(REDTEAM_PROFILE);
+      expect(draft?.payload.claim?.hubId).toBe(REDTEAM_HUB);
+      expect(authorSignatureValid(draft!.payload, ZERO_SIGNATURE)).toBe(false);
+      expect(signedHubDocument(draft!.payload, ZERO_SIGNATURE)).toBeNull();
+    }
+  });
+});
