@@ -24711,12 +24711,71 @@ function isProofMethod(value) {
 }
 
 // src/hub/update.ts
-import { createHash, createPublicKey as createPublicKey2, verify as cryptoVerify2 } from "node:crypto";
+import { createHash } from "node:crypto";
+
+// src/hub/ed25519-verify.ts
+import { createPublicKey, verify as cryptoVerify } from "node:crypto";
+var ED25519_SPKI_PREFIX = Buffer.from("302a300506032b6570032100", "hex");
+var FIELD_PRIME = (1n << 255n) - 19n;
+var GROUP_ORDER = (1n << 252n) + 27742317777372353535851937790883648493n;
+var SMALL_ORDER_Y = [
+  "0000000000000000000000000000000000000000000000000000000000000000",
+  "0100000000000000000000000000000000000000000000000000000000000000",
+  "26e8958fc2b227b045c3f489f2ef98f0d5dfac05d3c63339b13802886d53fc05",
+  "c7176a703d4dd84fba3c0b760d10670f2a2053fa2c39ccc64ec7fd7792ac037a",
+  "ecffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f",
+  "edffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f",
+  "eeffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f"
+].map((hex) => Buffer.from(hex, "hex"));
+function readLittleEndian(bytes) {
+  let value = 0n;
+  for (let index = 0; index < bytes.length; index += 1) {
+    value |= BigInt(bytes[index] ?? 0) << 8n * BigInt(index);
+  }
+  return value;
+}
+function isCanonicalEd25519Point(point) {
+  if (point.length !== 32) return false;
+  return (readLittleEndian(point) & (1n << 255n) - 1n) < FIELD_PRIME;
+}
+function isSmallOrderEd25519Point(point) {
+  if (point.length !== 32) return false;
+  const last = (point[31] ?? 0) & 127;
+  for (const candidate of SMALL_ORDER_Y) {
+    if (candidate[31] !== last) continue;
+    let matches = true;
+    for (let index = 0; index < 31; index += 1) {
+      if (point[index] !== candidate[index]) {
+        matches = false;
+        break;
+      }
+    }
+    if (matches) return true;
+  }
+  return false;
+}
+function pointAccepted(point) {
+  return isCanonicalEd25519Point(point) && !isSmallOrderEd25519Point(point);
+}
+function verifyEd25519Detached(message, signature, publicKey) {
+  if (publicKey.length !== 32 || signature.length !== 64) return false;
+  if (!pointAccepted(publicKey)) return false;
+  if (!pointAccepted(signature.subarray(0, 32))) return false;
+  if (readLittleEndian(signature.subarray(32)) >= GROUP_ORDER) return false;
+  try {
+    const key = createPublicKey({
+      key: Buffer.concat([ED25519_SPKI_PREFIX, Buffer.from(publicKey)]),
+      format: "der",
+      type: "spki"
+    });
+    return cryptoVerify(null, message, key, signature);
+  } catch {
+    return false;
+  }
+}
 
 // src/hub/story-optin.ts
-import { createPublicKey, verify as cryptoVerify } from "node:crypto";
 import { isIP as isIP2 } from "node:net";
-var ED25519_SPKI_PREFIX = Buffer.from("302a300506032b6570032100", "hex");
 var DATE_PATTERN2 = /^\d{4}-\d{2}-\d{2}$/;
 var ADDRESS_PATTERN = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
 var HUB_ID_PATTERN = /^https:\/\/[a-z0-9](?:[a-z0-9.-]*[a-z0-9])?(?::[0-9]{1,5})?(?:\/[a-z0-9._-]+)+$/;
@@ -24819,17 +24878,7 @@ function verifyMessage(message, opt) {
   } catch {
     return false;
   }
-  if (publicKey.length !== 32 || signature.length !== 64) return false;
-  try {
-    const key = createPublicKey({
-      key: Buffer.concat([ED25519_SPKI_PREFIX, Buffer.from(publicKey)]),
-      format: "der",
-      type: "spki"
-    });
-    return cryptoVerify(null, new TextEncoder().encode(message), key, signature);
-  } catch {
-    return false;
-  }
+  return verifyEd25519Detached(new TextEncoder().encode(message), signature, publicKey);
 }
 var RESERVED_HOST_SUFFIXES = ["local", "internal", "home.arpa", "lan", "localdomain", "test", "example", "invalid", "localhost"];
 function blockedHubHost(host) {
@@ -27196,14 +27245,189 @@ function validAddress2(value) {
   }
 }
 
+// src/hub/reputation-link.ts
+var DATE_PATTERN3 = /^\d{4}-\d{2}-\d{2}$/;
+var ADDRESS_PATTERN5 = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
+var HUB_ID_PATTERN2 = /^https:\/\/[a-z0-9](?:[a-z0-9.-]*[a-z0-9])?(?::[0-9]{1,5})?(?:\/[a-z0-9._-]+)+$/;
+var PROFILE_NAME_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._-]{1,32}$/;
+var REPUTATION_SCOPES = ["legacy", "fleets", "guild", "story"];
+var LINK_KEYS = /* @__PURE__ */ new Set(["action", "date", "profile", "signature", "wallet"]);
+function reputationLinkMessage(wallet2, profile, hubId, scope, date4) {
+  return `I link wallet ${wallet2} to public profile ${profile} on hub ${hubId}. Scope: ${scope}. Date: ${date4}.`;
+}
+function reputationUnlinkMessage(wallet2, profile, hubId, date4) {
+  return `I unlink wallet ${wallet2} from public profile ${profile} on hub ${hubId}. Date: ${date4}.`;
+}
+function parseReputationLink(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  const record4 = value;
+  const keys = Object.keys(record4);
+  if (keys.some((key) => !LINK_KEYS.has(key))) return null;
+  if (["action", "date", "profile", "signature", "wallet"].some((key) => !keys.includes(key))) return null;
+  if (record4.action !== "link" && record4.action !== "unlink") return null;
+  if (typeof record4.wallet !== "string" || !validWallet2(record4.wallet)) return null;
+  if (typeof record4.profile !== "string" || !validProfile(record4.profile)) return null;
+  if (typeof record4.date !== "string" || !validDate2(record4.date)) return null;
+  if (typeof record4.signature !== "string" || !validPlayerSignature2(record4.signature)) return null;
+  return {
+    action: record4.action,
+    wallet: record4.wallet,
+    profile: record4.profile,
+    date: record4.date,
+    signature: record4.signature
+  };
+}
+function copyReputationLink(link) {
+  return {
+    action: link.action,
+    wallet: link.wallet,
+    profile: link.profile,
+    date: link.date,
+    signature: link.signature
+  };
+}
+function reputationLinkCanonical(link) {
+  return {
+    action: link.action,
+    date: link.date,
+    profile: link.profile,
+    signature: link.signature,
+    wallet: link.wallet
+  };
+}
+function matchReputationLink(link, hubId) {
+  if (!HUB_ID_PATTERN2.test(hubId)) return null;
+  if (link.action === "unlink") {
+    return verifyMessage2(reputationUnlinkMessage(link.wallet, link.profile, hubId, link.date), link) ? { action: "unlink", scope: null } : null;
+  }
+  if (link.action !== "link") return null;
+  for (const scope of REPUTATION_SCOPES) {
+    if (verifyMessage2(reputationLinkMessage(link.wallet, link.profile, hubId, scope, link.date), link)) {
+      return { action: "link", scope };
+    }
+  }
+  return null;
+}
+function reputationLinkConsent(link, hubId) {
+  if (!isHubConsentId(hubId)) return "inert";
+  return matchReputationLink(link, hubId) ? "valid" : "inert";
+}
+function activeReputationLinks(updates, wallet2, options) {
+  if (!isHubConsentId(options.hubId)) return [];
+  const profiles = /* @__PURE__ */ new Map();
+  const linkDays = /* @__PURE__ */ new Set();
+  const seen = /* @__PURE__ */ new Set();
+  for (const update of updates) {
+    if (update.kind !== "reputation-link" || !update.reputationLink) continue;
+    if (typeof update.hash !== "string" || update.hash.length === 0) continue;
+    const link = update.reputationLink;
+    if (link.wallet !== wallet2 || link.date > options.today) continue;
+    const matched = matchReputationLink(link, options.hubId);
+    if (!matched) continue;
+    const signature = signatureKey2(link.signature);
+    if (seen.has(signature)) continue;
+    seen.add(signature);
+    const state2 = profileState(profiles, link.profile);
+    if (matched.action === "unlink" || matched.scope === null) {
+      if (state2.unlinkDate === null || link.date > state2.unlinkDate) state2.unlinkDate = link.date;
+      hideThrough(state2);
+      continue;
+    }
+    if (state2.unlinkDate !== null && link.date <= state2.unlinkDate) continue;
+    if (linkDays.has(link.date)) continue;
+    const current = state2.scopes.get(matched.scope);
+    if (current && link.date <= current.date) continue;
+    linkDays.add(link.date);
+    state2.scopes.set(matched.scope, { date: link.date, hash: update.hash });
+  }
+  const active = [];
+  for (const [profile, state2] of profiles) {
+    for (const scope of REPUTATION_SCOPES) {
+      const current = state2.scopes.get(scope);
+      if (!current) continue;
+      active.push({ profile, scope, date: current.date, hash: current.hash });
+    }
+  }
+  return active;
+}
+function shownReputationLinkHashes(updates, options) {
+  const wallets = /* @__PURE__ */ new Set();
+  for (const update of updates) {
+    if (update.kind === "reputation-link" && update.reputationLink) wallets.add(update.reputationLink.wallet);
+  }
+  const hashes = /* @__PURE__ */ new Set();
+  for (const wallet2 of wallets) {
+    for (const item of activeReputationLinks(updates, wallet2, options)) hashes.add(item.hash);
+  }
+  return hashes;
+}
+function profileState(profiles, profile) {
+  const existing = profiles.get(profile);
+  if (existing) return existing;
+  const created = { unlinkDate: null, scopes: /* @__PURE__ */ new Map() };
+  profiles.set(profile, created);
+  return created;
+}
+function hideThrough(state2) {
+  if (state2.unlinkDate === null) return;
+  for (const [scope, hit] of state2.scopes) {
+    if (hit.date <= state2.unlinkDate) state2.scopes.delete(scope);
+  }
+}
+function signatureKey2(signature) {
+  try {
+    return base58Encode(base58Decode(signature));
+  } catch {
+    return signature;
+  }
+}
+function verifyMessage2(message, link) {
+  let signature;
+  let publicKey;
+  try {
+    signature = base58Decode(link.signature);
+    publicKey = base58Decode(link.wallet);
+  } catch {
+    return false;
+  }
+  return verifyEd25519Detached(new TextEncoder().encode(message), signature, publicKey);
+}
+function validWallet2(value) {
+  if (!ADDRESS_PATTERN5.test(value)) return false;
+  try {
+    return base58Decode(value).length === 32;
+  } catch {
+    return false;
+  }
+}
+function validProfile(value) {
+  if (PROFILE_NAME_PATTERN.test(value)) return true;
+  return validWallet2(value);
+}
+function validPlayerSignature2(value) {
+  try {
+    return base58Decode(value).length === 64;
+  } catch {
+    return false;
+  }
+}
+function validDate2(value) {
+  if (!DATE_PATTERN3.test(value)) return false;
+  const year = Number(value.slice(0, 4));
+  const month2 = Number(value.slice(5, 7));
+  const day = Number(value.slice(8, 10));
+  if (!Number.isInteger(year) || month2 < 1 || month2 > 12 || day < 1 || day > 31) return false;
+  const time3 = Date.UTC(year, month2 - 1, day);
+  const date4 = new Date(time3);
+  return date4.getUTCFullYear() === year && date4.getUTCMonth() === month2 - 1 && date4.getUTCDate() === day;
+}
+
 // src/hub/update.ts
-var ED25519_SPKI_PREFIX2 = Buffer.from("302a300506032b6570032100", "hex");
-var ED25519_PUBLIC_KEY_LENGTH = 32;
 var ED25519_SIGNATURE_LENGTH = 64;
 var HUB_UPDATE_SCHEMA = "sa-ecosystem-node.hub-update.v1";
 var HUB_UPDATE_DOMAIN = "sa-ecosystem-node:hub-update:v1\n";
 var HUB_APPROVAL_DOMAIN = "sa-ecosystem-node:hub-approval:v1\n";
-var HUB_UPDATE_KINDS = ["announcement", "proposal-note", "payment-note", "status", "signer-change", "listing", "guild", "story-optin", "claim", "attestation"];
+var HUB_UPDATE_KINDS = ["announcement", "proposal-note", "payment-note", "status", "signer-change", "listing", "guild", "story-optin", "claim", "attestation", "reputation-link"];
 var ID_PATTERN2 = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,79}$/;
 var TIME_PATTERN4 = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
 var HASH_PATTERN2 = /^[0-9a-f]{64}$/;
@@ -27252,6 +27476,9 @@ function canonicalHubPayload(payload) {
   }
   if (payload.kind === "story-optin" && payload.storyOptIn) {
     document.storyOptIn = storyOptInCanonical(payload.storyOptIn);
+  }
+  if (payload.kind === "reputation-link" && payload.reputationLink) {
+    document.reputationLink = reputationLinkCanonical(payload.reputationLink);
   }
   if (payload.kind === "claim" && payload.claim) {
     document.claim = claimCanonical(payload.claim);
@@ -27313,7 +27540,7 @@ function parseHubPayload(value) {
   const extra = keys.filter((key) => !baseKeys.includes(key));
   if (extra.length > 1) return null;
   const extraKey = extra[0];
-  if (extraKey !== void 0 && extraKey !== "change" && extraKey !== "listing" && extraKey !== "guild" && extraKey !== "storyOptIn" && extraKey !== "claim" && extraKey !== "attestation") {
+  if (extraKey !== void 0 && extraKey !== "change" && extraKey !== "listing" && extraKey !== "guild" && extraKey !== "storyOptIn" && extraKey !== "reputationLink" && extraKey !== "claim" && extraKey !== "attestation") {
     return null;
   }
   if (record4.v !== 1) return null;
@@ -27336,6 +27563,7 @@ function parseHubPayload(value) {
   let listing;
   let guild;
   let storyOptIn;
+  let reputationLink;
   let claim2;
   let attestation;
   if (record4.kind === "signer-change") {
@@ -27354,6 +27582,10 @@ function parseHubPayload(value) {
     if (extraKey !== "storyOptIn") return null;
     storyOptIn = parseStoryOptIn(record4.storyOptIn) ?? void 0;
     if (!storyOptIn) return null;
+  } else if (record4.kind === "reputation-link") {
+    if (extraKey !== "reputationLink") return null;
+    reputationLink = parseReputationLink(record4.reputationLink) ?? void 0;
+    if (!reputationLink) return null;
   } else if (record4.kind === "claim") {
     if (extraKey !== "claim") return null;
     claim2 = parseClaim(record4.claim) ?? void 0;
@@ -27378,6 +27610,7 @@ function parseHubPayload(value) {
     ...listing ? { listing: copyListing(listing) } : {},
     ...guild ? { guild: copyGuild(guild) } : {},
     ...storyOptIn ? { storyOptIn: copyStoryOptIn(storyOptIn) } : {},
+    ...reputationLink ? { reputationLink: copyReputationLink(reputationLink) } : {},
     ...claim2 ? { claim: copyClaim(claim2) } : {},
     ...attestation ? { attestation: copyAttestation(attestation) } : {}
   };
@@ -27411,21 +27644,7 @@ function parseSignedHubDocument(value) {
 }
 function authorSignatureValid(payload, signature) {
   try {
-    return verifyDetached(hubUpdateSigningMessage(payload), base58Decode(signature), base58Decode(payload.author));
-  } catch {
-    return false;
-  }
-}
-function verifyDetached(message, signature, publicKey) {
-  if (publicKey.length !== ED25519_PUBLIC_KEY_LENGTH) return false;
-  if (signature.length !== ED25519_SIGNATURE_LENGTH) return false;
-  try {
-    const key = createPublicKey2({
-      key: Buffer.concat([ED25519_SPKI_PREFIX2, Buffer.from(publicKey)]),
-      format: "der",
-      type: "spki"
-    });
-    return cryptoVerify2(null, message, key, signature);
+    return verifyEd25519Detached(hubUpdateSigningMessage(payload), base58Decode(signature), base58Decode(payload.author));
   } catch {
     return false;
   }
@@ -27501,7 +27720,7 @@ function classifyApprovals(payload, approvals, allowlist, excludeAuthor, revoked
     } catch {
       continue;
     }
-    if (!verifyDetached(message, signature, publicKey)) continue;
+    if (!verifyEd25519Detached(message, signature, publicKey)) continue;
     if (revoked.has(approval.publicKey)) revokedKeys.push(approval.publicKey);
     else counted.push(approval.publicKey);
   }
@@ -27520,7 +27739,7 @@ function authorIsOnlyApprover(payload, approvals) {
     } catch {
       continue;
     }
-    if (!verifyDetached(message, signature, publicKey)) continue;
+    if (!verifyEd25519Detached(message, signature, publicKey)) continue;
     keys.push(approval.publicKey);
   }
   return keys.length === 1 && keys[0] === payload.author;
@@ -27549,7 +27768,7 @@ function walletsThatSigned(payload, approvals) {
     } catch {
       continue;
     }
-    if (!verifyDetached(message, signature, publicKey)) continue;
+    if (!verifyEd25519Detached(message, signature, publicKey)) continue;
     keys.add(approval.publicKey);
   }
   return [...keys].sort();
@@ -27702,6 +27921,7 @@ function toVerified(candidate) {
     ...candidate.payload.listing ? { listing: copyListing(candidate.payload.listing) } : {},
     ...candidate.payload.guild ? { guild: copyGuild(candidate.payload.guild) } : {},
     ...candidate.payload.storyOptIn ? { storyOptIn: copyStoryOptIn(candidate.payload.storyOptIn) } : {},
+    ...candidate.payload.reputationLink ? { reputationLink: copyReputationLink(candidate.payload.reputationLink) } : {},
     ...candidate.payload.claim ? { claim: copyClaim(candidate.payload.claim) } : {},
     ...candidate.payload.attestation ? { attestation: copyAttestation(candidate.payload.attestation) } : {},
     verified: true,
@@ -28912,8 +29132,9 @@ async function readHubUpdates(source, allowlist, threshold, kind, signerSets, op
     profile: options?.profile
   });
   const stamped = stampClaimed(selectPublicUpdates(checked.updates, directory.picks), directory);
+  const today = utcDateStamp(options?.now ?? /* @__PURE__ */ new Date());
   const updates = withLogoSrc(
-    withStoryConsent(kind ? stamped.filter((update) => update.kind === kind) : stamped, hubId),
+    withStoryConsent(kind ? stamped.filter((update) => update.kind === kind) : stamped, hubId, today),
     imagePin(source)
   );
   const rejected = options?.rejectedKind ? rejectionsForKind(loaded.documents, checked.rejected, options.rejectedKind) : checked.rejected;
@@ -28942,10 +29163,20 @@ function stampClaimed(updates, directory) {
     return { ...update, claimed: true };
   });
 }
-function withStoryConsent(updates, hubId) {
+function withStoryConsent(updates, hubId, today = utcDateStamp(/* @__PURE__ */ new Date())) {
+  const shown = shownReputationLinkHashes(updates, { hubId, today });
   return updates.map((update) => {
-    if (update.kind !== "story-optin" || !update.storyOptIn) return update;
-    return { ...update, consent: storyOptInConsent(update.storyOptIn, hubId) };
+    if (update.kind === "story-optin" && update.storyOptIn) {
+      return { ...update, consent: storyOptInConsent(update.storyOptIn, hubId) };
+    }
+    if (update.kind === "reputation-link" && update.reputationLink) {
+      return {
+        ...update,
+        consent: reputationLinkConsent(update.reputationLink, hubId),
+        linkShown: shown.has(update.hash)
+      };
+    }
+    return update;
   });
 }
 var LISTING_NOTE = "list_listings returns listing updates only. The rejected list is listing updates only. The url is the business's own https page or checkout. An optional image is a public png, jpeg, or webp logo covered by the same signature. src is set only for a hub-relative path resolved to raw.githubusercontent.com at the pinned commit. An external https logo stays in url and is not loaded by the plain page. This node does not take payment and does not upload images. A listing whose status is withdrawn is a takedown and is left out. A listing whose expiresAt is before the current UTC date is hidden unless includeExpired is true, and those rows have expired set to true. signerDisplayName is the author's label on the trusted signer file. signedMeaning is one plain line for that signature.";

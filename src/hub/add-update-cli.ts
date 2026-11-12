@@ -18,6 +18,7 @@ import { pathToFileURL } from "node:url";
 import { guildBodyProblem, guildFailureMessage, inspectGuild } from "./guild.js";
 import { inspectListing, listingFailureMessage, listingIdentity } from "./listing.js";
 import { normalizeSearchQuery } from "./search.js";
+import { parseReputationLink, reputationLinkSignatureValid } from "./reputation-link.js";
 import { normalizeHubRepo, parseStoryOptIn, storyOptInSignatureValid } from "./story-optin.js";
 import { nodeRepoRoot } from "./repo-path.js";
 import { approveHubDocument, readSolanaKeyFile, signHubPayload, solanaKeyAddress } from "./sign-cli.js";
@@ -42,7 +43,7 @@ import {
  */
 
 const USAGE = [
-  "Usage: npm run hub-add-update -- --store <dir> (--payload <file> | --id <id> --kind <kind> --body <text> [--listing <json>] [--guild <json>] [--story-optin <json>]) [--author <address>] [--prev <hash>] [--created-at <time>] [--pip <id>] [--tx <sig>] [--keypair <path>] [--approve] [--manifest <path>] [--hub-repo <url>] [--dry-run]",
+  "Usage: npm run hub-add-update -- --store <dir> (--payload <file> | --id <id> --kind <kind> --body <text> [--listing <json>] [--guild <json>] [--story-optin <json>] [--reputation-link <json>]) [--author <address>] [--prev <hash>] [--created-at <time>] [--pip <id>] [--tx <sig>] [--keypair <path>] [--approve] [--manifest <path>] [--hub-repo <url>] [--dry-run]",
 ].join("\n");
 
 interface Report {
@@ -602,6 +603,12 @@ function assertStoryConsent(opt: NonNullable<ReturnType<typeof parseStoryOptIn>>
   if (!storyOptInSignatureValid(opt, hubId)) throw new Error("The player signature did not verify.");
 }
 
+function assertReputationConsent(link: NonNullable<ReturnType<typeof parseReputationLink>>, repo: string): void {
+  const hubId = normalizeHubRepo(repo);
+  if (!hubId) throw new Error("Pass --hub-repo with an https repository URL. The hub id is that URL, not a file name.");
+  if (!reputationLinkSignatureValid(link, hubId)) throw new Error("The player signature did not verify.");
+}
+
 function originUrl(store: string): string {
   const remote = git(store, ["remote", "get-url", "origin"]);
   return remote.ok ? remote.stdout : "";
@@ -645,6 +652,7 @@ export function runAddUpdateCli(argv: readonly string[], hooks?: AddUpdateHooks)
   let listingText = "";
   let guildText = "";
   let storyOptInText = "";
+  let reputationLinkText = "";
   let hubRepoFlag = "";
   let approve = false;
   let dryRun = false;
@@ -675,6 +683,7 @@ export function runAddUpdateCli(argv: readonly string[], hooks?: AddUpdateHooks)
     else if (arg === "--listing") listingText = next;
     else if (arg === "--guild") guildText = next;
     else if (arg === "--story-optin") storyOptInText = next;
+    else if (arg === "--reputation-link") reputationLinkText = next;
     else if (arg === "--hub-repo") hubRepoFlag = next;
     else if (arg === "--tx") txs.push(next);
     else return fail(USAGE);
@@ -682,7 +691,18 @@ export function runAddUpdateCli(argv: readonly string[], hooks?: AddUpdateHooks)
   }
 
   const flagPayload = Boolean(
-    id || kind || body || author || createdAt || pip || listingText || guildText || storyOptInText || txs.length > 0 || prevFlag !== undefined,
+    id ||
+      kind ||
+      body ||
+      author ||
+      createdAt ||
+      pip ||
+      listingText ||
+      guildText ||
+      storyOptInText ||
+      reputationLinkText ||
+      txs.length > 0 ||
+      prevFlag !== undefined,
   );
   if (!storeArg || (payloadPath ? flagPayload : !id || !kind || !body)) return fail(USAGE);
 
@@ -710,6 +730,10 @@ export function runAddUpdateCli(argv: readonly string[], hooks?: AddUpdateHooks)
       if (kind === "guild" && !guildText) throw new Error("Pass --guild with the guild JSON.");
       if (storyOptInText && kind !== "story-optin") throw new Error("--story-optin is only valid when --kind is story-optin.");
       if (kind === "story-optin" && !storyOptInText) throw new Error("Pass --story-optin with the opt-in JSON.");
+      if (reputationLinkText && kind !== "reputation-link") {
+        throw new Error("--reputation-link is only valid when --kind is reputation-link.");
+      }
+      if (kind === "reputation-link" && !reputationLinkText) throw new Error("Pass --reputation-link with the link JSON.");
       if (kind === "guild" && guildBodyProblem(body)) {
         throw new Error("A guild listing cannot include a wallet address or a price.");
       }
@@ -744,6 +768,17 @@ export function runAddUpdateCli(argv: readonly string[], hooks?: AddUpdateHooks)
         if (!parsed) throw new Error("The story opt-in does not match the schema.");
         assertStoryConsent(parsed, hubRepo);
       }
+      let reputationLink: unknown;
+      if (reputationLinkText) {
+        try {
+          reputationLink = JSON.parse(reputationLinkText) as unknown;
+        } catch {
+          throw new Error("The reputation link JSON could not be read.");
+        }
+        const parsed = parseReputationLink(reputationLink);
+        if (!parsed) throw new Error("The reputation link does not match the schema.");
+        assertReputationConsent(parsed, hubRepo);
+      }
       const payload = parseHubPayload({
         v: 1,
         id,
@@ -756,6 +791,7 @@ export function runAddUpdateCli(argv: readonly string[], hooks?: AddUpdateHooks)
         ...(listingText ? { listing } : {}),
         ...(guildText ? { guild } : {}),
         ...(storyOptInText ? { storyOptIn } : {}),
+        ...(reputationLinkText ? { reputationLink } : {}),
       });
       if (!payload) throw new Error("The payload does not match the hub update schema.");
       if (!key) throw new Error("The payload has no author signature. Pass --keypair for the author.");
@@ -764,6 +800,9 @@ export function runAddUpdateCli(argv: readonly string[], hooks?: AddUpdateHooks)
     }
     if (document.payload.kind === "story-optin" && document.payload.storyOptIn) {
       assertStoryConsent(document.payload.storyOptIn, hubRepo);
+    }
+    if (document.payload.kind === "reputation-link" && document.payload.reputationLink) {
+      assertReputationConsent(document.payload.reputationLink, hubRepo);
     }
     if (document.payload.prev !== tip) {
       throw new Error(
