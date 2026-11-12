@@ -108,7 +108,7 @@ Omitted optional fields use the defaults in the table. Unknown extra fields are 
 | `ecofund_limit` | optional `asOf`, `unpaidPips`, `councilOverride` |
 | `treasury_balances` | none |
 | `pip_tracker` | none |
-| `hub_updates` | optional `kind`: `announcement`, `proposal-note`, `payment-note`, `status`, `signer-change`, `listing`, `guild`, `story-optin`, `claim`, or `attestation`. A `claim` or `attestation` filter still returns no rows, because those kinds are removed before the response |
+| `hub_updates` | optional `kind`: `announcement`, `proposal-note`, `payment-note`, `status`, `signer-change`, `listing`, `guild`, `story-optin`, `claim`, `attestation`, or `reputation-link`. A `claim` or `attestation` filter still returns no rows, because those kinds are removed before the response |
 | `list_listings` | optional `stream` (`referral`, `hybrid`, `irl`, `player`), `category`, `status`, `includeExpired` |
 | `list_c4_markers` | optional `kind` (`listing`, `guild`, `all`), `anchored` (boolean), `stream` (a listing stream) |
 | `list_community_tools` | none |
@@ -164,7 +164,7 @@ Schema `sa-ecosystem-node.hub-update.v1`. One file is `{ "payload", "signature",
 
 Payload fields: `v` (1), `id`, `created_at` (UTC with milliseconds), `author` (base58 address), `kind`, `body`, `refs` (`pip` and `txs`), `prev`. `prev` is null on the first update. After that it is the sha256 hex of the previous payload's canonical JSON.
 
-`kind` is `announcement`, `proposal-note`, `payment-note`, `status`, `signer-change`, `listing`, `guild`, `story-optin`, `claim`, or `attestation`.
+`kind` is `announcement`, `proposal-note`, `payment-note`, `status`, `signer-change`, `listing`, `guild`, `story-optin`, `claim`, `attestation`, or `reputation-link`.
 
 Canonical JSON sorts keys and has no whitespace. The author signs the UTF-8 bytes of `sa-ecosystem-node:hub-update:v1\n` plus that JSON. Each approver signs the UTF-8 bytes of `sa-ecosystem-node:hub-approval:v1\n` plus the sha256 hex of that JSON. Signatures are detached ed25519, stored as base58. An approval is the bytes a Solana wallet signs with `signMessage`. It is not a transaction and it moves no funds.
 
@@ -208,6 +208,22 @@ Revoke sentence:
 
 `<id>` is the normalized `HUB_GIT_REPO` URL, such as `https://github.com/owner/repo`. It is not the manifest file name. An allow counts only when its date is strictly after the latest revoke date. A future date stays in the chain and does not count until that UTC date. Without a valid unrevoked opt-in, `player_story` returns not opted in. If the hub URL is missing or not a valid https repository, the tool returns not available. Story sentences do not copy names or prices. Listings stay in a separate `listings` field. The steps for a claim are in [claim-and-verify.md](claim-and-verify.md).
 
+### Reputation link
+
+Kind `reputation-link`, object `reputationLink`: `action` (`link` or `unlink`), `wallet`, `profile` (a public profile name or a profile address), `date` (`YYYY-MM-DD`), and `signature` (the player's detached signature, base58). The scope is not a field. A reputation link is signed only by the player's own wallet. An agent may prepare the message. It must never sign it for the player.
+
+Link sentence, one scope:
+
+`I link wallet <address> to public profile <profile> on hub <id>. Scope: legacy. Date: <YYYY-MM-DD>.`
+
+`Scope` is `legacy`, `fleets`, `guild`, or `story`. `legacy` is the smallest. A link does not grant any other scope.
+
+Unlink sentence:
+
+`I unlink wallet <address> from public profile <profile> on hub <id>. Date: <YYYY-MM-DD>.`
+
+`<id>` is the normalized `HUB_GIT_REPO` URL. An unlink hides every scope for that wallet and profile from that date on, including a link dated the same day. The records stay in the chain. `hub_updates` sets `consent` to `valid` or `inert`, and `linkShown` to true only for a scope still on display. One counting link per wallet per UTC day. A second link that day stays in the chain and does not add a scope. A future date does not count until that UTC date. This kind does not change signer sets. M6 is still planned. The operator steps are in [reputation-link.md](reputation-link.md).
+
 ### Claim and attestation
 
 Kind `claim` binds one public key (for a player, their own wallet) to one listing id or one guild name. Kind `attestation` is a verifier's statement about Discord or X. Neither kind is returned by `hub_updates`. `claim_status` returns the claim state. The field list, the states, and the commands are in [claim-and-verify.md](claim-and-verify.md).
@@ -246,7 +262,7 @@ Nothing in this section is an MCP tool, a route, or a button in v1.0.0. The type
 | Submitting a claim from `/plain/claim/` without a hub editor | `/plain/claim/` collects the wallet signature and does not publish. A hub editor still commits the file. `POST /submit` remains 404 |
 | Weekly pack, embed widget, and a DAO-tier feed for an ATMTA-hosted dashboard | Not built. `/plain/` is the public page |
 | Application form and a roster of approved ecosystems per category | `list_categories` returns ids and `members: "unknown"` |
-| Agent record keys vouched per stack (one PR to a signer-set file), a shown trust level (`single-stack` / `multi-stack`), per-key rate limits, kind-scoped signer sets | Not implemented. Drafted in [protocol/TRUST-ARCHITECTURE.md](../protocol/TRUST-ARCHITECTURE.md) and [protocol/h2h/SPEC.md](../protocol/h2h/SPEC.md) Appendix A (code items C1–C7). No wallet delegation is planned. The author signs with the key that matches `author` |
+| Agent record keys vouched per stack (one PR to a signer-set file), a shown trust level (`single-stack` / `multi-stack`), per-key rate limits, kind-scoped signer sets | Not implemented. Drafted in [protocol/TRUST-ARCHITECTURE.md](../protocol/TRUST-ARCHITECTURE.md) and [protocol/h2h/SPEC.md](../protocol/h2h/SPEC.md) Appendix A (code items C1–C4 and C7). The `reputation-link` kind is built. M6 is not. No wallet delegation is planned. The author signs with the key that matches `author` |
 | Revoking a whole signer group in one step | `HUB_REVOKED_SIGNERS` drops individual public keys when the process loads config |
 | Cloudflare Workers entry | Not included. The hub reader and the HTTP server use Node APIs. See [hosting.md](hosting.md) |
 | Moving this repository to a Council-owned GitHub organization | The public source repository is `PhoenixClaw01/sa-ecosystem-node` |

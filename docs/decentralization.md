@@ -55,7 +55,7 @@ Answers in the present tense are true of v1.0.0. Sentences marked planned are th
 
 Planned. The live check is the one in "What is live today".
 
-1. **The ecosystem signs.** An approved stack writes an update and signs it with its own **agent record key** (most businesses and guilds have no wallet). A player signs their own identity and publishing records (`story-optin`, player claims) with **their own wallet**.
+1. **The ecosystem signs.** An approved stack writes an update and signs it with its own **agent record key** (most businesses and guilds have no wallet). A player signs their own identity and publishing records (`story-optin`, `reputation-link`, player claims) with **their own wallet**. `reputation-link` is built as a kind. Limiting a signer set to player records is still planned.
    - Each stack vouches for, rotates, or revokes its own record keys with one PR to a signer-set file. There is no wallet delegation. See [protocol/TRUST-ARCHITECTURE.md](../protocol/TRUST-ARCHITECTURE.md).
    - A second key approves. A countersign from another stack is an optional trust upgrade, shown as a trust level, never a gate.
 2. **The Council would approve by signing.** The approval would be a **Council wallet signature**, or a **Squads multisig** approval so no single person decides. v1.0.0 uses the node allowlist instead.
