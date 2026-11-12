@@ -5,18 +5,18 @@ import type { ProfileKeyChecker } from "./claim-profile.js";
 import {
   buildPlayerAttestationDraft,
   buildPlayerClaimDraft,
-  buildVerifierAttestationDraft,
   discordProof,
   PLAYER_PACK_NOTE,
   readyPlayerPack,
   signedHubDocument,
+  verifierAttestationForClaim,
   writePlayerPack,
   type PlayerClaimFields,
 } from "./player-discord-flow.js";
 import { normalizeWalletSignature } from "./sign-cli.js";
 import { hubUpdateHash, type HubUpdatePayload } from "./update.js";
-import { discordAuthorizeUrl, discordIdentify, discordVerifierConfig, type DiscordVerifierConfig } from "./verifier/discord-oauth.js";
-import { bindAttestationState, type VerifierProof } from "./verifier/proof.js";
+import { discordAuthorizeUrl, discordIdentify, discordPkce, discordVerifierConfig, type DiscordVerifierConfig } from "./verifier/discord-oauth.js";
+import { opaqueVerifierState, type VerifierProof } from "./verifier/proof.js";
 import { PLAYER_FLOW_HTML, PLAYER_FLOW_SCRIPT } from "./player-flow-page.js";
 
 /**
@@ -65,8 +65,11 @@ interface Session {
   id: string;
   state: string;
   salt: string;
+  /** PKCE verifier. It is not returned to the browser. */
+  verifier: string;
   fields: PlayerClaimFields;
   proof: VerifierProof | null;
+  codeUsed: boolean;
   createdAtMs: number;
 }
 
@@ -117,9 +120,12 @@ export function createPlayerExchange(
       return text(400, "That request is refused.");
     }
     if (url.hostname !== "127.0.0.1") return text(403, "This exchange listens on 127.0.0.1 only.");
-    if (request.headers.get("sec-fetch-site") === "cross-site") return text(403, "Cross-site requests are refused.");
+    const navigation = discordCallbackNavigation(request, url, listen.callbackPath);
+    if (request.headers.get("sec-fetch-site") === "cross-site" && !navigation) {
+      return text(403, "Cross-site requests are refused.");
+    }
     const origin = request.headers.get("origin");
-    if (origin && origin !== `http://127.0.0.1:${listen.port}`) return text(403, "That origin is refused.");
+    if (!navigation && origin && origin !== `http://127.0.0.1:${listen.port}`) return text(403, "That origin is refused.");
     if (request.method === "GET" && url.pathname === "/") return html(PLAYER_FLOW_HTML);
     if (request.method === "GET" && url.pathname === "/player.js") {
       return new Response(PLAYER_FLOW_SCRIPT, {
@@ -167,10 +173,11 @@ export function createPlayerExchange(
     if (!draft?.payload.claim) return json(400, { error: "Those fields do not match the claim schema." });
     dropExpired();
     const salt = base58Encode(randomBytes(16));
-    const state = bindAttestationState({ wallet: draft.payload.author, nonce: draft.payload.claim.nonce, salt });
+    const state = opaqueVerifierState(randomBytes(32));
+    const pkce = discordPkce(randomBytes(32));
     let authorizeUrl = "";
     try {
-      authorizeUrl = discordAuthorizeUrl(discord, state);
+      authorizeUrl = discordAuthorizeUrl(discord, state, pkce.challenge);
     } catch {
       return json(400, { error: "The Discord authorize URL was refused." });
     }
@@ -182,6 +189,7 @@ export function createPlayerExchange(
       id,
       state,
       salt,
+      verifier: pkce.verifier,
       fields: {
         ...fields,
         wallet: draft.payload.author,
@@ -191,6 +199,7 @@ export function createPlayerExchange(
         listingId: draft.payload.claim.identity.type === "listing" ? draft.payload.claim.identity.listingId : fields.listingId,
       },
       proof: null,
+      codeUsed: false,
       createdAtMs: now(),
     });
     return json(200, { authorizeUrl });
@@ -201,9 +210,11 @@ export function createPlayerExchange(
     const state = url.searchParams.get("state") ?? "";
     const session = [...sessions.values()].find((item) => item.state === state);
     if (!session) return text(400, "The Discord state does not match this exchange.");
+    if (session.codeUsed || session.proof) return text(400, "That Discord state was already used.");
+    session.codeUsed = true;
     let identity: { id: string };
     try {
-      identity = await discordIdentify(discord, code, fetchImpl);
+      identity = await discordIdentify(discord, code, session.verifier, fetchImpl);
     } catch {
       return text(400, "Discord did not confirm the account.");
     }
@@ -289,24 +300,11 @@ export function createPlayerExchange(
     }
     let verifier = null;
     if (options.signVerifier && options.verifierKey && options.verifierId) {
-      const claim = buildPlayerClaimDraft(session.fields);
-      if (!claim) return json(400, { published: false, error: "Those fields do not match the claim schema." });
-      const playerAttestation = buildPlayerAttestationDraft({
+      const draft = verifierAttestationForClaim({
+        fields: session.fields,
         proof: session.proof,
-        hub: session.fields.hub,
-        issuedAt: session.fields.createdAt,
-        expiresAt: session.fields.expiresAt,
-        prev: hubUpdateHash(claim.payload),
-      });
-      if (!playerAttestation) return json(400, { published: false, error: "The verifier attestation was not signed. Nothing was written." });
-      const draft = buildVerifierAttestationDraft({
-        proof: session.proof,
-        hub: session.fields.hub,
         verifierKey: options.verifierKey,
         verifierId: options.verifierId,
-        issuedAt: session.fields.createdAt,
-        expiresAt: session.fields.expiresAt,
-        prev: hubUpdateHash(playerAttestation.payload),
       });
       if (!draft) return json(400, { published: false, error: "The verifier attestation was not signed. Nothing was written." });
       try {
@@ -376,6 +374,17 @@ async function readBody(request: Request): Promise<unknown | null> {
 
 function stringField(value: unknown): string {
   return typeof value === "string" ? value : "";
+}
+
+/** Discord's redirect is a cross-site top-level GET. Every other cross-site request stays refused. */
+function discordCallbackNavigation(request: Request, url: URL, callbackPath: string): boolean {
+  return (
+    request.method === "GET" &&
+    url.pathname === callbackPath &&
+    request.headers.get("sec-fetch-site") === "cross-site" &&
+    request.headers.get("sec-fetch-mode") === "navigate" &&
+    request.headers.get("sec-fetch-dest") === "document"
+  );
 }
 
 function jsonMentions(value: unknown, secret: string): boolean {

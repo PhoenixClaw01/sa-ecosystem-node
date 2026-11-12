@@ -210,7 +210,7 @@ npm run hub-attest -- discord-code --code <code> --state <state> --wallet <subje
 npm run hub-attest -- build --proof-file proof.json --wallet <subject> --nonce <nonce> ...
 ```
 
-`discord-url` binds the OAuth state to that wallet and nonce. `discord-code` checks the state matches, then writes a proof file with the verified account id and the salt. `build` refuses to run without that proof file. A raw Discord id is not a public handle. `--show-handle` is ignored for a numeric Discord id. The subject's claim must already have set `showHandles` or the node rejects an attestation that includes a handle.
+`discord-url` stores the wallet, nonce, and salt on this machine under a random state. The authorize URL carries that state and a PKCE S256 challenge, not the wallet. `discord-code` checks the state matches, then writes a proof file with the verified account id and the salt. A second code for the same state is refused. `build` refuses to run without that proof file. A raw Discord id is not a public handle. `--show-handle` is ignored for a numeric Discord id. The subject's claim must already have set `showHandles` or the node rejects an attestation that includes a handle.
 
 The player command does the same identify exchange on loopback, then asks the wallet to sign the claim and the attestation. It reads the Player Profile before it writes files. A mismatch or an unfinished read writes nothing.
 

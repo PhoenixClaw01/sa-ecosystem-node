@@ -37,8 +37,8 @@ import {
   writePlayerPack,
 } from "../src/hub/player-discord-flow.js";
 import { createPlayerExchange, exchangeListenTarget } from "../src/hub/player-exchange.js";
-import { discordAuthorizeUrl, discordIdentify, discordVerifierConfig } from "../src/hub/verifier/discord-oauth.js";
-import { bindAttestationState } from "../src/hub/verifier/proof.js";
+import { discordAuthorizeUrl, discordIdentify, discordPkce, discordVerifierConfig } from "../src/hub/verifier/discord-oauth.js";
+import { opaqueVerifierState } from "../src/hub/verifier/proof.js";
 import { fetchPostedCode, postContainsCode } from "../src/hub/verifier/x-proof.js";
 import { sharedMissWindow } from "../src/legacy/gate.js";
 
@@ -799,16 +799,26 @@ describe("optional verifier module", () => {
       DISCORD_REDIRECT_URI: "http://127.0.0.1:8788/discord",
     });
     expect(config).not.toBeNull();
-    const url = discordAuthorizeUrl(config!, "state-1111");
+    const pkce = discordPkce(new Uint8Array(32).fill(3));
+    const url = discordAuthorizeUrl(config!, "state-1111", pkce.challenge);
     expect(url).toContain("scope=identify");
+    expect(url).toContain("code_challenge_method=S256");
+    expect(url).toContain(`code_challenge=${encodeURIComponent(pkce.challenge)}`);
+    expect(url).not.toContain(pkce.verifier);
     expect(url).not.toContain("guilds");
     expect(url).not.toContain("test-secret-value");
-    const identity = await discordIdentify(config!, "code-1234", (async (input) => {
-      const url = String(input);
-      const body = url.includes("oauth2/token")
+    const identity = await discordIdentify(config!, "code-1234", pkce.verifier, (async (input, init) => {
+      const target = String(input);
+      if (target.includes("oauth2/token")) {
+        const raw = init?.body;
+        const body = raw instanceof URLSearchParams ? raw.toString() : String(raw ?? "");
+        expect(body).toContain(`code_verifier=${pkce.verifier}`);
+        expect(body).not.toContain(pkce.challenge);
+      }
+      const payload = target.includes("oauth2/token")
         ? { access_token: "token-value", scope: "identify" }
         : { id: "123456789012345678" };
-      return new Response(JSON.stringify(body), { status: 200 });
+      return new Response(JSON.stringify(payload), { status: 200 });
     }) as typeof fetch);
     expect(identity.id).toBe("123456789012345678");
     expect(postContainsCode("posted code ABCDEFGH today", "ABCDEFGH")).toBe(true);
@@ -1239,7 +1249,6 @@ describe("red-team regressions", () => {
 
   it("rejects an OAuth state that does not match the wallet and nonce", async () => {
     const wallet = signer().publicKey;
-    const state = bindAttestationState({ wallet, nonce: "nonce-1111", salt: "salt-value-1" });
     const previous = {
       id: process.env.DISCORD_CLIENT_ID,
       secret: process.env.DISCORD_CLIENT_SECRET,
@@ -1248,6 +1257,11 @@ describe("red-team regressions", () => {
     process.env.DISCORD_CLIENT_ID = "123456789012345678";
     process.env.DISCORD_CLIENT_SECRET = "test-secret-value";
     process.env.DISCORD_REDIRECT_URI = "http://127.0.0.1:8788/discord";
+    const opened = await runAttestCli(["discord-url", "--wallet", wallet, "--nonce", "nonce-1111"]);
+    expect(opened.code, opened.stderr).toBe(0);
+    expect(opened.stdout).toContain("code_challenge_method=S256");
+    expect(opened.stdout).not.toContain(wallet);
+    const state = /discord-code\): (\S+)/.exec(opened.stderr)?.[1] ?? "";
     const mismatched = await runAttestCli([
       "discord-code",
       "--code",
@@ -1257,7 +1271,7 @@ describe("red-team regressions", () => {
       "--wallet",
       wallet,
       "--nonce",
-      "other-nonce",
+      "other-nonce1",
     ]);
     process.env.DISCORD_CLIENT_ID = previous.id;
     process.env.DISCORD_CLIENT_SECRET = previous.secret;
@@ -1481,7 +1495,7 @@ function discordProofFor(wallet: string, nonce = PLAYER_FIELDS.nonce) {
     salt,
     wallet,
     nonce,
-    state: bindAttestationState({ wallet, nonce, salt }),
+    state: opaqueVerifierState(new Uint8Array(32).fill(9)),
   };
 }
 
@@ -1589,6 +1603,30 @@ describe("player discord claim flow", () => {
     expect(unavailable).toEqual({ ok: false, reason: "profile_unavailable" });
   });
 
+  it("refuses a claim whose expiry is already past", () => {
+    const player = signer();
+    const profile = signer();
+    const fields = { ...playerFields(player.publicKey, profile.publicKey), expiresAt: "2020-01-01T00:00:00.000Z" };
+    const proof = discordProofFor(player.publicKey);
+    const claim = buildPlayerClaimDraft(fields);
+    const attestation = buildPlayerAttestationDraft({
+      proof,
+      hub: fields.hub,
+      issuedAt: fields.createdAt,
+      expiresAt: fields.expiresAt,
+      prev: hubUpdateHash(claim!.payload),
+    });
+    const packed = readyPlayerPack({
+      fields,
+      proof,
+      claimSignature: signUtf8(player.secret, claim!.message.utf8),
+      attestationSignature: signUtf8(player.secret, attestation!.message.utf8),
+      profile: "match",
+      nowMs: NOW.getTime(),
+    });
+    expect(packed).toEqual({ ok: false, reason: "expired" });
+  });
+
   it("chains a verifier attestation after the player signature when the profile matches", async () => {
     const player = signer();
     const verifier = signer();
@@ -1678,17 +1716,30 @@ describe("player discord claim flow", () => {
         seen.push(url);
         const raw = init?.body;
         const body = typeof raw === "string" ? raw : raw instanceof URLSearchParams ? raw.toString() : "";
-        if (url.includes("oauth2/token")) expect(body).toContain("client_secret=test-secret-value");
+        if (url.includes("oauth2/token")) {
+          expect(body).toContain("client_secret=test-secret-value");
+          expect(body).toContain("code_verifier=");
+          const verifier = new URLSearchParams(body).get("code_verifier") ?? "";
+          expect(verifier).not.toContain("test-secret-value");
+          expect(verifier.length).toBeGreaterThanOrEqual(43);
+        }
         expect(url).not.toContain("test-secret-value");
         if (url.includes("oauth2/token")) {
           return new Response(JSON.stringify({ access_token: "token-value", scope: "identify" }), { status: 200 });
         }
-        return new Response(JSON.stringify({ id: DISCORD_ACCOUNT }), { status: 200 });
+        return new Response(JSON.stringify({ id: seen.filter((item) => item.includes("users/@me")).length > 1 ? "999999999999999999" : DISCORD_ACCOUNT }), { status: 200 });
       }) as typeof fetch,
     });
     expect(opened.ok).toBe(true);
     if (!opened.ok) return;
-    const headers = { "content-type": "application/json", "x-player-flow": "1", origin: "http://127.0.0.1:8788" };
+    const headers = {
+      "content-type": "application/json",
+      "x-player-flow": "1",
+      origin: "http://127.0.0.1:8788",
+      "sec-fetch-site": "same-origin",
+      "sec-fetch-mode": "cors",
+      "sec-fetch-dest": "empty",
+    };
     const begun = await opened.handle(new Request("http://127.0.0.1:8788/begin", {
       method: "POST",
       headers,
@@ -1697,11 +1748,45 @@ describe("player discord claim flow", () => {
     const started = (await begun.json()) as { authorizeUrl?: string };
     expect(begun.status).toBe(200);
     expect(started.authorizeUrl).toContain("scope=identify");
+    expect(started.authorizeUrl).toContain("code_challenge_method=S256");
     expect(started.authorizeUrl).not.toContain("guilds");
     expect(started.authorizeUrl).not.toContain("test-secret-value");
+    expect(started.authorizeUrl).not.toContain(player.publicKey);
     const state = new URL(started.authorizeUrl ?? "").searchParams.get("state") ?? "";
-    const callback = await opened.handle(new Request(`http://127.0.0.1:8788/discord?code=code-1234&state=${encodeURIComponent(state)}`));
+    expect(Buffer.from(state, "base64url").toString("utf8")).not.toContain(player.publicKey);
+    const callback = await opened.handle(new Request(`http://127.0.0.1:8788/discord?code=code-1234&state=${encodeURIComponent(state)}`, {
+      headers: {
+        "sec-fetch-site": "cross-site",
+        "sec-fetch-mode": "navigate",
+        "sec-fetch-dest": "document",
+      },
+    }));
     expect(callback.status).toBe(302);
+    const replay = await opened.handle(new Request(`http://127.0.0.1:8788/discord?code=code-5678&state=${encodeURIComponent(state)}`, {
+      headers: {
+        "sec-fetch-site": "cross-site",
+        "sec-fetch-mode": "navigate",
+        "sec-fetch-dest": "document",
+      },
+    }));
+    expect(replay.status).toBe(400);
+    expect(await replay.text()).toMatch(/already used/);
+    const fetchCallback = await opened.handle(new Request(`http://127.0.0.1:8788/discord?code=code-9999&state=${encodeURIComponent(state)}`, {
+      headers: {
+        "sec-fetch-site": "cross-site",
+        "sec-fetch-mode": "cors",
+        "sec-fetch-dest": "empty",
+      },
+    }));
+    expect(fetchCallback.status).toBe(403);
+    const crossHome = await opened.handle(new Request("http://127.0.0.1:8788/", {
+      headers: {
+        "sec-fetch-site": "cross-site",
+        "sec-fetch-mode": "navigate",
+        "sec-fetch-dest": "document",
+      },
+    }));
+    expect(crossHome.status).toBe(403);
     const session = new URL(callback.headers.get("location") ?? "", "http://127.0.0.1:8788").searchParams.get("session");
     const messages = await opened.handle(new Request("http://127.0.0.1:8788/messages", {
       method: "POST",
@@ -1736,7 +1821,13 @@ describe("player discord claim flow", () => {
     expect(seen.some((url) => url.includes("oauth2/token"))).toBe(true);
     const cross = await opened.handle(new Request("http://127.0.0.1:8788/finish", {
       method: "POST",
-      headers: { ...headers, origin: "https://example.com" },
+      headers: {
+        ...headers,
+        origin: "https://example.com",
+        "sec-fetch-site": "cross-site",
+        "sec-fetch-mode": "cors",
+        "sec-fetch-dest": "empty",
+      },
       body: JSON.stringify({ session, claimSignature: "x", attestationSignature: "y" }),
     }));
     expect(cross.status).toBe(403);

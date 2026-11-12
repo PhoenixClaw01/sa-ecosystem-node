@@ -6,18 +6,17 @@ import { loadConfig } from "../config.js";
 import { createRpcClient } from "../dao/rpc.js";
 import { createProfileKeyChecker, type ProfileKeyChecker } from "./claim-profile.js";
 import {
-  buildPlayerAttestationDraft,
   buildPlayerClaimDraft,
-  buildVerifierAttestationDraft,
   PLAYER_PACK_NOTE,
   readyPlayerPack,
   signedHubDocument,
+  verifierAttestationForClaim,
   writePlayerPack,
   type PlayerClaimFields,
 } from "./player-discord-flow.js";
 import { createPlayerExchange } from "./player-exchange.js";
 import { normalizeWalletSignature, readSolanaKeyFile, signHubPayload, solanaKeyAddress } from "./sign-cli.js";
-import { hubUpdateHash, type HubUpdatePayload } from "./update.js";
+import type { HubUpdatePayload } from "./update.js";
 
 /**
  * Player-facing claim files. Discord identify stays on 127.0.0.1.
@@ -132,24 +131,12 @@ async function pack(
     const verifierId = flag(argv, "--verifier-id");
     if (!verifierId) return fail("Pass --verifier-id with the verifier key.");
     const key = readSolanaKeyFile(verifierKey);
-    const playerAttestation = buildPlayerAttestationDraft({
+    const draft = verifierAttestationForClaim({
+      fields,
       proof,
-      hub: fields.hub,
-      issuedAt: fields.createdAt,
-      expiresAt: fields.expiresAt,
-      prev: hubUpdateHash(claim.payload),
+      verifierKey: solanaKeyAddress(key),
+      verifierId,
     });
-    const draft = playerAttestation
-      ? buildVerifierAttestationDraft({
-          proof,
-          hub: fields.hub,
-          verifierKey: solanaKeyAddress(key),
-          verifierId,
-          issuedAt: fields.createdAt,
-          expiresAt: fields.expiresAt,
-          prev: hubUpdateHash(playerAttestation.payload),
-        })
-      : null;
     if (!draft) return fail("The verifier attestation was not signed. Nothing was written.");
     verifier = signedHubDocument(draft.payload, signHubPayload(draft.payload, key).signature);
     if (!verifier) return fail("The verifier attestation was not signed. Nothing was written.");
@@ -173,7 +160,9 @@ async function pack(
         ? "The wallet is not the Player Profile auth key. Nothing was written."
         : packed.reason === "profile_unavailable"
           ? "The Player Profile could not be read. Nothing was written."
-          : "The signed files were refused. Nothing was written.",
+          : packed.reason === "expired"
+            ? "The claim has expired. Nothing was written."
+            : "The signed files were refused. Nothing was written.",
     );
   }
   const files = writePlayerPack(out, packed.pack);

@@ -1,13 +1,17 @@
+import { createHash } from "node:crypto";
+
 /**
  * Optional Discord verifier. It stays off unless the operator sets
  * DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET, and DISCORD_REDIRECT_URI together.
  * The only scope is identify. The node does not import this module.
+ * The authorize URL uses PKCE S256. The code verifier stays on the operator machine.
  */
 
 const IDENTIFY_SCOPE = "identify";
 const AUTHORIZE_URL = "https://discord.com/oauth2/authorize";
 const TOKEN_URL = "https://discord.com/api/oauth2/token";
 const USER_URL = "https://discord.com/api/users/@me";
+const PKCE_PATTERN = /^[A-Za-z0-9_-]{43,128}$/;
 
 export interface DiscordVerifierConfig {
   clientId: string;
@@ -32,15 +36,28 @@ export function discordVerifierConfig(env: NodeJS.ProcessEnv): DiscordVerifierCo
   return { clientId, clientSecret, redirectUri };
 }
 
+/** PKCE S256 pair. The verifier is not put on the authorize URL. */
+export function discordPkce(verifierBytes: Uint8Array): { verifier: string; challenge: string } {
+  if (verifierBytes.length < 32 || verifierBytes.length > 64) throw new Error("The Discord code verifier is not usable.");
+  const verifier = Buffer.from(verifierBytes).toString("base64url");
+  if (!PKCE_PATTERN.test(verifier)) throw new Error("The Discord code verifier is not usable.");
+  const challenge = createHash("sha256").update(verifier).digest().toString("base64url");
+  if (!PKCE_PATTERN.test(challenge)) throw new Error("The Discord code challenge is not usable.");
+  return { verifier, challenge };
+}
+
 /** Authorize URL. The scope is identify and nothing else. */
-export function discordAuthorizeUrl(config: DiscordVerifierConfig, state: string): string {
+export function discordAuthorizeUrl(config: DiscordVerifierConfig, state: string, codeChallenge: string): string {
   if (!/^[A-Za-z0-9_-]{8,500}$/.test(state)) throw new Error("The Discord state value is not usable.");
+  if (!PKCE_PATTERN.test(codeChallenge)) throw new Error("The Discord code challenge is not usable.");
   const url = new URL(AUTHORIZE_URL);
   url.searchParams.set("client_id", config.clientId);
   url.searchParams.set("redirect_uri", config.redirectUri);
   url.searchParams.set("response_type", "code");
   url.searchParams.set("scope", IDENTIFY_SCOPE);
   url.searchParams.set("state", state);
+  url.searchParams.set("code_challenge", codeChallenge);
+  url.searchParams.set("code_challenge_method", "S256");
   return url.toString();
 }
 
@@ -55,15 +72,18 @@ export interface DiscordIdentity {
 export async function discordIdentify(
   config: DiscordVerifierConfig,
   code: string,
+  codeVerifier: string,
   fetchImpl: typeof fetch = fetch,
 ): Promise<DiscordIdentity> {
   if (!/^[A-Za-z0-9._-]{4,128}$/.test(code)) throw new Error("The Discord code is not usable.");
+  if (!PKCE_PATTERN.test(codeVerifier)) throw new Error("The Discord code verifier is not usable.");
   const body = new URLSearchParams({
     client_id: config.clientId,
     client_secret: config.clientSecret,
     grant_type: "authorization_code",
     code,
     redirect_uri: config.redirectUri,
+    code_verifier: codeVerifier,
   });
   let tokenResponse: Response;
   try {

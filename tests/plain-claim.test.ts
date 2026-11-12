@@ -11,7 +11,7 @@ import { base58Encode } from "../src/hub/base58.js";
 import { buildPlayerAttestationDraft, buildPlayerClaimDraft } from "../src/hub/player-discord-flow.js";
 import { normalizeHubRepo } from "../src/hub/story-optin.js";
 import { authorSignatureValid, hubUpdateHash } from "../src/hub/update.js";
-import { bindAttestationState } from "../src/hub/verifier/proof.js";
+import { opaqueVerifierState } from "../src/hub/verifier/proof.js";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const ACCOUNT = "123456789012345678";
@@ -45,7 +45,7 @@ describe("plain claim page", () => {
       salt: "salt-value-1",
       wallet,
       nonce: input.nonce,
-      state: bindAttestationState({ wallet, nonce: input.nonce, salt: "salt-value-1" }),
+      state: opaqueVerifierState(new Uint8Array(32).fill(9)),
     };
     const claim = buildClaimDraft(input);
     const prev = await claimCanonicalHash(claim);
@@ -66,6 +66,7 @@ describe("plain claim page", () => {
     const source = readFileSync(path.join(ROOT, "dashboard/plain/claim/claim.js"), "utf8");
     const home = readFileSync(path.join(ROOT, "dashboard/plain/index.html"), "utf8");
     expect(html).toContain("This page does not publish");
+    expect(html).not.toContain("Star Atlas");
     expect(html).toContain("operator machine");
     expect(html).not.toMatch(/\son\w+=/);
     expect(source).not.toMatch(/\bfetch\s*\(|innerHTML|submit_hub_update|\/submit|DISCORD_CLIENT_SECRET|discord\.com\/api/);

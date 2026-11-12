@@ -52,6 +52,7 @@ export interface UnsignedHubFile {
 export type PackRefusal =
   | "profile_mismatch"
   | "profile_unavailable"
+  | "expired"
   | "proof"
   | "claim_signature"
   | "attestation_signature"
@@ -192,6 +193,34 @@ export function buildVerifierAttestationDraft(input: {
   return { payload, message: signingMessageText(payload) };
 }
 
+/** Verifier attestation whose prev is the player attestation, which prevs the claim. */
+export function verifierAttestationForClaim(input: {
+  fields: PlayerClaimFields;
+  proof: unknown;
+  verifierKey: string;
+  verifierId: string;
+}): UnsignedHubFile | null {
+  const claim = buildPlayerClaimDraft(input.fields);
+  if (!claim) return null;
+  const playerAttestation = buildPlayerAttestationDraft({
+    proof: input.proof,
+    hub: input.fields.hub,
+    issuedAt: input.fields.createdAt,
+    expiresAt: input.fields.expiresAt,
+    prev: hubUpdateHash(claim.payload),
+  });
+  if (!playerAttestation) return null;
+  return buildVerifierAttestationDraft({
+    proof: input.proof,
+    hub: input.fields.hub,
+    verifierKey: input.verifierKey,
+    verifierId: input.verifierId,
+    issuedAt: input.fields.createdAt,
+    expiresAt: input.fields.expiresAt,
+    prev: hubUpdateHash(playerAttestation.payload),
+  });
+}
+
 /** Accept a signature that already verifies. This does not sign and does not publish. */
 export function signedHubDocument(payload: HubUpdatePayload, signature: string): SignedHubDocument | null {
   if (!authorSignatureValid(payload, signature)) return null;
@@ -209,6 +238,7 @@ export function readyPlayerPack(input: {
   attestationSignature: string;
   profile: ProfileKeyVerdict;
   verifier?: SignedHubDocument | null;
+  nowMs?: number;
 }): { ok: true; pack: ReadyPlayerPack } | { ok: false; reason: PackRefusal } {
   if (input.profile === "mismatch") return { ok: false, reason: "profile_mismatch" };
   if (input.profile !== "match") return { ok: false, reason: "profile_unavailable" };
@@ -217,6 +247,10 @@ export function readyPlayerPack(input: {
   const claimDraft = buildPlayerClaimDraft(input.fields);
   if (!claimDraft || claimDraft.payload.author !== proof.wallet || claimDraft.payload.claim?.nonce !== proof.nonce) {
     return { ok: false, reason: "fields" };
+  }
+  const expiresAt = Date.parse(claimDraft.payload.claim?.expiresAt ?? "");
+  if (!Number.isFinite(expiresAt) || expiresAt <= (input.nowMs ?? Date.now())) {
+    return { ok: false, reason: "expired" };
   }
   const claim = signedHubDocument(claimDraft.payload, input.claimSignature);
   if (!claim) return { ok: false, reason: "claim_signature" };

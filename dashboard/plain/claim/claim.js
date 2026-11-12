@@ -282,8 +282,7 @@ export function parseDiscordProof(value) {
   const account = normalizeAccount(value.account);
   if (!account || typeof value.salt !== "string" || value.salt.length < 8) return null;
   if (!validAddress(value.wallet) || !NONCE_PATTERN.test(String(value.nonce || ""))) return null;
-  const state = readState(value.state);
-  if (!state || state.wallet !== value.wallet || state.nonce !== value.nonce || state.salt !== value.salt) return null;
+  if (!opaqueState(value.state)) return null;
   return { account, salt: value.salt, wallet: value.wallet, nonce: value.nonce, state: value.state };
 }
 
@@ -292,16 +291,17 @@ function decodeBase64Url(value) {
   return atob(padded);
 }
 
-function readState(state) {
-  if (typeof state !== "string" || !state || state.length > 500) return null;
+function opaqueState(state) {
+  if (typeof state !== "string" || !/^[A-Za-z0-9_-]{43,128}$/.test(state)) return false;
   try {
     const parsed = JSON.parse(decodeBase64Url(state));
-    if (!parsed || parsed.v !== 1) return null;
-    if (typeof parsed.wallet !== "string" || typeof parsed.nonce !== "string" || typeof parsed.salt !== "string") return null;
-    return parsed;
+    if (parsed && typeof parsed === "object" && !Array.isArray(parsed) && (parsed.wallet || parsed.nonce || parsed.salt)) {
+      return false;
+    }
   } catch {
-    return null;
+    // Not a JSON binding.
   }
+  return true;
 }
 
 function normalizeAccount(value) {
