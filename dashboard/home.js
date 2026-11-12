@@ -9,6 +9,9 @@ export const FEATURED_HEADING = "Built by the ecosystem";
 export const C4_LIVE_URL = "https://ses.aephia.com/C4Live/";
 export const MONTHS_SHOWN = 12;
 
+/** Public profile of the C4 Live creator, used for the credit link on the page. */
+export const C4_CREATOR_URL = "https://x.com/Siphaawal";
+
 function el(doc, tag, className, text) {
   const node = doc.createElement(tag);
   if (className) node.className = className;

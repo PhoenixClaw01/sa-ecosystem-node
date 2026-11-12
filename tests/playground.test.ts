@@ -11,10 +11,13 @@ import {
   buildArguments,
   callOutput,
   connectSnippets,
+  DESCRIPTION_OVERRIDES,
   endpointFor,
+  HIDDEN_TOOLS,
   fieldsFor,
   groupDecimal,
   isRunnable,
+  presentTools,
   renderTreasury,
   summarize,
 } from "../dashboard/playground/playground.js";
@@ -251,7 +254,7 @@ describe("playground page", () => {
     expect(doc.querySelectorAll(".pg-tool")).toHaveLength(4);
     const writeCard = doc.querySelector('[data-tool="write_thing"]')!;
     expect(writeCard.querySelector("form")).toBeNull();
-    expect(doc.getElementById("pg-status")!.textContent).toContain("4 tools, 3 marked read-only");
+    expect(doc.getElementById("pg-status")!.textContent).toContain("4 shown of 4, 3 marked read-only");
     const treasury = doc.getElementById("pg-treasury")!;
     expect(treasury.textContent).toContain("Live call failed (treasury_balances)");
     expect(treasury.querySelectorAll(".kpi")).toHaveLength(0);
@@ -285,6 +288,55 @@ describe("playground page", () => {
     expect(tools.every((tool) => isRunnable(tool))).toBe(true);
     for (const tool of tools) expect(Array.isArray(fieldsFor(tool.inputSchema))).toBe(true);
   }, 60_000);
+});
+
+describe("playground hide list", () => {
+  const WORDING = /\bPIPs?\b|PIP-\d|Council|\bvot(e|es|ing|ers?)\b|proposal/i;
+
+  it("hides the three governance tools, counts honestly, and renders no such wording from the real tool list", async () => {
+    const handler = (await import(pathToFileURL(path.join(ROOT, "dashboard/api/mcp.js")).href)).default;
+    const { window, doc } = playgroundDoc();
+    const names: string[] = [];
+    const fakeFetch = async (url: string, init: { body: string }) => {
+      const body = JSON.parse(init.body);
+      if (body.method === "tools/call") {
+        names.push(body.params.name);
+        return new Response("upstream down", { status: 503 });
+      }
+      return handler.fetch(new Request(url, { method: "POST", headers: { "content-type": "application/json", accept: "application/json, text/event-stream" }, body: init.body }));
+    };
+    const result = await bindPage(doc, { fetch: fakeFetch, location: window.location, view: window });
+    const total = result.tools.length;
+    expect(total).toBeGreaterThanOrEqual(24);
+    expect(result.shown).toHaveLength(total - HIDDEN_TOOLS.length);
+    for (const name of HIDDEN_TOOLS) {
+      expect(result.tools.some((tool: { name: string }) => tool.name === name), name).toBe(true);
+      expect(doc.querySelector(`[data-tool="${name}"]`), name).toBeNull();
+      expect(result.allowed.has(name), name).toBe(false);
+    }
+    expect(doc.querySelectorAll(".pg-tool")).toHaveLength(total - HIDDEN_TOOLS.length);
+    expect(doc.getElementById("pg-status")!.textContent).toContain(`${total - HIDDEN_TOOLS.length} shown of ${total} (${HIDDEN_TOOLS.length} hidden on this page)`);
+    const text = String(doc.body.textContent);
+    expect(text.match(new RegExp(`.{0,60}(${WORDING.source}).{0,60}`, "i"))?.[0] ?? null).toBeNull();
+    expect(doc.body.innerHTML).not.toMatch(WORDING);
+    expect(names.every((name) => !HIDDEN_TOOLS.includes(name))).toBe(true);
+  }, 60_000);
+
+  it("keeps hidden tools and fields out of presentTools without touching the input", () => {
+    const tools = [
+      { name: "pip_tracker", description: "x" },
+      { name: "ecofund_limit", description: "server text", inputSchema: { type: "object", properties: { asOf: { type: "string" }, unpaidPips: { type: "array" }, councilOverride: { type: "object" } }, required: ["unpaidPips"] } },
+    ];
+    const shown = presentTools(tools);
+    expect(shown.map((tool: { name: string }) => tool.name)).toEqual(["ecofund_limit"]);
+    expect(Object.keys(shown[0].inputSchema.properties)).toEqual(["asOf"]);
+    expect(shown[0].inputSchema.required).toEqual([]);
+    expect(shown[0].description).toBe(DESCRIPTION_OVERRIDES.ecofund_limit);
+    expect(Object.keys(tools[1].inputSchema!.properties)).toHaveLength(3);
+    for (const text of Object.values(DESCRIPTION_OVERRIDES)) expect(text).not.toMatch(WORDING);
+    const hub = presentTools([{ name: "hub_updates", inputSchema: { type: "object", properties: { kind: { type: "string", enum: ["listing", "proposal-note", "guild"] } } } }]);
+    expect(hub[0].inputSchema.properties.kind.enum).toEqual(["listing", "guild"]);
+  });
 });
 
 describe("playground files", () => {
@@ -329,7 +381,7 @@ describe("front page portal", () => {
     return { window, doc: window.document };
   }
 
-  it("links the featured tools and every node tool, with one module script and no inline code", () => {
+  it("links the featured tools and every node tool, with one module script and no inline code", async () => {
     for (const href of [
       "/playground/",
       "/playground/#records",
@@ -340,13 +392,14 @@ describe("front page portal", () => {
       "/playground/#connect",
       "https://ses.aephia.com/C4Live/",
       "https://github.com/Aephia/atlas-kit",
-      "https://x.com/Siphaawal",
       "https://github.com/ttdonovan/sa-forge-signer",
       "https://ttdonovan.github.io/sa-forge-signer/",
       "https://ttdonovan.github.io/sa-forge-signer/llms.txt",
     ]) {
       expect(home).toContain(`href="${href}"`);
     }
+    const { C4_CREATOR_URL } = await import("../dashboard/home.js");
+    expect(home).toContain(`href="${C4_CREATOR_URL}"`);
     expect(home.match(/<script/g)).toHaveLength(1);
     expect(home).toContain('<script type="module" src="/home.js"></script>');
     expect(home).not.toMatch(/\son\w+=|\sstyle=|<iframe/);

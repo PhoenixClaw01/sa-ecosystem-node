@@ -69,6 +69,48 @@ export function callOutput(message) {
   }
 }
 
+// ---------- what this page shows ----------
+
+/** Tools this page does not show. The server still serves them; this is a page-only choice. */
+export const HIDDEN_TOOLS = ["pip_tracker", "list_proposals", "get_proposal_votes"];
+
+/** Plain descriptions this page shows instead of the server's wording. The tools are unchanged. */
+export const DESCRIPTION_OVERRIDES = {
+  dao_overview: "Live treasury balances, the multisig decode, and data-health checks in one read.",
+  ecofund_limit: "The Ecosystem Fund's single-grant limit, its refills, and the next quarter mark, from the published treasury cache.",
+  data_health: "How fresh each source is (the treasury cache, the galaxy feeds, the public tracker sheet, and wallet balances), and the last error if a read failed.",
+};
+
+/** Optional inputs this page leaves off the form. Omitting them is the tool's default. */
+export const HIDDEN_FIELDS = { ecofund_limit: ["unpaidPips", "councilOverride"] };
+
+/** Choices this page leaves out of a dropdown. The server still accepts them. */
+export const HIDDEN_CHOICES = { hub_updates: { kind: ["proposal-note"] } };
+
+/** The tools this page shows, with the page's descriptions and forms. Input order is kept. */
+export function presentTools(tools) {
+  const hidden = new Set(HIDDEN_TOOLS);
+  return (Array.isArray(tools) ? tools : [])
+    .filter((tool) => tool && !hidden.has(tool.name))
+    .map((tool) => {
+      const shown = { ...tool };
+      if (Object.prototype.hasOwnProperty.call(DESCRIPTION_OVERRIDES, tool.name)) shown.description = DESCRIPTION_OVERRIDES[tool.name];
+      const drop = HIDDEN_FIELDS[tool.name] ?? [];
+      const choices = HIDDEN_CHOICES[tool.name] ?? {};
+      if ((drop.length || Object.keys(choices).length) && tool.inputSchema && typeof tool.inputSchema === "object") {
+        const properties = { ...(tool.inputSchema.properties ?? {}) };
+        for (const name of drop) delete properties[name];
+        for (const [name, values] of Object.entries(choices)) {
+          const prop = properties[name];
+          if (prop && Array.isArray(prop.enum)) properties[name] = { ...prop, enum: prop.enum.filter((value) => !values.includes(value)) };
+        }
+        const required = Array.isArray(tool.inputSchema.required) ? tool.inputSchema.required.filter((name) => !drop.includes(name)) : undefined;
+        shown.inputSchema = { ...tool.inputSchema, properties, ...(required ? { required } : {}) };
+      }
+      return shown;
+    });
+}
+
 // ---------- form fields from inputSchema ----------
 
 /** One field description per input property. kind is text, number, boolean, choice, or json. */
@@ -512,15 +554,17 @@ export async function bindPage(doc, env = {}) {
       banner.textContent = `Live call failed: tools/list did not answer (${error.message}). Nothing below is filled in.`;
     }
   }
-  allowed = new Set(tools.filter(isRunnable).map((tool) => tool.name));
+  const shown = presentTools(tools);
+  allowed = new Set(shown.filter(isRunnable).map((tool) => tool.name));
   if (tools.length && banner) {
+    const hiddenCount = tools.length - shown.length;
     banner.className = "banner ok";
-    banner.textContent = `Live: ${serverLine || "this server"} lists ${tools.length} tools, ${allowed.size} marked read-only. Endpoint ${client.url}`;
+    banner.textContent = `Live: ${serverLine || "this server"} lists ${tools.length} tools. ${shown.length} shown of ${tools.length}${hiddenCount ? ` (${hiddenCount} hidden on this page)` : ""}, ${allowed.size} marked read-only. Endpoint ${client.url}`;
   }
   if (toolsHost) {
     clear(toolsHost);
-    for (const tool of tools) toolsHost.appendChild(renderToolCard(doc, tool, run));
-    if (!tools.length) toolsHost.appendChild(el(doc, "p", "hint", "No tools to show."));
+    for (const tool of shown) toolsHost.appendChild(renderToolCard(doc, tool, run));
+    if (!shown.length) toolsHost.appendChild(el(doc, "p", "hint", "No tools to show."));
   }
 
   bindRecords(doc, run, env);
@@ -543,5 +587,5 @@ export async function bindPage(doc, env = {}) {
   const refresh = doc.getElementById("pg-treasury-refresh");
   if (refresh) refresh.addEventListener("click", () => { loadTreasury().catch(() => {}); });
   await loadTreasury();
-  return { tools, allowed };
+  return { tools, shown, allowed };
 }
