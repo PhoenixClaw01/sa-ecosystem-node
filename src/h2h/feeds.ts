@@ -287,7 +287,6 @@ function parseKit(value: unknown, entryId: string): CommunityDeveloperKit {
   if (!licenseExpression(row.license)) throw new Error(`Entry ${entryId} kit ${row.name} license must be an SPDX expression or "none stated".`);
   if (typeof row.linkOnly !== "boolean") throw new Error(`Entry ${entryId} kit ${row.name} linkOnly must be true or false.`);
   if (row.license === NONE_STATED && row.linkOnly !== true) throw new Error(`Entry ${entryId} kit ${row.name} with license none stated must be link only.`);
-  if (row.license !== NONE_STATED && row.linkOnly !== false) throw new Error(`Entry ${entryId} kit ${row.name} with an SPDX license must not be link only.`);
   if (row.note !== undefined && !plainText(row.note, 240)) throw new Error(`Entry ${entryId} kit ${row.name} note is invalid.`);
   return {
     name: row.name,
@@ -370,7 +369,7 @@ export function listCommunityTools(now: Date = new Date()) {
     generatedAt: now.toISOString(),
     tools: catalog.tools,
     categories: catalog.categories,
-    note: "A curated list in protocol/h2h/community-tools.json. Anyone can add a tool with one pull request, reviewed by a board steward. A row is a pointer, not an endorsement, a referral, or a price. weOperateIt is true only for tools Phoenix runs. categories in the same file are Community developers and Official. dualUse means the public kits are useful to the public read-only MCP and to guild tooling. A kit whose license is \"none stated\" is a link only, and this repo does not vendor it.",
+    note: "A curated list in protocol/h2h/community-tools.json. Anyone can add a tool with one pull request, reviewed by a board steward. Every row is a pointer only. It is not permission, a partnership, an endorsement, or embedding, and it is not a referral or a price. weOperateIt is true only for tools Phoenix runs. categories in the same file are Community developers and Game publisher packages. dualUse is a catalog flag on the row. It is not permission, a partnership, an endorsement, or embedding. linkOnly means this repo does not copy that kit's code, docs, or assets, even when license is an SPDX string. A kit whose license is \"none stated\" is always link only.",
     howToAdd: "https://github.com/PhoenixClaw01/sa-ecosystem-node/blob/main/protocol/h2h/START-HERE.md",
   };
 }

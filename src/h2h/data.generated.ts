@@ -244,7 +244,7 @@ export const H2H_COMMUNITY_TOOLS: unknown = {
               "url": "https://ses.aephia.com/C4Live/",
               "license": "none stated",
               "linkOnly": true,
-              "note": "No LICENSE file in the public C4Live tree. package.json says ISC and the README badge says MIT, and those disagree, so this kit is a link only."
+              "note": "No license is stated in the C4Live directory. The ISC package.json is the OperationsHub root, not C4Live."
             }
           ],
           "dualUse": true,
@@ -354,9 +354,9 @@ export const H2H_COMMUNITY_TOOLS: unknown = {
             {
               "name": "zamsor-fleet",
               "url": "https://github.com/Zamsor/zamsor-fleet",
-              "license": "none stated",
+              "license": "MIT",
               "linkOnly": true,
-              "note": "package.json says MIT and the repository has no LICENSE file, so this kit is a link only."
+              "note": "package.json license is MIT. The repository has no LICENSE file. This repo does not copy the kit."
             }
           ],
           "dualUse": true,
@@ -365,8 +365,8 @@ export const H2H_COMMUNITY_TOOLS: unknown = {
       ]
     },
     {
-      "id": "official",
-      "name": "Official",
+      "id": "game-publisher-packages",
+      "name": "Game publisher packages",
       "entries": [
         {
           "id": "staratlas-dev-sage",

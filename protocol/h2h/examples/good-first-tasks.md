@@ -62,7 +62,7 @@ Use Node built-ins only (no new dependency).
 
 **Lane:** `read-only-data` · **Size:** tiny
 
-**What:** One PR that adds a row for a tool you run to [`../community-tools.json`](../community-tools.json), then runs `npm run build:h2h-data`. The fields are `id`, `name`, `url` (https), `what` (at most 280 characters, with no price, referral, or promise words), `license.spdx`, `operatedBy`, `weOperateIt: false`, `h2hCard` (your card URL or `null`), `addedIn` (your PR URL), and `checkedAt`. A developer entry belongs in `categories`, not in `tools`. SPEC §6.2 has that shape. A kit with no published license uses `license` `"none stated"` and `linkOnly: true`, and the PR does not vendor its code.
+**What:** One PR that adds a row for a tool you run to [`../community-tools.json`](../community-tools.json), then runs `npm run build:h2h-data`. The fields are `id`, `name`, `url` (https), `what` (at most 280 characters, with no price, referral, or promise words), `license.spdx`, `operatedBy`, `weOperateIt: false`, `h2hCard` (your card URL or `null`), `addedIn` (your PR URL), and `checkedAt`. A developer entry belongs in `categories`, not in `tools`. SPEC §6.2 has that shape. A kit with no stated license uses `license` `"none stated"` and `linkOnly: true`. `linkOnly` may also be true when `license` is an SPDX string, if the PR does not copy that kit's code, docs, or assets. A row is a pointer only.
 
 **Acceptance:**
 - `npm test` passes. The feed validator rejects a bad row, so a failing test tells you what to fix.

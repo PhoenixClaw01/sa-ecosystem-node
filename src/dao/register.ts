@@ -331,7 +331,7 @@ export function registerDaoTools(server: McpServer, dao: DaoReaders): void {
     {
       title: "List community tools (H2H)",
       description:
-        "H2H bridge feed h2h.community-tools.v1 (protocol/h2h/SPEC.md section 6.2). A curated list from protocol/h2h/community-tools.json in this node's repo, including the Community developers and Official categories in the same feed. Anyone can add a tool with one pull request. A row is a pointer, not an endorsement, a referral, or a price. A kit whose license is \"none stated\" is a link only. Also served as GET /community-tools.json. Read-only.",
+        "H2H bridge feed h2h.community-tools.v1 (protocol/h2h/SPEC.md section 6.2). A curated list from protocol/h2h/community-tools.json in this node's repo, including the Community developers and Game publisher packages categories in the same feed. Anyone can add a tool with one pull request. Every row is a pointer only. It is not permission, a partnership, an endorsement, or embedding. linkOnly means this repo does not copy that kit's code, docs, or assets. Also served as GET /community-tools.json. Read-only.",
       inputSchema: z.object({}),
       annotations: readOnlyAnnotations,
     },

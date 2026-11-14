@@ -125,10 +125,16 @@ describe("community developer categories", () => {
     categories: [{ id: "community-developers", name: "Community developers", entries: [entry] }],
   });
 
-  it("serves Community developers and Official from list_community_tools, with SPDX or none stated", () => {
+  it("serves Community developers and Game publisher packages from list_community_tools, with SPDX or none stated", () => {
     const feed = listCommunityTools(NOW);
     expect(feed.generatedAt).toBe(NOW.toISOString());
-    expect(feed.categories.map((category) => category.name)).toEqual(["Community developers", "Official"]);
+    expect(feed.categories.map((category) => ({ id: category.id, name: category.name }))).toEqual([
+      { id: "community-developers", name: "Community developers" },
+      { id: "game-publisher-packages", name: "Game publisher packages" },
+    ]);
+    expect(feed.note).toMatch(/pointer only/);
+    expect(feed.note).toMatch(/not permission, a partnership, an endorsement, or embedding/);
+    expect(feed.note).not.toMatch(/guild/i);
     const entries = feed.categories.flatMap((category) => category.entries);
     expect(entries).toHaveLength(8);
     expect(entries.map((entry) => entry.id)).toEqual([
@@ -157,17 +163,25 @@ describe("community developer categories", () => {
     const licenseOf = (entryId: string, kitName: string) => kits.find((kit) => kit.entry === entryId && kit.name === kitName);
     expect(licenseOf("atlas-kit", "Atlas Kit")).toMatchObject({ license: "Apache-2.0", linkOnly: false });
     expect(licenseOf("siphaawal", "agent-team-harness")).toMatchObject({ license: "MIT", linkOnly: false });
-    expect(licenseOf("siphaawal", "C4 Live")).toMatchObject({ license: "none stated", linkOnly: true });
+    expect(licenseOf("siphaawal", "C4 Live")).toMatchObject({
+      license: "none stated",
+      linkOnly: true,
+      note: "No license is stated in the C4Live directory. The ISC package.json is the OperationsHub root, not C4Live.",
+    });
     expect(licenseOf("ttdonovan", "sa-forge-signer")).toMatchObject({ license: "Unlicense OR MIT", linkOnly: false });
     expect(licenseOf("ryden-systems", "dao-dashboard")).toMatchObject({ license: "none stated", linkOnly: true });
     expect(licenseOf("ryden-systems", "zxp-tracker")).toMatchObject({ license: "MIT", linkOnly: false });
     expect(licenseOf("harlock-space-pirate", "c4-sage-sdk")).toMatchObject({ license: "Apache-2.0", linkOnly: false });
-    expect(licenseOf("zamsor", "zamsor-fleet")).toMatchObject({ license: "none stated", linkOnly: true });
+    expect(licenseOf("zamsor", "zamsor-fleet")).toMatchObject({
+      license: "MIT",
+      linkOnly: true,
+      note: "package.json license is MIT. The repository has no LICENSE file. This repo does not copy the kit.",
+    });
     expect(licenseOf("staratlas-dev-sage", "@staratlas/dev-sage")).toMatchObject({ license: "Apache-2.0", linkOnly: false });
     expect(licenseOf("star-atlas-decoders", "star-atlas-decoders")).toMatchObject({ license: "Apache-2.0", linkOnly: false });
     for (const kit of kits) {
       expect(kit.url.startsWith("https://")).toBe(true);
-      expect(kit.linkOnly).toBe(kit.license === "none stated");
+      if (kit.license === "none stated") expect(kit.linkOnly).toBe(true);
     }
     const text = JSON.stringify(feed);
     expect(text).not.toMatch(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i);
@@ -181,10 +195,10 @@ describe("community developer categories", () => {
       kits: [{ name: "Sample kit", url: "https://example.com/sample", license: "none stated", linkOnly: false }],
     });
     expect(() => parseCommunityCatalog(catalog(unlicensed))).toThrow(/link only/);
-    const markedLinkOnly = developer({
+    const linkedSpdx = developer({
       kits: [{ name: "Sample kit", url: "https://example.com/sample", license: "Apache-2.0", linkOnly: true }],
     });
-    expect(() => parseCommunityCatalog(catalog(markedLinkOnly))).toThrow(/must not be link only/);
+    expect(parseCommunityCatalog(catalog(linkedSpdx)).categories[0]?.entries[0]?.kits[0]).toMatchObject({ license: "Apache-2.0", linkOnly: true });
     expect(() => parseCommunityCatalog(catalog(developer({ sites: ["http://example.com/sample"] })))).toThrow(/https/);
     expect(() => parseCommunityCatalog(catalog(developer({ handle: "person@example.com" })))).toThrow(/handle/);
     expect(() => parseCommunityCatalog(catalog(developer({ extra: 1 })))).toThrow(/unknown field/);
@@ -194,7 +208,7 @@ describe("community developer categories", () => {
       tools: [],
       categories: [
         { id: "community-developers", name: "Community developers", entries: [developer()] },
-        { id: "official", name: "Official", entries: [developer({ id: "sample-dev" })] },
+        { id: "game-publisher-packages", name: "Game publisher packages", entries: [developer({ id: "sample-dev" })] },
       ],
     };
     expect(() => parseCommunityCatalog(repeated)).toThrow(/repeated id/);
