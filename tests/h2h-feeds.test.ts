@@ -115,6 +115,7 @@ describe("community developer categories", () => {
     sites: ["https://example.com/sample"],
     credentials: [{ kind: "repo", name: "sample/kit", url: "https://example.com/sample" }],
     kits: [{ name: "Sample kit", url: "https://example.com/sample", license: "MIT", linkOnly: false }],
+    credit: "Credit: sample. A pointer only.",
     dualUse: false,
     checkedAt: "2026-11-14",
     ...over,
@@ -158,6 +159,19 @@ describe("community developer categories", () => {
       "staratlasmeta",
     ]);
     expect(entries.every((entry) => entry.dualUse === true)).toBe(true);
+    expect(entries.find((entry) => entry.id === "atlas-kit")?.credit).toBe("Credit: Aephia and Funcracker. A pointer only.");
+    expect(entries.find((entry) => entry.id === "atlas-kit")?.sites).toEqual([
+      "https://atlaskit.dev/",
+      "https://docs.atlaskit.dev/",
+      "https://www.npmjs.com/package/@aephia/atlas-kit",
+    ]);
+    expect(JSON.stringify(entries.find((entry) => entry.id === "atlas-kit"))).not.toMatch(/github\.com\/Aephia/);
+    expect(entries.filter((entry) => entry.id !== "atlas-kit").every((entry) => entry.credit === `Credit: ${entry.handle}. A pointer only.`)).toBe(true);
+    expect(entries.map((entry) => entry.id)).toContain("zamsor");
+    const spec = readFileSync("protocol/h2h/SPEC.md", "utf8");
+    expect(spec).toMatch(/neutral, link-only credit/);
+    expect(spec).toMatch(/A private repo is never listed/);
+    expect(spec).toMatch(/not an endorsement, a partnership, or embedding/);
     const kits = entries.flatMap((entry) => entry.kits.map((kit) => ({ entry: entry.id, ...kit })));
     expect(kits).toHaveLength(10);
     const licenseOf = (entryId: string, kitName: string) => kits.find((kit) => kit.entry === entryId && kit.name === kitName);
@@ -202,6 +216,7 @@ describe("community developer categories", () => {
     expect(() => parseCommunityCatalog(catalog(developer({ sites: ["http://example.com/sample"] })))).toThrow(/https/);
     expect(() => parseCommunityCatalog(catalog(developer({ handle: "person@example.com" })))).toThrow(/handle/);
     expect(() => parseCommunityCatalog(catalog(developer({ extra: 1 })))).toThrow(/unknown field/);
+    expect(() => parseCommunityCatalog(catalog(developer({ credit: "Thanks, sample." })))).toThrow(/credit/);
     expect(() => parseCommunityCatalog(catalog(developer({ kits: [{ name: "Sample kit", url: "https://example.com/sample", license: "not a license", linkOnly: false }] })))).toThrow(/SPDX expression or "none stated"/);
     const repeated = {
       schema: "h2h.community-tools.v1",

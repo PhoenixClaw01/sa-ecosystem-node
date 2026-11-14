@@ -175,6 +175,7 @@ export interface CommunityDeveloperCredential {
 export interface CommunityDeveloperEntry {
   id: string;
   handle: string;
+  credit: string;
   sites: string[];
   credentials: CommunityDeveloperCredential[];
   kits: CommunityDeveloperKit[];
@@ -300,10 +301,13 @@ function parseKit(value: unknown, entryId: string): CommunityDeveloperKit {
 function parseDeveloperEntry(value: unknown, seen: Set<string>): CommunityDeveloperEntry {
   if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error("A developer entry is not an object.");
   const row = value as Record<string, unknown>;
-  rejectUnknown(row, new Set(["id", "handle", "sites", "credentials", "kits", "dualUse", "checkedAt"]), "Developer entry");
+  rejectUnknown(row, new Set(["id", "handle", "credit", "sites", "credentials", "kits", "dualUse", "checkedAt"]), "Developer entry");
   if (typeof row.id !== "string" || !TOOL_ID.test(row.id) || seen.has(row.id)) throw new Error(`Developer entry ${String(row.id)} has a missing, invalid, or repeated id.`);
   seen.add(row.id);
   if (typeof row.handle !== "string" || !HANDLE.test(row.handle)) throw new Error(`Entry ${row.id} handle must be a public handle.`);
+  if (!plainText(row.credit, 160) || !row.credit.startsWith("Credit: ") || !row.credit.includes(row.handle)) {
+    throw new Error(`Entry ${row.id} credit must name the public handle.`);
+  }
   if (typeof row.dualUse !== "boolean") throw new Error(`Entry ${row.id} dualUse must be true or false.`);
   if (typeof row.checkedAt !== "string" || !DATE.test(row.checkedAt)) throw new Error(`Entry ${row.id} checkedAt must be YYYY-MM-DD.`);
   if (!Array.isArray(row.credentials) || row.credentials.length < 1 || row.credentials.length > 8) {
@@ -322,6 +326,7 @@ function parseDeveloperEntry(value: unknown, seen: Set<string>): CommunityDevelo
   return {
     id: row.id,
     handle: row.handle,
+    credit: row.credit,
     sites: httpsList(row.sites, `Entry ${row.id} sites`),
     credentials,
     kits: row.kits.map((kit) => parseKit(kit, row.id as string)),
@@ -369,7 +374,7 @@ export function listCommunityTools(now: Date = new Date()) {
     generatedAt: now.toISOString(),
     tools: catalog.tools,
     categories: catalog.categories,
-    note: "A curated list in protocol/h2h/community-tools.json. Anyone can add a tool with one pull request, reviewed by a board steward. Every row is a pointer only. It is not permission, a partnership, an endorsement, or embedding, and it is not a referral or a price. weOperateIt is true only for tools Phoenix runs. categories in the same file are Community developers and Game publisher packages. dualUse is a catalog flag on the row. It is not permission, a partnership, an endorsement, or embedding. linkOnly means this repo does not copy that kit's code, docs, or assets, even when license is an SPDX string. A kit whose license is \"none stated\" is always link only.",
+    note: "A curated list in protocol/h2h/community-tools.json. Anyone can add a tool with one pull request, reviewed by a board steward. Every row is a pointer only. It is not permission, a partnership, an endorsement, or embedding, and it is not a referral or a price. weOperateIt is true only for tools Phoenix runs. categories in the same file are Community developers and Game publisher packages. dualUse is a catalog flag on the row. It is not permission, a partnership, an endorsement, or embedding. Each entry has a credit line that names the public handle. That line is a pointer only. A private repo is never listed. linkOnly means this repo does not copy that kit's code, docs, or assets, even when license is an SPDX string. A kit whose license is \"none stated\" is always link only.",
     howToAdd: "https://github.com/PhoenixClaw01/sa-ecosystem-node/blob/main/protocol/h2h/START-HERE.md",
   };
 }

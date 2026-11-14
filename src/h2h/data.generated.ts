@@ -194,10 +194,11 @@ export const H2H_COMMUNITY_TOOLS: unknown = {
         {
           "id": "atlas-kit",
           "handle": "Aephia",
+          "credit": "Credit: Aephia and Funcracker. A pointer only.",
           "sites": [
             "https://atlaskit.dev/",
             "https://docs.atlaskit.dev/",
-            "https://github.com/Aephia"
+            "https://www.npmjs.com/package/@aephia/atlas-kit"
           ],
           "credentials": [
             {
@@ -211,7 +212,8 @@ export const H2H_COMMUNITY_TOOLS: unknown = {
               "name": "Atlas Kit",
               "url": "https://www.npmjs.com/package/@aephia/atlas-kit",
               "license": "Apache-2.0",
-              "linkOnly": false
+              "linkOnly": false,
+              "note": "The Aephia site names Funcracker. This row links the public site, the docs, and the npm package."
             }
           ],
           "dualUse": true,
@@ -220,6 +222,7 @@ export const H2H_COMMUNITY_TOOLS: unknown = {
         {
           "id": "siphaawal",
           "handle": "Siphaawal",
+          "credit": "Credit: Siphaawal. A pointer only.",
           "sites": [
             "https://github.com/Siphaawal",
             "https://ses.aephia.com/C4Live/",
@@ -253,6 +256,7 @@ export const H2H_COMMUNITY_TOOLS: unknown = {
         {
           "id": "ttdonovan",
           "handle": "ttdonovan",
+          "credit": "Credit: ttdonovan. A pointer only.",
           "sites": [
             "https://github.com/ttdonovan/sa-forge-signer",
             "https://ttdonovan.github.io/sa-forge-signer/"
@@ -279,6 +283,7 @@ export const H2H_COMMUNITY_TOOLS: unknown = {
         {
           "id": "ryden-systems",
           "handle": "ryden-systems",
+          "credit": "Credit: ryden-systems. A pointer only.",
           "sites": [
             "https://github.com/ryden-systems",
             "https://ryden-systems.github.io/dao-dashboard/"
@@ -316,6 +321,7 @@ export const H2H_COMMUNITY_TOOLS: unknown = {
         {
           "id": "harlock-space-pirate",
           "handle": "Harlock-Space-Pirate",
+          "credit": "Credit: Harlock-Space-Pirate. A pointer only.",
           "sites": [
             "https://github.com/Harlock-Space-Pirate"
           ],
@@ -340,6 +346,7 @@ export const H2H_COMMUNITY_TOOLS: unknown = {
         {
           "id": "zamsor",
           "handle": "Zamsor",
+          "credit": "Credit: Zamsor. A pointer only.",
           "sites": [
             "https://github.com/Zamsor"
           ],
@@ -371,6 +378,7 @@ export const H2H_COMMUNITY_TOOLS: unknown = {
         {
           "id": "staratlas-dev-sage",
           "handle": "@staratlas",
+          "credit": "Credit: @staratlas. A pointer only.",
           "sites": [
             "https://www.npmjs.com/package/@staratlas/dev-sage",
             "https://build.staratlas.com/"
@@ -397,6 +405,7 @@ export const H2H_COMMUNITY_TOOLS: unknown = {
         {
           "id": "star-atlas-decoders",
           "handle": "staratlasmeta",
+          "credit": "Credit: staratlasmeta. A pointer only.",
           "sites": [
             "https://github.com/staratlasmeta",
             "https://build.staratlas.com/"
