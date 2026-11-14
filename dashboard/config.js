@@ -76,7 +76,7 @@ window.SA_DASHBOARD_CONFIG = {
   /* Public galaxy JSON. The page sends GET only. */
   galaxyBaseUrl: "https://galaxy.staratlas.com",
 
-  /* Same-origin treasury cache published by the refresh workflow. Not fetched from another host. */
+  /* Same-origin committed treasury cache. Not fetched from another host. */
   treasuryCacheUrl: "data/treasury-cache.json",
 
   /* Empty so Ask the MCP keeps showing the recorded sample.

@@ -356,7 +356,7 @@ function rememberTreasury(cursor: ParsedCursor, signatures: readonly SignatureIn
 
 /**
  * Keep each unapplied forward window small enough that several of them still
- * fit under the workflow's 8MB cache commit cap. Newest rows are dropped
+ * fit under the 8MB cache file cap in scripts/check-treasury-cache.mjs. Newest rows are dropped
  * first. They stay on chain and are listed again after this window is applied.
  */
 const MAX_PENDING_SIGNATURES = 10_000;

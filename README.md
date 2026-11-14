@@ -277,7 +277,7 @@ Two wallets are scanned. Both are named on the public knowledge base and in the 
 
 Sources: [knowledge base](https://star-atlas-dao.gitbook.io/knowledge-base/overview/treasury), [PIP-23](https://govern.staratlas.com/proposals/0ecf2928-15df-497e-8b67-d87eda030d5a). The retired pre-multisig address `DRGThVUMGEYcsoTERhmkFSa5q7HVjxBQdKwMNjyvehD1` is recorded in code and is not scanned.
 
-The refresh is idempotent and resumable. It is the only writer of the cache. A scheduled run passes `--incremental`. It fetches signatures newer than each cached cursor, then continues the older walk from the oldest parsed signature while that walk is unfinished. Both walks stay inside the page cap, so one run stays short and the history completes over later runs. A run without that flag continues the older walk with no newer-signature pass:
+The refresh is idempotent and resumable. It is the only writer of the cache. Pass `--incremental` to fetch signatures newer than each cached cursor, then continue the older walk from the oldest parsed signature while that walk is unfinished. Both walks stay inside the page cap, so one run stays short and the history completes over later runs. A run without that flag continues the older walk with no newer-signature pass:
 
 ```bash
 npm run refresh-treasury
