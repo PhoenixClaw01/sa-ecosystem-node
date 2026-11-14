@@ -8,7 +8,7 @@ import nacl from "tweetnacl";
 import { describe, expect, it } from "vitest";
 
 import { H2H_CARD, H2H_COMMUNITY_TOOLS } from "../src/h2h/data.generated.js";
-import { h2hCard, listC4Markers, listCommunityTools, parseCommunityTools } from "../src/h2h/feeds.js";
+import { h2hCard, listC4Markers, listCommunityTools, parseCommunityCatalog, parseCommunityTools } from "../src/h2h/feeds.js";
 import { h2hFeedFor, h2hFeedResponse } from "../src/h2h/routes.js";
 import { loadSignerAllowlist } from "../src/hub/allowlist.js";
 import { base58Encode } from "../src/hub/base58.js";
@@ -104,6 +104,100 @@ describe("H2H data files", () => {
     const feed = listCommunityTools(NOW);
     expect(feed.schema).toBe("h2h.community-tools.v1");
     expect(feed.tools.every((tool) => tool.weOperateIt === true)).toBe(true);
+    expect(() => parseCommunityTools({ schema: "h2h.community-tools.v1", tools: [base], extra: true })).toThrow(/unknown field/);
+  });
+});
+
+describe("community developer categories", () => {
+  const developer = (over: Record<string, unknown> = {}) => ({
+    id: "sample-dev",
+    handle: "sample",
+    sites: ["https://example.com/sample"],
+    credentials: [{ kind: "repo", name: "sample/kit", url: "https://example.com/sample" }],
+    kits: [{ name: "Sample kit", url: "https://example.com/sample", license: "MIT", linkOnly: false }],
+    dualUse: false,
+    checkedAt: "2026-11-14",
+    ...over,
+  });
+  const catalog = (entry: Record<string, unknown>) => ({
+    schema: "h2h.community-tools.v1",
+    tools: [],
+    categories: [{ id: "community-developers", name: "Community developers", entries: [entry] }],
+  });
+
+  it("serves Community developers and Official from list_community_tools, with SPDX or none stated", () => {
+    const feed = listCommunityTools(NOW);
+    expect(feed.generatedAt).toBe(NOW.toISOString());
+    expect(feed.categories.map((category) => category.name)).toEqual(["Community developers", "Official"]);
+    const entries = feed.categories.flatMap((category) => category.entries);
+    expect(entries).toHaveLength(8);
+    expect(entries.map((entry) => entry.id)).toEqual([
+      "atlas-kit",
+      "siphaawal",
+      "ttdonovan",
+      "ryden-systems",
+      "harlock-space-pirate",
+      "zamsor",
+      "staratlas-dev-sage",
+      "star-atlas-decoders",
+    ]);
+    expect(entries.map((entry) => entry.handle)).toEqual([
+      "Aephia",
+      "Siphaawal",
+      "ttdonovan",
+      "ryden-systems",
+      "Harlock-Space-Pirate",
+      "Zamsor",
+      "@staratlas",
+      "staratlasmeta",
+    ]);
+    expect(entries.every((entry) => entry.dualUse === true)).toBe(true);
+    const kits = entries.flatMap((entry) => entry.kits.map((kit) => ({ entry: entry.id, ...kit })));
+    expect(kits).toHaveLength(10);
+    const licenseOf = (entryId: string, kitName: string) => kits.find((kit) => kit.entry === entryId && kit.name === kitName);
+    expect(licenseOf("atlas-kit", "Atlas Kit")).toMatchObject({ license: "Apache-2.0", linkOnly: false });
+    expect(licenseOf("siphaawal", "agent-team-harness")).toMatchObject({ license: "MIT", linkOnly: false });
+    expect(licenseOf("siphaawal", "C4 Live")).toMatchObject({ license: "none stated", linkOnly: true });
+    expect(licenseOf("ttdonovan", "sa-forge-signer")).toMatchObject({ license: "Unlicense OR MIT", linkOnly: false });
+    expect(licenseOf("ryden-systems", "dao-dashboard")).toMatchObject({ license: "none stated", linkOnly: true });
+    expect(licenseOf("ryden-systems", "zxp-tracker")).toMatchObject({ license: "MIT", linkOnly: false });
+    expect(licenseOf("harlock-space-pirate", "c4-sage-sdk")).toMatchObject({ license: "Apache-2.0", linkOnly: false });
+    expect(licenseOf("zamsor", "zamsor-fleet")).toMatchObject({ license: "none stated", linkOnly: true });
+    expect(licenseOf("staratlas-dev-sage", "@staratlas/dev-sage")).toMatchObject({ license: "Apache-2.0", linkOnly: false });
+    expect(licenseOf("star-atlas-decoders", "star-atlas-decoders")).toMatchObject({ license: "Apache-2.0", linkOnly: false });
+    for (const kit of kits) {
+      expect(kit.url.startsWith("https://")).toBe(true);
+      expect(kit.linkOnly).toBe(kit.license === "none stated");
+    }
+    const text = JSON.stringify(feed);
+    expect(text).not.toMatch(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i);
+    expect(text).not.toMatch(/private key|password|api[_-]?key|BEGIN [A-Z ]+KEY/i);
+    expect(parseCommunityCatalog(H2H_COMMUNITY_TOOLS).categories).toEqual(feed.categories);
+  });
+
+  it("rejects a developer row that vendors an unlicensed kit, an unknown field, or a non-https listing", () => {
+    expect(parseCommunityCatalog(catalog(developer())).categories[0]?.entries[0]?.dualUse).toBe(false);
+    const unlicensed = developer({
+      kits: [{ name: "Sample kit", url: "https://example.com/sample", license: "none stated", linkOnly: false }],
+    });
+    expect(() => parseCommunityCatalog(catalog(unlicensed))).toThrow(/link only/);
+    const markedLinkOnly = developer({
+      kits: [{ name: "Sample kit", url: "https://example.com/sample", license: "Apache-2.0", linkOnly: true }],
+    });
+    expect(() => parseCommunityCatalog(catalog(markedLinkOnly))).toThrow(/must not be link only/);
+    expect(() => parseCommunityCatalog(catalog(developer({ sites: ["http://example.com/sample"] })))).toThrow(/https/);
+    expect(() => parseCommunityCatalog(catalog(developer({ handle: "person@example.com" })))).toThrow(/handle/);
+    expect(() => parseCommunityCatalog(catalog(developer({ extra: 1 })))).toThrow(/unknown field/);
+    expect(() => parseCommunityCatalog(catalog(developer({ kits: [{ name: "Sample kit", url: "https://example.com/sample", license: "not a license", linkOnly: false }] })))).toThrow(/SPDX expression or "none stated"/);
+    const repeated = {
+      schema: "h2h.community-tools.v1",
+      tools: [],
+      categories: [
+        { id: "community-developers", name: "Community developers", entries: [developer()] },
+        { id: "official", name: "Official", entries: [developer({ id: "sample-dev" })] },
+      ],
+    };
+    expect(() => parseCommunityCatalog(repeated)).toThrow(/repeated id/);
   });
 });
 

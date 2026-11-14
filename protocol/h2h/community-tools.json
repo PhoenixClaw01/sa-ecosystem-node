@@ -44,5 +44,241 @@
       "addedIn": null,
       "checkedAt": "2026-11-11"
     }
+  ],
+  "categories": [
+    {
+      "id": "community-developers",
+      "name": "Community developers",
+      "entries": [
+        {
+          "id": "atlas-kit",
+          "handle": "Aephia",
+          "sites": [
+            "https://atlaskit.dev/",
+            "https://docs.atlaskit.dev/",
+            "https://github.com/Aephia"
+          ],
+          "credentials": [
+            {
+              "kind": "package",
+              "name": "@aephia/atlas-kit",
+              "url": "https://www.npmjs.com/package/@aephia/atlas-kit"
+            }
+          ],
+          "kits": [
+            {
+              "name": "Atlas Kit",
+              "url": "https://www.npmjs.com/package/@aephia/atlas-kit",
+              "license": "Apache-2.0",
+              "linkOnly": false
+            }
+          ],
+          "dualUse": true,
+          "checkedAt": "2026-11-14"
+        },
+        {
+          "id": "siphaawal",
+          "handle": "Siphaawal",
+          "sites": [
+            "https://github.com/Siphaawal",
+            "https://ses.aephia.com/C4Live/",
+            "https://github.com/Aephia/OperationsHub/tree/main/C4Live"
+          ],
+          "credentials": [
+            {
+              "kind": "repo",
+              "name": "Siphaawal/agent-team-harness",
+              "url": "https://github.com/Siphaawal/agent-team-harness"
+            }
+          ],
+          "kits": [
+            {
+              "name": "agent-team-harness",
+              "url": "https://github.com/Siphaawal/agent-team-harness",
+              "license": "MIT",
+              "linkOnly": false
+            },
+            {
+              "name": "C4 Live",
+              "url": "https://ses.aephia.com/C4Live/",
+              "license": "none stated",
+              "linkOnly": true,
+              "note": "No LICENSE file in the public C4Live tree. package.json says ISC and the README badge says MIT, and those disagree, so this kit is a link only."
+            }
+          ],
+          "dualUse": true,
+          "checkedAt": "2026-11-14"
+        },
+        {
+          "id": "ttdonovan",
+          "handle": "ttdonovan",
+          "sites": [
+            "https://github.com/ttdonovan/sa-forge-signer",
+            "https://ttdonovan.github.io/sa-forge-signer/"
+          ],
+          "credentials": [
+            {
+              "kind": "repo",
+              "name": "ttdonovan/sa-forge-signer",
+              "url": "https://github.com/ttdonovan/sa-forge-signer"
+            }
+          ],
+          "kits": [
+            {
+              "name": "sa-forge-signer",
+              "url": "https://github.com/ttdonovan/sa-forge-signer",
+              "license": "Unlicense OR MIT",
+              "linkOnly": false,
+              "note": "Cargo.toml says Unlicense OR MIT. LICENSE-MIT and UNLICENSE are both in the repository."
+            }
+          ],
+          "dualUse": true,
+          "checkedAt": "2026-11-14"
+        },
+        {
+          "id": "ryden-systems",
+          "handle": "ryden-systems",
+          "sites": [
+            "https://github.com/ryden-systems",
+            "https://ryden-systems.github.io/dao-dashboard/"
+          ],
+          "credentials": [
+            {
+              "kind": "repo",
+              "name": "ryden-systems/dao-dashboard",
+              "url": "https://github.com/ryden-systems/dao-dashboard"
+            },
+            {
+              "kind": "repo",
+              "name": "ryden-systems/zxp-tracker",
+              "url": "https://github.com/ryden-systems/zxp-tracker"
+            }
+          ],
+          "kits": [
+            {
+              "name": "dao-dashboard",
+              "url": "https://github.com/ryden-systems/dao-dashboard",
+              "license": "none stated",
+              "linkOnly": true,
+              "note": "No LICENSE file, and package.json has no license field. Link only."
+            },
+            {
+              "name": "zxp-tracker",
+              "url": "https://github.com/ryden-systems/zxp-tracker",
+              "license": "MIT",
+              "linkOnly": false
+            }
+          ],
+          "dualUse": true,
+          "checkedAt": "2026-11-14"
+        },
+        {
+          "id": "harlock-space-pirate",
+          "handle": "Harlock-Space-Pirate",
+          "sites": [
+            "https://github.com/Harlock-Space-Pirate"
+          ],
+          "credentials": [
+            {
+              "kind": "repo",
+              "name": "Harlock-Space-Pirate/c4-sage-sdk",
+              "url": "https://github.com/Harlock-Space-Pirate/c4-sage-sdk"
+            }
+          ],
+          "kits": [
+            {
+              "name": "c4-sage-sdk",
+              "url": "https://github.com/Harlock-Space-Pirate/c4-sage-sdk",
+              "license": "Apache-2.0",
+              "linkOnly": false
+            }
+          ],
+          "dualUse": true,
+          "checkedAt": "2026-11-14"
+        },
+        {
+          "id": "zamsor",
+          "handle": "Zamsor",
+          "sites": [
+            "https://github.com/Zamsor"
+          ],
+          "credentials": [
+            {
+              "kind": "repo",
+              "name": "Zamsor/zamsor-fleet",
+              "url": "https://github.com/Zamsor/zamsor-fleet"
+            }
+          ],
+          "kits": [
+            {
+              "name": "zamsor-fleet",
+              "url": "https://github.com/Zamsor/zamsor-fleet",
+              "license": "none stated",
+              "linkOnly": true,
+              "note": "package.json says MIT and the repository has no LICENSE file, so this kit is a link only."
+            }
+          ],
+          "dualUse": true,
+          "checkedAt": "2026-11-14"
+        }
+      ]
+    },
+    {
+      "id": "official",
+      "name": "Official",
+      "entries": [
+        {
+          "id": "staratlas-dev-sage",
+          "handle": "@staratlas",
+          "sites": [
+            "https://www.npmjs.com/package/@staratlas/dev-sage",
+            "https://build.staratlas.com/"
+          ],
+          "credentials": [
+            {
+              "kind": "package",
+              "name": "@staratlas/dev-sage",
+              "url": "https://www.npmjs.com/package/@staratlas/dev-sage"
+            }
+          ],
+          "kits": [
+            {
+              "name": "@staratlas/dev-sage",
+              "url": "https://www.npmjs.com/package/@staratlas/dev-sage",
+              "license": "Apache-2.0",
+              "linkOnly": false,
+              "note": "The npm registry license field is Apache-2.0. That record has no repository url."
+            }
+          ],
+          "dualUse": true,
+          "checkedAt": "2026-11-14"
+        },
+        {
+          "id": "star-atlas-decoders",
+          "handle": "staratlasmeta",
+          "sites": [
+            "https://github.com/staratlasmeta",
+            "https://build.staratlas.com/"
+          ],
+          "credentials": [
+            {
+              "kind": "repo",
+              "name": "staratlasmeta/star-atlas-decoders",
+              "url": "https://github.com/staratlasmeta/star-atlas-decoders"
+            }
+          ],
+          "kits": [
+            {
+              "name": "star-atlas-decoders",
+              "url": "https://github.com/staratlasmeta/star-atlas-decoders",
+              "license": "Apache-2.0",
+              "linkOnly": false
+            }
+          ],
+          "dualUse": true,
+          "checkedAt": "2026-11-14"
+        }
+      ]
+    }
   ]
 }

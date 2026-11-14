@@ -62,7 +62,7 @@ Use Node built-ins only (no new dependency).
 
 **Lane:** `read-only-data` · **Size:** tiny
 
-**What:** One PR that adds a row for a tool you run to [`../community-tools.json`](../community-tools.json), then runs `npm run build:h2h-data`. The fields are `id`, `name`, `url` (https), `what` (at most 280 characters, with no price, referral, or promise words), `license.spdx`, `operatedBy`, `weOperateIt: false`, `h2hCard` (your card URL or `null`), `addedIn` (your PR URL), and `checkedAt`.
+**What:** One PR that adds a row for a tool you run to [`../community-tools.json`](../community-tools.json), then runs `npm run build:h2h-data`. The fields are `id`, `name`, `url` (https), `what` (at most 280 characters, with no price, referral, or promise words), `license.spdx`, `operatedBy`, `weOperateIt: false`, `h2hCard` (your card URL or `null`), `addedIn` (your PR URL), and `checkedAt`. A developer entry belongs in `categories`, not in `tools`. SPEC §6.2 has that shape. A kit with no published license uses `license` `"none stated"` and `linkOnly: true`, and the PR does not vendor its code.
 
 **Acceptance:**
 - `npm test` passes. The feed validator rejects a bad row, so a failing test tells you what to fix.

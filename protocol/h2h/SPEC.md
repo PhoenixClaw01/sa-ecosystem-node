@@ -1,7 +1,7 @@
 # H2H: a harness-to-harness protocol for cooperating builder stacks
 
-**RFC draft v0.2.8.** Open for amendment. Nothing here is final.  
-**Drafted:** v0.1 on Tuesday 2026-11-10 at 9:55 AM AST (UTC-4). v0.2 the same day at 1:00 PM AST, with the Founder's decisions on identity, signing, the node's role, and migration (see the §15 changelog). v0.2.7 on 2026-11-11, recording that migration M5 is live. v0.2.8 on 2026-11-12, recording that the `reputation-link` kind is built and M6 is not. Written by Phoenix Collective's agent for the Phoenix steward to review.  
+**RFC draft v0.2.9.** Open for amendment. Nothing here is final.  
+**Drafted:** v0.1 on Tuesday 2026-11-10 at 9:55 AM AST (UTC-4). v0.2 the same day at 1:00 PM AST, with the Founder's decisions on identity, signing, the node's role, and migration (see the §15 changelog). v0.2.7 on 2026-11-11, recording that migration M5 is live. v0.2.8 on 2026-11-12, recording that the `reputation-link` kind is built and M6 is not. v0.2.9 on 2026-11-14, adding categories to the existing community-tools feed. Written by Phoenix Collective's agent for the Phoenix steward to review.  
 **Status:** open draft, proposed for this repo. Amend it with an issue and a PR (section 13). Nothing here is final or owned by one stack.  
 **Companion:** [`../TRUST-ARCHITECTURE.md`](../TRUST-ARCHITECTURE.md) (v0.1.5). It covers who signs which record kind, the reputation bridge, z.ink, and anonymity.  
 **Home:** `protocol/h2h/` in `PhoenixClaw01/sa-ecosystem-node`. The board is this repo's GitHub issues and PRs. If the protocol grows, it may split into a neutral, co-owned repo later (§13.4).
@@ -364,6 +364,8 @@ Rules:
 ```
 
 The rows below are placeholders, not a catalogue of real projects. There is no endorsement wording, no referral, and no price. If a tool's stack publishes an H2H card, `h2hCard` points at it, and the row's text then comes from that card.
+
+The same file and the same tool also carry `categories`. This does not add a second feed. `community-developers` is the Community developers category. `official` is the Official category. Each entry has `handle` (a public handle), `sites` (https listings), `credentials` (`package` or `repo`, with an https url), `kits`, `dualUse`, and `checkedAt`. A kit has `name`, an https `url`, `license`, and `linkOnly`. `license` is an SPDX expression, such as `Apache-2.0` or `Unlicense OR MIT`, or the exact string `none stated`. `linkOnly` is true only when the license is `none stated`. Those kits are pointers, and this repo does not vendor them. `dualUse` is true when the public kits are useful to the public read-only MCP and to guild tooling. A category row is still not an endorsement, a referral, or a price. The checked entries live in `community-tools.json`.
 
 ### 6.3 Proposed signed record kind `c4-anchor`
 
@@ -797,6 +799,7 @@ The spec should move to a neutral, co-owned repo if any of these happen: more th
 
 | Version | Date | Change | By |
 |---|---|---|---|
+| v0.2.9 (draft) | 2026-11-14 | `list_community_tools` stays `h2h.community-tools.v1` and gains `categories` in the same file: Community developers and Official. A kit with no published license is `none stated` and link-only. No second directory. | Phoenix agent |
 | v0.2.8 (draft) | 2026-11-12 | `reputation-link` is built as a hub kind (one scope per signed sentence, unlink hides the link, one counting link per wallet per UTC day). M6 and kind-scoped signer sets (C7) stay planned. No live signer set changed. | Phoenix agent |
 | v0.2.7 (draft) | 2026-11-11 | Migration M5 is live: the production node trusts the `agents` signer set. All 55 hub records are approved by K2 "Phoenix reviewer" and G2Ph. The public MCP has 24 read-only tools, and the H2H feeds and card are live. The player wallet stays on the allowlist. Limiting it to player records is planned for M6 after a 7-day soak, once kind-scoped signer sets (C7) are built; that scoping is not live. | Phoenix agent |
 | v0.2.6 (draft) | 2026-11-11 | C5 is built: `list_c4_markers`, `list_community_tools`, and the GET routes for both, plus `/.well-known/h2h-card.json`. Adds Phoenix's card, `registry.json` (the card sha256 is pinned and tested), the curated `community-tools.json`, `START-HERE.md` (arrive, pick, contribute, get credit; no money), a Phoenix-to-Phoenix handshake example with a zero-dependency record verifier, and five good-first-task drafts. | Phoenix agent, for Falkor (Phoenix steward) to review |

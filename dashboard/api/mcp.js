@@ -28351,7 +28351,7 @@ function registerDaoTools(server, dao) {
     "list_community_tools",
     {
       title: "List community tools (H2H)",
-      description: "H2H bridge feed h2h.community-tools.v1 (protocol/h2h/SPEC.md section 6.2). A curated list from protocol/h2h/community-tools.json in this node's repo. Anyone can add a tool with one pull request. A row is a pointer, not an endorsement, a referral, or a price. Also served as GET /community-tools.json. Read-only.",
+      description: `H2H bridge feed h2h.community-tools.v1 (protocol/h2h/SPEC.md section 6.2). A curated list from protocol/h2h/community-tools.json in this node's repo, including the Community developers and Official categories in the same feed. Anyone can add a tool with one pull request. A row is a pointer, not an endorsement, a referral, or a price. A kit whose license is "none stated" is a link only. Also served as GET /community-tools.json. Read-only.`,
       inputSchema: object({}),
       annotations: readOnlyAnnotations
     },
@@ -30005,6 +30005,242 @@ var H2H_COMMUNITY_TOOLS = {
       "addedIn": null,
       "checkedAt": "2026-11-11"
     }
+  ],
+  "categories": [
+    {
+      "id": "community-developers",
+      "name": "Community developers",
+      "entries": [
+        {
+          "id": "atlas-kit",
+          "handle": "Aephia",
+          "sites": [
+            "https://atlaskit.dev/",
+            "https://docs.atlaskit.dev/",
+            "https://github.com/Aephia"
+          ],
+          "credentials": [
+            {
+              "kind": "package",
+              "name": "@aephia/atlas-kit",
+              "url": "https://www.npmjs.com/package/@aephia/atlas-kit"
+            }
+          ],
+          "kits": [
+            {
+              "name": "Atlas Kit",
+              "url": "https://www.npmjs.com/package/@aephia/atlas-kit",
+              "license": "Apache-2.0",
+              "linkOnly": false
+            }
+          ],
+          "dualUse": true,
+          "checkedAt": "2026-11-14"
+        },
+        {
+          "id": "siphaawal",
+          "handle": "Siphaawal",
+          "sites": [
+            "https://github.com/Siphaawal",
+            "https://ses.aephia.com/C4Live/",
+            "https://github.com/Aephia/OperationsHub/tree/main/C4Live"
+          ],
+          "credentials": [
+            {
+              "kind": "repo",
+              "name": "Siphaawal/agent-team-harness",
+              "url": "https://github.com/Siphaawal/agent-team-harness"
+            }
+          ],
+          "kits": [
+            {
+              "name": "agent-team-harness",
+              "url": "https://github.com/Siphaawal/agent-team-harness",
+              "license": "MIT",
+              "linkOnly": false
+            },
+            {
+              "name": "C4 Live",
+              "url": "https://ses.aephia.com/C4Live/",
+              "license": "none stated",
+              "linkOnly": true,
+              "note": "No LICENSE file in the public C4Live tree. package.json says ISC and the README badge says MIT, and those disagree, so this kit is a link only."
+            }
+          ],
+          "dualUse": true,
+          "checkedAt": "2026-11-14"
+        },
+        {
+          "id": "ttdonovan",
+          "handle": "ttdonovan",
+          "sites": [
+            "https://github.com/ttdonovan/sa-forge-signer",
+            "https://ttdonovan.github.io/sa-forge-signer/"
+          ],
+          "credentials": [
+            {
+              "kind": "repo",
+              "name": "ttdonovan/sa-forge-signer",
+              "url": "https://github.com/ttdonovan/sa-forge-signer"
+            }
+          ],
+          "kits": [
+            {
+              "name": "sa-forge-signer",
+              "url": "https://github.com/ttdonovan/sa-forge-signer",
+              "license": "Unlicense OR MIT",
+              "linkOnly": false,
+              "note": "Cargo.toml says Unlicense OR MIT. LICENSE-MIT and UNLICENSE are both in the repository."
+            }
+          ],
+          "dualUse": true,
+          "checkedAt": "2026-11-14"
+        },
+        {
+          "id": "ryden-systems",
+          "handle": "ryden-systems",
+          "sites": [
+            "https://github.com/ryden-systems",
+            "https://ryden-systems.github.io/dao-dashboard/"
+          ],
+          "credentials": [
+            {
+              "kind": "repo",
+              "name": "ryden-systems/dao-dashboard",
+              "url": "https://github.com/ryden-systems/dao-dashboard"
+            },
+            {
+              "kind": "repo",
+              "name": "ryden-systems/zxp-tracker",
+              "url": "https://github.com/ryden-systems/zxp-tracker"
+            }
+          ],
+          "kits": [
+            {
+              "name": "dao-dashboard",
+              "url": "https://github.com/ryden-systems/dao-dashboard",
+              "license": "none stated",
+              "linkOnly": true,
+              "note": "No LICENSE file, and package.json has no license field. Link only."
+            },
+            {
+              "name": "zxp-tracker",
+              "url": "https://github.com/ryden-systems/zxp-tracker",
+              "license": "MIT",
+              "linkOnly": false
+            }
+          ],
+          "dualUse": true,
+          "checkedAt": "2026-11-14"
+        },
+        {
+          "id": "harlock-space-pirate",
+          "handle": "Harlock-Space-Pirate",
+          "sites": [
+            "https://github.com/Harlock-Space-Pirate"
+          ],
+          "credentials": [
+            {
+              "kind": "repo",
+              "name": "Harlock-Space-Pirate/c4-sage-sdk",
+              "url": "https://github.com/Harlock-Space-Pirate/c4-sage-sdk"
+            }
+          ],
+          "kits": [
+            {
+              "name": "c4-sage-sdk",
+              "url": "https://github.com/Harlock-Space-Pirate/c4-sage-sdk",
+              "license": "Apache-2.0",
+              "linkOnly": false
+            }
+          ],
+          "dualUse": true,
+          "checkedAt": "2026-11-14"
+        },
+        {
+          "id": "zamsor",
+          "handle": "Zamsor",
+          "sites": [
+            "https://github.com/Zamsor"
+          ],
+          "credentials": [
+            {
+              "kind": "repo",
+              "name": "Zamsor/zamsor-fleet",
+              "url": "https://github.com/Zamsor/zamsor-fleet"
+            }
+          ],
+          "kits": [
+            {
+              "name": "zamsor-fleet",
+              "url": "https://github.com/Zamsor/zamsor-fleet",
+              "license": "none stated",
+              "linkOnly": true,
+              "note": "package.json says MIT and the repository has no LICENSE file, so this kit is a link only."
+            }
+          ],
+          "dualUse": true,
+          "checkedAt": "2026-11-14"
+        }
+      ]
+    },
+    {
+      "id": "official",
+      "name": "Official",
+      "entries": [
+        {
+          "id": "staratlas-dev-sage",
+          "handle": "@staratlas",
+          "sites": [
+            "https://www.npmjs.com/package/@staratlas/dev-sage",
+            "https://build.staratlas.com/"
+          ],
+          "credentials": [
+            {
+              "kind": "package",
+              "name": "@staratlas/dev-sage",
+              "url": "https://www.npmjs.com/package/@staratlas/dev-sage"
+            }
+          ],
+          "kits": [
+            {
+              "name": "@staratlas/dev-sage",
+              "url": "https://www.npmjs.com/package/@staratlas/dev-sage",
+              "license": "Apache-2.0",
+              "linkOnly": false,
+              "note": "The npm registry license field is Apache-2.0. That record has no repository url."
+            }
+          ],
+          "dualUse": true,
+          "checkedAt": "2026-11-14"
+        },
+        {
+          "id": "star-atlas-decoders",
+          "handle": "staratlasmeta",
+          "sites": [
+            "https://github.com/staratlasmeta",
+            "https://build.staratlas.com/"
+          ],
+          "credentials": [
+            {
+              "kind": "repo",
+              "name": "staratlasmeta/star-atlas-decoders",
+              "url": "https://github.com/staratlasmeta/star-atlas-decoders"
+            }
+          ],
+          "kits": [
+            {
+              "name": "star-atlas-decoders",
+              "url": "https://github.com/staratlasmeta/star-atlas-decoders",
+              "license": "Apache-2.0",
+              "linkOnly": false
+            }
+          ],
+          "dualUse": true,
+          "checkedAt": "2026-11-14"
+        }
+      ]
+    }
   ]
 };
 
@@ -30100,8 +30336,14 @@ async function listC4Markers(source, allowlist, threshold, query = {}, signerSet
   };
 }
 var TOOL_ID = /^[a-z0-9][a-z0-9-]{1,47}$/;
+var HANDLE = /^@?[A-Za-z0-9][A-Za-z0-9._-]{0,39}$/;
+var CREDENTIAL_NAME = /^[@A-Za-z0-9][A-Za-z0-9._+/-]{0,79}$/;
+var SPDX_ID = /^[A-Za-z0-9][A-Za-z0-9.+-]{1,39}$/;
 var DATE = /^\d{4}-\d{2}-\d{2}$/;
 var PRICE_OR_REFERRAL = /\$|€|£|\b(?:price|prices|discount|referral|affiliate|airdrop|token sale|guaranteed)\b/i;
+var NONE_STATED = "none stated";
+var CREDENTIAL_KINDS = /* @__PURE__ */ new Set(["package", "repo"]);
+var TOP_LEVEL_KEYS = /* @__PURE__ */ new Set(["schema", "tools", "categories"]);
 function httpsUrl(value) {
   if (typeof value !== "string" || value.length > 300) return false;
   try {
@@ -30111,24 +30353,41 @@ function httpsUrl(value) {
     return false;
   }
 }
-function parseCommunityTools(value) {
-  if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error("community-tools.json must be an object.");
-  const record4 = value;
-  if (record4.schema !== COMMUNITY_TOOLS_SCHEMA || !Array.isArray(record4.tools) || record4.tools.length > 200) {
-    throw new Error("community-tools.json does not match h2h.community-tools.v1.");
-  }
+function rejectUnknown(row, allowed, label) {
+  for (const key of Object.keys(row)) if (!allowed.has(key)) throw new Error(`${label} has an unknown field ${key}.`);
+}
+function plainText2(value, max) {
+  return typeof value === "string" && value.trim() !== "" && value.length <= max && !PRICE_OR_REFERRAL.test(value);
+}
+function httpsList(value, label) {
+  if (!Array.isArray(value) || value.length < 1 || value.length > 8) throw new Error(`${label} must list 1 to 8 https urls.`);
   const seen = /* @__PURE__ */ new Set();
-  return record4.tools.map((entry, index) => {
+  return value.map((item) => {
+    if (!httpsUrl(item) || seen.has(item)) throw new Error(`${label} must be distinct https urls.`);
+    seen.add(item);
+    return item;
+  });
+}
+function licenseExpression(value) {
+  if (value === NONE_STATED) return true;
+  if (typeof value !== "string" || value.length > 80) return false;
+  const parts = value.split(" OR ");
+  return parts.length > 0 && parts.every((part) => SPDX_ID.test(part));
+}
+function parseTools(tools) {
+  const seen = /* @__PURE__ */ new Set();
+  return tools.map((entry, index) => {
     if (!entry || typeof entry !== "object" || Array.isArray(entry)) throw new Error(`Tool ${index} is not an object.`);
     const row = entry;
-    const allowed = /* @__PURE__ */ new Set(["id", "name", "url", "what", "license", "operatedBy", "weOperateIt", "h2hCard", "addedIn", "checkedAt"]);
-    for (const key of Object.keys(row)) if (!allowed.has(key)) throw new Error(`Tool ${index} has an unknown field ${key}.`);
+    rejectUnknown(row, /* @__PURE__ */ new Set(["id", "name", "url", "what", "license", "operatedBy", "weOperateIt", "h2hCard", "addedIn", "checkedAt"]), `Tool ${index}`);
     if (typeof row.id !== "string" || !TOOL_ID.test(row.id) || seen.has(row.id)) throw new Error(`Tool ${index} has a missing, invalid, or repeated id.`);
     seen.add(row.id);
     for (const key of ["name", "what", "operatedBy"]) {
       const text2 = row[key];
-      if (typeof text2 !== "string" || text2.trim() === "" || text2.length > (key === "what" ? 280 : 80)) throw new Error(`Tool ${row.id} has an invalid ${key}.`);
-      if (PRICE_OR_REFERRAL.test(text2)) throw new Error(`Tool ${row.id} ${key} has a price, referral, or promise word.`);
+      if (!plainText2(text2, key === "what" ? 280 : 80)) {
+        if (typeof text2 === "string" && PRICE_OR_REFERRAL.test(text2)) throw new Error(`Tool ${row.id} ${key} has a price, referral, or promise word.`);
+        throw new Error(`Tool ${row.id} has an invalid ${key}.`);
+      }
     }
     if (!httpsUrl(row.url)) throw new Error(`Tool ${row.id} url must be https.`);
     if (row.h2hCard !== null && !httpsUrl(row.h2hCard)) throw new Error(`Tool ${row.id} h2hCard must be https or null.`);
@@ -30139,6 +30398,7 @@ function parseCommunityTools(value) {
     if (!license || typeof license !== "object" || typeof license.spdx !== "string" || !/^[A-Za-z0-9.+-]{2,40}$/.test(license.spdx)) {
       throw new Error(`Tool ${row.id} license.spdx is missing.`);
     }
+    if (license.note !== void 0 && !plainText2(license.note, 160)) throw new Error(`Tool ${row.id} license.note is invalid.`);
     return {
       id: row.id,
       name: row.name,
@@ -30153,13 +30413,90 @@ function parseCommunityTools(value) {
     };
   });
 }
+function parseKit(value, entryId) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error(`Entry ${entryId} has a kit that is not an object.`);
+  const row = value;
+  rejectUnknown(row, /* @__PURE__ */ new Set(["name", "url", "license", "linkOnly", "note"]), `Entry ${entryId} kit`);
+  if (!plainText2(row.name, 80)) throw new Error(`Entry ${entryId} has a kit with an invalid name.`);
+  if (!httpsUrl(row.url)) throw new Error(`Entry ${entryId} kit ${String(row.name)} url must be https.`);
+  if (!licenseExpression(row.license)) throw new Error(`Entry ${entryId} kit ${row.name} license must be an SPDX expression or "none stated".`);
+  if (typeof row.linkOnly !== "boolean") throw new Error(`Entry ${entryId} kit ${row.name} linkOnly must be true or false.`);
+  if (row.license === NONE_STATED && row.linkOnly !== true) throw new Error(`Entry ${entryId} kit ${row.name} with license none stated must be link only.`);
+  if (row.license !== NONE_STATED && row.linkOnly !== false) throw new Error(`Entry ${entryId} kit ${row.name} with an SPDX license must not be link only.`);
+  if (row.note !== void 0 && !plainText2(row.note, 240)) throw new Error(`Entry ${entryId} kit ${row.name} note is invalid.`);
+  return {
+    name: row.name,
+    url: row.url,
+    license: row.license,
+    linkOnly: row.linkOnly,
+    ...typeof row.note === "string" ? { note: row.note } : {}
+  };
+}
+function parseDeveloperEntry(value, seen) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error("A developer entry is not an object.");
+  const row = value;
+  rejectUnknown(row, /* @__PURE__ */ new Set(["id", "handle", "sites", "credentials", "kits", "dualUse", "checkedAt"]), "Developer entry");
+  if (typeof row.id !== "string" || !TOOL_ID.test(row.id) || seen.has(row.id)) throw new Error(`Developer entry ${String(row.id)} has a missing, invalid, or repeated id.`);
+  seen.add(row.id);
+  if (typeof row.handle !== "string" || !HANDLE.test(row.handle)) throw new Error(`Entry ${row.id} handle must be a public handle.`);
+  if (typeof row.dualUse !== "boolean") throw new Error(`Entry ${row.id} dualUse must be true or false.`);
+  if (typeof row.checkedAt !== "string" || !DATE.test(row.checkedAt)) throw new Error(`Entry ${row.id} checkedAt must be YYYY-MM-DD.`);
+  if (!Array.isArray(row.credentials) || row.credentials.length < 1 || row.credentials.length > 8) {
+    throw new Error(`Entry ${row.id} credentials must list 1 to 8 packages or repos.`);
+  }
+  const credentials = row.credentials.map((item) => {
+    if (!item || typeof item !== "object" || Array.isArray(item)) throw new Error(`Entry ${row.id} has a credential that is not an object.`);
+    const credential = item;
+    rejectUnknown(credential, /* @__PURE__ */ new Set(["kind", "name", "url"]), `Entry ${row.id} credential`);
+    if (typeof credential.kind !== "string" || !CREDENTIAL_KINDS.has(credential.kind)) throw new Error(`Entry ${row.id} credential kind must be package or repo.`);
+    if (typeof credential.name !== "string" || !CREDENTIAL_NAME.test(credential.name)) throw new Error(`Entry ${row.id} credential name is invalid.`);
+    if (!httpsUrl(credential.url)) throw new Error(`Entry ${row.id} credential url must be https.`);
+    return { kind: credential.kind, name: credential.name, url: credential.url };
+  });
+  if (!Array.isArray(row.kits) || row.kits.length < 1 || row.kits.length > 8) throw new Error(`Entry ${row.id} kits must list 1 to 8 kits.`);
+  return {
+    id: row.id,
+    handle: row.handle,
+    sites: httpsList(row.sites, `Entry ${row.id} sites`),
+    credentials,
+    kits: row.kits.map((kit) => parseKit(kit, row.id)),
+    dualUse: row.dualUse,
+    checkedAt: row.checkedAt
+  };
+}
+function parseCategories(value) {
+  if (value === void 0) return [];
+  if (!Array.isArray(value) || value.length > 8) throw new Error("categories must be an array of at most 8.");
+  const seenCategories = /* @__PURE__ */ new Set();
+  const seenEntries = /* @__PURE__ */ new Set();
+  return value.map((item, index) => {
+    if (!item || typeof item !== "object" || Array.isArray(item)) throw new Error(`Category ${index} is not an object.`);
+    const row = item;
+    rejectUnknown(row, /* @__PURE__ */ new Set(["id", "name", "entries"]), `Category ${index}`);
+    if (typeof row.id !== "string" || !TOOL_ID.test(row.id) || seenCategories.has(row.id)) throw new Error(`Category ${index} has a missing, invalid, or repeated id.`);
+    seenCategories.add(row.id);
+    if (!plainText2(row.name, 80)) throw new Error(`Category ${row.id} has an invalid name.`);
+    if (!Array.isArray(row.entries) || row.entries.length < 1 || row.entries.length > 40) throw new Error(`Category ${row.id} entries must list 1 to 40 developers.`);
+    return { id: row.id, name: row.name, entries: row.entries.map((entry) => parseDeveloperEntry(entry, seenEntries)) };
+  });
+}
+function parseCommunityCatalog(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error("community-tools.json must be an object.");
+  const record4 = value;
+  rejectUnknown(record4, TOP_LEVEL_KEYS, "community-tools.json");
+  if (record4.schema !== COMMUNITY_TOOLS_SCHEMA || !Array.isArray(record4.tools) || record4.tools.length > 200) {
+    throw new Error("community-tools.json does not match h2h.community-tools.v1.");
+  }
+  return { tools: parseTools(record4.tools), categories: parseCategories(record4.categories) };
+}
 function listCommunityTools(now = /* @__PURE__ */ new Date()) {
-  const tools = parseCommunityTools(H2H_COMMUNITY_TOOLS);
+  const catalog = parseCommunityCatalog(H2H_COMMUNITY_TOOLS);
   return {
     schema: COMMUNITY_TOOLS_SCHEMA,
     generatedAt: now.toISOString(),
-    tools,
-    note: "A curated list in protocol/h2h/community-tools.json. Anyone can add a tool with one pull request, reviewed by a board steward. A row is a pointer, not an endorsement, a referral, or a price. weOperateIt is true only for tools Phoenix runs.",
+    tools: catalog.tools,
+    categories: catalog.categories,
+    note: 'A curated list in protocol/h2h/community-tools.json. Anyone can add a tool with one pull request, reviewed by a board steward. A row is a pointer, not an endorsement, a referral, or a price. weOperateIt is true only for tools Phoenix runs. categories in the same file are Community developers and Official. dualUse means the public kits are useful to the public read-only MCP and to guild tooling. A kit whose license is "none stated" is a link only, and this repo does not vendor it.',
     howToAdd: "https://github.com/PhoenixClaw01/sa-ecosystem-node/blob/main/protocol/h2h/START-HERE.md"
   };
 }

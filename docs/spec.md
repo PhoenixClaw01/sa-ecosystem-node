@@ -80,7 +80,7 @@ The names are the tools registered in `createNodeServer` (`src/server.ts`) and `
 | `hub_updates` | Signed hub updates from the pinned git commit. Claim records and attestation records are left out |
 | `list_listings` | Signed business listings from that commit. The node does not take payment |
 | `list_c4_markers` | Signed listings and guilds as map markers for a renderer (H2H). No coordinates yet |
-| `list_community_tools` | A curated list of community tools anyone can add to with a PR (H2H) |
+| `list_community_tools` | A curated list of community tools, plus Community developers and Official categories, anyone can add to with a PR (H2H). A kit with no published license is a link only |
 | `claim_status` | Whether a listing or guild name has a claim, and what state that claim is in |
 | `data_health` | Freshness and the last error for the cache, galaxy, the Council sheet, and wallet balances |
 
