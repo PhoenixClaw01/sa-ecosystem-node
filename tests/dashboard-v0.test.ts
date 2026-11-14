@@ -6,7 +6,8 @@ import { monthlyIncome, proposalTableHtml, proposalVoteTable, revenueSectionHtml
 import { updatedAgo } from "../src/dao/freshness.js";
 import { parseProposals } from "../src/dao/galaxy.js";
 import { matchTrackerToPayments, parseTrackerMoney } from "../src/dao/payment-match.js";
-import { buildRecordedMcp, RECORDED_AT } from "../src/dao/recorded-mcp.js";
+import { buildRecordedMcp } from "../src/dao/recorded-mcp.js";
+import { READ_ONLY_TOOLS } from "../src/server.js";
 import { approximateUsd, parseJupiterPrices } from "../src/dao/usd.js";
 import { ATLAS_MINT, USDC_MINT } from "../src/dao/wallets.js";
 
@@ -124,43 +125,22 @@ describe("updated ago", () => {
   });
 });
 
-describe("recorded MCP output", () => {
-  it("runs the tool code on the checked-in sample and does not invent a balance", async () => {
-    const recorded = await buildRecordedMcp({
-      proposals: readJson("proposals.json"),
-      votes: readJson("votes.json"),
-      revenue: readJson("revenue.json"),
-      trackerCsv: readFileSync("dashboard/tracker.csv", "utf8"),
-      now: new Date(RECORDED_AT),
-    });
-    expect(recorded.label).toBe("recorded MCP output");
-    expect(recorded.recordedAt).toBe(RECORDED_AT);
+describe("recorded MCP shapes", () => {
+  it("records the 24 tool schemas and no cache timestamp", async () => {
+    const recorded = await buildRecordedMcp();
+    const again = await buildRecordedMcp();
+    expect(again).toEqual(recorded);
+    expect(recorded.label).toBe("recorded MCP shapes");
     expect(recorded.network).toBe(false);
-    expect(recorded.panels.results?.ok).toBe(true);
-    expect(JSON.stringify(recorded.panels.results?.output)).toContain("Star Atlas DAO Dashboard");
-    expect(recorded.panels.votes?.ok).toBe(true);
-    expect(recorded.panels.revenue?.ok).toBe(true);
-    const paymentsError = recorded.panels.payments?.error ?? "";
-    const cacheMissing = /does not invent balances/.test(paymentsError);
-    expect(recorded.panels.history?.ok).toBe(true);
-    expect(recorded.panels.limit?.ok).toBe(true);
-    if (cacheMissing) {
-      expect(recorded.panels.payments?.ok).toBe(false);
-      expect(recorded.panels.payments?.output).toBeNull();
-      expect(paymentsError).toMatch(/does not invent balances|is not available/);
-      expect(recorded.panels.flows?.ok).toBe(false);
-      expect(recorded.panels.flows?.output).toBeNull();
-      expect(JSON.stringify(recorded.panels.history?.output)).toMatch(/not yet populated/);
-      expect(JSON.stringify(recorded.panels.limit?.output)).not.toMatch(/amountRaw/);
-    } else {
-      expect(recorded.panels.payments?.ok).toBe(true);
-      expect(recorded.panels.flows?.ok).toBe(true);
-    }
-    expect(recorded.panels.results?.registered).toBe(true);
-    expect(recorded.panels.balances?.registered).toBe(false);
-    expect(recorded.panels.balances?.ok).toBe(false);
-    expect(recorded.panels.balances?.error).toMatch(/No balance was invented/);
-    expect(recorded.panels.usd?.error).toMatch(/No price was invented/);
-    expect(JSON.stringify(recorded)).not.toMatch(/\/workspace|\/home\/|\/tmp\/|\/Users\//);
+    expect(recorded.tools.map((tool) => tool.name)).toEqual([...READ_ONLY_TOOLS]);
+    expect(recorded.tools).toHaveLength(24);
+    const community = recorded.tools.find((tool) => tool.name === "list_community_tools");
+    expect(community?.inputSchema).toMatchObject({ type: "object" });
+    const text = JSON.stringify(recorded);
+    const cache = JSON.parse(readFileSync("dashboard/data/treasury-cache.json", "utf8")) as { generatedAt: string };
+    const balances = JSON.parse(readFileSync("dashboard/balances.json", "utf8")) as { generatedAtUtc: string };
+    expect(text).not.toContain(cache.generatedAt);
+    expect(text).not.toContain(balances.generatedAtUtc);
+    expect(text).not.toMatch(/\/workspace|\/home\/|\/tmp\/|\/Users\//);
   });
 });
