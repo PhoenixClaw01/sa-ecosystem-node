@@ -16,6 +16,7 @@ import {
   type ParsedDeliverable,
   type ParsedVerify,
 } from "./types.ts";
+import { hasUnsafeSingleLine } from "./text.ts";
 
 const OTHER_KINDS = new Set([
   "hello",
@@ -228,7 +229,7 @@ function parseVerify(body: Record<string, unknown>, id: string, owner: string, s
   if (typeof commands === "string") return { error: issue(commands === "missing" ? "missing-field" : "bad-field", "commands must be 1 to 20 single-line strings.", blockIndex) };
   const expectedRaw = own(body, "expected");
   if (typeof expectedRaw !== "string") return { error: fieldIssue(expectedRaw, "expected", blockIndex) };
-  if (expectedRaw.length < 1 || expectedRaw.length > LIMITS.fieldChars || expectedRaw.includes("\0")) {
+  if (expectedRaw.length < 1 || expectedRaw.length > LIMITS.fieldChars || expectedRaw.includes("\0") || hasUnsafeSingleLine(expectedRaw)) {
     return { error: issue("bad-field", "expected must be a string of at most 2000 characters.", blockIndex) };
   }
   return { block: { kind: "verify", id, owner, scope, status, commands, expected: expectedRaw } };
@@ -240,7 +241,7 @@ function readCommands(value: unknown): string[] | "missing" | "bad" {
   const commands: string[] = [];
   for (const item of value) {
     if (typeof item !== "string" || item.length < 1 || item.length > LIMITS.fieldChars) return "bad";
-    if (item.includes("\n") || item.includes("\r") || item.includes("\0")) return "bad";
+    if (item.includes("\n") || item.includes("\r") || item.includes("\0") || hasUnsafeSingleLine(item)) return "bad";
     commands.push(item);
   }
   return commands;
@@ -271,6 +272,7 @@ function isMessageId(value: string): boolean {
 function readToken(value: unknown, pattern: RegExp, pathLike: boolean): string | null {
   if (typeof value !== "string" || value.length < 1 || value.length > LIMITS.fieldChars) return null;
   if (!pattern.test(value)) return null;
+  if (hasUnsafeSingleLine(value)) return null;
   if (pathLike && (value.includes("..") || value.includes("//") || value.includes("\\") || value.includes("@"))) return null;
   return value;
 }

@@ -83,8 +83,11 @@ export interface ParseResult {
   errors: ParseIssue[];
 }
 
+export type AccountRole = "repo-owner" | "example";
+
 export interface KnownAccounts {
-  logins: ReadonlySet<string>;
+  /** Lowercased login → role. Example rows are listed and never verify. */
+  roles: ReadonlyMap<string, AccountRole>;
 }
 
 export interface LedgerError {

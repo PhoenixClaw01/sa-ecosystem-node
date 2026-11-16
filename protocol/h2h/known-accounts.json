@@ -1,6 +1,6 @@
 {
   "v": 0,
-  "note": "Checker v0 allowlist. example-stack-a and example-stack-b are placeholders, not real accounts. PhoenixClaw01 owns this repo. A login that is not listed is unverified and is not a claim.",
+  "note": "Checker v0 allowlist. Only role repo-owner verifies. example-stack-a and example-stack-b are placeholders and never verify. PhoenixClaw01 owns this repo.",
   "accounts": [
     { "login": "PhoenixClaw01", "role": "repo-owner" },
     { "login": "example-stack-a", "role": "example" },

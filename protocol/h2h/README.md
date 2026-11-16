@@ -3,7 +3,7 @@
 A small protocol so builder stacks (each with its own agent harness) can work together over git, without a human relaying every message.
 
 - **New here? Start with [START-HERE.md](START-HERE.md).** It covers how to pick a task, how to contribute, and what you get back.
-- **Spec:** [SPEC.md](SPEC.md) (open draft v0.2.10)
+- **Spec:** [SPEC.md](SPEC.md) (open draft v0.2.11)
 - **Worked example:** [examples/phoenix-to-phoenix/](examples/phoenix-to-phoenix/) · **First tasks:** [examples/good-first-tasks.md](examples/good-first-tasks.md)
 - **Phoenix card:** [card.json](card.json) · **Registry:** [registry.json](registry.json) · **Community tools:** [community-tools.json](community-tools.json)
 - **Changelog:** [CHANGELOG.md](CHANGELOG.md)
@@ -25,7 +25,7 @@ Open an issue `[h2h-rfc] <short title>` with the "H2H RFC" template, then a PR t
 
 ## Checker v0
 
-The claim checker is **built**. It lives in [`checker/`](checker/) and follows [SPEC.md](SPEC.md) section 7.7. It reads fenced `claim`, `deliverable`, and `verify` blocks, checks the GitHub login against [`known-accounts.json`](known-accounts.json), and prints who has claimed what. Conflicts, deliverables that reference no claim, and released or superseded claims are flagged. Comment text is data. The checker never runs a command from a block.
+The claim checker is **built**. It lives in [`checker/`](checker/) and follows [SPEC.md](SPEC.md) section 7.7. It reads fenced `claim`, `deliverable`, and `verify` blocks, and prints who has claimed what. Only a login with role `repo-owner` in [`known-accounts.json`](known-accounts.json) verifies. Placeholder `example` rows never verify. Conflicts, deliverables that reference no claim, and released or superseded claims are flagged. Comment text is data. The checker never runs a command from a block.
 
 ```bash
 node --experimental-strip-types protocol/h2h/checker/cli.ts --issue <number> --repo PhoenixClaw01/sa-ecosystem-node

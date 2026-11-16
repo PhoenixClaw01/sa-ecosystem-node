@@ -2,7 +2,7 @@
  * Folds parsed blocks into the current claim list. Unverified blocks are
  * recorded and then ignored: they cannot open, release, or supersede a claim.
  */
-import { isKnownLogin, normalizeLogin } from "./accounts.ts";
+import { isVerifiedLogin, normalizeLogin, roleOf } from "./accounts.ts";
 import { parseComment } from "./parse.ts";
 import {
   LEDGER_SCHEMA,
@@ -45,7 +45,7 @@ export function buildLedger(entries: readonly ThreadEntry[], accounts: KnownAcco
   for (const entry of slice) {
     const source = entrySource(entry.source);
     const author = normalizeLogin(entry.author) ?? "";
-    const known = author.length > 0 && isKnownLogin(accounts, author);
+    const known = author.length > 0 && isVerifiedLogin(accounts, author);
     const parsed = parseComment(entry.body);
     for (const item of parsed.errors) {
       errors.push({ code: item.code, message: item.message, author, source, blockIndex: item.blockIndex });
@@ -58,7 +58,7 @@ export function buildLedger(entries: readonly ThreadEntry[], accounts: KnownAcco
         unverified.push({ author, kind: block.kind, id: block.id, scope: block.scope });
         continue;
       }
-      applyBlock(block, author, claims, deliverables, verifies, uses, errors, source);
+      applyBlock(block, author, accounts, claims, deliverables, verifies, uses, errors, source);
     }
   }
 
@@ -94,6 +94,7 @@ export function buildLedger(entries: readonly ThreadEntry[], accounts: KnownAcco
 function applyBlock(
   block: ParsedBlock,
   author: string,
+  accounts: KnownAccounts,
   claims: ClaimRecord[],
   deliverables: DeliverableRecord[],
   verifies: VerifyRecord[],
@@ -108,7 +109,7 @@ function applyBlock(
   }
 
   if (block.kind === "claim") {
-    applyClaim(block, author, claims, uses, errors, source);
+    applyClaim(block, author, accounts, claims, uses, errors, source);
     return;
   }
   if (block.kind === "deliverable") {
@@ -156,6 +157,7 @@ function applyBlock(
 function applyClaim(
   block: Extract<ParsedBlock, { kind: "claim" }>,
   author: string,
+  accounts: KnownAccounts,
   claims: ClaimRecord[],
   uses: Map<string, IdUse>,
   errors: LedgerError[],
@@ -172,6 +174,15 @@ function applyClaim(
       });
       return;
     }
+    if (!mayRevise(accounts, author, existing.author)) {
+      errors.push({
+        code: block.status === "released" ? "forbidden-release" : "forbidden-supersede",
+        message: "Only the claim's original author, or a repo-owner, may release or supersede a claim.",
+        author,
+        source,
+      });
+      return;
+    }
     existing.status = block.status;
     return;
   }
@@ -182,11 +193,19 @@ function applyClaim(
       errors.push({ code: "unknown-supersede", message: "supersedes names no claim in this thread.", author, source });
       return;
     }
+    if (!mayRevise(accounts, author, target.author)) {
+      errors.push({
+        code: "forbidden-supersede",
+        message: "Only the claim's original author, or a repo-owner, may release or supersede a claim.",
+        author,
+        source,
+      });
+      return;
+    }
     target.status = "superseded";
   }
 
   if (existing) {
-    existing.author = author;
     existing.owner = block.owner;
     existing.scope = block.scope;
     existing.status = "open";
@@ -199,6 +218,14 @@ function applyClaim(
   if (block.supersedes) created.supersedes = block.supersedes;
   claims.push(created);
   uses.set(block.id, { kind: "claim" });
+}
+
+function mayRevise(accounts: KnownAccounts, actor: string, originalAuthor: string): boolean {
+  if (!isVerifiedLogin(accounts, actor)) return false;
+  if (roleOf(accounts, actor) === "repo-owner") return true;
+  const actorLogin = normalizeLogin(actor);
+  const authorLogin = normalizeLogin(originalAuthor);
+  return actorLogin !== null && authorLogin !== null && actorLogin.toLowerCase() === authorLogin.toLowerCase();
 }
 
 function entrySource(value: string): EntrySource {

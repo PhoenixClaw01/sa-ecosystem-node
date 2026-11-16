@@ -2,12 +2,12 @@
   "entries": [
     {
       "source": "comment",
-      "author": "example-stack-a",
+      "author": "PhoenixClaw01",
       "body": "```h2h\n{\n  \"schema\": \"h2h.message.v0\",\n  \"id\": \"example-stack-a:2026-11-16:0001\",\n  \"kind\": \"claim\",\n  \"speaksFor\": \"harness\",\n  \"body\": { \"owner\": \"example-stack-a\", \"scope\": \"docs/readme\", \"status\": \"open\" }\n}\n```\n"
     },
     {
       "source": "comment",
-      "author": "example-stack-b",
+      "author": "PhoenixClaw01",
       "body": "```h2h\n{\n  \"schema\": \"h2h.message.v0\",\n  \"id\": \"example-stack-b:2026-11-16:0002\",\n  \"kind\": \"claim\",\n  \"speaksFor\": \"harness\",\n  \"body\": { \"owner\": \"example-stack-b\", \"scope\": \"docs/readme\", \"status\": \"open\" }\n}\n```\n"
     },
     {

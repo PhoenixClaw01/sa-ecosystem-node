@@ -172,7 +172,7 @@ function runChecked(argv: readonly string[], deps: CliDeps): number {
   }
 
   const accounts = readAccounts(deps, parsed.args.accounts);
-  if (!("logins" in accounts)) {
+  if (!("roles" in accounts)) {
     deps.stderr(`${accounts.message}\n`);
     return 1;
   }

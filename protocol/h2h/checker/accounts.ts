@@ -1,12 +1,13 @@
 /**
- * Checked-in allowlist of GitHub logins. A login that is absent is unverified.
+ * Checked-in allowlist of GitHub logins.
+ * Only role repo-owner verifies. Role example is a placeholder and never verifies.
  */
 import { fileURLToPath } from "node:url";
 
-import type { KnownAccounts } from "./types.ts";
+import type { AccountRole, KnownAccounts } from "./types.ts";
 
-const LOGIN = /^[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?$/;
-const ROLES = new Set(["repo-owner", "example"]);
+const LOGIN = /^[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?(?:\[bot\])?$/;
+const ROLES = new Set<AccountRole>(["repo-owner", "example"]);
 
 export function defaultAccountsPath(): string {
   return fileURLToPath(new URL("../known-accounts.json", import.meta.url));
@@ -17,10 +18,15 @@ export function normalizeLogin(login: string): string | null {
   return login;
 }
 
-export function isKnownLogin(accounts: KnownAccounts, login: string): boolean {
+export function roleOf(accounts: KnownAccounts, login: string): AccountRole | null {
   const normal = normalizeLogin(login);
-  if (!normal) return false;
-  return accounts.logins.has(normal.toLowerCase());
+  if (!normal) return null;
+  return accounts.roles.get(normal.toLowerCase()) ?? null;
+}
+
+/** True only for a real repo-owner. Placeholder example rows return false. */
+export function isVerifiedLogin(accounts: KnownAccounts, login: string): boolean {
+  return roleOf(accounts, login) === "repo-owner";
 }
 
 export function loadKnownAccounts(value: unknown): { ok: true; accounts: KnownAccounts } | { ok: false; message: string } {
@@ -38,7 +44,7 @@ export function loadKnownAccounts(value: unknown): { ok: true; accounts: KnownAc
   if (!Array.isArray(value.accounts)) return { ok: false, message: "known-accounts.json accounts must be a list." };
   if (value.accounts.length > 100) return { ok: false, message: "known-accounts.json has too many accounts." };
 
-  const logins = new Set<string>();
+  const roles = new Map<string, AccountRole>();
   for (const entry of value.accounts) {
     if (!isPlain(entry)) return { ok: false, message: "An allowlist entry is not an object." };
     const entryKeys = Object.getOwnPropertyNames(entry);
@@ -48,14 +54,18 @@ export function loadKnownAccounts(value: unknown): { ok: true; accounts: KnownAc
     if (typeof entry.login !== "string" || normalizeLogin(entry.login) === null) {
       return { ok: false, message: "An allowlist login is not a GitHub login." };
     }
-    if (typeof entry.role !== "string" || !ROLES.has(entry.role)) {
+    if (typeof entry.role !== "string" || !isAccountRole(entry.role)) {
       return { ok: false, message: "An allowlist role must be repo-owner or example." };
     }
     const folded = entry.login.toLowerCase();
-    if (logins.has(folded)) return { ok: false, message: "An allowlist login is duplicated." };
-    logins.add(folded);
+    if (roles.has(folded)) return { ok: false, message: "An allowlist login is duplicated." };
+    roles.set(folded, entry.role);
   }
-  return { ok: true, accounts: { logins } };
+  return { ok: true, accounts: { roles } };
+}
+
+function isAccountRole(value: string): value is AccountRole {
+  return (ROLES as ReadonlySet<string>).has(value);
 }
 
 function isPlain(value: unknown): value is Record<string, unknown> {

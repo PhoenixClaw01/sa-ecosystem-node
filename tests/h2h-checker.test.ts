@@ -9,7 +9,9 @@ import {
   LIMITS,
   buildLedger,
   formatMarkdown,
-  isKnownLogin,
+  formatSummary,
+  formatJson,
+  isVerifiedLogin,
   loadKnownAccounts,
   parseComment,
   threadFromIssue,
@@ -80,8 +82,11 @@ describe("known accounts", () => {
     expect(file.accounts.filter((account) => account.role === "repo-owner").map((account) => account.login)).toEqual(["PhoenixClaw01"]);
     expect(file.accounts.filter((account) => account.role === "example")).toHaveLength(2);
     const known = accounts();
-    expect(isKnownLogin(known, "phoenixclaw01")).toBe(true);
-    expect(isKnownLogin(known, "example-outsider")).toBe(false);
+    expect(isVerifiedLogin(known, "phoenixclaw01")).toBe(true);
+    expect(isVerifiedLogin(known, "example-stack-a")).toBe(false);
+    expect(isVerifiedLogin(known, "example-stack-b")).toBe(false);
+    expect(isVerifiedLogin(known, "example-outsider")).toBe(false);
+    expect(isVerifiedLogin(known, "dependabot[bot]")).toBe(false);
   });
 });
 
@@ -90,12 +95,12 @@ describe("claim ledger fixtures", () => {
     const ledger = ledgerOf("valid-claim.json");
     expect(codes(ledger)).toEqual([]);
     expect(ledger.claims).toEqual([
-      { id: "example-stack-a:2026-11-16:0001", author: "example-stack-a", owner: "example-stack-a", scope: "docs/readme", status: "open" },
+      { id: "example-stack-a:2026-11-16:0001", author: "PhoenixClaw01", owner: "example-stack-a", scope: "docs/readme", status: "open" },
     ]);
     expect(ledger.deliverables).toEqual([
       {
         id: "example-stack-a:2026-11-16:0002",
-        author: "example-stack-a",
+        author: "PhoenixClaw01",
         owner: "example-stack-a",
         scope: "docs/readme",
         status: "submitted",
@@ -106,7 +111,7 @@ describe("claim ledger fixtures", () => {
       },
     ]);
     expect(ledger.verifies[0]).toMatchObject({ id: "example-stack-b:2026-11-16:0003", commands: ["node --version"], expected: "v22", status: "passed" });
-    expect(ledger.ignored).toEqual([{ author: "example-stack-a", kind: "hello", id: "example-stack-a:2026-11-16:0009" }]);
+    expect(ledger.ignored).toEqual([{ author: "PhoenixClaw01", kind: "hello", id: "example-stack-a:2026-11-16:0009" }]);
     expect(ledger.conflicts).toEqual([]);
   });
 
@@ -116,8 +121,8 @@ describe("claim ledger fixtures", () => {
       {
         scope: "docs/readme",
         claims: [
-          { id: "example-stack-a:2026-11-16:0001", author: "example-stack-a" },
-          { id: "example-stack-b:2026-11-16:0002", author: "example-stack-b" },
+          { id: "example-stack-a:2026-11-16:0001", author: "PhoenixClaw01" },
+          { id: "example-stack-b:2026-11-16:0002", author: "PhoenixClaw01" },
         ],
       },
     ]);
@@ -205,7 +210,7 @@ describe("parser edges", () => {
     for (let seq = 1; seq <= 9; seq += 1) {
       parts.push(message("claim", `example-stack-a:2026-11-16:${String(seq).padStart(4, "0")}`, { owner: "example-stack-a", scope: "docs/readme", status: "open" }));
     }
-    const ledger = buildLedger([{ source: "comment", author: "example-stack-a", body: parts.join("\n") }], accounts());
+    const ledger = buildLedger([{ source: "comment", author: "PhoenixClaw01", body: parts.join("\n") }], accounts());
     expect(ledger.claims.map((claim) => claim.id)).not.toContain("example-stack-a:2026-11-16:0009");
     expect(ledger.claims.map((claim) => claim.id)).toContain("example-stack-a:2026-11-16:0001");
     expect(codes(ledger)).toEqual(expect.arrayContaining(["too-many-blocks", "multiple-blocks"]));
@@ -225,7 +230,7 @@ describe("parser edges", () => {
 
   it("does not invent a claim when a release names nothing", () => {
     const ledger = buildLedger(
-      [{ source: "comment", author: "example-stack-a", body: message("claim", "example-stack-a:2026-11-16:0001", { owner: "example-stack-a", scope: "docs/readme", status: "released" }) }],
+      [{ source: "comment", author: "PhoenixClaw01", body: message("claim", "example-stack-a:2026-11-16:0001", { owner: "example-stack-a", scope: "docs/readme", status: "released" }) }],
       accounts(),
     );
     expect(ledger.claims).toEqual([]);
@@ -241,12 +246,126 @@ describe("parser edges", () => {
     expect(ledger.claims[0]?.author).toBe("phoenixclaw01");
   });
 
+  it("leaves a claim open when example-stack-b posts a release", () => {
+    const open = message("claim", "example-stack-a:2026-11-16:0001", { owner: "PhoenixClaw01", scope: "docs/readme", status: "open" });
+    const release = message("claim", "example-stack-a:2026-11-16:0001", { owner: "example-stack-b", scope: "docs/readme", status: "released" });
+    const ledger = buildLedger(
+      [
+        { source: "body", author: "PhoenixClaw01", body: open },
+        { source: "comment", author: "example-stack-b", body: release },
+      ],
+      accounts(),
+    );
+    expect(ledger.claims).toEqual([
+      { id: "example-stack-a:2026-11-16:0001", author: "PhoenixClaw01", owner: "PhoenixClaw01", scope: "docs/readme", status: "open" },
+    ]);
+    expect(ledger.released).toEqual([]);
+    expect(ledger.unverified).toEqual([
+      { author: "example-stack-b", kind: "claim", id: "example-stack-a:2026-11-16:0001", scope: "docs/readme" },
+    ]);
+  });
+
+  it("lets a repo-owner release a claim opened by someone else, and keeps the original author", () => {
+    const loaded = loadKnownAccounts({
+      v: 0,
+      accounts: [
+        { login: "PhoenixClaw01", role: "repo-owner" },
+        { login: "example-owner", role: "repo-owner" },
+        { login: "example-stack-b", role: "example" },
+      ],
+    });
+    if (!loaded.ok) throw new Error(loaded.message);
+    const open = message("claim", "example-stack-a:2026-11-16:0001", { owner: "example-owner", scope: "docs/readme", status: "open" });
+    const release = message("claim", "example-stack-a:2026-11-16:0001", { owner: "PhoenixClaw01", scope: "docs/readme", status: "released" });
+    const ledger = buildLedger(
+      [
+        { source: "comment", author: "example-owner", body: open },
+        { source: "comment", author: "PhoenixClaw01", body: release },
+      ],
+      loaded.accounts,
+    );
+    expect(ledger.errors).toEqual([]);
+    expect(ledger.claims[0]).toMatchObject({ author: "example-owner", status: "released" });
+  });
+
+  it("shows a bot login as unverified instead of a blank author", () => {
+    const ledger = buildLedger(
+      [{
+        source: "comment",
+        author: "dependabot[bot]",
+        body: message("claim", "example-stack-a:2026-11-16:0001", { owner: "example-stack-a", scope: "docs/readme", status: "open" }),
+      }],
+      accounts(),
+    );
+    expect(ledger.claims).toEqual([]);
+    expect(ledger.unverified).toEqual([
+      { author: "dependabot[bot]", kind: "claim", id: "example-stack-a:2026-11-16:0001", scope: "docs/readme" },
+    ]);
+  });
+
+  it("rejects unicode line breaks and bidi controls in a command", () => {
+    const parsed = parseComment(message("verify", "example-stack-a:2026-11-16:0003", {
+      owner: "example-stack-a",
+      scope: "docs/readme",
+      status: "failed",
+      commands: ["node --version\u2028https://example.com/x\u202E"],
+      expected: "no",
+    }));
+    expect(parsed.blocks).toEqual([]);
+    expect(parsed.errors[0]?.code).toBe("bad-field");
+  });
+
+  it("keeps a backtick URL inside a code span in the summary", () => {
+    const ledger = buildLedger(
+      [{
+        source: "comment",
+        author: "PhoenixClaw01",
+        body: message("verify", "example-stack-a:2026-11-16:0003", {
+          owner: "example-stack-a",
+          scope: "docs/readme",
+          status: "failed",
+          commands: ["see `https://example.com/pwn`"],
+          expected: "do not open",
+        }),
+      }],
+      accounts(),
+    );
+    const markdown = formatMarkdown(ledger);
+    const summary = formatSummary(markdown, formatJson(ledger));
+    expect(markdown).toContain("`see 'https://example.com/pwn'`");
+    expect(summary).toContain("`see 'https://example.com/pwn'`");
+    const outsideCode = summary.replace(/```[\s\S]*?```/g, "").replace(/`[^`\n]*`/g, "");
+    expect(outsideCode).not.toContain("https://example.com/pwn");
+    const displayed = formatMarkdown({
+      schema: "h2h.ledger.v0",
+      claims: [],
+      conflicts: [],
+      released: [],
+      superseded: [],
+      deliverables: [],
+      verifies: [{
+        id: "example-stack-a:2026-11-16:0003",
+        author: "PhoenixClaw01",
+        owner: "example-stack-a",
+        scope: "docs/readme",
+        status: "failed",
+        commands: ["go\u2028https://example.com/a\u202E"],
+        expected: "ok\u2029",
+      }],
+      unverified: [],
+      ignored: [],
+      errors: [],
+    });
+    expect(displayed).not.toMatch(/\u2028|\u2029|\u202e/);
+    expect(displayed).toContain("`gohttps://example.com/a`");
+  });
+
   it("reads the worked verify example", () => {
     const example = readJson("protocol/h2h/examples/phoenix-to-phoenix/03-verify.json");
     const ledger = buildLedger([{ source: "comment", author: "PhoenixClaw01", body: `\`\`\`h2h\n${JSON.stringify(example)}\n\`\`\`\n` }], accounts());
     expect(codes(ledger)).toEqual([]);
     expect(ledger.verifies[0]?.expected).toBe("exit 0");
-    expect(ledger.verifies[0]?.commands[0]).toContain("verify-record.mjs");
+    expect(ledger.verifies[0]?.commands).toEqual(["node --version"]);
     expect(ledger.claims).toEqual([]);
   });
 });
@@ -312,7 +431,7 @@ describe("cli", () => {
       ghApi: (apiPath) => {
         calls.push(apiPath);
         if (apiPath.includes("/comments")) return [];
-        return { number: 12, body: injection?.body, user: { login: "example-stack-a" }, created_at: "2026-11-16T00:00:00.000Z" };
+        return { number: 12, body: injection?.body, user: { login: "PhoenixClaw01" }, created_at: "2026-11-16T00:00:00.000Z" };
       },
     });
     const code = run(["--issue", "12", "--repo", "example/widget", "--format", "json"], harness.deps);
@@ -327,7 +446,7 @@ describe("cli", () => {
 
 describe("supply chain", () => {
   it("keeps the core free of network, eval, and shell", () => {
-    const core = ["types.ts", "parse.ts", "accounts.ts", "ledger.ts", "format.ts", "thread.ts", "index.ts"];
+    const core = ["types.ts", "parse.ts", "accounts.ts", "ledger.ts", "format.ts", "text.ts", "thread.ts", "index.ts"];
     for (const name of core) {
       const src = readFileSync(path.join(root, "protocol/h2h/checker", name), "utf8");
       expect(src).not.toMatch(/child_process/);
@@ -356,6 +475,12 @@ describe("supply chain", () => {
     expect(yml).toContain("contents: read");
     expect(yml).toContain("issues: read");
     expect(yml).toContain("pull-requests: read");
+    expect(yml).toMatch(/actions\/checkout@[0-9a-f]{40}/);
+    expect(yml).toMatch(/actions\/setup-node@[0-9a-f]{40}/);
+    expect(yml).not.toContain("actions/checkout@v");
+    expect(yml).not.toContain("actions/setup-node@v");
+    expect(yml).toContain("concurrency:");
+    expect(yml).toContain("h2h-check-${{ github.repository }}");
     expect(yml).toContain("issue_comment:");
     expect(yml).toContain("pull_request_review_comment:");
     expect(yml).not.toMatch(/^pull_request:/m);

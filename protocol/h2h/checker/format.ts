@@ -2,6 +2,7 @@
  * Renders a ledger as Markdown and JSON. Field text is escaped.
  * Nothing here is executed.
  */
+import { stripUnsafeSingleLine } from "./text.ts";
 import { LIMITS, type Ledger } from "./types.ts";
 
 export function formatJson(ledger: Ledger): string {
@@ -86,7 +87,8 @@ export function formatMarkdown(ledger: Ledger): string {
 }
 
 export function formatSummary(markdown: string, json: string): string {
-  const fenced = fence("json", json);
+  const safeJson = stripUnsafeSingleLine(json).replace(/`/g, "'");
+  const fenced = fence("json", safeJson);
   const text = `${markdown}\n\n### JSON\n\n${fenced}`;
   if (text.length <= LIMITS.summaryChars) return text;
   return `${text.slice(0, LIMITS.summaryChars)}\n\nTruncated.\n`;
@@ -97,19 +99,19 @@ function cell(value: string): string {
 }
 
 function inline(value: string): string {
-  const flat = flattenControls(value);
+  const flat = flattenControls(value).replace(/`/g, "'");
   const escaped = flat
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/\]\(/g, "] (");
-  const quoted = escaped.includes("`") ? escaped.replace(/`/g, "'") : `\`${escaped}\``;
-  return quoted;
+  return `\`${escaped}\``;
 }
 
 function flattenControls(value: string): string {
+  const stripped = stripUnsafeSingleLine(value);
   let out = "";
-  for (const char of value) out += char.charCodeAt(0) <= 31 ? " " : char;
+  for (const char of stripped) out += char.charCodeAt(0) <= 31 ? " " : char;
   return out;
 }
 

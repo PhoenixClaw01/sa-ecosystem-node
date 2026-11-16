@@ -2,7 +2,7 @@
  * Checker v0 core. Importing this module does not read the network.
  * The CLI is protocol/h2h/checker/cli.ts.
  */
-export { defaultAccountsPath, isKnownLogin, loadKnownAccounts, normalizeLogin } from "./accounts.ts";
+export { defaultAccountsPath, isVerifiedLogin, loadKnownAccounts, normalizeLogin, roleOf } from "./accounts.ts";
 export { formatJson, formatMarkdown, formatSummary } from "./format.ts";
 export { buildLedger } from "./ledger.ts";
 export { parseComment } from "./parse.ts";
