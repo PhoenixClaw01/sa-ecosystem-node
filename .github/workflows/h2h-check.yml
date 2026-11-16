@@ -1,0 +1,40 @@
+name: h2h-check
+
+# Reads issue comments and pull request review comments, then writes a claim
+# ledger to the job summary. It does not comment, label, or push.
+#
+# A pull request conversation comment arrives as issue_comment. This file
+# runs from the default branch. The checkout ref is that branch, so a pull
+# request head is not checked out and its scripts are not run.
+on:
+  issue_comment:
+    types: [created, edited]
+  pull_request_review_comment:
+    types: [created, edited]
+
+permissions:
+  contents: read
+  issues: read
+  pull-requests: read
+
+concurrency:
+  group: h2h-check-${{ github.repository }}-${{ github.event.issue.number || github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  ledger:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout the default branch
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.repository.default_branch }}
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+      - name: Write the claim ledger to the job summary
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node --experimental-strip-types protocol/h2h/checker/cli.ts --github-summary
