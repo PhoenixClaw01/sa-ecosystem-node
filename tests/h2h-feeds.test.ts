@@ -192,9 +192,11 @@ describe("community developer categories", () => {
     ]);
     expect(licenseOf("ryden-systems", "dao-dashboard")).toMatchObject({ license: "none stated", linkOnly: true });
     expect(licenseOf("ryden-systems", "zxp-tracker")).toMatchObject({ license: "MIT", linkOnly: false });
+    expect(entries.find((entry) => entry.id === "star-portals")?.sites).toEqual(["https://github.com/StarAtlasFleet/star-portals"]);
     expect(licenseOf("star-portals", "star-portals")).toMatchObject({
       license: "MIT",
       linkOnly: true,
+      url: "https://github.com/StarAtlasFleet/star-portals",
       note: "Interactive maps. LICENSE is MIT. This repo does not copy the kit.",
     });
     expect(licenseOf("harlock-space-pirate", "c4-sage-sdk")).toMatchObject({ license: "Apache-2.0", linkOnly: false });
