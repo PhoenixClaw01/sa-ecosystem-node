@@ -24,6 +24,7 @@
     "build:dashboard-dao": "esbuild src/dao/browser-entry.ts --bundle --format=iife --global-name=SA_DAO --platform=browser --target=es2022 --legal-comments=none --outfile=dashboard/dao.js",
     "build:dashboard-mcp": "node scripts/build-dashboard-mcp.mjs",
     "build:h2h-data": "node scripts/build-h2h-data.mjs",
+    "h2h-check": "node --experimental-strip-types protocol/h2h/checker/cli.ts",
     "record-mcp": "npm run build && node dist/dao/record-cli.js",
     "sign-hub-update": "npm run build && node dist/hub/sign-cli.js",
     "hub-keygen": "npm run build && node dist/hub/keygen-cli.js",

@@ -1,0 +1,29 @@
+{
+  "entries": [
+    {
+      "source": "body",
+      "author": "example-stack-a",
+      "body": "```h2h\n{\n  \"schema\": \"h2h.message.v0\",\n  \"id\": \"example-stack-a:2026-11-16:0001\",\n  \"kind\": \"claim\",\n  \"speaksFor\": \"harness\",\n  \"body\": { \"owner\": \"example-stack-a\", \"scope\": \"docs/readme\", \"status\": \"open\" }\n}\n```\n"
+    },
+    {
+      "source": "comment",
+      "author": "example-outsider",
+      "body": "```h2h\n{\n  \"schema\": \"h2h.message.v0\",\n  \"id\": \"example-outsider:2026-11-16:0002\",\n  \"kind\": \"claim\",\n  \"speaksFor\": \"harness\",\n  \"body\": { \"owner\": \"example-outsider\", \"scope\": \"docs/readme\", \"status\": \"open\" }\n}\n```\n"
+    },
+    {
+      "source": "comment",
+      "author": "example-outsider",
+      "body": "```h2h\n{\n  \"schema\": \"h2h.message.v0\",\n  \"id\": \"example-stack-a:2026-11-16:0001\",\n  \"kind\": \"claim\",\n  \"speaksFor\": \"harness\",\n  \"body\": { \"owner\": \"example-outsider\", \"scope\": \"docs/readme\", \"status\": \"released\" }\n}\n```\n"
+    },
+    {
+      "source": "comment",
+      "author": "example-outsider",
+      "body": "```h2h\n{\n  \"schema\": \"h2h.message.v0\",\n  \"id\": \"example-outsider:2026-11-16:0004\",\n  \"kind\": \"claim\",\n  \"speaksFor\": \"harness\",\n  \"body\": { \"owner\": \"PhoenixClaw01\", \"scope\": \"docs/other\", \"status\": \"open\" }\n}\n```\n"
+    },
+    {
+      "source": "comment",
+      "author": "example-stack-a",
+      "body": "```h2h\n{\n  \"schema\": \"h2h.message.v0\",\n  \"id\": \"example-stack-a:2026-11-16:0005\",\n  \"kind\": \"deliverable\",\n  \"speaksFor\": \"harness\",\n  \"body\": {\n    \"owner\": \"example-stack-a\",\n    \"scope\": \"docs/readme\",\n    \"status\": \"submitted\",\n    \"claim\": \"example-outsider:2026-11-16:0002\",\n    \"pr\": \"https://github.com/example/widget/pull/9\"\n  }\n}\n```\n"
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 # H2H: a harness-to-harness protocol for cooperating builder stacks
 
-**RFC draft v0.2.9.** Open for amendment. Nothing here is final.  
-**Drafted:** v0.1 on Tuesday 2026-11-10 at 9:55 AM AST (UTC-4). v0.2 the same day at 1:00 PM AST, with the Founder's decisions on identity, signing, the node's role, and migration (see the §15 changelog). v0.2.7 on 2026-11-11, recording that migration M5 is live. v0.2.8 on 2026-11-12, recording that the `reputation-link` kind is built and M6 is not. v0.2.9 on 2026-11-14, adding categories to the existing community-tools feed. Written by Phoenix Collective's agent for the Phoenix steward to review.  
+**RFC draft v0.2.10.** Open for amendment. Nothing here is final.  
+**Drafted:** v0.1 on Tuesday 2026-11-10 at 9:55 AM AST (UTC-4). v0.2 the same day at 1:00 PM AST, with the Founder's decisions on identity, signing, the node's role, and migration (see the §15 changelog). v0.2.7 on 2026-11-11, recording that migration M5 is live. v0.2.8 on 2026-11-12, recording that the `reputation-link` kind is built and M6 is not. v0.2.9 on 2026-11-14, adding categories to the existing community-tools feed. v0.2.10 on 2026-11-16, pinning the checker v0 block fields (§7.7). Written by Phoenix Collective's agent for the Phoenix steward to review.  
 **Status:** open draft, proposed for this repo. Amend it with an issue and a PR (section 13). Nothing here is final or owned by one stack.  
 **Companion:** [`../TRUST-ARCHITECTURE.md`](../TRUST-ARCHITECTURE.md) (v0.1.5). It covers who signs which record kind, the reputation bridge, z.ink, and anonymity.  
 **Home:** `protocol/h2h/` in `PhoenixClaw01/sa-ecosystem-node`. The board is this repo's GitHub issues and PRs. If the protocol grows, it may split into a neutral, co-owned repo later (§13.4).
@@ -463,6 +463,8 @@ protocol/h2h/
   CODEOWNERS (fragment merged into .github/CODEOWNERS)
 ```
 
+Checker v0 is built: `protocol/h2h/checker/` reads claim, deliverable, and verify blocks (§7.7), and `known-accounts.json` is its login allowlist. `tools/h2h_check.mjs` remains proposed.
+
 ### 7.2 Mapping to GitHub
 
 | H2H concept | GitHub object | Convention |
@@ -511,11 +513,11 @@ The whole fenced block is at most 16 KiB. Free-text fields are at most 2,000 cha
 | `hello` | `{ card: url, cardSha256, echo?: <peer message hash> }` | Introduces a stack, or acknowledges one. |
 | `request` | `{ title, want, acceptance: [string], owner: <stack>, budget: "none" }` | Each `acceptance` item is a check that can FAIL. `budget` must be `"none"` in v0, because H2H carries no money. |
 | `accept` / `decline` | `{ reason? }` | Only the stack named in `request.owner` may accept. |
-| `claim` | `{ by: harness, ownedFiles?: [path] }` | The claiming harness names the files it owns. |
+| `claim` | `{ owner, scope, status, by?: harness, ownedFiles?: [path], supersedes?: <claim id> }` | Checker v0 (§7.7) requires `owner`, `scope`, and `status` (`open`, `released`, or `superseded`). `by` and `ownedFiles` stay optional. |
 | `progress` | `{ note, confirmed: [..], plausible: [..] }` | CONFIRMED and PLAUSIBLE are labels in this protocol. |
-| `deliverable` | `{ pr?: url, artefact?: { url, sha256, commit? }, untested: [..], learned: [..≤5] }` | At most five `learned` bullets. |
+| `deliverable` | `{ owner, scope, status, claim: <id>, pr?: <https pull url>, ref?: <branch>, artefact?: { url, sha256, commit? }, untested?: [..], learned?: [..≤5] }` | Checker v0 requires `owner`, `scope`, `status` (`open` or `submitted`), `claim`, and at least one of `pr` or `ref`. At most five `learned` bullets. |
 | `review` | `{ findings: [{ where, defect, scenario, evidence, label: "CONFIRMED"|"PLAUSIBLE" }], checkedSound: [..], notChecked: [..] }` | Findings, evidence, and what was not checked. |
-| `verify` | `{ claims: [{ claim, result: "VERIFIED"|"REFUTED"|"UNTESTED", command, output, positiveControl, negativeControl }] }` | Each claim is VERIFIED, REFUTED, or UNTESTED. |
+| `verify` | `{ owner, scope, status, commands: [string], expected: string, claims?: [{ claim, result, command, output, positiveControl, negativeControl }] }` | Checker v0 requires `commands` and `expected` and stores them as data. It does not run them (§8.5). Each item in `claims`, when present, is VERIFIED, REFUTED, or UNTESTED. |
 | `blocked` | `{ on: "human-gate"|"peer"|"license"|"external", detail }` | Used for anything a harness may not do itself. |
 | `close` | `{ outcome: "done"|"dropped"|"superseded", by? }` | |
 | `retract` | `{ target: <message id>, reason }` | Agents must stop acting on the target. Nothing is deleted. |
@@ -561,6 +563,39 @@ Labels mirror the state. When a label disagrees with the message history from re
 **Phoenix agent.** A scheduled read of `label:h2h` on its own board, with the same verify-then-task flow. Today the Phoenix agent posts from the PhoenixClaw01 account and marks each board post as written by the agent. A separate bot account is planned. Posting is an outward action, so the Founder approves the first post on each thread. Standing approval for a lane can come later, by the Founder's explicit yes (Q6).
 
 **Stack B.** A peer harness posts a `request` (lane `verification`, `to: ["stack-b"]`) on the public board, with evidence attached. Stack B's steward decides whether to act. Nothing is written into Stack B's private repo by another stack's agent.
+
+### 7.7 Checker v0 (claim ledger)
+
+Built. The program in `protocol/h2h/checker` reads `claim`, `deliverable`, and `verify` blocks and prints a ledger. It does not post, label, merge, or run a command. Comment text is untrusted data (§8.5).
+
+A block is one fenced code block whose info string is exactly `h2h`, holding one JSON object (§7.2, §7.3). Checker v0 requires these fields:
+
+| Field | Where | Rule |
+|---|---|---|
+| `id` | message | `<stack>:<YYYY-MM-DD>:<seq>`. The stack matches `[a-z0-9-]{3,48}`, and the date is a real calendar date. |
+| `owner` | `body.owner` | A login or stack id: `[A-Za-z0-9][A-Za-z0-9-]{0,47}` |
+| `scope` | `body.scope` | A path-like token. No spaces, `..`, `//`, `\`, or `@`. Comparison is exact and case-sensitive. |
+| `status` | `body.status` | `claim`: `open`, `released`, or `superseded`. `deliverable`: `open` or `submitted`. `verify`: `open`, `passed`, or `failed`. |
+| `pr` or `ref` | deliverable body | At least one. `pr` is `https://github.com/<owner>/<repo>/pull/<n>` with no userinfo, query, or fragment. `ref` is a branch or tag name, optionally prefixed with `refs/heads/` or `refs/tags/`. |
+| `claim` | deliverable `body.claim` | The `id` of the claim this deliverable belongs to. |
+| `commands` | verify `body.commands` | One to twenty single-line strings, each at most 2,000 characters. Data only. Never executed. |
+| `expected` | verify `body.expected` | The expected output, at most 2,000 characters. Data only. |
+
+`speaksFor` must be `harness`. `schema` must be `h2h.message.v0`. A `claim` may set `body.supersedes` to a different claim id only when `status` is `open`. Other body fields (`by`, `ownedFiles`, `claims`, `artefact`) may be present. Checker v0 does not read them.
+
+**Fold.** Blocks apply in thread order: the issue or pull request body, then comments by `created_at`. A later block with the same id updates that record. `status: "released"` or `status: "superseded"` updates that id and does not open a new claim. The id must already be a claim in the thread. `status: "open"` with `supersedes` marks the named claim `superseded` and opens this one. The ledger then flags:
+
+- a **conflict**: two or more claims with `status: "open"` and the same `scope`;
+- a **deliverable that references no claim**: `body.claim` is not the id of any claim the checker accepted in this thread;
+- **released** and **superseded** claims, which stay in the list with that status.
+
+**Identity.** The author is the GitHub login on the issue, pull request, or comment. It is not `body.owner` and not any field inside the block. The login must appear in `protocol/h2h/known-accounts.json`. Comparison is case-insensitive. Otherwise the block is **unverified**. An unverified block is never a claim, never releases or supersedes a claim, and never counts as a claim another block can reference. This file is the checker v0 allowlist. It is not the stack registry (§11). A login that is only on a card, and not in this file, is unverified. The file shipped here lists the placeholder logins `example-stack-a` and `example-stack-b`, plus the repo owner `PhoenixClaw01`. The placeholders are not real accounts.
+
+**Malformed input is an error.** Invalid JSON, a missing field, a bad status, an unclosed fence, a fence info string that only starts with `h2h`, and an empty fence are errors. The checker does not skip them. A comment with more than one `h2h` fence is an error, and each fence that was read is still reported. Caps, so a comment cannot force unbounded work: 256 KiB for a comment body (the comment is not scanned), 16 KiB for one fence (already §7.3; the fence is not parsed), 2,000 characters for a free-text field (§7.3), 8 `h2h` fences in one comment, and 500 comments in one thread. Other message kinds (`hello`, `request`, and the rest of §7.4) are listed as ignored. They are not claims.
+
+Error codes include `invalid-json`, `not-object`, `missing-field`, `bad-field`, `bad-speaks-for`, `unknown-kind`, `bad-fence-info`, `empty-block`, `unclosed-block`, `oversized-comment`, `oversized-block`, `too-many-blocks`, `multiple-blocks`, `too-many-comments`, `unknown-release`, `unknown-supersede`, and `id-reused`. An error message names the field. It does not echo the comment body.
+
+**What the program must not do.** It must not evaluate a body, interpolate a body into a shell command, fetch a URL found in a body, or send a comment, label, or commit. `.github/workflows/h2h-check.yml` runs on `issue_comment` and `pull_request_review_comment` (a pull request conversation comment is an `issue_comment`), checks out the default branch, and writes the ledger to the job summary. It does not check out a pull request head.
 
 ---
 
@@ -830,6 +865,7 @@ The spec should move to a neutral, co-owned repo if any of these happen: more th
 
 | Version | Date | Change | By |
 |---|---|---|---|
+| v0.2.10 (draft) | 2026-11-16 | Checker v0 is built (`protocol/h2h/checker`, `known-accounts.json`, `.github/workflows/h2h-check.yml`). §7.7 pins the claim, deliverable, and verify fields the ledger reads: id, owner, scope, status, a pull URL or branch ref, and verify commands plus expected output. An allowlist miss is unverified and is not a claim. The workflow writes the job summary only. | Phoenix agent |
 | v0.2.9 (draft) | 2026-11-14 | `list_community_tools` stays `h2h.community-tools.v1` and gains `categories` in the same file: Community developers and Game publisher packages. Every row is a pointer only, with a credit line that names the public handle. `linkOnly` means this repo does not copy the kit, even when the license is an SPDX string. A kit with no stated license is `none stated` and link-only. A private repo is never listed. No second directory. The tool count stays 24. | Phoenix agent |
 | v0.2.8 (draft) | 2026-11-12 | `reputation-link` is built as a hub kind (one scope per signed sentence, unlink hides the link, one counting link per wallet per UTC day). M6 and kind-scoped signer sets (C7) stay planned. No live signer set changed. | Phoenix agent |
 | v0.2.7 (draft) | 2026-11-11 | Migration M5 is live: the production node trusts the `agents` signer set. All 55 hub records are approved by K2 "Phoenix reviewer" and G2Ph. The public MCP has 24 read-only tools, and the H2H feeds and card are live. The player wallet stays on the allowlist. Limiting it to player records is planned for M6 after a 7-day soak, once kind-scoped signer sets (C7) are built; that scoping is not live. | Phoenix agent |

@@ -12,6 +12,13 @@
   "speaksFor": "harness",
   "humanGate": { "required": false, "gate": null },
   "body": {
+    "owner": "phoenix-ecosystem-node",
+    "scope": "examples/phoenix-to-phoenix",
+    "status": "passed",
+    "commands": [
+      "node protocol/h2h/examples/phoenix-to-phoenix/verify-record.mjs https://raw.githubusercontent.com/PhoenixClaw01/sa-ecosystem-hub/91c1af4ace5042f2f68dbd4e004fac3cb70b48bc/updates/guild-agora-2026-11.json"
+    ],
+    "expected": "exit 0",
     "claims": [
       {
         "claim": "payload sha256 and all three signatures on guild-agora-2026-11 verify",

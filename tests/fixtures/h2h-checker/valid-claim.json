@@ -1,0 +1,24 @@
+{
+  "entries": [
+    {
+      "source": "body",
+      "author": "example-stack-a",
+      "body": "Human summary. The fence below is the claim.\n\n```h2h\n{\n  \"schema\": \"h2h.message.v0\",\n  \"id\": \"example-stack-a:2026-11-16:0001\",\n  \"thread\": \"checker-v0\",\n  \"from\": { \"stack\": \"example-stack-a\", \"harness\": \"example-harness\" },\n  \"to\": [\"all\"],\n  \"kind\": \"claim\",\n  \"lane\": \"docs\",\n  \"createdAt\": \"2026-11-16T00:00:00.000Z\",\n  \"expiresAt\": \"2026-11-30T00:00:00.000Z\",\n  \"inReplyTo\": null,\n  \"speaksFor\": \"harness\",\n  \"humanGate\": { \"required\": false, \"gate\": null },\n  \"body\": {\n    \"owner\": \"example-stack-a\",\n    \"scope\": \"docs/readme\",\n    \"status\": \"open\",\n    \"by\": \"example-harness\"\n  }\n}\n```\n"
+    },
+    {
+      "source": "comment",
+      "author": "example-stack-a",
+      "body": "```h2h\n{\n  \"schema\": \"h2h.message.v0\",\n  \"id\": \"example-stack-a:2026-11-16:0002\",\n  \"kind\": \"deliverable\",\n  \"speaksFor\": \"harness\",\n  \"body\": {\n    \"owner\": \"example-stack-a\",\n    \"scope\": \"docs/readme\",\n    \"status\": \"submitted\",\n    \"claim\": \"example-stack-a:2026-11-16:0001\",\n    \"pr\": \"https://github.com/example/widget/pull/4\",\n    \"ref\": \"refs/heads/readme-claim\"\n  }\n}\n```\n"
+    },
+    {
+      "source": "comment",
+      "author": "example-stack-b",
+      "body": "```h2h\n{\n  \"schema\": \"h2h.message.v0\",\n  \"id\": \"example-stack-b:2026-11-16:0003\",\n  \"kind\": \"verify\",\n  \"speaksFor\": \"harness\",\n  \"body\": {\n    \"owner\": \"example-stack-b\",\n    \"scope\": \"docs/readme\",\n    \"status\": \"passed\",\n    \"commands\": [\"node --version\"],\n    \"expected\": \"v22\"\n  }\n}\n```\n"
+    },
+    {
+      "source": "comment",
+      "author": "example-stack-a",
+      "body": "```h2h\n{\n  \"schema\": \"h2h.message.v0\",\n  \"id\": \"example-stack-a:2026-11-16:0009\",\n  \"kind\": \"hello\",\n  \"speaksFor\": \"harness\"\n}\n```\n"
+    }
+  ]
+}

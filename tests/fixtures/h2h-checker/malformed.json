@@ -1,0 +1,64 @@
+{
+  "entries": [
+    {
+      "source": "comment",
+      "author": "example-stack-a",
+      "body": "```h2h\n{ this is not json\n```\n"
+    },
+    {
+      "source": "comment",
+      "author": "example-stack-a",
+      "body": "```h2h\n{\n  \"schema\": \"h2h.message.v0\",\n  \"id\": \"example-stack-a:2026-11-16:0001\",\n  \"kind\": \"claim\",\n  \"speaksFor\": \"harness\",\n  \"body\": { \"owner\": \"example-stack-a\", \"status\": \"open\" }\n}\n```\n"
+    },
+    {
+      "source": "comment",
+      "author": "example-stack-a",
+      "body": "```h2h\n{\n  \"schema\": \"h2h.message.v0\",\n  \"id\": \"example-stack-a:2026-11-16:0001\",\n  \"kind\": \"claim\",\n  \"speaksFor\": \"harness\",\n  \"body\": { \"owner\": \"example-stack-a\", \"scope\": \"docs/readme\", \"status\": \"owned\" }\n}\n```\n"
+    },
+    {
+      "source": "comment",
+      "author": "example-stack-a",
+      "body": "```h2h\n{\"schema\":\"h2h.message.v0\",\"kind\":\"claim\"}\n"
+    },
+    {
+      "source": "comment",
+      "author": "example-stack-a",
+      "body": "```h2h\n{\n  \"schema\": \"h2h.message.v0\",\n  \"id\": \"example-stack-a:2026-11-16:0001\",\n  \"kind\": \"claim\",\n  \"speaksFor\": \"human\",\n  \"body\": { \"owner\": \"example-stack-a\", \"scope\": \"docs/readme\", \"status\": \"open\" }\n}\n```\n"
+    },
+    {
+      "source": "comment",
+      "author": "example-stack-a",
+      "body": "```h2h\n```\n"
+    },
+    {
+      "source": "comment",
+      "author": "example-stack-a",
+      "body": "```h2h extra\n{}\n```\n"
+    },
+    {
+      "source": "comment",
+      "author": "example-stack-a",
+      "body": "```h2h\n{\n  \"schema\": \"h2h.message.v0\",\n  \"id\": \"example-stack-a:2026-11-31:0001\",\n  \"kind\": \"claim\",\n  \"speaksFor\": \"harness\",\n  \"body\": { \"owner\": \"example-stack-a\", \"scope\": \"docs/readme\", \"status\": \"open\" }\n}\n```\n"
+    },
+    {
+      "source": "comment",
+      "author": "example-stack-a",
+      "body": "```h2h\n[]\n```\n"
+    },
+    {
+      "source": "comment",
+      "author": "example-stack-a",
+      "body": "```h2h\n{\n  \"schema\": \"h2h.message.v0\",\n  \"id\": \"example-stack-a:2026-11-16:0006\",\n  \"kind\": \"deliverable\",\n  \"speaksFor\": \"harness\",\n  \"body\": { \"owner\": \"example-stack-a\", \"scope\": \"docs/readme\", \"status\": \"open\", \"claim\": \"example-stack-a:2026-11-16:0001\", \"pr\": \"http://github.com/example/widget/pull/1\" }\n}\n```\n"
+    },
+    {
+      "source": "comment",
+      "author": "example-stack-a",
+      "body": "```h2h\n{\n  \"schema\": \"h2h.message.v0\",\n  \"id\": \"example-stack-a:2026-11-16:0007\",\n  \"kind\": \"claim\",\n  \"speaksFor\": \"harness\",\n  \"__proto__\": { \"admin\": true },\n  \"body\": { \"owner\": \"example-stack-a\", \"scope\": \"docs/readme\", \"status\": \"open\" }\n}\n```\n"
+    },
+    {
+      "source": "comment",
+      "author": "example-stack-a",
+      "body": "A later valid claim still counts.\n\n```h2h\n{\n  \"schema\": \"h2h.message.v0\",\n  \"id\": \"example-stack-a:2026-11-16:0008\",\n  \"kind\": \"claim\",\n  \"speaksFor\": \"harness\",\n  \"body\": { \"owner\": \"example-stack-a\", \"scope\": \"docs/kept\", \"status\": \"open\" }\n}\n```\n"
+    }
+  ]
+}
