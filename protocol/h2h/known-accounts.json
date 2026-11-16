@@ -1,6 +1,6 @@
 {
   "v": 0,
-  "note": "Checker v0 allowlist. Only role repo-owner verifies. example-stack-a and example-stack-b are placeholders and never verify. PhoenixClaw01 owns this repo.",
+  "note": "Checker v0 allowlist. Roles repo-owner and collaborator verify. A collaborator may revise only a claim, deliverable, or verify row that login authored. example-stack-a and example-stack-b are placeholders and never verify. PhoenixClaw01 owns this repo.",
   "accounts": [
     { "login": "PhoenixClaw01", "role": "repo-owner" },
     { "login": "example-stack-a", "role": "example" },

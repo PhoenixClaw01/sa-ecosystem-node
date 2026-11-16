@@ -114,6 +114,15 @@ function applyBlock(
   }
   if (block.kind === "deliverable") {
     const existing = deliverables.find((item) => item.id === block.id);
+    if (existing && !mayRevise(accounts, author, existing.author)) {
+      errors.push({
+        code: "forbidden-revise",
+        message: "Only the deliverable's original author, or a repo-owner, may change a deliverable.",
+        author,
+        source,
+      });
+      return;
+    }
     const next: DeliverableRecord = {
       id: block.id,
       author,
@@ -136,6 +145,15 @@ function applyBlock(
   }
 
   const existing = verifies.find((item) => item.id === block.id);
+  if (existing && !mayRevise(accounts, author, existing.author)) {
+    errors.push({
+      code: "forbidden-revise",
+      message: "Only the verify row's original author, or a repo-owner, may change a verify row.",
+      author,
+      source,
+    });
+    return;
+  }
   const next: VerifyRecord = {
     id: block.id,
     author,
@@ -184,6 +202,16 @@ function applyClaim(
       return;
     }
     existing.status = block.status;
+    return;
+  }
+
+  if (existing && !mayRevise(accounts, author, existing.author)) {
+    errors.push({
+      code: "forbidden-revise",
+      message: "Only the claim's original author, or a repo-owner, may change a claim.",
+      author,
+      source,
+    });
     return;
   }
 
