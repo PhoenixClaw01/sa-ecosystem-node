@@ -25,7 +25,7 @@ Open an issue `[h2h-rfc] <short title>` with the "H2H RFC" template, then a PR t
 
 ## Checker v0
 
-The claim checker is **built**. It lives in [`checker/`](checker/) and follows [SPEC.md](SPEC.md) section 7.7. It reads fenced `claim`, `deliverable`, and `verify` blocks, and prints who has claimed what. A login with role `repo-owner` or `collaborator` in [`known-accounts.json`](known-accounts.json) verifies. A `repo-owner` may release, supersede, or change any claim. A `collaborator` may do that only for a claim they originally authored. Placeholder `example` rows never verify. Conflicts, deliverables that reference no claim, and released or superseded claims are flagged. Comment text is data. The checker never runs a command from a block.
+The claim checker is **built**. It lives in [`checker/`](checker/) and follows [SPEC.md](SPEC.md) section 7.7. It reads fenced `claim`, `deliverable`, and `verify` blocks, and prints who has claimed what. A login with role `repo-owner` or `collaborator` in [`known-accounts.json`](known-accounts.json) verifies. A `repo-owner` may release, supersede, or change any claim, deliverable, or verify row. A `collaborator` may do that only for a row they originally authored. Placeholder `example` rows never verify. Conflicts, deliverables that reference no claim, and released or superseded claims are flagged. Comment text is data. The checker never runs a command from a block.
 
 ```bash
 node --experimental-strip-types protocol/h2h/checker/cli.ts --issue <number> --repo PhoenixClaw01/sa-ecosystem-node
