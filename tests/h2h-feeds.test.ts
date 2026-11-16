@@ -137,7 +137,7 @@ describe("community developer categories", () => {
     expect(feed.note).toMatch(/not permission, a partnership, an endorsement, or embedding/);
     expect(feed.note).not.toMatch(/guild/i);
     const entries = feed.categories.flatMap((category) => category.entries);
-    expect(entries).toHaveLength(8);
+    expect(entries).toHaveLength(9);
     expect(entries.map((entry) => entry.id)).toEqual([
       "atlas-kit",
       "siphaawal",
@@ -145,6 +145,7 @@ describe("community developer categories", () => {
       "ryden-systems",
       "harlock-space-pirate",
       "zamsor",
+      "star-portals",
       "staratlas-dev-sage",
       "star-atlas-decoders",
     ]);
@@ -155,6 +156,7 @@ describe("community developer categories", () => {
       "ryden-systems",
       "Harlock-Space-Pirate",
       "Zamsor",
+      "StarAtlasFleet",
       "@staratlas",
       "staratlasmeta",
     ]);
@@ -173,7 +175,7 @@ describe("community developer categories", () => {
     expect(spec).toMatch(/A private repo is never listed/);
     expect(spec).toMatch(/not an endorsement, a partnership, or embedding/);
     const kits = entries.flatMap((entry) => entry.kits.map((kit) => ({ entry: entry.id, ...kit })));
-    expect(kits).toHaveLength(10);
+    expect(kits).toHaveLength(11);
     const licenseOf = (entryId: string, kitName: string) => kits.find((kit) => kit.entry === entryId && kit.name === kitName);
     expect(licenseOf("atlas-kit", "Atlas Kit")).toMatchObject({ license: "Apache-2.0", linkOnly: false });
     expect(licenseOf("siphaawal", "agent-team-harness")).toMatchObject({ license: "MIT", linkOnly: false });
@@ -183,8 +185,18 @@ describe("community developer categories", () => {
       note: "No license is stated in the C4Live directory. The ISC package.json is the OperationsHub root, not C4Live.",
     });
     expect(licenseOf("ttdonovan", "sa-forge-signer")).toMatchObject({ license: "Unlicense OR MIT", linkOnly: false });
+    expect(entries.find((entry) => entry.id === "ryden-systems")?.sites).toEqual([
+      "https://github.com/ryden-systems",
+      "https://ryden-systems.github.io/dao-dashboard/",
+      "https://ryden.systems",
+    ]);
     expect(licenseOf("ryden-systems", "dao-dashboard")).toMatchObject({ license: "none stated", linkOnly: true });
     expect(licenseOf("ryden-systems", "zxp-tracker")).toMatchObject({ license: "MIT", linkOnly: false });
+    expect(licenseOf("star-portals", "star-portals")).toMatchObject({
+      license: "MIT",
+      linkOnly: true,
+      note: "Interactive maps. LICENSE is MIT. This repo does not copy the kit.",
+    });
     expect(licenseOf("harlock-space-pirate", "c4-sage-sdk")).toMatchObject({ license: "Apache-2.0", linkOnly: false });
     expect(licenseOf("zamsor", "zamsor-fleet")).toMatchObject({
       license: "MIT",

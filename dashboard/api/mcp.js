@@ -30106,7 +30106,8 @@ var H2H_COMMUNITY_TOOLS = {
           "credit": "Credit: ryden-systems. A pointer only.",
           "sites": [
             "https://github.com/ryden-systems",
-            "https://ryden-systems.github.io/dao-dashboard/"
+            "https://ryden-systems.github.io/dao-dashboard/",
+            "https://ryden.systems"
           ],
           "credentials": [
             {
@@ -30136,7 +30137,7 @@ var H2H_COMMUNITY_TOOLS = {
             }
           ],
           "dualUse": true,
-          "checkedAt": "2026-11-14"
+          "checkedAt": "2026-11-16"
         },
         {
           "id": "harlock-space-pirate",
@@ -30188,6 +30189,32 @@ var H2H_COMMUNITY_TOOLS = {
           ],
           "dualUse": true,
           "checkedAt": "2026-11-14"
+        },
+        {
+          "id": "star-portals",
+          "handle": "StarAtlasFleet",
+          "credit": "Credit: StarAtlasFleet. A pointer only.",
+          "sites": [
+            "https://github.com/StarAtlasFleet/star-portals"
+          ],
+          "credentials": [
+            {
+              "kind": "repo",
+              "name": "StarAtlasFleet/star-portals",
+              "url": "https://github.com/StarAtlasFleet/star-portals"
+            }
+          ],
+          "kits": [
+            {
+              "name": "star-portals",
+              "url": "https://github.com/StarAtlasFleet/star-portals",
+              "license": "MIT",
+              "linkOnly": true,
+              "note": "Interactive maps. LICENSE is MIT. This repo does not copy the kit."
+            }
+          ],
+          "dualUse": true,
+          "checkedAt": "2026-11-16"
         }
       ]
     },
