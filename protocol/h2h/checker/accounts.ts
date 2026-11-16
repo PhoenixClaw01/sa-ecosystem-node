@@ -1,13 +1,13 @@
 /**
  * Checked-in allowlist of GitHub logins.
- * Only role repo-owner verifies. Role example is a placeholder and never verifies.
+ * Roles repo-owner and collaborator verify. Role example is a placeholder and never verifies.
  */
 import { fileURLToPath } from "node:url";
 
 import type { AccountRole, KnownAccounts } from "./types.ts";
 
 const LOGIN = /^[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?(?:\[bot\])?$/;
-const ROLES = new Set<AccountRole>(["repo-owner", "example"]);
+const ROLES = new Set<AccountRole>(["repo-owner", "collaborator", "example"]);
 
 export function defaultAccountsPath(): string {
   return fileURLToPath(new URL("../known-accounts.json", import.meta.url));
@@ -24,9 +24,10 @@ export function roleOf(accounts: KnownAccounts, login: string): AccountRole | nu
   return accounts.roles.get(normal.toLowerCase()) ?? null;
 }
 
-/** True only for a real repo-owner. Placeholder example rows return false. */
+/** True for repo-owner and collaborator. Example rows and unknown logins return false. */
 export function isVerifiedLogin(accounts: KnownAccounts, login: string): boolean {
-  return roleOf(accounts, login) === "repo-owner";
+  const role = roleOf(accounts, login);
+  return role === "repo-owner" || role === "collaborator";
 }
 
 export function loadKnownAccounts(value: unknown): { ok: true; accounts: KnownAccounts } | { ok: false; message: string } {
@@ -55,7 +56,7 @@ export function loadKnownAccounts(value: unknown): { ok: true; accounts: KnownAc
       return { ok: false, message: "An allowlist login is not a GitHub login." };
     }
     if (typeof entry.role !== "string" || !isAccountRole(entry.role)) {
-      return { ok: false, message: "An allowlist role must be repo-owner or example." };
+      return { ok: false, message: "An allowlist role must be repo-owner, collaborator, or example." };
     }
     const folded = entry.login.toLowerCase();
     if (roles.has(folded)) return { ok: false, message: "An allowlist login is duplicated." };

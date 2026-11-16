@@ -4,6 +4,7 @@ Mirrors section 15 of [SPEC.md](SPEC.md). Edit both in the same PR.
 
 | Version | Date | Change | By |
 |---|---|---|---|
+| v0.2.12 (draft) | 2026-11-16 | Checker v0 also verifies role `collaborator`. A collaborator may release, supersede, or change a claim only when they originally authored it. A repo-owner may do so for any claim. Placeholder `example` rows never verify. | Phoenix agent |
 | v0.2.11 (draft) | 2026-11-16 | Checker v0 verifies only role `repo-owner`. Placeholder `example` rows never verify, so they cannot release or supersede a claim. The job summary keeps field text in a code span. | Phoenix agent |
 | v0.2.10 (draft) | 2026-11-16 | Checker v0 is built (`protocol/h2h/checker`, `known-accounts.json`, `.github/workflows/h2h-check.yml`). SPEC §7.7 pins the claim, deliverable, and verify fields the ledger reads. An allowlist miss is unverified and is not a claim. The workflow writes the job summary only. | Phoenix agent |
 | v0.2.9 (draft) | 2026-11-14 | `list_community_tools` stays `h2h.community-tools.v1` and gains `categories` in the same file: Community developers and Game publisher packages. Every row is a pointer only, with a credit line that names the public handle. `linkOnly` means this repo does not copy the kit, even when the license is an SPDX string. A kit with no stated license is `none stated` and link-only. A private repo is never listed. No second directory. The tool count stays 24. | Phoenix agent |

@@ -187,6 +187,16 @@ function applyClaim(
     return;
   }
 
+  if (existing && !mayRevise(accounts, author, existing.author)) {
+    errors.push({
+      code: "forbidden-revise",
+      message: "Only the claim's original author, or a repo-owner, may change an open claim.",
+      author,
+      source,
+    });
+    return;
+  }
+
   if (block.supersedes) {
     const target = claims.find((claim) => claim.id === block.supersedes);
     if (!target) {

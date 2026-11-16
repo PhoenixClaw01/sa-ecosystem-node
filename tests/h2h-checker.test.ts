@@ -288,6 +288,137 @@ describe("parser edges", () => {
     expect(ledger.claims[0]).toMatchObject({ author: "example-owner", status: "released" });
   });
 
+  it("verifies a collaborator and still rejects example rows and unknown logins", () => {
+    const loaded = loadKnownAccounts({
+      v: 0,
+      accounts: [
+        { login: "PhoenixClaw01", role: "repo-owner" },
+        { login: "example-collaborator", role: "collaborator" },
+        { login: "example-stack-a", role: "example" },
+        { login: "example-stack-b", role: "example" },
+      ],
+    });
+    if (!loaded.ok) throw new Error(loaded.message);
+    expect(isVerifiedLogin(loaded.accounts, "example-collaborator")).toBe(true);
+    expect(isVerifiedLogin(loaded.accounts, "Example-Collaborator")).toBe(true);
+    expect(isVerifiedLogin(loaded.accounts, "PhoenixClaw01")).toBe(true);
+    expect(isVerifiedLogin(loaded.accounts, "example-stack-a")).toBe(false);
+    expect(isVerifiedLogin(loaded.accounts, "example-stack-b")).toBe(false);
+    expect(isVerifiedLogin(loaded.accounts, "example-outsider")).toBe(false);
+    const rejected = loadKnownAccounts({ v: 0, accounts: [{ login: "example-collaborator", role: "guest" }] });
+    expect(rejected.ok).toBe(false);
+    if (!rejected.ok) expect(rejected.message).toBe("An allowlist role must be repo-owner, collaborator, or example.");
+  });
+
+  it("lets a collaborator open, release, and supersede claims they authored", () => {
+    const loaded = loadKnownAccounts({
+      v: 0,
+      accounts: [
+        { login: "PhoenixClaw01", role: "repo-owner" },
+        { login: "example-collaborator", role: "collaborator" },
+        { login: "example-stack-b", role: "example" },
+      ],
+    });
+    if (!loaded.ok) throw new Error(loaded.message);
+    const open = message("claim", "example-stack-a:2026-11-16:0001", { owner: "example-collaborator", scope: "docs/readme", status: "open" });
+    const revise = message("claim", "example-stack-a:2026-11-16:0001", { owner: "example-collaborator", scope: "docs/guide", status: "open" });
+    const release = message("claim", "example-stack-a:2026-11-16:0001", { owner: "example-collaborator", scope: "docs/guide", status: "released" });
+    const second = message("claim", "example-stack-a:2026-11-16:0002", { owner: "example-collaborator", scope: "docs/api", status: "open" });
+    const supersede = message("claim", "example-stack-a:2026-11-16:0003", {
+      owner: "example-collaborator",
+      scope: "docs/api",
+      status: "open",
+      supersedes: "example-stack-a:2026-11-16:0002",
+    });
+    const ledger = buildLedger(
+      [
+        { source: "comment", author: "example-collaborator", body: open },
+        { source: "comment", author: "example-collaborator", body: revise },
+        { source: "comment", author: "example-collaborator", body: release },
+        { source: "comment", author: "example-collaborator", body: second },
+        { source: "comment", author: "example-collaborator", body: supersede },
+      ],
+      loaded.accounts,
+    );
+    expect(ledger.errors).toEqual([]);
+    expect(ledger.unverified).toEqual([]);
+    expect(ledger.released).toEqual(["example-stack-a:2026-11-16:0001"]);
+    expect(ledger.superseded).toEqual(["example-stack-a:2026-11-16:0002"]);
+    expect(ledger.claims.find((claim) => claim.id === "example-stack-a:2026-11-16:0001")).toMatchObject({
+      author: "example-collaborator",
+      scope: "docs/guide",
+      status: "released",
+    });
+    expect(ledger.claims.find((claim) => claim.id === "example-stack-a:2026-11-16:0003")).toMatchObject({
+      author: "example-collaborator",
+      status: "open",
+      supersedes: "example-stack-a:2026-11-16:0002",
+    });
+  });
+
+  it("records an error when a collaborator releases, supersedes, or changes a repo-owner claim", () => {
+    const loaded = loadKnownAccounts({
+      v: 0,
+      accounts: [
+        { login: "PhoenixClaw01", role: "repo-owner" },
+        { login: "example-collaborator", role: "collaborator" },
+        { login: "example-stack-a", role: "example" },
+      ],
+    });
+    if (!loaded.ok) throw new Error(loaded.message);
+    const open = message("claim", "example-stack-a:2026-11-16:0001", { owner: "PhoenixClaw01", scope: "docs/readme", status: "open" });
+    const other = message("claim", "example-stack-a:2026-11-16:0002", { owner: "PhoenixClaw01", scope: "docs/api", status: "open" });
+    const release = message("claim", "example-stack-a:2026-11-16:0001", { owner: "example-collaborator", scope: "docs/stolen", status: "released" });
+    const direct = message("claim", "example-stack-a:2026-11-16:0002", { owner: "example-collaborator", scope: "docs/api", status: "superseded" });
+    const viaNew = message("claim", "example-stack-a:2026-11-16:0004", {
+      owner: "example-collaborator",
+      scope: "docs/other",
+      status: "open",
+      supersedes: "example-stack-a:2026-11-16:0002",
+    });
+    const modify = message("claim", "example-stack-a:2026-11-16:0001", { owner: "example-collaborator", scope: "docs/stolen", status: "open" });
+    const exampleRelease = message("claim", "example-stack-a:2026-11-16:0001", { owner: "example-stack-a", scope: "docs/readme", status: "released" });
+    const ownerRelease = message("claim", "example-stack-a:2026-11-16:0002", { owner: "PhoenixClaw01", scope: "docs/api", status: "released" });
+    const reopen = message("claim", "example-stack-a:2026-11-16:0002", { owner: "example-collaborator", scope: "docs/stolen", status: "open" });
+    const ownerRevise = message("claim", "example-stack-a:2026-11-16:0001", { owner: "PhoenixClaw01", scope: "docs/guide", status: "open" });
+    const ledger = buildLedger(
+      [
+        { source: "body", author: "PhoenixClaw01", body: open },
+        { source: "comment", author: "PhoenixClaw01", body: other },
+        { source: "comment", author: "example-collaborator", body: release },
+        { source: "comment", author: "example-collaborator", body: direct },
+        { source: "comment", author: "example-collaborator", body: viaNew },
+        { source: "comment", author: "example-collaborator", body: modify },
+        { source: "comment", author: "example-stack-a", body: exampleRelease },
+        { source: "comment", author: "PhoenixClaw01", body: ownerRelease },
+        { source: "comment", author: "example-collaborator", body: reopen },
+        { source: "comment", author: "PhoenixClaw01", body: ownerRevise },
+      ],
+      loaded.accounts,
+    );
+    expect(codes(ledger)).toEqual(["forbidden-release", "forbidden-supersede", "forbidden-supersede", "forbidden-revise", "forbidden-revise"]);
+    expect(ledger.unverified).toEqual([
+      { author: "example-stack-a", kind: "claim", id: "example-stack-a:2026-11-16:0001", scope: "docs/readme" },
+    ]);
+    expect(ledger.claims.map((claim) => claim.id)).toEqual(["example-stack-a:2026-11-16:0001", "example-stack-a:2026-11-16:0002"]);
+    expect(ledger.claims.find((claim) => claim.id === "example-stack-a:2026-11-16:0001")).toEqual({
+      id: "example-stack-a:2026-11-16:0001",
+      author: "PhoenixClaw01",
+      owner: "PhoenixClaw01",
+      scope: "docs/guide",
+      status: "open",
+    });
+    expect(ledger.claims.find((claim) => claim.id === "example-stack-a:2026-11-16:0002")).toEqual({
+      id: "example-stack-a:2026-11-16:0002",
+      author: "PhoenixClaw01",
+      owner: "PhoenixClaw01",
+      scope: "docs/api",
+      status: "released",
+    });
+    expect(ledger.released).toEqual(["example-stack-a:2026-11-16:0002"]);
+    expect(ledger.superseded).toEqual([]);
+  });
+
   it("shows a bot login as unverified instead of a blank author", () => {
     const ledger = buildLedger(
       [{

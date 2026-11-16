@@ -83,7 +83,7 @@ export interface ParseResult {
   errors: ParseIssue[];
 }
 
-export type AccountRole = "repo-owner" | "example";
+export type AccountRole = "repo-owner" | "collaborator" | "example";
 
 export interface KnownAccounts {
   /** Lowercased login → role. Example rows are listed and never verify. */
