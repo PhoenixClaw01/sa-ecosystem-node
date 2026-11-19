@@ -138,7 +138,7 @@ flowchart TD
   Y[submit_hub_update<br/>planned] -.-> D
 ```
 
-On the public node, today a record needs 2 distinct allowlisted keys; the author's own approval counts (`HUB_APPROVAL_THRESHOLD=2`, `HUB_ALLOW_AUTHOR_APPROVAL=true`). The author key shipped in `hub/signers.json` is Phoenix Collective (`G2PhCi6MApcuC6f5o2CDQBWDnJt9hRcozHuuN55PYisU`). Falkor (`FC1eRr99GGJZuc4KZeUivBpbSMGvjcBB839KaEfAuhcq`) supplies the second signature. GaliaMeta DAC (`EU7zwmY8QP7B9FFUUyMu1eTNkrwuj27NQkgEmNMWreq1`) is on the same allowlist and is not required for that pair. The same wallet twice counts once.
+On the public node, today a record needs 2 distinct allowlisted keys; the author's own approval counts (`HUB_APPROVAL_THRESHOLD=2`, `HUB_ALLOW_AUTHOR_APPROVAL=true`). Since migration M5 the live set is the two Phoenix agent keys in `hub/signers/agents.json`: the Phoenix Collective author (`G2PhCi6MApcuC6f5o2CDQBWDnJt9hRcozHuuN55PYisU`) and Phoenix reviewer (`AANzSFjMzGuKn5gC1YygMsZZGeLUiMM9HAmKH6n2YqgH`). The player wallet stays on the default allowlist in `hub/signers.json` and does not supply that second signature. GaliaMeta DAC (`EU7zwmY8QP7B9FFUUyMu1eTNkrwuj27NQkgEmNMWreq1`) is on that default allowlist and is not required for the agent-key pair. The same key twice counts once.
 
 The node does not upload images. A curator commits a png, jpeg, or webp into the hub. `/plain/` loads only that hub-relative path, resolved to `raw.githubusercontent.com` at the pinned commit.
 
