@@ -259,9 +259,9 @@ describe("signed hub updates", () => {
     expect(new Set(parsed.signers.map((entry) => entry.label)).size).toBe(3);
     expect(parsed.signers.map((entry) => entry.label)).not.toContain("Phoenix bus");
     expect(parseHubSigners(parsed)).toEqual([
-      { label: "Falkor", publicKey: "FC1eRr99GGJZuc4KZeUivBpbSMGvjcBB839KaEfAuhcq" },
+      { label: "player wallet", publicKey: "FC1eRr99GGJZuc4KZeUivBpbSMGvjcBB839KaEfAuhcq" },
       { label: "GaliaMeta DAC", publicKey: "EU7zwmY8QP7B9FFUUyMu1eTNkrwuj27NQkgEmNMWreq1" },
-      { label: "Phoenix Collective (Falkor's team)", publicKey: "G2PhCi6MApcuC6f5o2CDQBWDnJt9hRcozHuuN55PYisU" },
+      { label: "Phoenix Collective author", publicKey: "G2PhCi6MApcuC6f5o2CDQBWDnJt9hRcozHuuN55PYisU" },
     ]);
     expect(loadSignerAllowlist(path.resolve("hub/signers.json")).size).toBe(3);
   });
@@ -269,7 +269,7 @@ describe("signed hub updates", () => {
   it("requires a label on each allowlisted wallet", () => {
     const wallet = signer();
     const file = path.join(mkdtempSync(path.join(tmpdir(), "hub-signers-")), "signers.json");
-    writeFileSync(file, JSON.stringify({ v: 1, signers: [{ label: "Falkor", publicKey: wallet.publicKey }] }));
+    writeFileSync(file, JSON.stringify({ v: 1, signers: [{ label: "player wallet", publicKey: wallet.publicKey }] }));
     expect([...loadSignerAllowlist(file)]).toEqual([wallet.publicKey]);
     writeFileSync(file, JSON.stringify({ v: 1, publicKeys: [wallet.publicKey] }));
     expect(() => loadSignerAllowlist(file)).toThrow(/schema v1/);
@@ -281,8 +281,8 @@ describe("signed hub updates", () => {
       JSON.stringify({
         v: 1,
         signers: [
-          { label: "Falkor", publicKey: wallet.publicKey },
-          { label: "Falkor", publicKey: other.publicKey },
+          { label: "player wallet", publicKey: wallet.publicKey },
+          { label: "player wallet", publicKey: other.publicKey },
         ],
       }),
     );
@@ -411,7 +411,7 @@ describe("agents signer set", () => {
     const keys = loadSignerAllowlist(path.resolve("hub/signers/agents.json"));
     expect([...keys]).toEqual(["G2PhCi6MApcuC6f5o2CDQBWDnJt9hRcozHuuN55PYisU", "AANzSFjMzGuKn5gC1YygMsZZGeLUiMM9HAmKH6n2YqgH"]);
     const labels = parseHubSigners(JSON.parse(readFileSync("hub/signers/agents.json", "utf8"))).map((entry) => entry.label);
-    expect(labels).toEqual(["Phoenix Collective (Falkor's team)", "Phoenix reviewer"]);
+    expect(labels).toEqual(["Phoenix Collective author", "Phoenix reviewer"]);
   });
 });
 

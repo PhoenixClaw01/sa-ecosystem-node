@@ -13,6 +13,6 @@
   "humanGate": { "required": true, "gate": "public-speech" },
   "body": {
     "card": "https://sa-ecosystem-node-dashboard.vercel.app/.well-known/h2h-card.json",
-    "cardSha256": "0970a0da1255939c404c66bc35f8681b45d3e187e36135684ac9a465d06e4008"
+    "cardSha256": "d983cd40a106400741a6f23e2c8359b8cc955d244422a5871c00660ffe7def01"
   }
 }

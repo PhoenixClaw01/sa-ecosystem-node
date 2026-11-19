@@ -128,7 +128,7 @@ A host with the `git` binary checks out that commit. A host without it, includin
 
 This repository does not contain signing secrets. `hub/signers.json` ships with three public keys. The public deployment uses threshold 2 with `HUB_ALLOW_AUTHOR_APPROVAL=true`. Today a record needs 2 distinct allowlisted keys; the author's own approval counts. Since M5 that pair is the two Phoenix agent keys in `hub/signers/agents.json` (the Phoenix Collective author and Phoenix reviewer). The player wallet stays on the default allowlist. The example config stays at threshold 1 for a local dry run. A fourth slot may be added later.
 
-The shipped label strings live in `protocol/h2h/card.json` and the signer files. They are kept for hash stability and will be updated separately.
+The shipped label strings in `protocol/h2h/card.json` and the signer files use the role names in the table below.
 
 | Role | Public key | Who signs | How the approval is produced |
 |---|---|---|---|
