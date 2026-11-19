@@ -6,7 +6,7 @@ export const H2H_CARD: unknown = {
   "updatedAt": "2026-11-11T14:00:00.000Z",
   "stewards": [
     {
-      "handle": "Falkor (Phoenix steward)",
+      "handle": "Phoenix steward",
       "github": "PhoenixClaw01",
       "gates": [
         "merge",
@@ -27,7 +27,7 @@ export const H2H_CARD: unknown = {
   ],
   "recordKeys": [
     {
-      "label": "Phoenix Collective (Falkor's team)",
+      "label": "Phoenix Collective author",
       "alg": "ed25519",
       "publicKey": "G2PhCi6MApcuC6f5o2CDQBWDnJt9hRcozHuuN55PYisU",
       "set": "agents",

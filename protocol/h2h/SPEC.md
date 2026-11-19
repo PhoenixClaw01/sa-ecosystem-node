@@ -178,7 +178,7 @@ A stack **joins the registry** by opening a PR that adds one line to `protocol/h
 
 ### 5.2 Schema `h2h.card.v0`
 
-The example below uses role names in `handle` and `label`. The shipped label strings live in `protocol/h2h/card.json` and the signer files. They are kept for hash stability and will be updated separately.
+The example below uses the same role names as the shipped `handle` and `label` strings in `protocol/h2h/card.json` and the signer files.
 
 ```jsonc
 {

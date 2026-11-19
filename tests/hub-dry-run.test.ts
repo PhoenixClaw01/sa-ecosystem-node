@@ -25,7 +25,7 @@ import {
 } from "../src/hub/update.js";
 import { READ_ONLY_TOOLS } from "../src/server.js";
 
-const ROLES = ["Falkor", "GaliaMeta DAC", "Phoenix bus", "Phoenix Collective"] as const;
+const ROLES = ["player wallet", "GaliaMeta DAC", "Phoenix bus", "Phoenix Collective"] as const;
 
 interface Wallet {
   label: string;
