@@ -178,6 +178,8 @@ A stack **joins the registry** by opening a PR that adds one line to `protocol/h
 
 ### 5.2 Schema `h2h.card.v0`
 
+The example below uses role names in `handle` and `label`. The shipped label strings live in `protocol/h2h/card.json` and the signer files. They are kept for hash stability and will be updated separately.
+
 ```jsonc
 {
   "schema": "h2h.card.v0",
@@ -908,7 +910,7 @@ This section is the migration plan. Steps M0–M5 are done (status in §17.4). M
 | Author of all 55 | `G2PhCi6M…PYisU`, "Phoenix Collective author". It is **already a machine key**, generated with `npm run hub-keygen` and kept outside the repo. | Node `README.md` Operator runbook table (around line 125: "A new ed25519 key from `hub-keygen`") and "Collective key" section |
 | Approvals on all 55 | Two each: `G2Ph` (the author's own approval) plus the player wallet. | Hub `updates/*.json` |
 | How the player wallet's approval was produced | "Wallet `signMessage` on the printed bytes. The owner does not export the key." It is the **only wallet signature** on the records. A wallet signature cannot be told apart from a machine-key signature by its bytes (both are ed25519), so this rests on the README. | Node `README.md` around line 123 |
-| Signer set and threshold | One default set, `hub/signers.json`, with 3 keys: the player wallet, GaliaMeta DAC `EU7z…` (on no record), and Phoenix Collective. `HUB_APPROVAL_THRESHOLD=2` and `HUB_ALLOW_AUTHOR_APPROVAL=true`. | Node `README.md` lines 9 and 127; `docs/hosting.md` "Signer sets" |
+| Signer set and threshold | One default set, `hub/signers.json`, with 3 keys: the player wallet, GaliaMeta DAC `EU7z…` (on no record), and the Phoenix Collective author. `HUB_APPROVAL_THRESHOLD=2` and `HUB_ALLOW_AUTHOR_APPROVAL=true`. | Node `README.md` lines 9 and 127; `docs/hosting.md` "Signer sets" |
 | Pre-M5 live result | `hub_updates` at 12:48 PM AST on 2026-11-10: **55 updates, 0 rejected**. Every one had `approvalCount: 2`, `approvedBy: [player wallet, G2Ph…]`, and `selfApproved: false`. | Public MCP `tools/call hub_updates` |
 | Independence at baseline | Both approving keys sat on the Phoenix side. It was 2-of-2, but **one team**. | Above |
 
@@ -958,7 +960,7 @@ M0–M5 are done. Later steps still need the Founder's yes. M6 is planned, not l
   - Set `HUB_SIGNER_SETS` to `[{id:"default", path:"hub/signers.json", threshold:2}, {id:"agents", path:"hub/signers/agents.json", threshold:2}]`.
   - The default set is unchanged, and the player wallet stays in it. That is the rollback path.
 - **M2. Preserve provenance (not as a live approval).**
-  - In the hub, add `provenance/2026-11-agent-migration.json`. For each of the 55 records it holds: `id`, the payload sha256, the removed `{publicKey: player wallet, signature}`, `sourceCommit: f064f18d`, and `reason: "superseded by agent-key approval; kept as provenance"`.
+  - In the hub, add `provenance/2026-11-agent-migration.json`. For each of the 55 records it holds: `id`, the payload sha256, the removed `{publicKey: the player wallet, signature}`, `sourceCommit: f064f18d`, and `reason: "superseded by agent-key approval; kept as provenance"`.
   - Nodes read only the files in the manifest, so this file never counts toward a threshold.
   - Git history keeps the original files forever.
 - **M3. Re-approve.**

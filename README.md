@@ -128,7 +128,9 @@ A host with the `git` binary checks out that commit. A host without it, includin
 
 This repository does not contain signing secrets. `hub/signers.json` ships with three public keys. The public deployment uses threshold 2 with `HUB_ALLOW_AUTHOR_APPROVAL=true`. Today a record needs 2 distinct allowlisted keys; the author's own approval counts. Since M5 that pair is the two Phoenix agent keys in `hub/signers/agents.json` (the Phoenix Collective author and Phoenix reviewer). The player wallet stays on the default allowlist. The example config stays at threshold 1 for a local dry run. A fourth slot may be added later.
 
-| Label | Public key | Who signs | How the approval is produced |
+The shipped label strings live in `protocol/h2h/card.json` and the signer files. They are kept for hash stability and will be updated separately.
+
+| Role | Public key | Who signs | How the approval is produced |
 |---|---|---|---|
 | player wallet | the player-wallet public key in `hub/signers.json` | player wallet | Wallet `signMessage` on the printed bytes. The owner does not export the key |
 | GaliaMeta DAC | `EU7zwmY8QP7B9FFUUyMu1eTNkrwuj27NQkgEmNMWreq1` | GaliaMeta DAC wallet owner | Same `signMessage` flow |
@@ -145,7 +147,7 @@ The agent generates one fresh key. It is not a copy of a wallet key.
 
 ```bash
 mkdir -p "$HOME/.config/sa-ecosystem-node"
-npm run hub-keygen -- --label "Phoenix Collective" --out "$HOME/.config/sa-ecosystem-node/phoenix-collective.keypair.json"
+npm run hub-keygen -- --label "Phoenix Collective author" --out "$HOME/.config/sa-ecosystem-node/phoenix-collective.keypair.json"
 ```
 
 The command refuses a path inside this repository and sets the file mode to `0600`. Stdout is the public key, then one JSON object for the `signers` array. The secret is not printed. `*.keypair.json` is gitignored, and the file still stays outside this repository and outside the public store.
@@ -177,7 +179,7 @@ sha256sum hub-manifest.json
 
 ### Author an update
 
-The agent writes the payload with `author` set to the Collective public key, then signs it with the Collective key file:
+The Phoenix Collective author writes the payload with `author` set to the Phoenix Collective author public key, then signs it with that key file:
 
 ```bash
 npm run sign-hub-update -- \
@@ -228,9 +230,9 @@ npm run sign-hub-update -- \
   --out ./update.player.json
 ```
 
-Repeat for the next key, using the file that already has the first approval as `--approve`. The public deployment sets `HUB_APPROVAL_THRESHOLD=2` and `HUB_ALLOW_AUTHOR_APPROVAL=true`: the Phoenix Collective author signs, and Phoenix reviewer approves. Those two approvals meet the threshold. Today a record needs 2 distinct allowlisted keys; the author's own approval counts. The player wallet can still approve player records, and is not required for that pair. GaliaMeta DAC can still approve, and is not required for that pair. A local dry run at threshold 1 still accepts one wallet.
+Repeat for the next key, using the file that already has the first approval as `--approve`. The public deployment sets `HUB_APPROVAL_THRESHOLD=2` and `HUB_ALLOW_AUTHOR_APPROVAL=true`: the Phoenix Collective author signs, and Phoenix reviewer approves. Those two approvals meet the threshold. Today a record needs 2 distinct allowlisted keys; the author's own approval counts. The player wallet stays on the default allowlist. With both sets trusted, that key still counts on everyday records, because a trusted set counts its keys on every kind (`src/hub/update.ts`). Kind scoping is planned for M6 and is not live. The player wallet is not required for the live pair. GaliaMeta DAC can still approve, and is not required for that pair. A local dry run at threshold 1 still accepts one wallet.
 
-The Collective agent can approve with its key file. That signature is over the same bytes:
+The Phoenix Collective author can approve with its key file. That signature is over the same bytes:
 
 ```bash
 npm run sign-hub-update -- \
