@@ -8,7 +8,7 @@ This is not an ATMTA product, and the product name is not Star Atlas. It holds n
 
 The public node is [https://sa-ecosystem-node-dashboard.vercel.app](https://sa-ecosystem-node-dashboard.vercel.app) (Vercel project `sa-ecosystem-node-dashboard`, separate from the DAO Council preview). `/` on that site is the DAO dashboard front page. It links the live MCP Playground (`/playground/`) and the listings page (`/plain/`). The public hub is [sa-ecosystem-hub](https://github.com/PhoenixClaw01/sa-ecosystem-hub). Governance notes are in [phoenix-gate](https://github.com/PhoenixClaw01/phoenix-gate).
 
-This deployment uses threshold 2 with `HUB_ALLOW_AUTHOR_APPROVAL=true`. Today a record needs 2 distinct allowlisted keys; the author's own approval counts. The author is Phoenix Collective and the second approval is Falkor (`FC1e`). `HUB_GIT_REPO`, `HUB_GIT_COMMIT`, and `HUB_STORE_MANIFEST_HASH` are set. On 1 November 2026 the pinned commit was `f064f18db1da60c4f3e562d4064c8f344042e97e`.
+This deployment uses threshold 2 with `HUB_ALLOW_AUTHOR_APPROVAL=true`. Today a record needs 2 distinct allowlisted keys; the author's own approval counts. Since M5 the live approvals are two Phoenix agent keys in `hub/signers/agents.json`: the Phoenix Collective author and Phoenix reviewer. The player wallet stays on the default allowlist and is not that second approval. `HUB_GIT_REPO`, `HUB_GIT_COMMIT`, and `HUB_STORE_MANIFEST_HASH` are set. On 1 November 2026 the pinned commit was `f064f18db1da60c4f3e562d4064c8f344042e97e`.
 
 - [Spec v1.0.0](docs/spec.md)
 - [Hosting](docs/hosting.md)
@@ -126,15 +126,16 @@ A host with the `git` binary checks out that commit. A host without it, includin
 
 ## Operator runbook
 
-This repository does not contain signing secrets. `hub/signers.json` ships with three public keys. The public deployment uses threshold 2 with `HUB_ALLOW_AUTHOR_APPROVAL=true`. Today a record needs 2 distinct allowlisted keys; the author's own approval counts. That pair is Phoenix Collective, plus Falkor (`FC1e`). The example config stays at threshold 1 for a local dry run. A fourth slot may be added later.
+This repository does not contain signing secrets. `hub/signers.json` ships with three public keys. The public deployment uses threshold 2 with `HUB_ALLOW_AUTHOR_APPROVAL=true`. Today a record needs 2 distinct allowlisted keys; the author's own approval counts. Since M5 that pair is the two Phoenix agent keys in `hub/signers/agents.json` (the Phoenix Collective author and Phoenix reviewer). The player wallet stays on the default allowlist. The example config stays at threshold 1 for a local dry run. A fourth slot may be added later.
 
 | Label | Public key | Who signs | How the approval is produced |
 |---|---|---|---|
-| Falkor | `FC1eRr99GGJZuc4KZeUivBpbSMGvjcBB839KaEfAuhcq` | Falkor wallet owner | Wallet `signMessage` on the printed bytes. The owner does not export the key |
+| player wallet | the player-wallet public key in `hub/signers.json` | player wallet | Wallet `signMessage` on the printed bytes. The owner does not export the key |
 | GaliaMeta DAC | `EU7zwmY8QP7B9FFUUyMu1eTNkrwuj27NQkgEmNMWreq1` | GaliaMeta DAC wallet owner | Same `signMessage` flow |
-| Phoenix Collective (Falkor's team) | `G2PhCi6MApcuC6f5o2CDQBWDnJt9hRcozHuuN55PYisU` | Collective author | A new ed25519 key from `hub-keygen`, kept outside this repository |
+| Phoenix Collective author | `G2PhCi6MApcuC6f5o2CDQBWDnJt9hRcozHuuN55PYisU` | Phoenix Collective author | A new ed25519 key from `hub-keygen`, kept outside this repository |
+| Phoenix reviewer | `AANzSFjMzGuKn5gC1YygMsZZGeLUiMM9HAmKH6n2YqgH` | Phoenix reviewer | A second agent record key from `hub-keygen`, on a different machine, kept outside this repository |
 
-The public deployment is threshold `2` with `HUB_ALLOW_AUTHOR_APPROVAL=true`. Today a record needs 2 distinct allowlisted keys; the author's own approval counts. The author is Phoenix Collective (`G2PhCi6MApcuC6f5o2CDQBWDnJt9hRcozHuuN55PYisU`) and Falkor (`FC1eRr99GGJZuc4KZeUivBpbSMGvjcBB839KaEfAuhcq`) adds the second. GaliaMeta DAC stays on the allowlist and is not required for that pair. The same wallet twice counts once. Without `HUB_ALLOW_AUTHOR_APPROVAL`, the author's approval would not count at threshold 2, and that is not this deployment. The example config stays at threshold 1 for a local dry run: one distinct allowlisted approval is enough, including the author's own approval, and that result is `selfApproved: true` when no other key approved. Publish a store commit whose updates already have the Collective signature and Falkor's approval before raising a local node to threshold 2, then pin that commit.
+The public deployment is threshold `2` with `HUB_ALLOW_AUTHOR_APPROVAL=true`. Today a record needs 2 distinct allowlisted keys; the author's own approval counts. Since M5 the author is the Phoenix Collective author (`G2PhCi6MApcuC6f5o2CDQBWDnJt9hRcozHuuN55PYisU`) and Phoenix reviewer (`AANzSFjMzGuKn5gC1YygMsZZGeLUiMM9HAmKH6n2YqgH`) is the second approval. The player wallet stays on the default allowlist and is not required for that pair. GaliaMeta DAC stays on the default allowlist and is not required for that pair. The same key twice counts once. Without `HUB_ALLOW_AUTHOR_APPROVAL`, the author's approval would not count at threshold 2, and that is not this deployment. The example config stays at threshold 1 for a local dry run: one distinct allowlisted approval is enough, including the author's own approval, and that result is `selfApproved: true` when no other key approved. Publish a store commit whose updates already have the Phoenix Collective author's signature and the Phoenix reviewer's approval before raising a local node to threshold 2, then pin that commit.
 
 The public node sets `HUB_GIT_REPO` to `https://github.com/PhoenixClaw01/sa-ecosystem-hub`, `HUB_APPROVAL_THRESHOLD` to `2`, and `HUB_ALLOW_AUTHOR_APPROVAL` to `true`. On 1 November 2026 `HUB_GIT_COMMIT` was `f064f18db1da60c4f3e562d4064c8f344042e97e`, and `HUB_STORE_MANIFEST_HASH` was the sha256 of `hub-manifest.json` at that commit: `1fd4536e3a5b4176beebc04c16c53834092f519d98c0e30172862a2f24ae24f2`. Leave the three pin variables unset on a local process that should not serve the hub. Do not add a submit tool.
 
@@ -151,18 +152,7 @@ The command refuses a path inside this repository and sets the file mode to `060
 
 ### Allowlist
 
-Ask each owner for the wallet address their wallet displays. The shipped file is the live allowlist. Live approvals are by Falkor and Phoenix Collective. GaliaMeta DAC is on the same list. A fourth slot may be added later.
-
-```json
-{
-  "v": 1,
-  "signers": [
-    { "label": "Falkor", "publicKey": "FC1eRr99GGJZuc4KZeUivBpbSMGvjcBB839KaEfAuhcq" },
-    { "label": "GaliaMeta DAC", "publicKey": "EU7zwmY8QP7B9FFUUyMu1eTNkrwuj27NQkgEmNMWreq1" },
-    { "label": "Phoenix Collective (Falkor's team)", "publicKey": "G2PhCi6MApcuC6f5o2CDQBWDnJt9hRcozHuuN55PYisU" }
-  ]
-}
-```
+The shipped file is the default allowlist. Since M5, live approvals on everyday records are the two Phoenix agent keys in `hub/signers/agents.json`. The player wallet and GaliaMeta DAC stay on the default list. A fourth slot may be added later. Open `hub/signers.json` for the shipped public keys. Do not copy a personal name into a new label.
 
 ### Public store
 
@@ -198,7 +188,7 @@ npm run sign-hub-update -- \
 
 ### Wallet approval, without exporting a key
 
-Falkor and GaliaMeta DAC each do this. The Collective agent can do it from the key file instead, shown at the end of this section.
+The player wallet and GaliaMeta DAC each do this. The Phoenix Collective author can do it from the key file instead, shown at the end of this section.
 
 Print the exact bytes:
 
@@ -235,17 +225,17 @@ npm run sign-hub-update -- \
   --approve ./update.signed.json \
   --public-key "<wallet address>" \
   --signature "<signature hex>" \
-  --out ./update.falkor.json
+  --out ./update.player.json
 ```
 
-Repeat for the next wallet, using the file that already has the first approval as `--approve`. The public deployment sets `HUB_APPROVAL_THRESHOLD=2` and `HUB_ALLOW_AUTHOR_APPROVAL=true`: the Collective author signs, and Falkor (`FC1e`) approves. Those two approvals meet the threshold. Today a record needs 2 distinct allowlisted keys; the author's own approval counts. GaliaMeta DAC can still approve, and is not required for that pair. A local dry run at threshold 1 still accepts one wallet.
+Repeat for the next key, using the file that already has the first approval as `--approve`. The public deployment sets `HUB_APPROVAL_THRESHOLD=2` and `HUB_ALLOW_AUTHOR_APPROVAL=true`: the Phoenix Collective author signs, and Phoenix reviewer approves. Those two approvals meet the threshold. Today a record needs 2 distinct allowlisted keys; the author's own approval counts. The player wallet can still approve player records, and is not required for that pair. GaliaMeta DAC can still approve, and is not required for that pair. A local dry run at threshold 1 still accepts one wallet.
 
 The Collective agent can approve with its key file. That signature is over the same bytes:
 
 ```bash
 npm run sign-hub-update -- \
   --keypair "$HOME/.config/sa-ecosystem-node/phoenix-collective.keypair.json" \
-  --approve ./update.falkor.json \
+  --approve ./update.player.json \
   --out ./update.approved.json
 ```
 
