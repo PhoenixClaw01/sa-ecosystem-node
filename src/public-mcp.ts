@@ -1,7 +1,7 @@
 import { publicErrorMessage } from "./errors.js";
 import type { NodeHandler } from "./handler.js";
 import { h2hFeedResponse, type H2hFeeds } from "./h2h/routes.js";
-import { createToolTelemetry, type ToolTelemetry } from "./telemetry.js";
+import { createToolTelemetry, type ToolTelemetry, type WaitUntil } from "./telemetry.js";
 
 /** Public ecosystem node. The dashboard project serves this path. */
 export const PUBLIC_MCP_URL = "https://sa-ecosystem-node-dashboard.vercel.app/api/mcp";
@@ -53,6 +53,8 @@ export function createPublicMcpFetch(
     feeds?: H2hFeeds;
     /** Pass null to force telemetry off. Omit it to read operator env, which is off until a sink URL is set. */
     telemetry?: ToolTelemetry | null;
+    /** Read during a sink send. The public entry supplies the Vercel request context. */
+    waitUntil?: () => WaitUntil | undefined;
   },
 ): (request: Request) => Promise<Response> {
   const timeoutMs = options?.timeoutMs ?? REQUEST_TIMEOUT_MS;
@@ -107,11 +109,14 @@ export function createPublicMcpFetch(
   };
 }
 
-function resolveTelemetry(options?: { telemetry?: ToolTelemetry | null }): ToolTelemetry | null {
+function resolveTelemetry(options?: {
+  telemetry?: ToolTelemetry | null;
+  waitUntil?: () => WaitUntil | undefined;
+}): ToolTelemetry | null {
   if (options && Object.prototype.hasOwnProperty.call(options, "telemetry")) {
     return options.telemetry?.enabled ? options.telemetry : null;
   }
-  const fromEnv = createToolTelemetry();
+  const fromEnv = createToolTelemetry({ waitUntil: options?.waitUntil });
   return fromEnv.enabled ? fromEnv : null;
 }
 

@@ -8,7 +8,20 @@ import type { NodeHandler } from "../src/handler.js";
 import { createPublicMcpFetch } from "../src/public-mcp.js";
 import { ECOSYSTEM_CATEGORIES } from "../src/stubs/hub-update.js";
 import { READ_ONLY_TOOLS } from "../src/tool-names.js";
-import { argumentMeta, clientFamily, createToolTelemetry, TELEMETRY_FIELDS, TELEMETRY_META_FIELDS, type ToolTelemetry } from "../src/telemetry.js";
+import {
+  argumentMeta,
+  CLIENT_FAMILIES,
+  clientFamily,
+  createToolTelemetry,
+  ERROR_CLASSES,
+  isTelemetryLoopbackHost,
+  resolveRequestWaitUntil,
+  TELEMETRY_FIELDS,
+  TELEMETRY_META_FIELDS,
+  TOOL_OUTCOMES,
+  type ToolTelemetry,
+  type WaitUntil,
+} from "../src/telemetry.js";
 
 const WALLET = "LeakWallet1111111111111111111111111111111";
 const QUERY = "unique-search-phrase-qq";
@@ -51,7 +64,9 @@ function handler(reply: (body: Record<string, unknown>) => unknown): NodeHandler
   return {
     async fetch(request) {
       const body = (await request.json()) as Record<string, unknown>;
-      return new Response(JSON.stringify(reply(body)), {
+      const result = reply(body);
+      if (result instanceof Response) return result;
+      return new Response(JSON.stringify(result), {
         status: 200,
         headers: { "content-type": "application/json" },
       });
@@ -83,9 +98,16 @@ interface Captured {
   url: string;
   body: Record<string, unknown>;
   headers: Record<string, string>;
+  redirect?: NonNullable<RequestInit["redirect"]>;
 }
 
-function collectingTelemetry(options?: { hangMs?: number; throwSync?: boolean; rest?: boolean; timeoutMs?: string }) {
+function collectingTelemetry(options?: {
+  hangMs?: number;
+  throwSync?: boolean;
+  rest?: boolean;
+  timeoutMs?: string;
+  waitUntil?: () => WaitUntil | undefined;
+}) {
   const sent: Captured[] = [];
   let aborted = false;
   const telemetry = createToolTelemetry({
@@ -97,9 +119,15 @@ function collectingTelemetry(options?: { hangMs?: number; throwSync?: boolean; r
       MCP_TELEMETRY_ENV: "test",
       MCP_TELEMETRY_TIMEOUT_MS: options?.timeoutMs ?? "1500",
     },
+    waitUntil: options?.waitUntil,
     fetch: (url, init) => {
       const headers = (init?.headers ?? {}) as Record<string, string>;
-      sent.push({ url: String(url), body: JSON.parse(String(init?.body)) as Record<string, unknown>, headers });
+      sent.push({
+        url: String(url),
+        body: JSON.parse(String(init?.body)) as Record<string, unknown>,
+        headers,
+        redirect: init?.redirect,
+      });
       if (options?.throwSync) throw new Error(`sink down ${ERROR_TOKEN}`);
       if (options?.hangMs) {
         return new Promise((_resolve, reject) => {
@@ -186,6 +214,22 @@ describe("telemetry configuration", () => {
       fetch: fetchImpl,
     });
     expect(local.enabled).toBe(true);
+    expect(createToolTelemetry({ env: { MCP_TELEMETRY_URL: "http://[::1]:9/hook" }, fetch: fetchImpl }).enabled).toBe(true);
+    expect(createToolTelemetry({ env: { MCP_TELEMETRY_URL: "http://[2001:db8::1]/hook" }, fetch: fetchImpl }).enabled).toBe(false);
+  });
+
+  it("accepts both IPv6 loopback hostname spellings", () => {
+    expect(new URL("http://[::1]/hook").hostname).toBe("[::1]");
+    expect(isTelemetryLoopbackHost("[::1]")).toBe(true);
+    expect(isTelemetryLoopbackHost("::1")).toBe(true);
+    expect(isTelemetryLoopbackHost("localhost")).toBe(true);
+    expect(isTelemetryLoopbackHost("127.0.0.1")).toBe(true);
+    expect(isTelemetryLoopbackHost("2001:db8::1")).toBe(false);
+    const doc = readFileSync("docs/telemetry.md", "utf8");
+    expect(doc).toContain("[::1]");
+    expect(doc).toContain("::1");
+    expect(doc).toContain("127.0.0.1");
+    expect(doc).toContain("localhost");
   });
 });
 
@@ -439,7 +483,82 @@ describe("public MCP telemetry", () => {
     expect(sent[0]?.headers.authorization).toBe("Bearer telemetry-key");
     expect(sent[0]?.headers.apikey).toBe("telemetry-key");
     expect(sent[0]?.headers.prefer).toBe("return=minimal");
+    expect(sent[0]?.redirect).toBe("error");
     expect(JSON.stringify(sent[0]?.body)).not.toContain("telemetry-key");
+  });
+
+  it("refuses to follow a sink redirect", async () => {
+    const { telemetry, sent } = collectingTelemetry();
+    const response = await call(telemetry, toolCall("list_categories", {}), undefined, () => okResult(1, { categories: ["events"] }));
+    expect(response.status).toBe(200);
+    await telemetry.settled();
+    expect(sent[0]?.redirect).toBe("error");
+  });
+
+  it("maps a 413 from either a JSON-RPC error or an empty body to invalid_args", async () => {
+    const { telemetry, sent } = collectingTelemetry();
+    const rpc = await call(telemetry, toolCall("list_categories", {}), undefined, () =>
+      new Response(JSON.stringify({ jsonrpc: "2.0", id: 1, error: { code: -32603, message: `Request failed ${ERROR_TOKEN}` } }), {
+        status: 413,
+        headers: { "content-type": "application/json" },
+      }),
+    );
+    const empty = await call(telemetry, toolCall("search_hub", { query: QUERY }), undefined, () => new Response("too big", { status: 413 }));
+    const told = await call(telemetry, toolCall("get_fleet", { fleetAddress: FLEET }), undefined, (request) =>
+      errorResult(request.id, "The request exceeded the size cap."),
+    );
+    expect(rpc.status).toBe(413);
+    expect(empty.status).toBe(413);
+    expect(told.status).toBe(200);
+    await telemetry.settled();
+    expect(sent.map((item) => item.body.outcome)).toEqual(["invalid_args", "invalid_args", "invalid_args"]);
+    expect(sent.map((item) => item.body.error_class)).toEqual(["invalid_args", "invalid_args", "invalid_args"]);
+    const encoded = JSON.stringify(sent);
+    expect(encoded).not.toContain(ERROR_TOKEN);
+    expect(encoded).not.toContain(QUERY);
+    expect(encoded).not.toContain(FLEET);
+  });
+
+  it("gives the sink promise to the Vercel request context and does not wait for it", async () => {
+    const handed: Promise<unknown>[] = [];
+    const symbol = Symbol.for("@vercel/request-context");
+    const carrier = {
+      get() {
+        return {
+          waitUntil(promise: Promise<unknown>) {
+            handed.push(promise);
+          },
+        };
+      },
+    };
+    const host = globalThis as typeof globalThis & Record<symbol, unknown> & { waitUntil?: WaitUntil };
+    const previous = host[symbol];
+    const previousGlobal = host.waitUntil;
+    const globalWait = () => {
+      throw new Error("global waitUntil");
+    };
+    host[symbol] = carrier;
+    host.waitUntil = globalWait;
+    try {
+      const started = Date.now();
+      const { telemetry, sent } = collectingTelemetry({
+        hangMs: 5_000,
+        timeoutMs: "2000",
+        waitUntil: resolveRequestWaitUntil,
+      });
+      const response = await call(telemetry, toolCall("list_categories", {}), undefined, () => okResult(1, { categories: ["events"] }));
+      expect(response.status).toBe(200);
+      expect(Date.now() - started).toBeLessThan(400);
+      expect(handed).toHaveLength(1);
+      expect(handed[0]).toBeInstanceOf(Promise);
+      await telemetry.settled();
+      expect(sent[0]?.body.outcome).toBe("ok");
+    } finally {
+      if (previous === undefined) delete host[symbol];
+      else host[symbol] = previous;
+      if (previousGlobal === undefined) delete host.waitUntil;
+      else host.waitUntil = previousGlobal;
+    }
   });
 
   it("keeps the handler response when observe and finish throw", async () => {
@@ -450,6 +569,9 @@ describe("public MCP telemetry", () => {
       },
       finish() {
         throw new Error(`finish ${QUERY}`);
+      },
+      noteStatus() {
+        throw new Error(`note ${WALLET}`);
       },
       settled: () => Promise.resolve(),
     };
@@ -470,6 +592,13 @@ describe("telemetry source", () => {
     expect(source).not.toMatch(/eyJ[A-Za-z0-9_-]{8,}/);
     const sql = readFileSync("sql/optional_mcp_tool_calls.sql", "utf8");
     for (const field of [...TELEMETRY_FIELDS, ...TELEMETRY_META_FIELDS]) expect(sql).toContain(field);
+    for (const value of [...CLIENT_FAMILIES, ...ERROR_CLASSES, ...TOOL_OUTCOMES]) expect(sql).toContain(`'${value}'`);
+    for (const value of ["story", "not_opted_in", "not_available", "dao_treasury", "ecosystem_fund", "ATLAS", "USDC", "SOL"]) {
+      expect(sql).toContain(`'${value}'`);
+    }
+    expect(sql).toContain("error_class is null or error_class in");
+    expect(sql).toContain("client_family in");
+    expect(sql).toContain("story_status is null or story_status in");
     expect(sql.toLowerCase()).toContain("wallet");
     expect(sql.toLowerCase()).toMatch(/off|nothing until/);
   });

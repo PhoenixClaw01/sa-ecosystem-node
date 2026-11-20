@@ -113,10 +113,14 @@ const COUNT_FIELD: Readonly<Record<string, { kind: "array" | "number"; field: st
   pip_tracker: { kind: "number", field: "rowCount" },
 };
 
+export type WaitUntil = (promise: Promise<unknown>) => void;
+
 export interface ToolTelemetry {
   readonly enabled: boolean;
   observe(request: Request, userAgent: string | null): Promise<ObservedCall | null>;
   finish(observed: ObservedCall | null, body: Uint8Array, status: number, startedAtMs: number): void;
+  /** Record an HTTP denial, such as a Node rate limit, without reading a body or an address. */
+  noteStatus(userAgent: string | null, status: number): void;
   settled(): Promise<void>;
 }
 
@@ -139,6 +143,7 @@ interface TelemetryConfig {
   timeoutMs: number;
   rest: boolean;
   fetch: typeof fetch;
+  waitUntil?: () => WaitUntil | undefined;
 }
 
 interface Classified {
@@ -168,13 +173,16 @@ export function readTelemetryConfig(env: NodeJS.ProcessEnv = process.env): Telem
 export function createToolTelemetry(options?: {
   env?: NodeJS.ProcessEnv;
   fetch?: typeof fetch;
+  /** Called when a sink promise starts. The public entry passes the Vercel request context. */
+  waitUntil?: () => WaitUntil | undefined;
 }): ToolTelemetry {
   const config = readTelemetryConfig(options?.env ?? process.env);
   if (!config) return disabledTelemetry();
   if (options?.fetch) config.fetch = options.fetch;
+  if (options?.waitUntil) config.waitUntil = options.waitUntil;
 
   let chain: Promise<void> = Promise.resolve();
-  return {
+  const telemetry: ToolTelemetry = {
     enabled: true,
     observe,
     finish(observed, body, status, startedAtMs) {
@@ -201,8 +209,50 @@ export function createToolTelemetry(options?: {
         }
       }
     },
+    noteStatus(userAgent, status) {
+      telemetry.finish(
+        {
+          calls: [
+            {
+              id: null,
+              tool: "unknown",
+              meta: {},
+              clientFamily: clientFamily(userAgent),
+              lookupFiltered: false,
+            },
+          ],
+        },
+        new Uint8Array(),
+        status,
+        Date.now(),
+      );
+    },
     settled: () => chain,
   };
+  return telemetry;
+}
+
+/**
+ * Vercel Node stores `waitUntil` on the request context, not on `globalThis`.
+ * Call this while the request is still on the stack. Never await the promise it receives.
+ */
+export function resolveRequestWaitUntil(): WaitUntil | undefined {
+  try {
+    const carrier = (globalThis as typeof globalThis & Record<symbol, { get?: () => { waitUntil?: WaitUntil } | undefined } | undefined>)[
+      Symbol.for("@vercel/request-context")
+    ];
+    const current = carrier?.get?.();
+    const waitUntil = current?.waitUntil;
+    if (typeof waitUntil === "function") {
+      return (promise) => {
+        waitUntil.call(current, promise);
+      };
+    }
+  } catch {
+    // This host has no request context.
+  }
+  const fallback = (globalThis as typeof globalThis & { waitUntil?: WaitUntil }).waitUntil;
+  return typeof fallback === "function" ? fallback : undefined;
 }
 
 export function argumentMeta(tool: string, args: unknown): Record<string, string | boolean> {
@@ -250,6 +300,7 @@ function disabledTelemetry(): ToolTelemetry {
       return null;
     },
     finish() {},
+    noteStatus() {},
     settled: () => Promise.resolve(),
   };
 }
@@ -311,12 +362,20 @@ function send(config: TelemetryConfig, event: Record<string, unknown>, track: (w
     }
   }
   const work = Promise.resolve()
-    .then(() => config.fetch(config.url, { method: "POST", headers, body, signal: controller.signal }))
+    .then(() =>
+      config.fetch(config.url, {
+        method: "POST",
+        headers,
+        body,
+        redirect: "error",
+        signal: controller.signal,
+      }),
+    )
     .then(() => undefined)
     .catch(() => undefined)
     .finally(() => clearTimeout(timer));
   track(work);
-  const waitUntil = (globalThis as { waitUntil?: (pending: Promise<unknown>) => void }).waitUntil;
+  const waitUntil = config.waitUntil?.() ?? resolveRequestWaitUntil();
   if (typeof waitUntil === "function") {
     try {
       waitUntil(work);
@@ -372,6 +431,7 @@ function sealEvent(
 }
 
 function classifyCall(call: PendingCall, message: unknown, status: number): Classified {
+  if (status === 413) return sizeCap();
   if (!message || typeof message !== "object" || Array.isArray(message)) return fromStatus(status);
   const record = message as Record<string, unknown>;
   if (record.error && typeof record.error === "object") {
@@ -415,6 +475,9 @@ function classifyFailure(message: string): Classified {
     return { outcome: "unmatched", result_count: 0, error_class: null };
   }
   if (
+    text.includes("size cap") ||
+    text.includes("payload too large") ||
+    text.includes("entity too large") ||
     text.includes("invalid") ||
     text.includes("must be") ||
     text.includes("provide ") ||
@@ -487,10 +550,14 @@ function classifyOverview(data: Record<string, unknown>): Classified {
   return { outcome: "ok", result_count: ok, error_class: null };
 }
 
+function sizeCap(): Classified {
+  return { outcome: "invalid_args", result_count: null, error_class: "invalid_args" };
+}
+
 function fromStatus(status: number): Classified {
   if (status === 429) return { outcome: "error", result_count: null, error_class: "rate_limited" };
   if (status === 504) return { outcome: "error", result_count: null, error_class: "timeout" };
-  if (status === 413) return { outcome: "error", result_count: null, error_class: "internal" };
+  if (status === 413) return sizeCap();
   return { outcome: "error", result_count: null, error_class: status >= 500 ? "upstream" : "internal" };
 }
 
@@ -588,10 +655,14 @@ function sinkUrl(value: string | undefined): string | null {
   }
   if (parsed.username || parsed.password) return null;
   if (parsed.protocol === "https:") return parsed.toString();
-  const host = parsed.hostname;
-  const local = host === "localhost" || host === "127.0.0.1" || host === "[::1]";
-  if (parsed.protocol === "http:" && local) return parsed.toString();
+  if (parsed.protocol === "http:" && isTelemetryLoopbackHost(parsed.hostname)) return parsed.toString();
   return null;
+}
+
+/** Node reports `[::1]` today. Some URL implementations report `::1`. Both are loopback. */
+export function isTelemetryLoopbackHost(hostname: string): boolean {
+  const host = hostname.toLowerCase();
+  return host === "localhost" || host === "127.0.0.1" || host === "::1" || host === "[::1]";
 }
 
 function sinkKey(value: string | undefined): string | null {

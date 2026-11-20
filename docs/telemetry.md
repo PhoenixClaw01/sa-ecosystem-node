@@ -29,7 +29,7 @@ The event does **not** include wallet public keys, player ids, profile or fleet 
 
 | Name | Meaning |
 |---|---|
-| `MCP_TELEMETRY_URL` | HTTPS URL that accepts `POST` of one JSON object. `http` is accepted only for `localhost` or `127.0.0.1`. Unset, empty, or invalid (including a URL with a username or password) keeps telemetry off |
+| `MCP_TELEMETRY_URL` | HTTPS URL that accepts `POST` of one JSON object. `http` is accepted only for `localhost`, `127.0.0.1`, or `[::1]`. A runtime that reports the IPv6 loopback hostname as `::1` or `[::1]` is accepted. Unset, empty, or invalid (including a URL with a username or password) keeps telemetry off. This variable is read by the HTTP server and the public MCP handler, not by the stdio process |
 | `MCP_TELEMETRY_KEY` | Optional bearer token, sent as `Authorization: Bearer …`. When the URL path contains `/rest/v1/`, the same value is also sent as `apikey` and the request sets `Prefer: return=minimal`. A key with a newline is ignored |
 | `MCP_TELEMETRY_ENV` | Optional coarse label described above |
 | `MCP_TELEMETRY_TIMEOUT_MS` | Optional. Default 1500. Values outside 100–3000 are clamped. The MCP response does not wait for the sink |

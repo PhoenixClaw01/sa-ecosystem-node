@@ -73,7 +73,7 @@ These are not hub pins. They have the same meaning on every host:
 
 ## Tool telemetry
 
-Off unless `MCP_TELEMETRY_URL` is set. Unset, the process makes no telemetry request. The optional variables are `MCP_TELEMETRY_URL`, `MCP_TELEMETRY_KEY`, `MCP_TELEMETRY_ENV`, and `MCP_TELEMETRY_TIMEOUT_MS`. The event records the tool name and a coarse outcome. It does not record wallet addresses, search text, or IP addresses. The table an operator can create, and the privacy rules, are in [telemetry.md](telemetry.md).
+Off unless `MCP_TELEMETRY_URL` is set. Unset, the process makes no telemetry request. `MCP_TELEMETRY_URL` applies to the HTTP server and the public MCP handler. The stdio process does not read it and does not send telemetry. The optional variables are `MCP_TELEMETRY_URL`, `MCP_TELEMETRY_KEY`, `MCP_TELEMETRY_ENV`, and `MCP_TELEMETRY_TIMEOUT_MS`. The event records the tool name and a coarse outcome. It does not record wallet addresses, search text, or IP addresses. The table an operator can create, and the privacy rules, are in [telemetry.md](telemetry.md).
 
 ## Local HTTP
 

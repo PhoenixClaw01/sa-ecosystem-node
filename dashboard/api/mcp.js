@@ -273,8 +273,9 @@ function createToolTelemetry(options) {
   const config2 = readTelemetryConfig(options?.env ?? process.env);
   if (!config2) return disabledTelemetry();
   if (options?.fetch) config2.fetch = options.fetch;
+  if (options?.waitUntil) config2.waitUntil = options.waitUntil;
   let chain = Promise.resolve();
-  return {
+  const telemetry = {
     enabled: true,
     observe,
     finish(observed, body, status2, startedAtMs) {
@@ -300,8 +301,42 @@ function createToolTelemetry(options) {
         }
       }
     },
+    noteStatus(userAgent, status2) {
+      telemetry.finish(
+        {
+          calls: [
+            {
+              id: null,
+              tool: "unknown",
+              meta: {},
+              clientFamily: clientFamily(userAgent),
+              lookupFiltered: false
+            }
+          ]
+        },
+        new Uint8Array(),
+        status2,
+        Date.now()
+      );
+    },
     settled: () => chain
   };
+  return telemetry;
+}
+function resolveRequestWaitUntil() {
+  try {
+    const carrier = globalThis[/* @__PURE__ */ Symbol.for("@vercel/request-context")];
+    const current = carrier?.get?.();
+    const waitUntil = current?.waitUntil;
+    if (typeof waitUntil === "function") {
+      return (promise) => {
+        waitUntil.call(current, promise);
+      };
+    }
+  } catch {
+  }
+  const fallback = globalThis.waitUntil;
+  return typeof fallback === "function" ? fallback : void 0;
 }
 function argumentMeta(tool, args) {
   if (!args || typeof args !== "object" || Array.isArray(args)) return {};
@@ -346,6 +381,8 @@ function disabledTelemetry() {
       return null;
     },
     finish() {
+    },
+    noteStatus() {
     },
     settled: () => Promise.resolve()
   };
@@ -404,9 +441,17 @@ function send(config2, event, track) {
       headers.prefer = "return=minimal";
     }
   }
-  const work = Promise.resolve().then(() => config2.fetch(config2.url, { method: "POST", headers, body, signal: controller.signal })).then(() => void 0).catch(() => void 0).finally(() => clearTimeout(timer));
+  const work = Promise.resolve().then(
+    () => config2.fetch(config2.url, {
+      method: "POST",
+      headers,
+      body,
+      redirect: "error",
+      signal: controller.signal
+    })
+  ).then(() => void 0).catch(() => void 0).finally(() => clearTimeout(timer));
   track(work);
-  const waitUntil = globalThis.waitUntil;
+  const waitUntil = config2.waitUntil?.() ?? resolveRequestWaitUntil();
   if (typeof waitUntil === "function") {
     try {
       waitUntil(work);
@@ -453,6 +498,7 @@ function sealEvent(call, classified, env, calledAt, latencyMs) {
   return event;
 }
 function classifyCall(call, message, status2) {
+  if (status2 === 413) return sizeCap();
   if (!message || typeof message !== "object" || Array.isArray(message)) return fromStatus(status2);
   const record4 = message;
   if (record4.error && typeof record4.error === "object") {
@@ -484,7 +530,7 @@ function classifyFailure(message) {
   if (text2.includes("no galaxy proposal") || text2.includes("not found") || text2.includes("does not exist") || text2.includes("no matching")) {
     return { outcome: "unmatched", result_count: 0, error_class: null };
   }
-  if (text2.includes("invalid") || text2.includes("must be") || text2.includes("provide ") || text2.includes("expected") || text2.includes("too small") || text2.includes("too big") || text2.includes("unrecognized") || text2.includes("required")) {
+  if (text2.includes("size cap") || text2.includes("payload too large") || text2.includes("entity too large") || text2.includes("invalid") || text2.includes("must be") || text2.includes("provide ") || text2.includes("expected") || text2.includes("too small") || text2.includes("too big") || text2.includes("unrecognized") || text2.includes("required")) {
     return { outcome: "invalid_args", result_count: null, error_class: "invalid_args" };
   }
   return { outcome: "error", result_count: null, error_class: "upstream" };
@@ -543,10 +589,13 @@ function classifyOverview(data) {
   if (ok2 === 0) return { outcome: "error", result_count: 0, error_class: "upstream" };
   return { outcome: "ok", result_count: ok2, error_class: null };
 }
+function sizeCap() {
+  return { outcome: "invalid_args", result_count: null, error_class: "invalid_args" };
+}
 function fromStatus(status2) {
   if (status2 === 429) return { outcome: "error", result_count: null, error_class: "rate_limited" };
   if (status2 === 504) return { outcome: "error", result_count: null, error_class: "timeout" };
-  if (status2 === 413) return { outcome: "error", result_count: null, error_class: "internal" };
+  if (status2 === 413) return sizeCap();
   return { outcome: "error", result_count: null, error_class: status2 >= 500 ? "upstream" : "internal" };
 }
 function structuredData(result) {
@@ -627,10 +676,12 @@ function sinkUrl(value) {
   }
   if (parsed.username || parsed.password) return null;
   if (parsed.protocol === "https:") return parsed.toString();
-  const host = parsed.hostname;
-  const local = host === "localhost" || host === "127.0.0.1" || host === "[::1]";
-  if (parsed.protocol === "http:" && local) return parsed.toString();
+  if (parsed.protocol === "http:" && isTelemetryLoopbackHost(parsed.hostname)) return parsed.toString();
   return null;
+}
+function isTelemetryLoopbackHost(hostname) {
+  const host = hostname.toLowerCase();
+  return host === "localhost" || host === "127.0.0.1" || host === "::1" || host === "[::1]";
 }
 function sinkKey(value) {
   const raw = value?.trim() ?? "";
@@ -738,7 +789,7 @@ function resolveTelemetry(options) {
   if (options && Object.prototype.hasOwnProperty.call(options, "telemetry")) {
     return options.telemetry?.enabled ? options.telemetry : null;
   }
-  const fromEnv = createToolTelemetry();
+  const fromEnv = createToolTelemetry({ waitUntil: options?.waitUntil });
   return fromEnv.enabled ? fromEnv : null;
 }
 function reportBytes(telemetry, observed, bytes, status2, started) {
@@ -52733,6 +52784,7 @@ var deps = createDefaultDeps(settings);
 var fetchMcp = createPublicMcpFetch(createNodeHandler(deps, settings), {
   maxRequestBytes: settings.maxRequestBytes,
   maxBytes: settings.maxResponseBytes,
+  waitUntil: resolveRequestWaitUntil,
   feeds: {
     c4Markers: () => deps.c4Markers({}),
     communityTools: () => deps.communityTools(),
