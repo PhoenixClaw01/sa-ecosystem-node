@@ -146,6 +146,518 @@ async function h2hFeedResponse(request, feeds) {
   });
 }
 
+// src/tool-names.ts
+var READ_ONLY_TOOLS = [
+  "list_star_systems",
+  "get_fleet",
+  "profile_key_audit",
+  "player_legacy",
+  "player_story",
+  "dao_overview",
+  "treasury_balances",
+  "pip_tracker",
+  "galaxy_overview",
+  "list_categories",
+  "hub_updates",
+  "list_listings",
+  "search_hub",
+  "claim_status",
+  "list_c4_markers",
+  "list_community_tools",
+  "data_health",
+  "list_proposals",
+  "get_proposal_votes",
+  "dao_revenue",
+  "dao_treasury_flows",
+  "dao_payments",
+  "treasury_history",
+  "ecofund_limit"
+];
+
+// src/telemetry.ts
+var TOOL_OUTCOMES = ["ok", "empty", "unmatched", "invalid_args", "error"];
+var CLIENT_FAMILIES = ["cursor", "claude", "vscode", "chatgpt", "browser", "node", "unknown"];
+var ERROR_CLASSES = ["invalid_args", "timeout", "unavailable", "upstream", "rate_limited", "internal"];
+var TELEMETRY_META_FIELDS = [
+  "stream",
+  "category",
+  "status",
+  "kind",
+  "direction",
+  "mint",
+  "wallet_role",
+  "granularity",
+  "include_expired",
+  "include_internal",
+  "include_fees",
+  "allow_partial",
+  "anchored",
+  "story_status"
+];
+var DEFAULT_TIMEOUT_MS = 1500;
+var MIN_TIMEOUT_MS = 100;
+var MAX_TIMEOUT_MS = 3e3;
+var MAX_LATENCY_MS = 12e4;
+var MAX_RESULT_COUNT = 1e6;
+var MAX_KEY_LENGTH = 4096;
+var ENV_PATTERN = /^[a-z0-9_-]{1,24}$/;
+var CALLED_AT_PATTERN = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
+var TOOL_NAMES = new Set(READ_ONLY_TOOLS);
+var OUTCOMES = new Set(TOOL_OUTCOMES);
+var FAMILIES = new Set(CLIENT_FAMILIES);
+var CLASSES = new Set(ERROR_CLASSES);
+var STREAMS = /* @__PURE__ */ new Set(["referral", "hybrid", "irl", "player"]);
+var CATEGORIES = /* @__PURE__ */ new Set(["ip_and_business", "creators", "developers_and_tools", "guilds_and_dacs", "events"]);
+var LISTING_STATUS = /* @__PURE__ */ new Set(["available", "sold_out", "inquire_only", "paused", "withdrawn"]);
+var KINDS = /* @__PURE__ */ new Set([
+  "announcement",
+  "proposal-note",
+  "payment-note",
+  "status",
+  "signer-change",
+  "listing",
+  "guild",
+  "story-optin",
+  "claim",
+  "attestation",
+  "reputation-link",
+  "all"
+]);
+var DIRECTIONS = /* @__PURE__ */ new Set(["in", "out", "all"]);
+var MINTS = /* @__PURE__ */ new Set(["ATLAS", "USDC", "SOL"]);
+var WALLET_ROLES = /* @__PURE__ */ new Set(["dao_treasury", "ecosystem_fund"]);
+var GRANULARITY = /* @__PURE__ */ new Set(["day", "month"]);
+var STORY_STATUS = /* @__PURE__ */ new Set(["story", "not_opted_in", "not_available"]);
+var BOOL_ARGS = {
+  includeExpired: "include_expired",
+  includeInternal: "include_internal",
+  includeFees: "include_fees",
+  allowPartial: "allow_partial",
+  anchored: "anchored"
+};
+var COUNT_FIELD = {
+  list_star_systems: { kind: "array", field: "systems" },
+  galaxy_overview: { kind: "array", field: "systems" },
+  get_fleet: { kind: "array", field: "fleets" },
+  profile_key_audit: { kind: "array", field: "keys" },
+  list_categories: { kind: "array", field: "categories" },
+  hub_updates: { kind: "array", field: "updates" },
+  list_listings: { kind: "array", field: "listings" },
+  search_hub: { kind: "array", field: "results" },
+  claim_status: { kind: "array", field: "claims" },
+  list_c4_markers: { kind: "array", field: "markers" },
+  list_community_tools: { kind: "array", field: "tools" },
+  data_health: { kind: "array", field: "checks" },
+  list_proposals: { kind: "array", field: "proposals" },
+  get_proposal_votes: { kind: "number", field: "voterCount" },
+  dao_revenue: { kind: "number", field: "rowCount" },
+  dao_treasury_flows: { kind: "array", field: "rows" },
+  dao_payments: { kind: "array", field: "payments" },
+  treasury_history: { kind: "array", field: "series" },
+  treasury_balances: { kind: "array", field: "wallets" },
+  pip_tracker: { kind: "number", field: "rowCount" }
+};
+function readTelemetryConfig(env = process.env) {
+  const url2 = sinkUrl(env.MCP_TELEMETRY_URL);
+  if (!url2) return null;
+  return {
+    url: url2,
+    key: sinkKey(env.MCP_TELEMETRY_KEY),
+    env: coarseEnv(env),
+    timeoutMs: timeoutMs(env.MCP_TELEMETRY_TIMEOUT_MS),
+    rest: restTable(url2),
+    fetch: globalThis.fetch
+  };
+}
+function createToolTelemetry(options) {
+  const config2 = readTelemetryConfig(options?.env ?? process.env);
+  if (!config2) return disabledTelemetry();
+  if (options?.fetch) config2.fetch = options.fetch;
+  let chain = Promise.resolve();
+  return {
+    enabled: true,
+    observe,
+    finish(observed, body, status2, startedAtMs) {
+      if (!observed || observed.calls.length === 0) return;
+      let payload;
+      try {
+        payload = parseRpcBody(body);
+      } catch {
+        payload = null;
+      }
+      const calledAt = new Date(startedAtMs).toISOString();
+      const latencyMs = Math.max(0, Date.now() - startedAtMs);
+      const only = observed.calls.length === 1;
+      for (const call of observed.calls) {
+        try {
+          const message = messageFor(payload, call.id, only);
+          const classified = classifyCall(call, message, status2);
+          const event = sealEvent(call, classified, config2.env, calledAt, latencyMs);
+          if (event) send(config2, event, (work) => {
+            chain = chain.then(() => work).catch(() => void 0);
+          });
+        } catch {
+        }
+      }
+    },
+    settled: () => chain
+  };
+}
+function argumentMeta(tool, args) {
+  if (!args || typeof args !== "object" || Array.isArray(args)) return {};
+  if (tool !== "unknown" && !TOOL_NAMES.has(tool)) return {};
+  const record4 = args;
+  const meta2 = {};
+  const stream = enumValue(record4.stream, STREAMS);
+  const category = enumValue(record4.category, CATEGORIES);
+  const status2 = enumValue(record4.status, LISTING_STATUS);
+  const kind = enumValue(record4.kind, KINDS);
+  const direction = enumValue(record4.direction, DIRECTIONS);
+  const mint2 = enumValue(record4.mint, MINTS);
+  const walletRole = enumValue(record4.wallet, WALLET_ROLES);
+  const granularity = enumValue(record4.granularity, GRANULARITY);
+  if (stream) meta2.stream = stream;
+  if (category) meta2.category = category;
+  if (status2) meta2.status = status2;
+  if (kind) meta2.kind = kind;
+  if (direction) meta2.direction = direction;
+  if (mint2) meta2.mint = mint2;
+  if (walletRole) meta2.wallet_role = walletRole;
+  if (granularity) meta2.granularity = granularity;
+  for (const [name, field] of Object.entries(BOOL_ARGS)) {
+    if (typeof record4[name] === "boolean") meta2[field] = record4[name];
+  }
+  return meta2;
+}
+function clientFamily(userAgent) {
+  const text2 = (userAgent ?? "").slice(0, 300).toLowerCase();
+  if (text2.includes("cursor")) return "cursor";
+  if (text2.includes("claude")) return "claude";
+  if (text2.includes("vscode") || text2.includes("visual studio code")) return "vscode";
+  if (text2.includes("chatgpt") || text2.includes("openai")) return "chatgpt";
+  if (text2.includes("mozilla") || text2.includes("chrome") || text2.includes("safari") || text2.includes("firefox")) return "browser";
+  if (text2.includes("node")) return "node";
+  return "unknown";
+}
+function disabledTelemetry() {
+  return {
+    enabled: false,
+    async observe() {
+      return null;
+    },
+    finish() {
+    },
+    settled: () => Promise.resolve()
+  };
+}
+async function observe(request, userAgent) {
+  if (request.method !== "POST") return null;
+  let payload;
+  try {
+    payload = JSON.parse(await request.text());
+  } catch {
+    return null;
+  }
+  const family = clientFamily(userAgent);
+  const calls = [];
+  for (const message of rpcMessages(payload)) {
+    if (!message || typeof message !== "object" || Array.isArray(message)) continue;
+    const record4 = message;
+    if (record4.method !== "tools/call") continue;
+    const params = record4.params;
+    const paramRecord = params && typeof params === "object" && !Array.isArray(params) ? params : {};
+    const name = typeof paramRecord.name === "string" && TOOL_NAMES.has(paramRecord.name) ? paramRecord.name : "unknown";
+    const args = paramRecord.arguments;
+    calls.push({
+      id: record4.id ?? null,
+      tool: name,
+      meta: argumentMeta(name, args),
+      clientFamily: family,
+      lookupFiltered: name === "claim_status" && identityPresent(args)
+    });
+  }
+  return calls.length > 0 ? { calls } : null;
+}
+function identityPresent(args) {
+  if (!args || typeof args !== "object" || Array.isArray(args)) return false;
+  const identity = args.identity;
+  return typeof identity === "string" && identity.trim().length > 0;
+}
+function send(config2, event, track) {
+  let body;
+  try {
+    body = JSON.stringify(event);
+  } catch {
+    return;
+  }
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), config2.timeoutMs);
+  if (typeof timer === "object" && timer && "unref" in timer && typeof timer.unref === "function") timer.unref();
+  const headers = {
+    accept: "application/json",
+    "content-type": "application/json"
+  };
+  if (config2.key) {
+    headers.authorization = `Bearer ${config2.key}`;
+    if (config2.rest) {
+      headers.apikey = config2.key;
+      headers.prefer = "return=minimal";
+    }
+  }
+  const work = Promise.resolve().then(() => config2.fetch(config2.url, { method: "POST", headers, body, signal: controller.signal })).then(() => void 0).catch(() => void 0).finally(() => clearTimeout(timer));
+  track(work);
+  const waitUntil = globalThis.waitUntil;
+  if (typeof waitUntil === "function") {
+    try {
+      waitUntil(work);
+    } catch {
+    }
+  }
+}
+function sealEvent(call, classified, env, calledAt, latencyMs) {
+  if (call.tool !== "unknown" && !TOOL_NAMES.has(call.tool)) return null;
+  if (!FAMILIES.has(call.clientFamily) || !OUTCOMES.has(classified.outcome) || !ENV_PATTERN.test(env)) return null;
+  if (!CALLED_AT_PATTERN.test(calledAt)) return null;
+  if (classified.error_class !== null && !CLASSES.has(classified.error_class)) return null;
+  const latency = Number.isFinite(latencyMs) ? Math.min(MAX_LATENCY_MS, Math.max(0, Math.round(latencyMs))) : 0;
+  const event = {
+    tool: call.tool,
+    called_at: calledAt,
+    env,
+    client_family: call.clientFamily,
+    outcome: classified.outcome,
+    result_count: sanitizeCount(classified.result_count),
+    latency_ms: latency,
+    error_class: classified.error_class
+  };
+  const meta2 = { ...call.meta };
+  if (classified.story_status && STORY_STATUS.has(classified.story_status)) meta2.story_status = classified.story_status;
+  const boolFields = /* @__PURE__ */ new Set(["include_expired", "include_internal", "include_fees", "allow_partial", "anchored"]);
+  for (const field of TELEMETRY_META_FIELDS) {
+    const value = meta2[field];
+    if (typeof value === "boolean") {
+      if (boolFields.has(field)) event[field] = value;
+      continue;
+    }
+    if (typeof value !== "string") continue;
+    if (field === "stream" && STREAMS.has(value)) event[field] = value;
+    else if (field === "category" && CATEGORIES.has(value)) event[field] = value;
+    else if (field === "status" && LISTING_STATUS.has(value)) event[field] = value;
+    else if (field === "kind" && KINDS.has(value)) event[field] = value;
+    else if (field === "direction" && DIRECTIONS.has(value)) event[field] = value;
+    else if (field === "mint" && MINTS.has(value)) event[field] = value;
+    else if (field === "wallet_role" && WALLET_ROLES.has(value)) event[field] = value;
+    else if (field === "granularity" && GRANULARITY.has(value)) event[field] = value;
+    else if (field === "story_status" && STORY_STATUS.has(value)) event[field] = value;
+  }
+  return event;
+}
+function classifyCall(call, message, status2) {
+  if (!message || typeof message !== "object" || Array.isArray(message)) return fromStatus(status2);
+  const record4 = message;
+  if (record4.error && typeof record4.error === "object") {
+    const error2 = record4.error;
+    if (error2.code === -32602 || error2.code === -32600) {
+      return { outcome: "invalid_args", result_count: null, error_class: "invalid_args" };
+    }
+    return classifyFailure(typeof error2.message === "string" ? error2.message : "");
+  }
+  if (!record4.result || typeof record4.result !== "object" || Array.isArray(record4.result)) return fromStatus(status2);
+  const result = record4.result;
+  if (result.isError === true) {
+    const failed = classifyFailure(textContent(result.content));
+    return failed.outcome === "unmatched" ? failed : { ...failed, result_count: null };
+  }
+  return classifySuccess(call.tool, structuredData(result), call.lookupFiltered);
+}
+function classifyFailure(message) {
+  const text2 = message.toLowerCase();
+  if (text2.includes("timed out") || text2.includes("timeout")) {
+    return { outcome: "error", result_count: null, error_class: "timeout" };
+  }
+  if (text2.includes("rate limit") || text2.includes("rate_limited")) {
+    return { outcome: "error", result_count: null, error_class: "rate_limited" };
+  }
+  if (text2.includes("not yet populated") || text2.includes("not available") || text2.includes("unavailable") || text2.includes("refresh-treasury")) {
+    return { outcome: "error", result_count: null, error_class: "unavailable" };
+  }
+  if (text2.includes("no galaxy proposal") || text2.includes("not found") || text2.includes("does not exist") || text2.includes("no matching")) {
+    return { outcome: "unmatched", result_count: 0, error_class: null };
+  }
+  if (text2.includes("invalid") || text2.includes("must be") || text2.includes("provide ") || text2.includes("expected") || text2.includes("too small") || text2.includes("too big") || text2.includes("unrecognized") || text2.includes("required")) {
+    return { outcome: "invalid_args", result_count: null, error_class: "invalid_args" };
+  }
+  return { outcome: "error", result_count: null, error_class: "upstream" };
+}
+function classifySuccess(tool, data, lookupFiltered) {
+  if (data.populated === false) return { outcome: "empty", result_count: 0, error_class: null };
+  if (tool === "player_story") return classifyStory(data);
+  if (tool === "player_legacy") return classifyLegacy(data);
+  if (tool === "dao_overview") return classifyOverview(data);
+  if (tool === "ecofund_limit") return { outcome: "ok", result_count: 1, error_class: null };
+  const spec = COUNT_FIELD[tool];
+  if (!spec) return { outcome: "ok", result_count: null, error_class: null };
+  const count2 = spec.kind === "number" ? numberCount(data[spec.field]) : arrayCount(data[spec.field]);
+  if (count2 === null) return { outcome: "ok", result_count: null, error_class: null };
+  if (count2 === 0 && (tool === "get_fleet" || tool === "claim_status" && lookupFiltered)) {
+    return { outcome: "unmatched", result_count: 0, error_class: null };
+  }
+  if (count2 === 0) return { outcome: "empty", result_count: 0, error_class: null };
+  return { outcome: "ok", result_count: count2, error_class: null };
+}
+function classifyStory(data) {
+  if (data.status === "not opted in") {
+    return { outcome: "unmatched", result_count: 0, error_class: null, story_status: "not_opted_in" };
+  }
+  if (data.status === "not available") {
+    return { outcome: "empty", result_count: 0, error_class: null, story_status: "not_available" };
+  }
+  if (data.status === "story") {
+    const claims = arrayCount(data.claims);
+    const count2 = claims ?? 1;
+    return {
+      outcome: count2 === 0 ? "empty" : "ok",
+      result_count: count2,
+      error_class: null,
+      story_status: "story"
+    };
+  }
+  return { outcome: "ok", result_count: null, error_class: null };
+}
+function classifyLegacy(data) {
+  const profiles = arrayCount(data.profiles) ?? 0;
+  const fleets = arrayCount(data.fleets) ?? 0;
+  const activity = data.activity && typeof data.activity === "object" ? 1 : 0;
+  if (profiles === 0 && fleets === 0 && activity === 0) {
+    return { outcome: "unmatched", result_count: 0, error_class: null };
+  }
+  return { outcome: "ok", result_count: profiles + fleets + activity, error_class: null };
+}
+function classifyOverview(data) {
+  if (!Array.isArray(data.sections)) return { outcome: "ok", result_count: null, error_class: null };
+  if (data.sections.length === 0) return { outcome: "empty", result_count: 0, error_class: null };
+  let ok2 = 0;
+  for (const section of data.sections) {
+    if (section && typeof section === "object" && section.ok === true) ok2 += 1;
+  }
+  if (ok2 === 0) return { outcome: "error", result_count: 0, error_class: "upstream" };
+  return { outcome: "ok", result_count: ok2, error_class: null };
+}
+function fromStatus(status2) {
+  if (status2 === 429) return { outcome: "error", result_count: null, error_class: "rate_limited" };
+  if (status2 === 504) return { outcome: "error", result_count: null, error_class: "timeout" };
+  if (status2 === 413) return { outcome: "error", result_count: null, error_class: "internal" };
+  return { outcome: "error", result_count: null, error_class: status2 >= 500 ? "upstream" : "internal" };
+}
+function structuredData(result) {
+  const structured = result.structuredContent;
+  if (structured && typeof structured === "object" && !Array.isArray(structured)) {
+    return structured;
+  }
+  const text2 = textContent(result.content).trim();
+  if (!text2.startsWith("{")) return {};
+  try {
+    const parsed = JSON.parse(text2);
+    if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) return parsed;
+  } catch {
+    return {};
+  }
+  return {};
+}
+function textContent(content) {
+  if (!Array.isArray(content)) return "";
+  let text2 = "";
+  for (const item of content) {
+    if (!item || typeof item !== "object") continue;
+    const value = item.text;
+    if (typeof value !== "string") continue;
+    text2 += value;
+    if (text2.length >= 500) return text2.slice(0, 500);
+  }
+  return text2;
+}
+function arrayCount(value) {
+  return Array.isArray(value) ? value.length : null;
+}
+function numberCount(value) {
+  return typeof value === "number" && Number.isInteger(value) && value >= 0 && value <= MAX_RESULT_COUNT ? value : null;
+}
+function sanitizeCount(value) {
+  if (value === null || !Number.isInteger(value) || value < 0 || value > MAX_RESULT_COUNT) return null;
+  return value;
+}
+function enumValue(value, allowed) {
+  return typeof value === "string" && allowed.has(value) ? value : null;
+}
+function rpcMessages(payload) {
+  if (Array.isArray(payload)) return payload;
+  if (payload && typeof payload === "object") return [payload];
+  return [];
+}
+function messageFor(payload, id, only) {
+  const messages = rpcMessages(payload);
+  if (only && messages.length === 1) return messages[0];
+  const key = idKey(id);
+  return messages.find((message) => {
+    if (!message || typeof message !== "object") return false;
+    return idKey(message.id) === key;
+  }) ?? null;
+}
+function idKey(id) {
+  if (typeof id === "string" || typeof id === "number") return `${typeof id}:${id}`;
+  if (id === null) return "null";
+  return "other";
+}
+function parseRpcBody(body) {
+  const text2 = new TextDecoder().decode(body).trim();
+  if (!text2) return null;
+  if (text2.startsWith("{") || text2.startsWith("[")) return JSON.parse(text2);
+  const data = text2.split("\n").filter((line) => line.startsWith("data:")).map((line) => line.slice(5).trim()).filter((line) => line.length > 0 && line !== "[DONE]");
+  const last = data[data.length - 1];
+  return last ? JSON.parse(last) : null;
+}
+function sinkUrl(value) {
+  const raw = value?.trim() ?? "";
+  if (!raw) return null;
+  let parsed;
+  try {
+    parsed = new URL(raw);
+  } catch {
+    return null;
+  }
+  if (parsed.username || parsed.password) return null;
+  if (parsed.protocol === "https:") return parsed.toString();
+  const host = parsed.hostname;
+  const local = host === "localhost" || host === "127.0.0.1" || host === "[::1]";
+  if (parsed.protocol === "http:" && local) return parsed.toString();
+  return null;
+}
+function sinkKey(value) {
+  const raw = value?.trim() ?? "";
+  if (!raw || raw.length > MAX_KEY_LENGTH || /[\r\n]/.test(raw)) return null;
+  return raw;
+}
+function coarseEnv(env) {
+  const explicit = env.MCP_TELEMETRY_ENV?.trim().toLowerCase() ?? "";
+  if (ENV_PATTERN.test(explicit)) return explicit;
+  const vercel = env.VERCEL_ENV?.trim().toLowerCase() ?? "";
+  if (vercel === "production" || vercel === "preview" || vercel === "development") return vercel;
+  return "local";
+}
+function timeoutMs(value) {
+  if (!value?.trim()) return DEFAULT_TIMEOUT_MS;
+  const parsed = Number(value);
+  if (!Number.isInteger(parsed)) return DEFAULT_TIMEOUT_MS;
+  return Math.min(MAX_TIMEOUT_MS, Math.max(MIN_TIMEOUT_MS, parsed));
+}
+function restTable(url2) {
+  try {
+    return new URL(url2).pathname.includes("/rest/v1/");
+  } catch {
+    return false;
+  }
+}
+
 // src/public-mcp.ts
 var REQUEST_TIMEOUT_MS = 2e4;
 var MAX_RESPONSE_BYTES = 512 * 1024;
@@ -173,11 +685,14 @@ function jsonRpcError(message, status2 = 500) {
   );
 }
 function createPublicMcpFetch(handler, options) {
-  const timeoutMs = options?.timeoutMs ?? REQUEST_TIMEOUT_MS;
+  const timeoutMs2 = options?.timeoutMs ?? REQUEST_TIMEOUT_MS;
   const maxBytes = options?.maxBytes ?? MAX_RESPONSE_BYTES;
   const maxRequestBytes = options?.maxRequestBytes ?? MAX_REQUEST_BYTES;
+  const telemetry = resolveTelemetry(options);
   return async (request) => {
     if (request.method === "OPTIONS") return withCors(new Response(null, { status: 204 }));
+    const started = Date.now();
+    let observed = null;
     let timer;
     const pending = (async () => {
       if (options?.feeds) {
@@ -186,26 +701,59 @@ function createPublicMcpFetch(handler, options) {
       }
       const prepared = await limitedRequest(request, maxRequestBytes);
       if (prepared instanceof Response) return prepared;
+      if (telemetry) {
+        try {
+          observed = await telemetry.observe(prepared.clone(), request.headers.get("user-agent"));
+        } catch {
+          observed = null;
+        }
+      }
       return handler.fetch(prepared);
     })().catch((error2) => jsonRpcError(publicErrorMessage(error2)));
     const timeout = new Promise((resolve) => {
-      timer = setTimeout(() => resolve(jsonRpcError("The read timed out. No data was invented.", 504)), timeoutMs);
+      timer = setTimeout(() => resolve(jsonRpcError("The read timed out. No data was invented.", 504)), timeoutMs2);
     });
     try {
       const response = await Promise.race([pending, timeout]);
-      const bytes = await response.arrayBuffer();
+      const bytes = new Uint8Array(await response.arrayBuffer());
       if (bytes.byteLength > maxBytes) {
-        return jsonRpcError("The response exceeded the size cap. No partial data was returned.", 413);
+        const outgoing = jsonRpcError("The response exceeded the size cap. No partial data was returned.", 413);
+        await reportResponse(telemetry, observed, outgoing, started);
+        return outgoing;
       }
       const headers = new Headers(response.headers);
       headers.set("content-length", String(bytes.byteLength));
+      reportBytes(telemetry, observed, bytes, response.status, started);
       return withCors(new Response(bytes, { status: response.status, statusText: response.statusText, headers }));
     } catch (error2) {
-      return jsonRpcError(publicErrorMessage(error2));
+      const outgoing = jsonRpcError(publicErrorMessage(error2));
+      await reportResponse(telemetry, observed, outgoing, started);
+      return outgoing;
     } finally {
       if (timer) clearTimeout(timer);
     }
   };
+}
+function resolveTelemetry(options) {
+  if (options && Object.prototype.hasOwnProperty.call(options, "telemetry")) {
+    return options.telemetry?.enabled ? options.telemetry : null;
+  }
+  const fromEnv = createToolTelemetry();
+  return fromEnv.enabled ? fromEnv : null;
+}
+function reportBytes(telemetry, observed, bytes, status2, started) {
+  if (!telemetry) return;
+  try {
+    telemetry.finish(observed, bytes, status2, started);
+  } catch {
+  }
+}
+async function reportResponse(telemetry, observed, response, started) {
+  if (!telemetry) return;
+  try {
+    reportBytes(telemetry, observed, new Uint8Array(await response.clone().arrayBuffer()), response.status, started);
+  } catch {
+  }
 }
 var REQUEST_TOO_LARGE = "The request exceeded the size cap.";
 async function limitedRequest(request, maxRequestBytes) {
@@ -25523,9 +26071,9 @@ function createRpcClient(url2, fetchImpl = fetch, options) {
   const host = rpcHost(url2);
   let gap = options?.minIntervalMs ?? 200;
   const attempts = options?.attempts ?? 4;
-  async function post(body, timeoutMs) {
-    const capped = timeoutMs !== void 0;
-    const budget = timeoutMs ?? options?.timeoutMs ?? 45e3;
+  async function post(body, timeoutMs2) {
+    const capped = timeoutMs2 !== void 0;
+    const budget = timeoutMs2 ?? options?.timeoutMs ?? 45e3;
     if (!(budget > 0)) {
       throw new SafeClientError("Solana RPC read stopped because the time budget ran out.");
     }
@@ -25716,14 +26264,14 @@ async function listSignatures(rpc, address2, until, options) {
     if (before) config2.before = before;
     if (until) config2.until = until;
     const remaining = options?.deadlineMs !== void 0 ? options.deadlineMs - clock() : void 0;
-    const timeoutMs = remaining === void 0 ? void 0 : Math.min(4e3, remaining);
+    const timeoutMs2 = remaining === void 0 ? void 0 : Math.min(4e3, remaining);
     let page;
     try {
       page = signaturePage(
         await rpc.call(
           "getSignaturesForAddress",
           [address2, config2],
-          timeoutMs === void 0 ? void 0 : { timeoutMs }
+          timeoutMs2 === void 0 ? void 0 : { timeoutMs: timeoutMs2 }
         )
       );
     } catch (error2) {
@@ -26145,8 +26693,8 @@ function budgetedRpc(rpc, deadline, now) {
       if (remaining <= 0) {
         throw new SafeClientError("The read stopped because the time budget ran out.");
       }
-      const timeoutMs = Math.min(CALL_BUDGET_MS, remaining, options?.timeoutMs ?? CALL_BUDGET_MS);
-      return rpc.call(method, params, { timeoutMs });
+      const timeoutMs2 = Math.min(CALL_BUDGET_MS, remaining, options?.timeoutMs ?? CALL_BUDGET_MS);
+      return rpc.call(method, params, { timeoutMs: timeoutMs2 });
     },
     batch(requests) {
       return rpc.batch(requests);
@@ -36124,10 +36672,10 @@ function throwIfAborted(signal) {
     throw signal.reason;
   }
 }
-async function sendRpc(send, signal, operation) {
+async function sendRpc(send2, signal, operation) {
   throwIfAborted(signal);
   try {
-    return await send();
+    return await send2();
   } catch (cause) {
     if (signal?.aborted === true) {
       throw signal.reason;

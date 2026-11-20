@@ -51,7 +51,7 @@ Solid lines are live. Dashed lines are planned and are not in this version. The 
 
 `/plain/` shows listings, groups, hub updates, search results, and a player lookup as a card grid: one column on phones, two columns from 48rem, three from 68.75rem, and four on very wide screens from 93.75rem (`dashboard/plain/plain.css`). Cards in the grid start collapsed (`<details>` with no `open` attribute). Listings, groups, hub updates, and search each have Expand all, Collapse all, category filter chips, and a sort of A-Z, Newest, or Category (`dashboard/plain/plain.js`). The sort starts at A-Z. Groups are the guild rows from `hub_updates`. The page calls same-origin `/api/mcp` for `list_listings`, `hub_updates`, `search_hub`, `player_legacy`, and `player_story`. Under Listings there is one signed note, "What does signed mean?": "Signed means approved hub signers checked and published this record with their signing keys. It is not an endorsement, it is not proof of ownership, and it does not move money. The business is responsible for its own offer." The one payment line is: "This page does not take payment. Offers link to each business's own page." Each card can show the word Signed. `signedMeaning` is a field on `list_listings` results. The page does not print that field on each card. No API key.
 
-Checked on 1 November 2026: `initialize` returned server `sa-ecosystem-node` version `1.0.0`, and `tools/list` returned 22 tools. `list_c4_markers` and `list_community_tools` were added on 11 November 2026, for 24 in the list below. Every one has `readOnlyHint: true`.
+`tools/list` returns 24 read-only tools, including `list_c4_markers` and `list_community_tools`. Every one has `readOnlyHint: true`.
 
 ## Tools
 
