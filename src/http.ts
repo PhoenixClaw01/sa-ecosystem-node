@@ -10,7 +10,12 @@ import { createPublicMcpFetch } from "./public-mcp.js";
 import { clientKeyFromNode, createRateLimiter, type RateLimiter } from "./rate-limit.js";
 import { createDefaultDeps } from "./runtime.js";
 import type { NodeDeps } from "./server.js";
+import { createToolTelemetry, type ToolTelemetry } from "./telemetry.js";
 import { SERVER_NAME, SERVER_VERSION } from "./version.js";
+
+function headerValue(value: string | string[] | undefined): string | null {
+  return typeof value === "string" && value.length > 0 ? value : null;
+}
 
 function writeJson(response: ServerResponse, status: number, body: unknown) {
   response.writeHead(status, {
@@ -60,7 +65,7 @@ function enforcePublicHostPolicy(config: Config): void {
   console.error(OPEN_HOST_WARNING);
 }
 
-export async function startHttpServer(options?: { config?: Config; deps?: NodeDeps }): Promise<{
+export async function startHttpServer(options?: { config?: Config; deps?: NodeDeps; telemetry?: ToolTelemetry | null }): Promise<{
   url: string;
   close: () => Promise<void>;
 }> {
@@ -71,10 +76,12 @@ export async function startHttpServer(options?: { config?: Config; deps?: NodeDe
     limit: config.rateLimitMax,
     windowMs: config.rateLimitWindowMs,
   });
+  const telemetry = options?.telemetry ?? createToolTelemetry();
   const node = createNodeHandler(deps, config, allowAll);
   const fetchMcp = createPublicMcpFetch(node, {
     maxRequestBytes: config.maxRequestBytes,
     maxBytes: config.maxResponseBytes,
+    telemetry: telemetry.enabled ? telemetry : null,
   });
   const nodeHandler = toNodeHandler({ fetch: fetchMcp }, { maxRequestBodySize: config.maxRequestBytes });
   const validateHost = hostGuard(config);
@@ -94,6 +101,7 @@ export async function startHttpServer(options?: { config?: Config; deps?: NodeDe
     const decision = limiter.check(clientKeyFromNode(request, config.trustProxy));
     if (!decision.allowed) {
       writeJson(response, 429, { error: "rate_limited", ...decision });
+      if (telemetry.enabled) telemetry.noteStatus(headerValue(request.headers["user-agent"]), 429);
       return;
     }
 

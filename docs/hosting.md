@@ -71,6 +71,10 @@ These are not hub pins. They have the same meaning on every host:
 
 `npm run hub-player -- exchange` listens on `127.0.0.1` only, and only when `DISCORD_REDIRECT_URI` is `http://127.0.0.1:<port>/<path>`. An https redirect still works with `hub-attest discord-url` and `discord-code`. It does not start a public listener. The exchange does not publish a hub file and does not read or write `HUB_SIGNER_SETS`. The operator steps are in [claim-and-verify.md](claim-and-verify.md). An agent does not create the Discord application and does not paste the secret.
 
+## Tool telemetry
+
+Off unless `MCP_TELEMETRY_URL` is set. Unset, the process makes no telemetry request. `MCP_TELEMETRY_URL` applies to the HTTP server and the public MCP handler. The stdio process does not read it and does not send telemetry. The optional variables are `MCP_TELEMETRY_URL`, `MCP_TELEMETRY_KEY`, `MCP_TELEMETRY_ENV`, and `MCP_TELEMETRY_TIMEOUT_MS`. The event records the tool name and a coarse outcome. It does not record wallet addresses, search text, or IP addresses. The table an operator can create, and the privacy rules, are in [telemetry.md](telemetry.md).
+
 ## Local HTTP
 
 ```bash
