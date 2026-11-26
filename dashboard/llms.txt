@@ -44,7 +44,8 @@ Item ids match protocol/h2h/SPEC.md Appendix A. C5, C6, and C7 are built. C1–C
 - C2: optional `stack` on signer entries, and computed unsigned `trustLevel`
 - C3: per-key daily record cap
 - C4: non-retroactive revocation (`revokedFrom`)
-- A21 and A22 stay deferred (they need a real second Phoenix key and other stacks' steward logins; do not invent either)
+- A21 stays open: `node.config.example.json` still lists only the default signer set, not the live `agents` set
+- A22 stays deferred: CODEOWNERS waits until other stacks' steward logins are known. Do not invent a login
 - `get_fleet` returns readable fleets plus an unreadable count when some C4 PTR fleet state cannot yet be decoded
 
 ## Docs

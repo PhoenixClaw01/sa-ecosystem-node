@@ -29,6 +29,22 @@ describe("llms.txt", () => {
     expect(root).toContain("C4");
     expect(root).toContain("x-phoenix-agent");
     expect(root).toContain("self_traffic");
+    expect(root).toContain("A21 stays open");
+    expect(root).toContain("node.config.example.json");
+    expect(root).toContain("A22 stays deferred");
+    expect(root).not.toContain("second Phoenix key");
+  });
+
+  it("tells operators that stdout is the default and that off writes nothing", () => {
+    const hosting = readFileSync("docs/hosting.md", "utf8");
+    const envExample = readFileSync(".env.example", "utf8");
+    for (const text of [hosting, envExample]) {
+      expect(text).toContain("MCP_TELEMETRY_SINK=off");
+      expect(text).toContain("stdout");
+      expect(text.toLowerCase()).not.toContain("send nothing");
+      expect(text).not.toContain("Off unless");
+      expect(text).not.toContain("is off when MCP_TELEMETRY_URL is unset");
+    }
   });
 
   it("does not mention private repos or embed credentials", () => {

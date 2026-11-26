@@ -111,7 +111,11 @@ export async function startHttpServer(options?: { config?: Config; deps?: NodeDe
     if (!decision.allowed) {
       writeJson(response, 429, { error: "rate_limited", ...decision });
       if (telemetry.enabled) {
-        telemetry.noteStatus(headerValue(request.headers["user-agent"]), 429, nodeHeaders(request));
+        try {
+          telemetry.noteStatus(headerValue(request.headers["user-agent"]), 429, nodeHeaders(request));
+        } catch {
+          // The 429 is already written. A telemetry throw must not replace it.
+        }
       }
       return;
     }

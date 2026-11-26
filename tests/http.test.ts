@@ -116,6 +116,37 @@ describe("local http server", () => {
     expect(encoded).not.toContain("203.0.113.44");
   });
 
+  it("keeps the 429 when noteStatus throws", async () => {
+    const started = await startHttpServer({
+      config: loadConfig({ HOST: "127.0.0.1", PORT: "0", RATE_LIMIT_MAX: "1", RATE_LIMIT_WINDOW_MS: "60000" }),
+      deps,
+      telemetry: {
+        enabled: true,
+        sinkKind: "custom",
+        async observe() {
+          return null;
+        },
+        finish() {
+          throw new Error("finish leak");
+        },
+        noteStatus() {
+          throw new Error("note leak-token");
+        },
+        settled: () => Promise.resolve(),
+      },
+    });
+    closeServer = started.close;
+    const headers = { "content-type": "application/json" };
+    const body = JSON.stringify({ jsonrpc: "2.0", id: 1, method: "tools/list", params: {} });
+    const first = await request(`${started.url}/mcp`, headers, body);
+    expect(first.status).not.toBe(429);
+    const second = await request(`${started.url}/mcp`, headers, body);
+    expect(second.status).toBe(429);
+    expect(second.body).toMatch(/rate_limited/);
+    expect(second.body).not.toContain("note leak-token");
+    expect(second.body).not.toContain("finish leak");
+  });
+
   it("refuses an MCP response that exceeds the size cap", async () => {
     const marker = "x".repeat(4_000);
     const started = await startHttpServer({
