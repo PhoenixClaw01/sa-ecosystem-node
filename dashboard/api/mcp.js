@@ -30054,7 +30054,7 @@ function toJsonSafe(value) {
 
 // src/game/summarize.ts
 function summarizeGalaxyActivity(systems) {
-  const levels = {};
+  const levels = /* @__PURE__ */ Object.create(null);
   let starbaseCount = 0;
   let connectionCount = 0;
   let celestialBodyCount = 0;
@@ -30120,7 +30120,7 @@ function summarizeFleet(input) {
 
 // src/version.ts
 var SERVER_NAME = "sa-ecosystem-node";
-var SERVER_VERSION = "1.0.1";
+var SERVER_VERSION = "1.0.2";
 
 // src/server.ts
 var DEFAULT_SYSTEM_LIMIT = 100;

@@ -35,7 +35,7 @@ describe("MCP registry server.json", () => {
     expect(server.name.length).toBeLessThanOrEqual(200);
     expect(server.version).toBe(pkg.version);
     expect(server.version).toBe(SERVER_VERSION);
-    expect(server.version).toBe("1.0.1");
+    expect(server.version).toBe("1.0.2");
     expect(server.version).not.toMatch(/[\^~*]|(?:>=|<=)/);
     expect(server.description.length).toBeGreaterThan(0);
     expect(server.description.length).toBeLessThanOrEqual(100);

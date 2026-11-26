@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { pageStarSystems, summarizeFleet, summarizeStarSystem } from "../src/game/summarize.js";
+import { pageStarSystems, summarizeFleet, summarizeGalaxyActivity, summarizeStarSystem } from "../src/game/summarize.js";
 
 describe("game summaries", () => {
   it("keeps a compact star system shape", () => {
@@ -59,3 +59,24 @@ describe("game summaries", () => {
     expect(JSON.stringify(fleet)).not.toContain("bigint");
   });
 });
+
+  it("counts a __proto__ starbase level without writing to Object.prototype", () => {
+    const system = (name: string, level: string) =>
+      summarizeStarSystem({
+        address: name,
+        name,
+        systemId: 1,
+        coordinates: { x: 0, y: 0 },
+        connectionCount: 0,
+        celestialBodyCount: 0,
+        starbase: { owner: "owner", level },
+      });
+    const result = summarizeGalaxyActivity([system("A", "__proto__"), system("B", "constructor"), system("C", "level-1")]);
+    expect(Object.getPrototypeOf(result.starbaseLevels)).toBeNull();
+    expect(Object.getOwnPropertyNames(result.starbaseLevels).sort()).toEqual(["__proto__", "constructor", "level-1"]);
+    expect(result.starbaseLevels["__proto__"]).toBe(1);
+    expect(result.starbaseLevels.constructor).toBe(1);
+    expect(result.starbaseLevels["level-1"]).toBe(1);
+    expect(Object.prototype).not.toHaveProperty("__testPollution");
+  });
+
