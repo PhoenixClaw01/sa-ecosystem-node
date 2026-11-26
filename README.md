@@ -10,7 +10,7 @@ The public node is [https://sa-ecosystem-node-dashboard.vercel.app](https://sa-e
 
 This deployment uses threshold 2 with `HUB_ALLOW_AUTHOR_APPROVAL=true`. Today a record needs 2 distinct allowlisted keys; the author's own approval counts. Since M5 the live approvals are two Phoenix agent keys in `hub/signers/agents.json`: the Phoenix Collective author and Phoenix reviewer. The player wallet stays on the default allowlist and is not that second approval. `HUB_GIT_REPO`, `HUB_GIT_COMMIT`, and `HUB_STORE_MANIFEST_HASH` are set. On 1 November 2026 the pinned commit was `f064f18db1da60c4f3e562d4064c8f344042e97e`.
 
-- [Spec v1.0.0](docs/spec.md)
+- [Spec v1.0.1](docs/spec.md)
 - [Hosting](docs/hosting.md)
 - [Decentralization](docs/decentralization.md) (what is live, then the later design)
 - [Claim and verify](docs/claim-and-verify.md)
