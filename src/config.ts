@@ -78,10 +78,11 @@ export interface Config {
 }
 
 /**
- * Kind names a signer set may list. Every current hub update kind is allowed.
- * `c4-anchor`, `community-tool`, and `reputation-link` are proposed kinds a set
- * may name before those records exist. `claim` counts only for a player claim
- * (`action` is `claim` and `subject` is `player`), not a revoke or resolve.
+ * Kind names a signer set may list. Every current hub update kind is allowed,
+ * including `reputation-link`. `c4-anchor` and `community-tool` are proposed
+ * kinds a set may name before those records exist. `claim` counts only for a
+ * player claim (`action` is `claim` and `subject` is `player`), not a revoke
+ * or resolve.
  */
 export const SIGNER_SET_KINDS = [
   "announcement",

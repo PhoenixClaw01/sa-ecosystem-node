@@ -413,4 +413,75 @@ describe("kind-scoped signer sets", () => {
     const opened = await resolveClaimDirectory(admitted.updates, { hubId: hub, now, profile: async () => "match" });
     expect(opened.claims.find((row) => row.updateId === "business-claim")?.state).toBe("revoked");
   });
+
+  it("admits story-optin and reputation-link for a scoped key and refuses everyday kinds", () => {
+    const tools = signer();
+    const other = signer();
+    const scoped = setsOf([{ id: "player-tools", threshold: 1, members: [tools], kinds: PLAYER_TOOLS_KINDS }]);
+    const playerSignature = base58Encode(nacl.sign.detached(new TextEncoder().encode("scoped-set"), tools.solanaKey));
+    const story: HubUpdatePayload = {
+      v: 1,
+      id: "story-allow",
+      created_at: "2026-10-31T00:00:00.000Z",
+      author: tools.publicKey,
+      kind: "story-optin",
+      body: "Allow the story.",
+      refs: { pip: null, txs: [] },
+      prev: null,
+      storyOptIn: { action: "allow", wallet: tools.publicKey, date: "2026-10-31", signature: playerSignature },
+    };
+    const link: HubUpdatePayload = {
+      v: 1,
+      id: "link-legacy",
+      created_at: "2026-10-31T01:00:00.000Z",
+      author: tools.publicKey,
+      kind: "reputation-link",
+      body: "Link the profile.",
+      refs: { pip: null, txs: [] },
+      prev: null,
+      reputationLink: { action: "link", wallet: tools.publicKey, profile: "Pilot", date: "2026-10-31", signature: playerSignature },
+    };
+    expect(verifyHubUpdates([document(tools, story, [tools])], new Set(), 1, scoped).rejected).toEqual([]);
+    expect(verifyHubUpdates([document(tools, link, [tools])], new Set(), 1, scoped).rejected).toEqual([]);
+
+    for (const kind of ["announcement", "proposal-note", "payment-note", "status"] as const) {
+      const body: HubUpdatePayload = {
+        v: 1,
+        id: kind,
+        created_at: "2026-10-24T02:00:00.000Z",
+        author: tools.publicKey,
+        kind,
+        body: "Hello",
+        refs: { pip: null, txs: [] },
+        prev: null,
+      };
+      const checked = verifyHubUpdates([document(tools, body, [tools])], new Set(), 1, scoped);
+      expect(checked.updates).toEqual([]);
+      expect(checked.rejected).toEqual([{ id: kind, reason: "unknown_signer" }]);
+    }
+
+    const rotate = changePayload(tools.publicKey, { id: "rotate-tools", publicKey: other.publicKey, set: "player-tools" });
+    expect(verifyHubUpdates([document(tools, rotate, [tools])], new Set(), 1, scoped).rejected).toEqual([
+      { id: "rotate-tools", reason: "untrusted_set" },
+    ]);
+
+    const agents = signer();
+    const both = setsOf([
+      { id: "agents", threshold: 1, members: [agents] },
+      { id: "player-tools", threshold: 1, members: [tools], kinds: PLAYER_TOOLS_KINDS },
+    ]);
+    const outside = changePayload(agents.publicKey, { id: "agents-rotate", publicKey: other.publicKey, set: "player-tools" });
+    expect(verifyHubUpdates([document(agents, outside, [agents])], new Set(), 1, both).rejected).toEqual([
+      { id: "agents-rotate", reason: "untrusted_set" },
+    ]);
+
+    const overlap = setsOf([
+      { id: "agents", threshold: 1, members: [tools] },
+      { id: "player-tools", threshold: 1, members: [tools], kinds: PLAYER_TOOLS_KINDS },
+    ]);
+    const everyday = note(tools, { id: "overlap-note" });
+    const admitted = verifyHubUpdates([document(tools, everyday, [tools])], new Set(), 1, overlap);
+    expect(admitted.rejected).toEqual([]);
+    expect(admitted.updates.map((update) => update.id)).toEqual(["overlap-note"]);
+  });
 });

@@ -18,6 +18,8 @@ That project is separate from the DAO Council preview. Its MCP endpoint, home pa
 
     HUB_SIGNER_SETS=[{"id":"default","path":"hub/signers.json","threshold":2},{"id":"agents","path":"hub/signers/agents.json","threshold":2}]
 
+An optional `kinds` list limits that one set to those record kinds. Omit `kinds` and the set counts for every kind. `claim` in the list counts only when the action is `claim` and the subject is `player`. The live value omits `kinds`. Switching the player wallet onto a scoped set is M6, and it is not switched. The steps are in [M6-SWITCH-DAY.md](M6-SWITCH-DAY.md).
+
 A relative `path` is looked up the same way as the default signer file: first under the working directory, then next to the code (for the dashboard bundle in `dashboard/api/`, that is `dashboard/hub/...`). On Vercel the working directory is not `dashboard/`, so this fallback is what finds the shipped copies. An absolute path is used as given. `npm run test:live-hub` checks both sets against the public hub from the repo root and from the temp directory.
 
 A record counts when one set's keys meet that set's threshold. With both sets, the pre-migration commit and the migration commit both verify, so the default set stays the rollback path. The dashboard bundle ships a byte copy of each signer file under `dashboard/hub/` and pins every copy by sha256. Edit the file under `hub/`, then run `npm run build:dashboard-mcp`. A copy that does not match its pin is refused, and no updates are returned.
@@ -43,7 +45,7 @@ Names and meanings. The public values are the ones set on `sa-ecosystem-node-das
 | `HUB_REVOKED_SIGNERS` | Comma-separated base58 addresses, or a JSON array. Applied when the process loads config | Not part of the published pin. Empty unless an operator sets it |
 | `HUB_TRUSTED_VERIFIERS` | Verifier public keys. An attestation from one of these keys is `verified`. Any other attestation stays `self-attested, unverified`. Same list shape as `HUB_REVOKED_SIGNERS`. Empty by default | Empty unless an operator sets it. The public page does not print raw handles |
 | `HUB_SIGNERS_PATH` | Single allowlist file when `HUB_SIGNER_SETS` is omitted | The function bundle includes `hub/signers.json`, a byte-for-byte copy of the repository file |
-| `HUB_SIGNER_SETS` | JSON array of `{ "id", "path", "threshold" }`. Overrides the single path. The two-set value is in "Signer sets" above | Set since M5 to the default set and the `agents` set. Everyday records meet threshold on the two Phoenix agent keys |
+| `HUB_SIGNER_SETS` | JSON array of `{ "id", "path", "threshold" }` plus optional `kinds`. Overrides the single path. The two-set value is in "Signer sets" above | Set since M5 to the default set and the `agents` set. Neither entry sets `kinds`. Everyday records meet threshold on the two Phoenix agent keys |
 
 Today a record needs 2 distinct allowlisted keys; the author's own approval counts. Since M5 the live pair is the Phoenix Collective author (`G2PhCi6MApcuC6f5o2CDQBWDnJt9hRcozHuuN55PYisU`) and Phoenix reviewer (`AANzSFjMzGuKn5gC1YygMsZZGeLUiMM9HAmKH6n2YqgH`) in `hub/signers/agents.json`. The player wallet stays on the default allowlist in `hub/signers.json` and does not supply that second signature. GaliaMeta DAC stays on the default allowlist and is not required for the agent-key pair.
 

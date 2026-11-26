@@ -1,6 +1,6 @@
 # Reputation link
 
-The hub kind `reputation-link` is built. Migration M6 is not. A `player-tools` signer set is still planned. This note does not change `HUB_SIGNER_SETS`, production, or aliases.
+The hub kind `reputation-link` is built. Migration M6 is not. `hub/signers/player-tools.json` is prepared and is not referenced by a live signer set. This note does not change `HUB_SIGNER_SETS`, production, or aliases.
 
 Only the player signs the sentence, with `signMessage`. That signature is not a transaction and it moves no funds. An agent may prepare the sentence. It must never sign it. No key belongs in `src/`.
 

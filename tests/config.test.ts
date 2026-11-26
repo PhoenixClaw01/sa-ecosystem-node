@@ -221,6 +221,8 @@ describe("config", () => {
     expect(plain.hubRevokedSigners).toEqual([]);
     expect(() => loadConfig({ HUB_SIGNER_SETS: JSON.stringify([{ id: "default", path: "hub/signers.json", kinds: [] }]) })).toThrow(/kinds list/);
     expect(() => loadConfig({ HUB_SIGNER_SETS: JSON.stringify([{ id: "default", path: "hub/signers.json", kinds: ["nope"] }]) })).toThrow(/kind that is not allowed/);
+    expect(() => loadConfig({ HUB_SIGNER_SETS: JSON.stringify([{ id: "default", path: "hub/signers.json", kinds: ["claim", "claim"] }]) })).toThrow(/repeats a kind/);
+    expect(() => loadConfig({ HUB_SIGNER_SETS: JSON.stringify([{ id: "default", path: "hub/signers.json", kinds: null }]) })).toThrow(/kinds list/);
   });
 
   it("strips query secrets from echoed RPC URLs", () => {
