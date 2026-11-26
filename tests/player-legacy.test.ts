@@ -453,7 +453,7 @@ describe("player_legacy reader", () => {
         return { total: 0, systems: [] };
       },
       async getFleet() {
-        return [];
+        return { fleets: [], unreadableFleetCount: 0 };
       },
       async auditProfile(profileAddress) {
         return { profileAddress, keyThreshold: 0, authKeyCount: 0, keyCount: 0, riskyKeyCount: 0, keys: [] };

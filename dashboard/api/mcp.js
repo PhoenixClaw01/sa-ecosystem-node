@@ -30120,7 +30120,7 @@ function summarizeFleet(input) {
 
 // src/version.ts
 var SERVER_NAME = "sa-ecosystem-node";
-var SERVER_VERSION = "1.0.0";
+var SERVER_VERSION = "1.0.1";
 
 // src/server.ts
 var DEFAULT_SYSTEM_LIMIT = 100;
@@ -30210,13 +30210,17 @@ function createNodeServer(deps2, config2) {
         if (!fleetAddress && !profileAddress) {
           throw new UserInputError("Provide fleetAddress or profileAddress.");
         }
-        const fleets = await deps2.getFleet({ fleetAddress, profileAddress });
+        const { fleets, unreadableFleetCount } = await deps2.getFleet({ fleetAddress, profileAddress });
         return jsonResult2({
           readOnly: true,
           cluster: config2.cluster,
           rpc: redactRpcUrl(config2.zinkRpcUrl),
           disclaimer: DISCLAIMER,
-          fleets
+          fleets,
+          unreadableFleetCount,
+          ...unreadableFleetCount > 0 ? {
+            note: `${unreadableFleetCount} fleet account(s) owned by this profile could not be decoded by the pinned game bindings and were skipped.`
+          } : {}
         });
       } catch (error2) {
         return failure3(error2);
@@ -47825,7 +47829,10 @@ function translateState(state2) {
       const value = state2.fields[0];
       return {
         asteroid: value.asteroid,
+        cargoCapacity: value.cargoCapacity,
+        exitFuelCeiling: value.exitFuelCeiling,
         kind: "mining",
+        minedStorageUnits: value.minedStorageUnits,
         regionXpModifier: value.regionXpModifier.toNumber(),
         regionXpModifierRaw: value.regionXpModifier.raw,
         resourceIds: [...value.resources]
@@ -50223,6 +50230,17 @@ async function getFleet(ctx, address2, options) {
   requireGameAddress(ctx);
   const envelope = await ctx.data.read(fleetAccountDefinition, address2, options);
   return toFleetSnapshot(ctx, envelope);
+}
+async function getFleets(ctx, addresses, options) {
+  requireGameAddress(ctx);
+  const envelopes = await ctx.data.readMany(fleetAccountDefinition, addresses, options);
+  const requiredEnvelopes = envelopes.map((envelope, index) => {
+    if (envelope === void 0) {
+      throw new AccountNotFoundError("fleet", addresses[index]);
+    }
+    return envelope;
+  });
+  return Object.freeze(await Promise.all(requiredEnvelopes.map((envelope) => toFleetSnapshot(ctx, envelope))));
 }
 async function maybeGetFleet(ctx, address2, options) {
   requireGameAddress(ctx);
@@ -53362,6 +53380,47 @@ function createSageClient(options) {
   });
 }
 
+// src/game/fleet-lookup.ts
+var MAX_FALLBACK_FLEETS = 500;
+var FALLBACK_BATCH_SIZE = 25;
+async function readFleetsTolerantly(reads) {
+  try {
+    const fleets2 = await reads.readAll();
+    return { fleets: fleets2.map((fleet) => reads.summarize(fleet)), unreadableFleetCount: 0 };
+  } catch (error2) {
+    if (!reads.isUnreadable(error2)) throw error2;
+  }
+  const addresses = [...new Set(await reads.discoverAddresses())];
+  if (addresses.length > MAX_FALLBACK_FLEETS) {
+    throw new Error(
+      `This profile owns ${addresses.length} fleet accounts, more than the ${MAX_FALLBACK_FLEETS} this node reads one by one. Read single fleets by fleetAddress instead.`
+    );
+  }
+  const fleets = [];
+  let unreadableFleetCount = 0;
+  for (let start = 0; start < addresses.length; start += FALLBACK_BATCH_SIZE) {
+    const batch = addresses.slice(start, start + FALLBACK_BATCH_SIZE);
+    try {
+      const read = await reads.readMany(batch);
+      fleets.push(...read.map((fleet) => reads.summarize(fleet)));
+      continue;
+    } catch (error2) {
+      if (!reads.isUnreadable(error2)) throw error2;
+    }
+    const settled = await Promise.allSettled(batch.map((address2) => reads.readOne(address2)));
+    for (const outcome of settled) {
+      if (outcome.status === "fulfilled") {
+        fleets.push(reads.summarize(outcome.value));
+      } else if (reads.isUnreadable(outcome.reason)) {
+        unreadableFleetCount += 1;
+      } else {
+        throw outcome.reason;
+      }
+    }
+  }
+  return { fleets, unreadableFleetCount };
+}
+
 // src/profile/audit.ts
 var THIRTY_DAYS_SECONDS = 30n * 24n * 60n * 60n;
 var MEMBERSHIP_PERMISSIONS = /* @__PURE__ */ new Set([
@@ -53433,6 +53492,20 @@ function auditProfileKeys(input, nowMs = Date.now()) {
 }
 
 // src/game/live.ts
+var FLEET_DISCRIMINATOR3 = new Uint8Array([74, 178, 149, 158, 182, 52, 120, 94]);
+var FLEET_OFFSETS = { discriminator: 0n, game: 10n, owner: 42n };
+function toSummary(fleet) {
+  return summarizeFleet({
+    address: fleet.address,
+    name: fleet.name,
+    ownerProfile: fleet.ownerProfile.address,
+    state: fleet.state,
+    ships: fleet.ships
+  });
+}
+function isUndecodableAccount(error2) {
+  return typeof error2 === "object" && error2 !== null && error2.code === "ACCOUNT_DECODE_FAILED";
+}
 function asAddress(value, label) {
   try {
     return address(value.trim());
@@ -53442,10 +53515,12 @@ function asAddress(value, label) {
 }
 function createGameReaders(config2) {
   let sage;
+  let solanaRpc;
+  const rpc = () => solanaRpc ??= createSolanaRpc(config2.zinkRpcUrl);
   const client = () => {
     sage ??= createSageClient({
       cluster: config2.cluster,
-      rpc: createSolanaRpc(config2.zinkRpcUrl)
+      rpc: rpc()
     });
     return sage;
   };
@@ -53473,28 +53548,49 @@ function createGameReaders(config2) {
       const sageClient = client();
       if (query.fleetAddress) {
         const fleet = await sageClient.fleets.get(asAddress(query.fleetAddress, "fleetAddress"));
-        const summary = summarizeFleet({
-          address: fleet.address,
-          name: fleet.name,
-          ownerProfile: fleet.ownerProfile.address,
-          state: fleet.state,
-          ships: fleet.ships
-        });
+        const summary = toSummary(fleet);
         if (query.profileAddress && summary.ownerProfile !== query.profileAddress.trim()) {
           throw new UserInputError("That fleet is not owned by the given profile.");
         }
-        return [summary];
+        return { fleets: [summary], unreadableFleetCount: 0 };
       }
-      const fleets = await sageClient.fleets.byOwner(asAddress(query.profileAddress ?? "", "profileAddress"));
-      return fleets.map(
-        (fleet) => summarizeFleet({
-          address: fleet.address,
-          name: fleet.name,
-          ownerProfile: fleet.ownerProfile.address,
-          state: fleet.state,
-          ships: fleet.ships
-        })
-      );
+      const owner = asAddress(query.profileAddress ?? "", "profileAddress");
+      const context = sageClient.context;
+      return readFleetsTolerantly({
+        readAll: () => sageClient.fleets.byOwner(owner),
+        discoverAddresses: async () => {
+          const game = context.game;
+          if (game === void 0) throw new Error("The SAGE client has no Game configured.");
+          const base58 = getBase58Decoder();
+          const encoder = getAddressEncoder();
+          const accounts = await rpc().getProgramAccounts(context.programs.sage, {
+            encoding: "base64",
+            dataSlice: { offset: 0, length: 0 },
+            filters: [
+              {
+                memcmp: {
+                  offset: FLEET_OFFSETS.discriminator,
+                  bytes: base58.decode(FLEET_DISCRIMINATOR3),
+                  encoding: "base58"
+                }
+              },
+              { memcmp: { offset: FLEET_OFFSETS.game, bytes: base58.decode(encoder.encode(game)), encoding: "base58" } },
+              { memcmp: { offset: FLEET_OFFSETS.owner, bytes: base58.decode(encoder.encode(owner)), encoding: "base58" } }
+            ]
+          }).send();
+          return accounts.map((account) => account.pubkey);
+        },
+        readMany: (addresses) => getFleets(context, addresses),
+        readOne: (fleetAddress) => sageClient.fleets.get(fleetAddress),
+        isUnreadable: isUndecodableAccount,
+        summarize: (fleet) => {
+          const summary = toSummary(fleet);
+          if (summary.ownerProfile !== owner) {
+            throw new Error("A discovered fleet did not match the requested owner profile.");
+          }
+          return summary;
+        }
+      });
     },
     async auditProfile(profileAddress) {
       const profile = await client().profiles.get(asAddress(profileAddress, "profileAddress"));

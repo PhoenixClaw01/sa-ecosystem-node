@@ -91,7 +91,7 @@ Omitted optional fields use the defaults in the table. Unknown extra fields are 
 | Tool | Fields |
 |---|---|
 | `list_star_systems` | `limit` optional integer, 1 to 500. Default 100 |
-| `get_fleet` | `fleetAddress` or `profileAddress`. At least one is required |
+| `get_fleet` | `fleetAddress` or `profileAddress`. At least one is required. Returns `fleets` and `unreadableFleetCount` (owned fleet accounts that could not be decoded and were skipped) |
 | `profile_key_audit` | `profileAddress` |
 | `player_legacy` | `address`, 32 to 44 characters |
 | `player_story` | `address`, 32 to 44 characters |

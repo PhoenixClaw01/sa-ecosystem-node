@@ -126,13 +126,19 @@ export function createNodeServer(deps: NodeDeps, config: Config): McpServer {
         if (!fleetAddress && !profileAddress) {
           throw new UserInputError("Provide fleetAddress or profileAddress.");
         }
-        const fleets = await deps.getFleet({ fleetAddress, profileAddress });
+        const { fleets, unreadableFleetCount } = await deps.getFleet({ fleetAddress, profileAddress });
         return jsonResult({
           readOnly: true,
           cluster: config.cluster,
           rpc: redactRpcUrl(config.zinkRpcUrl),
           disclaimer: DISCLAIMER,
           fleets,
+          unreadableFleetCount,
+          ...(unreadableFleetCount > 0
+            ? {
+                note: `${unreadableFleetCount} fleet account(s) owned by this profile could not be decoded by the pinned game bindings and were skipped.`,
+              }
+            : {}),
         });
       } catch (error) {
         return failure(error);

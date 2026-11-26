@@ -4,7 +4,7 @@ A read-only ecosystem node inspired by Star Atlas. It is an MCP server anyone ca
 
 This is not an ATMTA product, and the product name is not Star Atlas. It holds no funds, no game keys, and no Council keys. The server does not sign, and it does not write to any chain.
 
-**Status:** public v1.0.0. Game reads use the z.ink test realm. Treasury, proposals, and player records use public mainnet data. Licensed under [Apache-2.0](LICENSE) ([NOTICE](NOTICE)). Hub listings, guild records, descriptions, and lore are CC BY 4.0, as the hub repository states. Each project keeps the rights to its own name and logo.
+**Status:** public v1.0.1. Game reads use the z.ink test realm. Treasury, proposals, and player records use public mainnet data. Licensed under [Apache-2.0](LICENSE) ([NOTICE](NOTICE)). Hub listings, guild records, descriptions, and lore are CC BY 4.0, as the hub repository states. Each project keeps the rights to its own name and logo.
 
 The public node is [https://sa-ecosystem-node-dashboard.vercel.app](https://sa-ecosystem-node-dashboard.vercel.app) (Vercel project `sa-ecosystem-node-dashboard`, separate from the DAO Council preview). `/` on that site is the DAO dashboard front page. It links the live MCP Playground (`/playground/`) and the listings page (`/plain/`). The public hub is [sa-ecosystem-hub](https://github.com/PhoenixClaw01/sa-ecosystem-hub). Governance notes are in [phoenix-gate](https://github.com/PhoenixClaw01/phoenix-gate).
 
@@ -40,7 +40,7 @@ Public RPC URLs have safe defaults (`https://testnet-rpc.z.ink` for game data). 
 | Tool | What it does |
 |---|---|
 | `list_star_systems` | Star systems on the z.ink test realm via [`@aephia/atlas-kit`](https://www.npmjs.com/package/@aephia/atlas-kit) (`zink-ptr`) |
-| `get_fleet` | One fleet by address, or the fleets owned by a profile |
+| `get_fleet` | One fleet by address, or the fleets owned by a profile. A profile read skips fleet accounts the pinned game bindings cannot decode and reports them as `unreadableFleetCount` |
 | `profile_key_audit` | Keys on a profile: scope, expiry, decoded permissions, heuristic risk flags |
 | `player_legacy` | Public mainnet record for a wallet or a player profile: profiles, creation date, faction enlistment, SAGE fleets still on the accounts, signature bands, and first and last activity. The read runs on the server |
 | `player_story` | Opt-in plain-language story built from that public record. The wallet signs a fixed sentence, published as a `story-optin` hub update. Without a valid unrevoked opt-in the tool returns `not opted in` and does not tell the story. Each claim cites a chain source. The story text has no prices and no call to action |

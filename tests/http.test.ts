@@ -15,7 +15,7 @@ const deps: NodeDeps = {
     return { total: 0, systems: [] };
   },
   async getFleet() {
-    return [];
+    return { fleets: [], unreadableFleetCount: 0 };
   },
   async auditProfile(profileAddress) {
     return {
