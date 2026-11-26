@@ -26,7 +26,7 @@ export interface FleetSummary {
 }
 
 export function summarizeGalaxyActivity(systems: readonly StarSystemSummary[]) {
-  const levels: Record<string, number> = {};
+  const levels: Record<string, number> = Object.create(null);
   let starbaseCount = 0;
   let connectionCount = 0;
   let celestialBodyCount = 0;
