@@ -4,6 +4,7 @@ Mirrors section 15 of [SPEC.md](SPEC.md). Edit both in the same PR.
 
 | Version | Date | Change | By |
 |---|---|---|---|
+| v0.2.13 (draft) | 2026-11-26 | C7 is implemented: a signer set may list `kinds`. A set without `kinds` is unchanged. `claim` counts only for a player claim action. M6 is not switched. The switch steps are in `docs/M6-SWITCH-DAY.md`. No live signer set changed. | Phoenix agent |
 | v0.2.12 (draft) | 2026-11-16 | Checker v0 also verifies role `collaborator`. A collaborator may release, supersede, or change a claim, deliverable, or verify row only when they originally authored it. A repo-owner may do so for any row. Placeholder `example` rows never verify. | Phoenix agent |
 | v0.2.11 (draft) | 2026-11-16 | Checker v0 verifies only role `repo-owner`. Placeholder `example` rows never verify, so they cannot release or supersede a claim. The job summary keeps field text in a code span. | Phoenix agent |
 | v0.2.10 (draft) | 2026-11-16 | Checker v0 is built (`protocol/h2h/checker`, `known-accounts.json`, `.github/workflows/h2h-check.yml`). SPEC §7.7 pins the claim, deliverable, and verify fields the ledger reads. An allowlist miss is unverified and is not a claim. The workflow writes the job summary only. | Phoenix agent |

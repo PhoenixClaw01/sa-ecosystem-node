@@ -1,6 +1,6 @@
 # Trust architecture: who signs what, and the reputation bridge
 
-**Open draft v0.1.5.** Versioned. Meant to be amended through the same propose-a-change process as the H2H spec ([`h2h/SPEC.md`](h2h/SPEC.md) §13).  
+**Open draft v0.1.6.** Versioned. Meant to be amended through the same propose-a-change process as the H2H spec ([`h2h/SPEC.md`](h2h/SPEC.md) §13).  
 **Drafted:** Tuesday 2026-11-10, 1:15 PM AST (UTC-4), by Phoenix Collective's agent, for the Phoenix steward to review. Updated 2026-11-12: the `reputation-link` kind is built. Migration M5 is live. M6 is not.  
 **Status:** open draft, proposed for this repo. Companion to the H2H spec ([`h2h/SPEC.md`](h2h/SPEC.md)), which links here. Amend it with an issue and a PR.  
 **Inspected read-only:** `PhoenixClaw01/sa-ecosystem-node` @ `6bef469b` (2026-11-10, 10:54 AM AST); `PhoenixClaw01/sa-ecosystem-hub` @ `f064f18d` (the pre-M5 pin and rollback target). Live signing state re-checked on the public MCP on 2026-11-11 after M5.
@@ -13,7 +13,7 @@
 
 **What is live today.** Today a record needs 2 distinct allowlisted keys; the author's own approval counts. The Phoenix stack's agent record key `G2Ph…` authors the 55 listing and guild records. A second Phoenix agent record key, Phoenix reviewer (`K2`, `AANz…gH`), is the second approval. The production node trusts the `agents` signer set. The public MCP has 24 read-only tools, and the H2H feeds and card are live. A third key (`EU7z…`) is on the allowlist and unused. The player wallet stays on the allowlist and is not the second approval on these everyday records. The verifier treats an agent record key and a wallet the same way: ed25519 on the allowlist. The count is distinct keys, not stacks.
 
-**Migration M5 is live as of 2026-11-11.** Phoenix reviewer (`K2`, `AANz…gH`) is the second approval on everyday records. The `agents` signer set is in `hub/signers/agents.json`, and the production node uses it. The player wallet stays on the allowlist and is meant only for things players own; limiting it to player records is planned for M6 after a 7-day soak, once kind-scoped signer sets are built (C7, not live). Pre-M5 approvals from that wallet are kept as provenance (H2H §17). A cross-stack countersign is an optional trust level (`single-stack` vs `multi-stack` verified), never required. Showing that trust level is code item C2, not built. `c4-anchor` and `community-tool` are proposed kinds. `reputation-link` is built as a kind. Limiting a signer set to it is M6, which is not live. Code items C5 and C6 are built; C1–C4 and C7 are not.
+**Migration M5 is live as of 2026-11-11.** Phoenix reviewer (`K2`, `AANz…gH`) is the second approval on everyday records. The `agents` signer set is in `hub/signers/agents.json`, and the production node uses it. The player wallet stays on the allowlist and is meant only for things players own; limiting it to player records is planned for M6 after a 7-day soak, C7 is implemented; M6 is not switched. Pre-M5 approvals from that wallet are kept as provenance (H2H §17). A cross-stack countersign is an optional trust level (`single-stack` vs `multi-stack` verified), never required. Showing that trust level is code item C2, not built. `c4-anchor` and `community-tool` are proposed kinds. `reputation-link` is built as a kind. Limiting a signer set to it is M6, which is not live. Code items C5, C6, and C7 are built; C1–C4 are not. Live signer sets stay unscoped.
 
 | Layer | Signer | Why |
 |---|---|---|
@@ -25,7 +25,7 @@ No record is signed twice by both an agent record key and a wallet "to be safe".
 
 **Never wait on another stack.** That is the live rule: the Phoenix stack's own two agent record keys are enough to publish everyday records. Today those keys are `G2Ph…` and Phoenix reviewer (`K2`). Each record would show a computed **trust level** once C2 exists: `single-stack` ("Phoenix-approved"), or `multi-stack` ("multi-stack verified") once another stack appends a countersign. Countersigns can be added at any time, without re-signing. The trust level is never a gate.
 
-**The player wallet** stays on the allowlist. **Planned, not live:** it is scoped to the player-tools side (fleet history, `story-optin`, and `reputation-link`) and does not approve everyday records. Since M5 it is not the second approval on the 55 records. Those earlier signatures are kept as provenance (H2H §17). Limiting it to player records is planned for M6 after a 7-day soak (C7, not live). The `reputation-link` kind does not perform that switch.
+**The player wallet** stays on the allowlist. **Planned, not live:** it is scoped to the player-tools side (fleet history, `story-optin`, and `reputation-link`) and does not approve everyday records. Since M5 it is not the second approval on the 55 records. Those earlier signatures are kept as provenance (H2H §17). Limiting it to player records is planned for M6 after a 7-day soak (C7 is implemented; M6 is not switched). The `reputation-link` kind does not perform that switch.
 
 ---
 
@@ -61,7 +61,7 @@ It also lets **non-players**, such as businesses, guilds and tools, be present i
 
 **Kinds that exist today** (`src/hub/update.ts` `HUB_UPDATE_KINDS`): `announcement`, `proposal-note`, `payment-note`, `status`, `signer-change`, `listing`, `guild`, `story-optin`, `claim` (actions `claim` / `revoke` / `resolve`; subjects `player` / `guild` / `business`), `attestation` (actions `attest` / `revoke`; methods `discord` / `x`), `reputation-link` (actions `link` / `unlink`; scopes `legacy`, `fleets`, `guild`, `story`).
 
-**Kinds proposed here:** `c4-anchor`, `community-tool` (pointer). `reputation-link` is built as a kind. M6, which would limit a `player-tools` set to `story-optin`, player `claim`, and `reputation-link`, is still planned (C7, not live).
+**Kinds proposed here:** `c4-anchor`, `community-tool` (pointer). `reputation-link` is built as a kind. M6, which would limit a `player-tools` set to `story-optin`, player `claim`, and `reputation-link`, is still planned (C7 is implemented; M6 is not switched).
 
 **Shared rules for every row.** Rows describe the target policy. The last column says what is true today.
 - *Two-key approval (live):* Today a record needs 2 distinct allowlisted keys; the author's own approval counts. Two keys from the **same** stack are enough. Today those two keys are `G2Ph…` and Phoenix reviewer (`K2`).
@@ -250,7 +250,7 @@ Solid arrows exist or are directly buildable. Dashed arrows are planned, or depe
 | **D5** | The rate limits in §3 (numbers proposed, enforced by review until code item C3) | Accept as starting values |
 | **D6** | Pursue z.ink hash anchors (Z1) once mainnet RPC is public | Yes in principle. Revisit when there is a date. |
 | **D7** | Should we approach ATMTA or the z.ink team about zProfile read or attest access? You are the one to send it, if anyone. | Not now. Wait for their developer docs. |
-| **D8** | ~~The second key for the 55-record migration~~ **Decided:** a second Phoenix agent record key. Cross-stack countersigns are an optional trust level, never required. The player wallet stays for player-side records. | Decision made. M0–M5 done (M5 live 2026-11-11). Scoping the player wallet to player records is planned for M6 (C7, not live). |
+| **D8** | ~~The second key for the 55-record migration~~ **Decided:** a second Phoenix agent record key. Cross-stack countersigns are an optional trust level, never required. The player wallet stays for player-side records. | Decision made. M0–M5 done (M5 live 2026-11-11). Scoping the player wallet to player records is planned for M6 (C7 is implemented; M6 is not switched). |
 | **D9** | The "Divergence War" / Chronicles context: should it ever become part of the reputation layer? | Out of scope here |
 
 ## 8. Open questions
@@ -267,6 +267,7 @@ Solid arrows exist or are directly buildable. Dashed arrows are planned, or depe
 
 | Version | Date | Change |
 |---|---|---|
+| v0.1.6 (draft) | 2026-11-26 | C7 is implemented: a signer set may list `kinds`. Live sets stay unscoped. M6 is not switched. |
 | v0.1.5 (draft) | 2026-11-12 | `reputation-link` is built as a hub kind: one signed scope per sentence (`legacy`, `fleets`, `guild`, `story`), `legacy` is the smallest, and an unlink hides the link. One counting link per wallet per UTC day. M6 and kind-scoped signer sets (C7) are still planned. No live signer set changed. |
 | v0.1.4 (draft) | 2026-11-11 | Migration M5 is live: the production node trusts the `agents` signer set. All 55 hub records are approved by K2 "Phoenix reviewer" and G2Ph. The public MCP has 24 read-only tools, and the H2H feeds and card are live. The player wallet stays on the allowlist. Limiting it to player records is planned for M6 after a 7-day soak (C7, not live). |
 | v0.1.3 (draft) | 2026-11-11 | Other builders are not named. Examples are Stack A and Stack B. `@aephia/atlas-kit` stays only as a package this node depends on. §1 separates what is live today from what is planned. Revocation matches the node: `signer-change` is forward-only; `HUB_REVOKED_SIGNERS` is retroactive; non-retroactive revocation is code item C4, planned. |

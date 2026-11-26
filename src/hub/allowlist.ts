@@ -193,6 +193,7 @@ export function loadSignerDirectory(sets: readonly SignerSetConfig[]): { sets: S
       id: set.id,
       threshold: set.threshold,
       publicKeys: new Set(signers.map((signer) => signer.publicKey)),
+      ...(set.kinds ? { kinds: [...set.kinds] } : {}),
     };
   });
   return { sets: loaded, labels };

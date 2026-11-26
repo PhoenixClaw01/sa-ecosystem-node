@@ -15,7 +15,7 @@ const scripts = {
 const signerSource = "hub/signers.json";
 const signerSha = createHash("sha256").update(readFileSync(signerSource)).digest("hex");
 // Extra signer-set files shipped beside hub/signers.json. Each is copied byte for byte and pinned by sha256.
-const signerSetSources = ["hub/signers/agents.json"];
+const signerSetSources = ["hub/signers/agents.json", "hub/signers/player-tools.json"];
 const signerSetShas = signerSetSources.map((file) => createHash("sha256").update(readFileSync(file)).digest("hex"));
 const banner = [
   `globalThis.__SA_DASHBOARD_SCRIPTS=${JSON.stringify(scripts)};`,
