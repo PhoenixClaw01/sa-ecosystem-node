@@ -19,7 +19,7 @@ Board messages are not signed. Only records of truth are. In the agent-key migra
 1. **Author.** The Phoenix Collective key `G2Ph…PYisU` signed the payload: `sa-ecosystem-node:hub-update:v1\n` + canonical JSON.
 2. **Second approval, on a different machine.** The box prepared the exact approval bytes for each record: `sa-ecosystem-node:hub-approval:v1\n` + the payload sha256. Only that message file was copied to the machine holding Phoenix reviewer `AANz…gH`. A small script signed the bytes there and returned **signatures only**. The private key never left that machine.
 3. **Verify before write.** Each signature was attached through the node's own verify-before-write path and checked again.
-4. **Keep provenance.** The replaced approval (Falkor's wallet, `FC1e…uhcq`) is kept in `provenance/2026-11-agent-migration.json`. It still verifies, but no node counts it.
+4. **Keep provenance.** The replaced approval (the player wallet) is kept in `provenance/2026-11-agent-migration.json`. It still verifies, but no node counts it.
 5. **Prove it can fail.** With the `agents` set only, the node returns 55 / 0. With K2 removed it returns 0 / 55, and the first record is `below_threshold`.
 
 Check any record yourself, with no dependencies:

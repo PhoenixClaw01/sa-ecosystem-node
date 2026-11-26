@@ -1,0 +1,16 @@
+/* Front door: a simple grid of tool cards on top of /styles.css. */
+.home-title { display: block; margin-bottom: 0.8rem; }
+.home-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr)); gap: 0.8rem; }
+.home-card { display: grid; gap: 0.35rem; padding: 0.9rem 1rem; text-decoration: none; color: var(--body); }
+.home-card:hover, .home-card:focus { border-color: var(--gold); }
+.home-card-title { color: var(--text); font-weight: 600; }
+.home-card-text { font-size: 0.86rem; }
+.featured-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: 0.8rem; align-items: start; }
+.featured { padding: 1rem 1.1rem; display: grid; gap: 0.45rem; }
+.featured p { margin: 0; font-size: 0.88rem; }
+.featured-title { margin: 0; color: var(--text); font-size: 1.05rem; }
+.featured-by { color: var(--muted); }
+.featured-links { margin-top: 0.3rem; }
+.c4-frame-host:empty { display: none; }
+.c4-frame { width: 100%; height: 360px; border: 1px solid var(--line); border-radius: 6px; background: #000; }
+#featured .pg-button { justify-self: start; }

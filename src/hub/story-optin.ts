@@ -1,7 +1,7 @@
-import { createPublicKey, verify as cryptoVerify } from "node:crypto";
 import { isIP } from "node:net";
 
 import { base58Decode } from "./base58.js";
+import { verifyEd25519Detached } from "./ed25519-verify.js";
 
 /**
  * Player opt-in carried on a hub update of kind `story-optin`.
@@ -10,7 +10,6 @@ import { base58Decode } from "./base58.js";
  * only publishes the signature. Unknown fields are rejected.
  */
 
-const ED25519_SPKI_PREFIX = Buffer.from("302a300506032b6570032100", "hex");
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 const ADDRESS_PATTERN = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
 /** Normalized https repository URL. The scheme's colon is required. */
@@ -174,17 +173,7 @@ function verifyMessage(message: string, opt: StoryOptIn): boolean {
   } catch {
     return false;
   }
-  if (publicKey.length !== 32 || signature.length !== 64) return false;
-  try {
-    const key = createPublicKey({
-      key: Buffer.concat([ED25519_SPKI_PREFIX, Buffer.from(publicKey)]),
-      format: "der",
-      type: "spki",
-    });
-    return cryptoVerify(null, new TextEncoder().encode(message), key, signature);
-  } catch {
-    return false;
-  }
+  return verifyEd25519Detached(new TextEncoder().encode(message), signature, publicKey);
 }
 
 const RESERVED_HOST_SUFFIXES = ["local", "internal", "home.arpa", "lan", "localdomain", "test", "example", "invalid", "localhost"] as const;

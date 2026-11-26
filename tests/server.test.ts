@@ -44,16 +44,19 @@ const deps: NodeDeps = {
     if (!query.fleetAddress && !query.profileAddress) {
       throw new Error("missing address");
     }
-    return [
-      {
-        address: query.fleetAddress ?? "FleetFromProfile",
-        name: "Ravager",
-        ownerProfile: query.profileAddress ?? "Profile111",
-        stateKind: "idle",
-        state: { kind: "idle" },
-        ships: [],
-      },
-    ];
+    return {
+      fleets: [
+        {
+          address: query.fleetAddress ?? "FleetFromProfile",
+          name: "Ravager",
+          ownerProfile: query.profileAddress ?? "Profile111",
+          stateKind: "idle",
+          state: { kind: "idle" },
+          ships: [],
+        },
+      ],
+      unreadableFleetCount: query.profileAddress === "ProfileWithGaps" ? 2 : 0,
+    };
   },
   async auditProfile(profileAddress) {
     return auditProfileKeys({
@@ -158,6 +161,24 @@ describe("mcp server", () => {
     const auditBody = audit.structuredContent as { keys: { flags: string[]; permissions: string[] }[] };
     expect(auditBody.keys[0]?.permissions).toEqual(["authenticate"]);
     expect(auditBody.keys[0]?.flags).toContain("no_expiry");
+  });
+
+  it("returns readable fleets with an unreadable count and a note", async () => {
+    const client = await connect();
+    const clean = await client.callTool({ name: "get_fleet", arguments: { profileAddress: "Profile111" } });
+    const cleanBody = clean.structuredContent as { fleets: unknown[]; unreadableFleetCount: number; note?: string };
+    expect(clean.isError).toBeFalsy();
+    expect(cleanBody.fleets).toHaveLength(1);
+    expect(cleanBody.unreadableFleetCount).toBe(0);
+    expect(cleanBody.note).toBeUndefined();
+
+    const gaps = await client.callTool({ name: "get_fleet", arguments: { profileAddress: "ProfileWithGaps" } });
+    const gapsBody = gaps.structuredContent as { fleets: unknown[]; unreadableFleetCount: number; note?: string; readOnly: boolean };
+    expect(gaps.isError).toBeFalsy();
+    expect(gapsBody.readOnly).toBe(true);
+    expect(gapsBody.fleets).toHaveLength(1);
+    expect(gapsBody.unreadableFleetCount).toBe(2);
+    expect(gapsBody.note).toContain("2 fleet account(s)");
   });
 
   it("rejects get_fleet when no address is given", async () => {

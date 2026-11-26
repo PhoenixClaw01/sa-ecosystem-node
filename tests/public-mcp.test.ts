@@ -91,7 +91,10 @@ function deps(): NodeDeps {
     },
     async getFleet(query) {
       if (!query.fleetAddress && !query.profileAddress) throw new Error("missing address");
-      return [{ address: query.fleetAddress ?? "Fleet111", name: "Ravager", ownerProfile: query.profileAddress ?? "Profile111", stateKind: "idle", state: { kind: "idle" }, ships: [] }];
+      return {
+        fleets: [{ address: query.fleetAddress ?? "Fleet111", name: "Ravager", ownerProfile: query.profileAddress ?? "Profile111", stateKind: "idle", state: { kind: "idle" }, ships: [] }],
+        unreadableFleetCount: 0,
+      };
     },
     async auditProfile(profileAddress) {
       return auditProfileKeys({

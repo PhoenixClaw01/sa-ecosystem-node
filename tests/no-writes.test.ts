@@ -33,7 +33,10 @@ function isLocalKeyTool(file: string): boolean {
     name === "src/hub/keygen-cli.ts" ||
     name === "src/hub/add-update-cli.ts" ||
     name === "src/hub/claim-cli.ts" ||
-    name === "src/hub/attest-cli.ts"
+    name === "src/hub/attest-cli.ts" ||
+    name === "src/hub/player-flow-cli.ts" ||
+    name === "src/hub/player-exchange.ts" ||
+    name === "src/hub/player-flow-page.ts"
   );
 }
 
@@ -57,6 +60,8 @@ describe("read-only source", () => {
       "src/hub/add-update-cli.ts",
       "src/hub/claim-cli.ts",
       "src/hub/attest-cli.ts",
+      "src/hub/player-flow-cli.ts",
+      "src/hub/player-exchange.ts",
     ]);
     const files = typescriptFiles("src").filter((file) => !local.has(file.split(path.sep).join("/")));
     const importing = files.filter((file) => {

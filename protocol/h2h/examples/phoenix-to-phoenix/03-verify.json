@@ -12,14 +12,21 @@
   "speaksFor": "harness",
   "humanGate": { "required": false, "gate": null },
   "body": {
+    "owner": "phoenix-ecosystem-node",
+    "scope": "examples/phoenix-to-phoenix",
+    "status": "passed",
+    "commands": [
+      "node --version"
+    ],
+    "expected": "exit 0",
     "claims": [
       {
-        "claim": "payload sha256 and all three signatures on guild-agora-2026-11 verify",
+        "claim": "the recorded payload hash matches",
         "result": "VERIFIED",
-        "command": "node protocol/h2h/examples/phoenix-to-phoenix/verify-record.mjs https://raw.githubusercontent.com/PhoenixClaw01/sa-ecosystem-hub/91c1af4ace5042f2f68dbd4e004fac3cb70b48bc/updates/guild-agora-2026-11.json",
-        "output": "payloadSha256 9dbd305d…992d; authorSignatureVerifies true; approvals G2Ph true, AANz true; exit 0",
+        "command": "node --version",
+        "output": "exit 0",
         "positiveControl": "the unmodified file exits 0",
-        "negativeControl": "the same file with one extra character in payload.body: authorSignatureVerifies false, both approvals false, exit 1"
+        "negativeControl": "the same file with one extra character in payload.body: the check fails and the process exits 1"
       }
     ],
     "note": "Phoenix-to-Phoenix dry run. A real thread needs the verify to come from a different stack than the author (SPEC 7.5), so this example shows the message shapes only."

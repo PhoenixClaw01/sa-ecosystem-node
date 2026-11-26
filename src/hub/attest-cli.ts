@@ -1,5 +1,7 @@
 import { randomBytes } from "node:crypto";
-import { readFileSync, writeFileSync } from "node:fs";
+import { chmodSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import path from "node:path";
 import { pathToFileURL } from "node:url";
 
 import {
@@ -18,8 +20,8 @@ import {
   parseSignedHubDocument,
   type SignedHubDocument,
 } from "./update.js";
-import { discordAuthorizeUrl, discordIdentify, discordVerifierConfig } from "./verifier/discord-oauth.js";
-import { bindAttestationState, parseVerifierProof, readAttestationState, type VerifierProof } from "./verifier/proof.js";
+import { discordAuthorizeUrl, discordIdentify, discordPkce, discordVerifierConfig } from "./verifier/discord-oauth.js";
+import { opaqueVerifierState, parseVerifierProof, verifierStateIsOpaque, type VerifierProof } from "./verifier/proof.js";
 import { fetchPostedCode, isStatusUrl } from "./verifier/x-proof.js";
 
 /**
@@ -186,10 +188,12 @@ function discordUrl(argv: readonly string[]): { code: number; stdout: string; st
   const nonce = flag(argv, "--nonce");
   if (!wallet || !nonce) return fail("Pass --wallet and --nonce. The state is bound to both.");
   const salt = base58Encode(randomBytes(16));
-  const state = bindAttestationState({ wallet, nonce, salt });
+  const state = opaqueVerifierState(randomBytes(32));
+  const pkce = discordPkce(randomBytes(32));
+  writeDiscordSession(state, { wallet, nonce, salt, verifier: pkce.verifier });
   return {
     code: 0,
-    stdout: `${discordAuthorizeUrl(config, state)}\n`,
+    stdout: `${discordAuthorizeUrl(config, state, pkce.challenge)}\n`,
     stderr: `State (pass this to discord-code): ${state}\n`,
   };
 }
@@ -200,9 +204,11 @@ async function discordCode(argv: readonly string[]): Promise<{ code: number; std
   const wallet = flag(argv, "--wallet");
   const nonce = flag(argv, "--nonce");
   const state = flag(argv, "--state");
-  const bound = readBoundState(state, wallet, nonce);
+  const bound = takeDiscordSession(state, wallet, nonce);
+  if (bound === "used") return fail("That Discord state was already used.");
   if (!bound) return fail("The state does not match this wallet and nonce.");
-  const identity = await discordIdentify(config, flag(argv, "--code"));
+  const identity = await discordIdentify(config, flag(argv, "--code"), bound.verifier);
+  rmSync(sessionPath(state), { force: true });
   const proof: VerifierProof = {
     v: 1,
     method: "discord",
@@ -233,15 +239,51 @@ async function xCheck(argv: readonly string[]): Promise<{ code: number; stdout: 
     salt,
     wallet,
     nonce,
-    state: bindAttestationState({ wallet, nonce, salt }),
+    state: opaqueVerifierState(randomBytes(32)),
   };
   return writeProof(proof, flag(argv, "--out"));
 }
 
-function readBoundState(state: string, wallet: string, nonce: string): { salt: string } | null {
-  const parsed = readAttestationState(state);
-  if (!parsed || parsed.wallet !== wallet || parsed.nonce !== nonce) return null;
-  return { salt: parsed.salt };
+function sessionPath(state: string): string {
+  if (!verifierStateIsOpaque(state)) throw new Error("The Discord state value is not usable.");
+  return path.join(tmpdir(), "sa-node-discord-oauth", `${state}.json`);
+}
+
+function writeDiscordSession(
+  state: string,
+  session: { wallet: string; nonce: string; salt: string; verifier: string },
+): void {
+  const file = sessionPath(state);
+  mkdirSync(path.dirname(file), { recursive: true });
+  writeFileSync(file, `${JSON.stringify({ v: 1, used: false, ...session })}\n`, { mode: 0o600 });
+  chmodSync(file, 0o600);
+}
+
+function takeDiscordSession(
+  state: string,
+  wallet: string,
+  nonce: string,
+): { salt: string; verifier: string } | "used" | null {
+  let file: string;
+  try {
+    file = sessionPath(state);
+  } catch {
+    return null;
+  }
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(readFileSync(file, "utf8")) as unknown;
+  } catch {
+    return null;
+  }
+  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return null;
+  const record = parsed as Record<string, unknown>;
+  if (record.v !== 1 || typeof record.salt !== "string" || typeof record.verifier !== "string") return null;
+  if (record.wallet !== wallet || record.nonce !== nonce) return null;
+  if (record.used === true) return "used";
+  writeFileSync(file, `${JSON.stringify({ ...record, used: true })}\n`, { mode: 0o600 });
+  chmodSync(file, 0o600);
+  return { salt: record.salt, verifier: record.verifier };
 }
 
 function writeProof(proof: VerifierProof, out: string): { code: number; stdout: string; stderr: string } {

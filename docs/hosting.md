@@ -12,9 +12,9 @@ That project is separate from the DAO Council preview. Its MCP endpoint, home pa
 
 ## Signer sets
 
-`hub.signerSets` is the list of signer sets this node trusts. Each entry is an id, a path to a `{ "v": 1, "signers": [ { "label", "publicKey" } ] }` file, and a threshold. `hub/signers.json` ships with three public keys, and the example config uses threshold 1: Falkor (`FC1eRr99GGJZuc4KZeUivBpbSMGvjcBB839KaEfAuhcq`), GaliaMeta DAC (`EU7zwmY8QP7B9FFUUyMu1eTNkrwuj27NQkgEmNMWreq1`), and Phoenix Collective (Falkor's team) (`G2PhCi6MApcuC6f5o2CDQBWDnJt9hRcozHuuN55PYisU`). A fourth slot may be added later. Point a set at another file only on the machine that runs the node.
+`hub.signerSets` is the list of signer sets this node trusts. Each entry is an id, a path to a `{ "v": 1, "signers": [ { "label", "publicKey" } ] }` file, and a threshold. `hub/signers.json` ships with three public keys, and the example config uses threshold 1: the player wallet, GaliaMeta DAC (`EU7zwmY8QP7B9FFUUyMu1eTNkrwuj27NQkgEmNMWreq1`), and the Phoenix Collective author (`G2PhCi6MApcuC6f5o2CDQBWDnJt9hRcozHuuN55PYisU`). A fourth slot may be added later. Point a set at another file only on the machine that runs the node.
 
-`hub/signers/agents.json` is a second signer file with two Phoenix agent record keys: Phoenix Collective (Falkor's team) (`G2PhCi6MApcuC6f5o2CDQBWDnJt9hRcozHuuN55PYisU`) and Phoenix reviewer (`AANzSFjMzGuKn5gC1YygMsZZGeLUiMM9HAmKH6n2YqgH`). The two keys were made on different machines, and neither holds funds. It is the `agents` set from the agent-key migration in [`protocol/h2h/SPEC.md`](../protocol/h2h/SPEC.md) section 17. **The public node does not use it yet.** It switches only at step M5, which needs the Founder's yes. To trust both files, set:
+`hub/signers/agents.json` is the `agents` signer set from the agent-key migration in [`protocol/h2h/SPEC.md`](../protocol/h2h/SPEC.md) section 17. It has two Phoenix agent record keys: the Phoenix Collective author (`G2PhCi6MApcuC6f5o2CDQBWDnJt9hRcozHuuN55PYisU`) and Phoenix reviewer (`AANzSFjMzGuKn5gC1YygMsZZGeLUiMM9HAmKH6n2YqgH`). The two keys were made on different machines, and neither holds funds. **Since M5 (2026-11-11) the public node trusts this set.** Those two agent keys are the live approvals on everyday records. The default file stays the rollback path. To trust both files, set:
 
     HUB_SIGNER_SETS=[{"id":"default","path":"hub/signers.json","threshold":2},{"id":"agents","path":"hub/signers/agents.json","threshold":2}]
 
@@ -34,7 +34,6 @@ Names and meanings. The public values are the ones set on `sa-ecosystem-node-das
 
 | Name | Meaning | On the public node |
 |---|---|---|
-| `PUBLIC_HOME` | Read by `dashboard/middleware.js` only. The value `plain` answers `/` and `/index.html` with 302 to `/plain/`. Any other value, including unset, serves the file at that path. The MCP server does not read this variable. `GET /` on `npm start` stays the status document | `plain` |
 | `HUB_GIT_REPO` | Public `https` git URL, no username, password, query, or hash. An absolute local path is accepted for a test on your own machine | `https://github.com/PhoenixClaw01/sa-ecosystem-hub` |
 | `HUB_GIT_COMMIT` | Full 40-character lowercase hex commit. The node refuses the hub read if checkout is not this commit | `f064f18db1da60c4f3e562d4064c8f344042e97e` (the commit in live hub-relative logo URLs that day) |
 | `HUB_STORE_MANIFEST` | Path of the manifest inside the commit. Unset reads `hub-manifest.json`, then `manifest.json` only if the first file is missing. Set, it selects that one path | Unset in the example. The public pin matches `hub-manifest.json` at the commit above |
@@ -44,9 +43,9 @@ Names and meanings. The public values are the ones set on `sa-ecosystem-node-das
 | `HUB_REVOKED_SIGNERS` | Comma-separated base58 addresses, or a JSON array. Applied when the process loads config | Not part of the published pin. Empty unless an operator sets it |
 | `HUB_TRUSTED_VERIFIERS` | Verifier public keys. An attestation from one of these keys is `verified`. Any other attestation stays `self-attested, unverified`. Same list shape as `HUB_REVOKED_SIGNERS`. Empty by default | Empty unless an operator sets it. The public page does not print raw handles |
 | `HUB_SIGNERS_PATH` | Single allowlist file when `HUB_SIGNER_SETS` is omitted | The function bundle includes `hub/signers.json`, a byte-for-byte copy of the repository file |
-| `HUB_SIGNER_SETS` | JSON array of `{ "id", "path", "threshold" }`. Overrides the single path. The two-set value is in "Signer sets" above | Not set today, so the node uses one default set at the `HUB_APPROVAL_THRESHOLD` above. The two-set value is planned for step M5 |
+| `HUB_SIGNER_SETS` | JSON array of `{ "id", "path", "threshold" }`. Overrides the single path. The two-set value is in "Signer sets" above | Set since M5 to the default set and the `agents` set. Everyday records meet threshold on the two Phoenix agent keys |
 
-Today a record needs 2 distinct allowlisted keys; the author's own approval counts. Phoenix Collective (`G2PhCi6MApcuC6f5o2CDQBWDnJt9hRcozHuuN55PYisU`) is the author key in `hub/signers.json`. Falkor (`FC1eRr99GGJZuc4KZeUivBpbSMGvjcBB839KaEfAuhcq`) supplies the second. GaliaMeta DAC stays on the allowlist and is not required for that pair.
+Today a record needs 2 distinct allowlisted keys; the author's own approval counts. Since M5 the live pair is the Phoenix Collective author (`G2PhCi6MApcuC6f5o2CDQBWDnJt9hRcozHuuN55PYisU`) and Phoenix reviewer (`AANzSFjMzGuKn5gC1YygMsZZGeLUiMM9HAmKH6n2YqgH`) in `hub/signers/agents.json`. The player wallet stays on the default allowlist in `hub/signers.json` and does not supply that second signature. GaliaMeta DAC stays on the default allowlist and is not required for the agent-key pair.
 
 `HUB_GIT_REPO`, `HUB_GIT_COMMIT`, and `HUB_STORE_MANIFEST_HASH` are set together on the public node. Leave all three unset on a local process and the hub tools return no rows. Do not add a submit tool.
 
@@ -68,7 +67,13 @@ These are not hub pins. They have the same meaning on every host:
 | `MAX_REQUEST_BYTES`, `MAX_RESPONSE_BYTES` | Default 524288 (512 KiB) each |
 | `NODE_CONFIG` | Path of the config file. Default `node.config.json` |
 
-`DISCORD_CLIENT_ID`, `DISCORD_CLIENT_SECRET`, and `DISCORD_REDIRECT_URI` belong to the optional operator command `npm run hub-attest`. The public server does not import that module (`src/hub/verifier/discord-oauth.ts`). Leave the secret off the public project. Do not commit it.
+`DISCORD_CLIENT_ID`, `DISCORD_CLIENT_SECRET`, and `DISCORD_REDIRECT_URI` belong to the optional operator commands `npm run hub-attest` and `npm run hub-player`. The public server does not import that module (`src/hub/verifier/discord-oauth.ts`) or the player exchange (`src/hub/player-exchange.ts`). Leave all three unset and a stock node does not change. Leave the secret off the public project. Do not commit it.
+
+`npm run hub-player -- exchange` listens on `127.0.0.1` only, and only when `DISCORD_REDIRECT_URI` is `http://127.0.0.1:<port>/<path>`. An https redirect still works with `hub-attest discord-url` and `discord-code`. It does not start a public listener. The exchange does not publish a hub file and does not read or write `HUB_SIGNER_SETS`. The operator steps are in [claim-and-verify.md](claim-and-verify.md). An agent does not create the Discord application and does not paste the secret.
+
+## Tool telemetry
+
+Off unless `MCP_TELEMETRY_URL` is set. Unset, the process makes no telemetry request. `MCP_TELEMETRY_URL` applies to the HTTP server and the public MCP handler. The stdio process does not read it and does not send telemetry. The optional variables are `MCP_TELEMETRY_URL`, `MCP_TELEMETRY_KEY`, `MCP_TELEMETRY_ENV`, and `MCP_TELEMETRY_TIMEOUT_MS`. The event records the tool name and a coarse outcome. It does not record wallet addresses, search text, or IP addresses. The table an operator can create, and the privacy rules, are in [telemetry.md](telemetry.md).
 
 ## Local HTTP
 
@@ -121,13 +126,13 @@ The process is still read-only: unknown paths return 404, the body cap is `maxRe
 
 The live public node is project `sa-ecosystem-node-dashboard`. It is separate from the DAO Council preview. Root Directory is `dashboard`. Production branch is `main`. The install command is empty. The function is the committed bundle `dashboard/api/mcp.js` (`npm run build:dashboard-mcp`). `dashboard/vercel.json` includes `hub/signers.json` with the function. That file is a byte-for-byte copy of the repository `hub/signers.json`. The build embeds that file's sha256 in the bundle. The function hashes the allowlist it loads and refuses a mismatch, which is the check that runs when only the bundled copy is on disk. `dashboard/vercel.json` and the root `vercel.json` set `TRUST_PROXY=1` because Vercel overwrites `X-Forwarded-For`. The rate limiter on that function is in memory on each instance. The function has no `git` binary. A pinned hub whose `HUB_GIT_REPO` is a public `github.com` URL is downloaded at `HUB_GIT_COMMIT` over HTTPS. Any other git host still needs `git`, which the Docker image has.
 
-`PUBLIC_HOME=plain` on that project redirects `/` and `/index.html` to `/plain/` with status 302. `/plain/` is the indexable reading page. MCP is `https://sa-ecosystem-node-dashboard.vercel.app/api/mcp`. Discovery is `https://sa-ecosystem-node-dashboard.vercel.app/.well-known/mcp.json`. The function `maxDuration` is 25 seconds. Each MCP request stops at 20 seconds so the client gets a clean timeout. Node.js for the dashboard package is 22.
+`/` on that project is the DAO dashboard front page. `/playground/` is the live MCP Playground. `/plain/` is the indexable reading page. MCP is `https://sa-ecosystem-node-dashboard.vercel.app/api/mcp`. Discovery is `https://sa-ecosystem-node-dashboard.vercel.app/.well-known/mcp.json`. The function `maxDuration` is 25 seconds. Each MCP request stops at 20 seconds so the client gets a clean timeout. Node.js for the dashboard package is 22.
 
 Someone else can deploy their own copy of that same dashboard project:
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/PhoenixClaw01/sa-ecosystem-node&root-directory=dashboard)
 
-A copy does not inherit the public project's environment. Set `PUBLIC_HOME` and the `HUB_*` variables yourself if you want the same home page and the same hub pin.
+A copy does not inherit the public project's environment. Set the `HUB_*` variables yourself if you want the same hub pin.
 
 A repo-root Vercel project still uses `api/mcp.ts` and the root `vercel.json` rewrite of `/mcp`. That is not the live public node. The live project uses Root Directory `dashboard`.
 

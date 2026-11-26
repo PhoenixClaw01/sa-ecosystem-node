@@ -5,6 +5,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { loadConfig } from "../src/config.js";
 import { startHttpServer } from "../src/http.js";
 import type { NodeDeps } from "../src/server.js";
+import { createToolTelemetry } from "../src/telemetry.js";
 import { stubDaoReaders, stubPlayerLegacy } from "./dao-stubs.js";
 
 const deps: NodeDeps = {
@@ -14,7 +15,7 @@ const deps: NodeDeps = {
     return { total: 0, systems: [] };
   },
   async getFleet() {
-    return [];
+    return { fleets: [], unreadableFleetCount: 0 };
   },
   async auditProfile(profileAddress) {
     return {
@@ -70,6 +71,49 @@ describe("local http server", () => {
     const second = await request(`${started.url}/`);
     expect(second.status).toBe(429);
     expect(JSON.parse(second.body)).toMatchObject({ error: "rate_limited", placeholder: true });
+  });
+
+  it("records a 429 rate limit without the client address or request text", async () => {
+    const sent: Record<string, unknown>[] = [];
+    const telemetry = createToolTelemetry({
+      env: {
+        MCP_TELEMETRY_URL: "https://telemetry.example/mcp-tool-calls",
+        MCP_TELEMETRY_ENV: "test",
+      },
+      fetch: (_url, init) => {
+        sent.push(JSON.parse(String(init?.body)) as Record<string, unknown>);
+        return Promise.resolve(new Response(null, { status: 204 }));
+      },
+    });
+    const started = await startHttpServer({
+      config: loadConfig({ HOST: "127.0.0.1", PORT: "0", RATE_LIMIT_MAX: "1", RATE_LIMIT_WINDOW_MS: "60000" }),
+      deps,
+      telemetry,
+    });
+    closeServer = started.close;
+    const wallet = "LeakWallet1111111111111111111111111111111";
+    const body = JSON.stringify({
+      jsonrpc: "2.0",
+      id: 1,
+      method: "tools/call",
+      params: { name: "list_categories", arguments: { query: wallet } },
+    });
+    const headers = {
+      "content-type": "application/json",
+      "user-agent": `SomeClient/1 ${wallet}`,
+      "x-forwarded-for": "203.0.113.44",
+    };
+    const first = await request(`${started.url}/mcp`, headers, body);
+    expect(first.status).not.toBe(429);
+    const second = await request(`${started.url}/mcp`, headers, body);
+    expect(second.status).toBe(429);
+    expect(JSON.parse(second.body)).toMatchObject({ error: "rate_limited" });
+    await telemetry.settled();
+    const denied = sent.find((event) => event.error_class === "rate_limited");
+    expect(denied).toMatchObject({ tool: "unknown", outcome: "error", error_class: "rate_limited", client_family: "unknown" });
+    const encoded = JSON.stringify(sent);
+    expect(encoded).not.toContain(wallet);
+    expect(encoded).not.toContain("203.0.113.44");
   });
 
   it("refuses an MCP response that exceeds the size cap", async () => {

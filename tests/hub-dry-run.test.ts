@@ -25,7 +25,7 @@ import {
 } from "../src/hub/update.js";
 import { READ_ONLY_TOOLS } from "../src/server.js";
 
-const ROLES = ["Falkor", "GaliaMeta DAC", "Phoenix bus", "Phoenix Collective"] as const;
+const ROLES = ["player wallet", "GaliaMeta DAC", "Phoenix bus", "Phoenix Collective"] as const;
 
 interface Wallet {
   label: string;
@@ -150,10 +150,10 @@ describe("hub signer dry run", () => {
       expect(JSON.stringify(emptyRead)).not.toContain(scratch);
 
       const collective = wallets[3];
-      const falkor = wallets[0];
+      const steward = wallets[0];
       const galiameta = wallets[1];
       const bus = wallets[2];
-      if (!collective || !falkor || !galiameta || !bus) throw new Error("missing wallet");
+      if (!collective || !steward || !galiameta || !bus) throw new Error("missing wallet");
 
       const payloadPath = path.join(scratch, "update.json");
       const signedPath = path.join(scratch, "update.signed.json");
@@ -189,12 +189,12 @@ describe("hub signer dry run", () => {
       expect(messageText.startsWith(HUB_APPROVAL_DOMAIN)).toBe(true);
       expect(Buffer.from(messageHex, "hex").equals(Buffer.from(message))).toBe(true);
 
-      const transfer = nacl.sign.detached(new TextEncoder().encode("transfer 1 SOL"), falkor.secretKey);
+      const transfer = nacl.sign.detached(new TextEncoder().encode("transfer 1 SOL"), steward.secretKey);
       const notATransfer = runSignCli([
         "--approve",
         signedPath,
         "--public-key",
-        falkor.publicKey,
+        steward.publicKey,
         "--signature",
         base58Encode(transfer),
         "--out",
@@ -204,7 +204,7 @@ describe("hub signer dry run", () => {
       expect(notATransfer.stdout).toBe("");
       expect(existsSync(path.join(scratch, "transfer.json"))).toBe(false);
 
-      const onePath = attach(signedPath, falkor, "hex", path.join(scratch, "one.json"), message);
+      const onePath = attach(signedPath, steward, "hex", path.join(scratch, "one.json"), message);
       const oneDoc = JSON.parse(readFileSync(onePath, "utf8")) as unknown;
       const oneChecked = verifyHubUpdates([oneDoc], allowlist, 1);
       expect(oneChecked.updates.map((update) => update.approvalCount)).toEqual([1]);
@@ -215,9 +215,9 @@ describe("hub signer dry run", () => {
         "--approve",
         onePath,
         "--public-key",
-        falkor.publicKey,
+        steward.publicKey,
         "--signature",
-        phantomSignMessage(message, falkor.secretKey).hex,
+        phantomSignMessage(message, steward.secretKey).hex,
         "--out",
         path.join(scratch, "again.json"),
       ]);
@@ -285,8 +285,8 @@ describe("hub signer dry run", () => {
       expect(agentAlone.rejected).toEqual([]);
       expect(agentAlone.updates[0]?.selfApproved).toBe(true);
       expect(agentAlone.updates[0]?.approvalCount).toBe(1);
-      const agentAndFalkor = attach(agentPath, falkor, "base64", path.join(scratch, "agent-falkor.json"), message);
-      const mixedDoc = JSON.parse(readFileSync(agentAndFalkor, "utf8")) as unknown;
+      const agentAndSteward = attach(agentPath, steward, "base64", path.join(scratch, "agent-steward.json"), message);
+      const mixedDoc = JSON.parse(readFileSync(agentAndSteward, "utf8")) as unknown;
       const mixed = verifyHubUpdates([mixedDoc], allowlist, 2);
       expect(mixed.rejected).toEqual([{ id: "dry-run-1", reason: "below_threshold" }]);
       const mixedAllowed = verifyHubUpdates([mixedDoc], allowlist, 2, undefined, { allowAuthorApproval: true });
@@ -305,9 +305,9 @@ describe("hub signer dry run", () => {
       expect(thresholdTwoEarly.updates).toEqual([]);
       expect(thresholdTwoEarly.rejected).toEqual([{ id: "dry-run-1", reason: "below_threshold" }]);
 
-      const falkorGaliameta = path.join(scratch, "falkor-galiameta.json");
-      attach(onePath, galiameta, "base64", falkorGaliameta, message);
-      copyUpdate(store, "updates/dry-run-1.json", falkorGaliameta);
+      const stewardGaliameta = path.join(scratch, "steward-galiameta.json");
+      attach(onePath, galiameta, "base64", stewardGaliameta, message);
+      copyUpdate(store, "updates/dry-run-1.json", stewardGaliameta);
       const twoPin = publish(store, ["updates/dry-run-1.json"]);
       const anyTwo = await readPinned(store, twoPin, signersPath, "2");
       expect(anyTwo.updates.map((update) => update.approvalCount)).toEqual([2]);
@@ -336,7 +336,7 @@ describe("hub signer dry run", () => {
       expect(otherRead.updates).toEqual([]);
       expect(otherRead.rejected).toEqual([{ id: "dry-run-1", reason: "below_threshold" }]);
 
-      const good = JSON.parse(readFileSync(falkorGaliameta, "utf8")) as { payload: HubUpdatePayload };
+      const good = JSON.parse(readFileSync(stewardGaliameta, "utf8")) as { payload: HubUpdatePayload };
       const replayPayload = {
         ...good.payload,
         body: "Replay.",
@@ -350,7 +350,7 @@ describe("hub signer dry run", () => {
       ).toBe(0);
       const replayMessage = hubApprovalSigningMessage(replayPayload);
       const replayApproved = attach(
-        attach(replaySigned, falkor, "hex", path.join(scratch, "replay.one.json"), replayMessage),
+        attach(replaySigned, steward, "hex", path.join(scratch, "replay.one.json"), replayMessage),
         galiameta,
         "hex",
         path.join(scratch, "replay.two.json"),
@@ -370,15 +370,15 @@ describe("hub signer dry run", () => {
       expect(runSignCli(["--keypair", outsider.file, "--payload", path.join(scratch, "outsider.json"), "--out", outsiderSigned]).code).toBe(0);
       const outsiderMessage = hubApprovalSigningMessage(outsiderPayload);
       const outsiderApproved = attach(
-        attach(outsiderSigned, falkor, "hex", path.join(scratch, "outsider.one.json"), outsiderMessage),
+        attach(outsiderSigned, steward, "hex", path.join(scratch, "outsider.one.json"), outsiderMessage),
         galiameta,
         "hex",
         path.join(scratch, "outsider.two.json"),
         outsiderMessage,
       );
 
-      copyUpdate(store, "updates/dry-run-1.json", falkorGaliameta);
-      copyUpdate(store, "updates/tampered.json", falkorGaliameta);
+      copyUpdate(store, "updates/dry-run-1.json", stewardGaliameta);
+      copyUpdate(store, "updates/tampered.json", stewardGaliameta);
       const tampered = JSON.parse(readFileSync(path.join(store, "updates/tampered.json"), "utf8")) as { payload: { body: string } };
       tampered.payload.body = "Tampered";
       writeFileSync(path.join(store, "updates/tampered.json"), `${JSON.stringify(tampered, null, 2)}\n`);

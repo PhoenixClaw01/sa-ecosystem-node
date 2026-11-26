@@ -143,7 +143,6 @@ th { color: var(--muted); font-weight: 600; font-size: 0.7rem; text-transform: u
 td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
 tr:last-child td { border-bottom: none; }
 td:first-child { min-width: 230px; }
-td .pip { color: var(--text); font-weight: 600; white-space: nowrap; }
 td .name { color: var(--body); }
 .empty, .q { color: var(--muted); font-style: normal; }
 
@@ -229,31 +228,6 @@ table.compact td:first-child { min-width: 0; }
 .tool-list .mono { flex: none; color: var(--text); }
 .plain-sources { margin: 0.2rem 0; padding-left: 1.1rem; }
 .plain-sources li { margin: 0.35rem 0; }
-button.vote-load {
-  background: transparent; color: var(--gold); border: 1px solid rgba(241, 180, 60, 0.5);
-  border-radius: 4px; padding: 0.25rem 0.5rem; cursor: pointer; font: inherit; font-size: 0.78rem;
-}
-button.vote-load:hover { color: var(--text); }
-
-table.votes { width: 100%; table-layout: fixed; }
-table.votes td, table.votes th { vertical-align: middle; padding: 0.35rem 0.4rem; }
-table.votes td:first-child { min-width: 0; }
-table.votes-main th:nth-child(1), table.votes-main td:nth-child(1) { width: 32%; }
-table.votes-main th:nth-child(2), table.votes-main td:nth-child(2) { width: 20%; }
-table.votes-main th:nth-child(3), table.votes-main td:nth-child(3),
-table.votes-main th:nth-child(4), table.votes-main td:nth-child(4),
-table.votes-main th:nth-child(5), table.votes-main td:nth-child(5) { width: 12%; }
-table.votes-main th:nth-child(6), table.votes-main td:nth-child(6) { width: 12%; }
-table.votes .name, table.votes .vote-status {
-  display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%;
-}
-table.votes .name { color: var(--muted); font-size: 0.75rem; font-weight: 400; }
-table.votes td.num { white-space: nowrap; }
-.vote-table tr.vote-extra { display: none; }
-.vote-table.is-open tr.vote-extra { display: table-row; }
-.votes-more { margin-top: 0.7rem; }
-.pip-line { display: flex; align-items: center; justify-content: space-between; gap: 0.35rem; }
-.pip-line .vote-load { flex: none; }
 
 @media (max-width: 760px) {
   .topbar { flex-direction: column; gap: 0; padding: 0.4rem 0.8rem 0; }
@@ -261,7 +235,6 @@ table.votes td.num { white-space: nowrap; }
   .tabs { margin: 0; overflow-x: auto; flex-wrap: nowrap; }
   .tab { padding: 0.6rem 0.7rem; }
   h1 { font-size: 2rem; }
-  table.votes-main { min-width: 34rem; }
 }
 @media (max-width: 420px) {
   .page-head, main, footer { padding-left: 0.8rem; padding-right: 0.8rem; }

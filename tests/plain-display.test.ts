@@ -812,7 +812,9 @@ describe("plain display privacy", () => {
 
     const publicHtml = htmlFiles(ROOT);
     expect(publicHtml.length).toBeGreaterThan(0);
-    for (const file of publicHtml) {
+    // The front door links the listings page on purpose. No other public page does.
+    const frontDoor = path.join(ROOT, "dashboard/index.html");
+    for (const file of publicHtml.filter((entry) => entry !== frontDoor)) {
       expect(readFileSync(file, "utf8"), file).not.toContain("plain/");
     }
     for (const file of filesNamed(ROOT, "robots.txt")) {

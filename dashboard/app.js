@@ -1107,7 +1107,7 @@
       "<li>Council PIP Tracker: <a href=\"" + esc(cfg.sheetUrl) + "\" target=\"_blank\" rel=\"noopener noreferrer\">Star Atlas DAO Council sheet</a>.</li>" +
       "<li>DAO wallets: " + walletLink(w.treasury, "DAO Treasury") + " and " + walletLink(w.ecosystemFund, "Ecosystem Fund") + ".</li>" +
       "<li>Galaxy proposals and revenue: <a href=\"" + esc(galaxy) + "\" target=\"_blank\" rel=\"noopener noreferrer\">" + esc(galaxy.replace(/^https:\/\//, "")) + "</a>.</li>" +
-      "<li>Treasury history cache, refreshed every few hours.</li>" +
+      "<li>Treasury history cache, from the committed file. This repository does not refresh it on a schedule.</li>" +
       "<li>Read-only <a href=\"#ask\">Star Atlas DAO MCP</a>.</li>" +
       "</ul>";
   }

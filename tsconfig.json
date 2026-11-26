@@ -13,7 +13,8 @@
     "isolatedModules": true,
     "allowJs": true,
     "resolveJsonModule": true,
+    "allowImportingTsExtensions": true,
     "types": ["node"]
   },
-  "include": ["src", "api", "tests", "vitest.config.ts"]
+  "include": ["src", "api", "tests", "vitest.config.ts", "protocol/h2h/checker"]
 }

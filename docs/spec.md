@@ -4,7 +4,7 @@
 
 The product name is **sa-ecosystem-node**. It is not an ATMTA product, and "Star Atlas" is not the product name. The server says so on every read: "Inspired by Star Atlas. Unofficial community read. This node is not affiliated with ATMTA, holds no funds, and holds no game or Council keys."
 
-Version `1.0.0` is `SERVER_VERSION` in `src/version.ts`. The public copy is [https://sa-ecosystem-node-dashboard.vercel.app](https://sa-ecosystem-node-dashboard.vercel.app). Source is [https://github.com/PhoenixClaw01/sa-ecosystem-node](https://github.com/PhoenixClaw01/sa-ecosystem-node) under [Apache-2.0](../LICENSE). Hub text (listings, guild records, descriptions, and lore) is CC BY 4.0, as the hub repository states. Each project keeps the rights to its own name and logo.
+Version `1.0.1` is `SERVER_VERSION` in `src/version.ts`. The public copy is [https://sa-ecosystem-node-dashboard.vercel.app](https://sa-ecosystem-node-dashboard.vercel.app). Source is [https://github.com/PhoenixClaw01/sa-ecosystem-node](https://github.com/PhoenixClaw01/sa-ecosystem-node) under [Apache-2.0](../LICENSE). Hub text (listings, guild records, descriptions, and lore) is CC BY 4.0, as the hub repository states. Each project keeps the rights to its own name and logo.
 
 ## What it is today
 
@@ -14,7 +14,7 @@ It does three jobs:
 
 1. **Read public game and DAO data.** Star systems and fleets come from the z.ink test realm. Treasury balances, proposals, votes, and revenue come from public Solana mainnet and public galaxy JSON. A player lookup reads public mainnet accounts.
 2. **Read a signed hub.** Updates live in a public git repository. Each update is signed by an allowlisted ed25519 key (an agent machine key or a wallet; a player's own wallet for that player's records). The public node shows an update only when the signature checks pass and enough distinct allowlisted keys have approved it.
-3. **Show that hub on a page.** A request for `/` on [https://sa-ecosystem-node-dashboard.vercel.app](https://sa-ecosystem-node-dashboard.vercel.app) redirects to `/plain/`. `/plain/` shows listings, groups, hub updates, search results, and a player lookup as a card grid: one column on phones, two columns from 48rem, three from 68.75rem, and four on very wide screens from 93.75rem (`dashboard/plain/plain.css`). Cards in the grid start collapsed (`<details>` with no `open` attribute). Listings, groups, hub updates, and search each have Expand all, Collapse all, category filter chips, and a sort of A-Z, Newest, or Category (`dashboard/plain/plain.js`). The sort starts at A-Z. Groups are the guild rows from `hub_updates`. The page calls same-origin `/api/mcp` for `list_listings`, `hub_updates`, `search_hub`, `player_legacy`, and `player_story`. Under Listings there is one signed note, "What does signed mean?": "Signed means approved hub signers checked and published this record with their signing keys. It is not an endorsement, it is not proof of ownership, and it does not move money. The business is responsible for its own offer." The one payment line is: "This page does not take payment. Offers link to each business's own page." Each card can show the word Signed. `signedMeaning` is a field on `list_listings` results. The page does not print that field on each card.
+3. **Show that hub on a page.** A request for `/` on [https://sa-ecosystem-node-dashboard.vercel.app](https://sa-ecosystem-node-dashboard.vercel.app) serves `dashboard/index.html`, the DAO dashboard front page: live revenue, treasury and Ecosystem Fund figures, and the node's other tools, from same-origin `/mcp`. A failed read says "Data unavailable" and shows no figure. There is no redirect. `/plain/` shows listings, groups, hub updates, search results, and a player lookup as a card grid: one column on phones, two columns from 48rem, three from 68.75rem, and four on very wide screens from 93.75rem (`dashboard/plain/plain.css`). Cards in the grid start collapsed (`<details>` with no `open` attribute). Listings, groups, hub updates, and search each have Expand all, Collapse all, category filter chips, and a sort of A-Z, Newest, or Category (`dashboard/plain/plain.js`). The sort starts at A-Z. Groups are the guild rows from `hub_updates`. The page calls same-origin `/api/mcp` for `list_listings`, `hub_updates`, `search_hub`, `player_legacy`, and `player_story`. Under Listings there is one signed note, "What does signed mean?": "Signed means approved hub signers checked and published this record with their signing keys. It is not an endorsement, it is not proof of ownership, and it does not move money. The business is responsible for its own offer." The one payment line is: "This page does not take payment. Offers link to each business's own page." Each card can show the word Signed. `signedMeaning` is a field on `list_listings` results. The page does not print that field on each card.
 
 The server does not sign, does not send transactions, and does not hold keys or funds. There is no submit button and no moderation queue in this version.
 
@@ -28,12 +28,12 @@ flowchart LR
   G --> N[sa-ecosystem-node<br/>24 read-only tools]
   C --> N
   H --> N
-  N --> P["/plain/ page"]
+  N --> P["/ front page and /plain/"]
   N --> M[MCP clients]
   Q[Moderation queue<br/>planned] -.-> A[Council wallet or Squads<br/>planned]
   A -.-> K[(Solana or z.ink anchor<br/>planned)]
   S[submit_hub_update<br/>planned] -.-> Q
-  B[Self-claim button<br/>planned] -.-> P
+  B["/plain/claim/ collects a signature<br/>and does not publish"] --> P
 ```
 
 Solid lines are live. Dashed lines are planned and are not in this version. The planned list is at the end of this page.
@@ -44,14 +44,14 @@ Solid lines are live. Dashed lines are planned and are not in this version. The 
 |---|---|
 | Vercel project | `sa-ecosystem-node-dashboard`. This project is separate from the DAO Council preview |
 | Site | [https://sa-ecosystem-node-dashboard.vercel.app](https://sa-ecosystem-node-dashboard.vercel.app) |
-| Home | `PUBLIC_HOME=plain` makes `/` and `/index.html` answer 302 to `/plain/` (`dashboard/middleware.js`) |
+| Home | `/` serves the DAO dashboard front page (`dashboard/index.html`). `/playground/` is the live MCP Playground |
 | Reading page | `/plain/` is indexable. It has no `noindex` tag and no `X-Robots-Tag` |
 | MCP | [https://sa-ecosystem-node-dashboard.vercel.app/api/mcp](https://sa-ecosystem-node-dashboard.vercel.app/api/mcp) |
 | Discovery | [https://sa-ecosystem-node-dashboard.vercel.app/.well-known/mcp.json](https://sa-ecosystem-node-dashboard.vercel.app/.well-known/mcp.json) |
 
 `/plain/` shows listings, groups, hub updates, search results, and a player lookup as a card grid: one column on phones, two columns from 48rem, three from 68.75rem, and four on very wide screens from 93.75rem (`dashboard/plain/plain.css`). Cards in the grid start collapsed (`<details>` with no `open` attribute). Listings, groups, hub updates, and search each have Expand all, Collapse all, category filter chips, and a sort of A-Z, Newest, or Category (`dashboard/plain/plain.js`). The sort starts at A-Z. Groups are the guild rows from `hub_updates`. The page calls same-origin `/api/mcp` for `list_listings`, `hub_updates`, `search_hub`, `player_legacy`, and `player_story`. Under Listings there is one signed note, "What does signed mean?": "Signed means approved hub signers checked and published this record with their signing keys. It is not an endorsement, it is not proof of ownership, and it does not move money. The business is responsible for its own offer." The one payment line is: "This page does not take payment. Offers link to each business's own page." Each card can show the word Signed. `signedMeaning` is a field on `list_listings` results. The page does not print that field on each card. No API key.
 
-Checked on 1 November 2026: `initialize` returned server `sa-ecosystem-node` version `1.0.0`, and `tools/list` returned 22 tools. `list_c4_markers` and `list_community_tools` were added on 11 November 2026, for 24 in the list below. Every one has `readOnlyHint: true`.
+`tools/list` returns 24 read-only tools, including `list_c4_markers` and `list_community_tools`. Every one has `readOnlyHint: true`.
 
 ## Tools
 
@@ -80,7 +80,7 @@ The names are the tools registered in `createNodeServer` (`src/server.ts`) and `
 | `hub_updates` | Signed hub updates from the pinned git commit. Claim records and attestation records are left out |
 | `list_listings` | Signed business listings from that commit. The node does not take payment |
 | `list_c4_markers` | Signed listings and guilds as map markers for a renderer (H2H). No coordinates yet |
-| `list_community_tools` | A curated list of community tools anyone can add to with a PR (H2H) |
+| `list_community_tools` | A curated list of community tools, plus Community developers and Game publisher packages categories, anyone can add to with a PR (H2H). Every row is a pointer only |
 | `claim_status` | Whether a listing or guild name has a claim, and what state that claim is in |
 | `data_health` | Freshness and the last error for the cache, galaxy, the Council sheet, and wallet balances |
 
@@ -91,7 +91,7 @@ Omitted optional fields use the defaults in the table. Unknown extra fields are 
 | Tool | Fields |
 |---|---|
 | `list_star_systems` | `limit` optional integer, 1 to 500. Default 100 |
-| `get_fleet` | `fleetAddress` or `profileAddress`. At least one is required |
+| `get_fleet` | `fleetAddress` or `profileAddress`. At least one is required. Returns `fleets` and `unreadableFleetCount` (owned fleet accounts that could not be decoded and were skipped) |
 | `profile_key_audit` | `profileAddress` |
 | `player_legacy` | `address`, 32 to 44 characters |
 | `player_story` | `address`, 32 to 44 characters |
@@ -108,7 +108,7 @@ Omitted optional fields use the defaults in the table. Unknown extra fields are 
 | `ecofund_limit` | optional `asOf`, `unpaidPips`, `councilOverride` |
 | `treasury_balances` | none |
 | `pip_tracker` | none |
-| `hub_updates` | optional `kind`: `announcement`, `proposal-note`, `payment-note`, `status`, `signer-change`, `listing`, `guild`, `story-optin`, `claim`, or `attestation`. A `claim` or `attestation` filter still returns no rows, because those kinds are removed before the response |
+| `hub_updates` | optional `kind`: `announcement`, `proposal-note`, `payment-note`, `status`, `signer-change`, `listing`, `guild`, `story-optin`, `claim`, `attestation`, or `reputation-link`. A `claim` or `attestation` filter still returns no rows, because those kinds are removed before the response |
 | `list_listings` | optional `stream` (`referral`, `hybrid`, `irl`, `player`), `category`, `status`, `includeExpired` |
 | `list_c4_markers` | optional `kind` (`listing`, `guild`, `all`), `anchored` (boolean), `stream` (a listing stream) |
 | `list_community_tools` | none |
@@ -134,11 +134,11 @@ flowchart TD
   E --> F[The public node is pinned to the commit<br/>and the manifest hash]
   F --> G[list_listings checks the pin,<br/>the signatures, and the threshold]
   G --> H["/plain/ calls list_listings<br/>and shows the row"]
-  X[Self-claim button on /plain/<br/>planned] -.-> H
+  X["/plain/claim/ signed file<br/>a hub editor still commits it"] -.-> D
   Y[submit_hub_update<br/>planned] -.-> D
 ```
 
-On the public node, today a record needs 2 distinct allowlisted keys; the author's own approval counts (`HUB_APPROVAL_THRESHOLD=2`, `HUB_ALLOW_AUTHOR_APPROVAL=true`). The author key shipped in `hub/signers.json` is Phoenix Collective (`G2PhCi6MApcuC6f5o2CDQBWDnJt9hRcozHuuN55PYisU`). Falkor (`FC1eRr99GGJZuc4KZeUivBpbSMGvjcBB839KaEfAuhcq`) supplies the second signature. GaliaMeta DAC (`EU7zwmY8QP7B9FFUUyMu1eTNkrwuj27NQkgEmNMWreq1`) is on the same allowlist and is not required for that pair. The same wallet twice counts once.
+On the public node, today a record needs 2 distinct allowlisted keys; the author's own approval counts (`HUB_APPROVAL_THRESHOLD=2`, `HUB_ALLOW_AUTHOR_APPROVAL=true`). Since migration M5 the live set is the two Phoenix agent keys in `hub/signers/agents.json`: the Phoenix Collective author (`G2PhCi6MApcuC6f5o2CDQBWDnJt9hRcozHuuN55PYisU`) and Phoenix reviewer (`AANzSFjMzGuKn5gC1YygMsZZGeLUiMM9HAmKH6n2YqgH`). The player wallet stays on the default allowlist in `hub/signers.json` and does not supply that second signature. GaliaMeta DAC (`EU7zwmY8QP7B9FFUUyMu1eTNkrwuj27NQkgEmNMWreq1`) is on that default allowlist and is not required for the agent-key pair. The same key twice counts once.
 
 The node does not upload images. A curator commits a png, jpeg, or webp into the hub. `/plain/` loads only that hub-relative path, resolved to `raw.githubusercontent.com` at the pinned commit.
 
@@ -164,7 +164,7 @@ Schema `sa-ecosystem-node.hub-update.v1`. One file is `{ "payload", "signature",
 
 Payload fields: `v` (1), `id`, `created_at` (UTC with milliseconds), `author` (base58 address), `kind`, `body`, `refs` (`pip` and `txs`), `prev`. `prev` is null on the first update. After that it is the sha256 hex of the previous payload's canonical JSON.
 
-`kind` is `announcement`, `proposal-note`, `payment-note`, `status`, `signer-change`, `listing`, `guild`, `story-optin`, `claim`, or `attestation`.
+`kind` is `announcement`, `proposal-note`, `payment-note`, `status`, `signer-change`, `listing`, `guild`, `story-optin`, `claim`, `attestation`, or `reputation-link`.
 
 Canonical JSON sorts keys and has no whitespace. The author signs the UTF-8 bytes of `sa-ecosystem-node:hub-update:v1\n` plus that JSON. Each approver signs the UTF-8 bytes of `sa-ecosystem-node:hub-approval:v1\n` plus the sha256 hex of that JSON. Signatures are detached ed25519, stored as base58. An approval is the bytes a Solana wallet signs with `signMessage`. It is not a transaction and it moves no funds.
 
@@ -208,6 +208,22 @@ Revoke sentence:
 
 `<id>` is the normalized `HUB_GIT_REPO` URL, such as `https://github.com/owner/repo`. It is not the manifest file name. An allow counts only when its date is strictly after the latest revoke date. A future date stays in the chain and does not count until that UTC date. Without a valid unrevoked opt-in, `player_story` returns not opted in. If the hub URL is missing or not a valid https repository, the tool returns not available. Story sentences do not copy names or prices. Listings stay in a separate `listings` field. The steps for a claim are in [claim-and-verify.md](claim-and-verify.md).
 
+### Reputation link
+
+Kind `reputation-link`, object `reputationLink`: `action` (`link` or `unlink`), `wallet`, `profile` (a public profile name or a profile address), `date` (`YYYY-MM-DD`), and `signature` (the player's detached signature, base58). The scope is not a field. A reputation link is signed only by the player's own wallet. An agent may prepare the message. It must never sign it for the player.
+
+Link sentence, one scope:
+
+`I link wallet <address> to public profile <profile> on hub <id>. Scope: legacy. Date: <YYYY-MM-DD>.`
+
+`Scope` is `legacy`, `fleets`, `guild`, or `story`. `legacy` is the smallest. A link does not grant any other scope.
+
+Unlink sentence:
+
+`I unlink wallet <address> from public profile <profile> on hub <id>. Date: <YYYY-MM-DD>.`
+
+`<id>` is the normalized `HUB_GIT_REPO` URL. An unlink hides every scope for that wallet and profile from that date on, including a link dated the same day. The records stay in the chain. `hub_updates` sets `consent` to `valid` or `inert`, and `linkShown` to true only for a scope still on display. One counting link per wallet per UTC day. A second link that day stays in the chain and does not add a scope. A future date does not count until that UTC date. This kind does not change signer sets. M6 is still planned. The operator steps are in [reputation-link.md](reputation-link.md).
+
 ### Claim and attestation
 
 Kind `claim` binds one public key (for a player, their own wallet) to one listing id or one guild name. Kind `attestation` is a verifier's statement about Discord or X. Neither kind is returned by `hub_updates`. `claim_status` returns the claim state. The field list, the states, and the commands are in [claim-and-verify.md](claim-and-verify.md).
@@ -229,7 +245,7 @@ Each request has a 20 second timeout (`REQUEST_TIMEOUT_MS` in `src/public-mcp.ts
 
 ## Run it yourself
 
-[hosting.md](hosting.md) covers a laptop, Docker, stdio for Claude Desktop and Cursor, and other hosts. A local `npm start` serves MCP at `http://127.0.0.1:8787/mcp`. `GET /` on that process is a status document. It does not redirect to `/plain/`, because `PUBLIC_HOME` is read only by the dashboard middleware.
+[hosting.md](hosting.md) covers a laptop, Docker, stdio for Claude Desktop and Cursor, and other hosts. A local `npm start` serves MCP at `http://127.0.0.1:8787/mcp`. `GET /` on that process is a status document. It does not serve the dashboard front page.
 
 Anyone can run a node. Nodes do not share a database. Two nodes agree on hub rows when they pin the same commit, the same manifest hash, and the same signer rules. They can differ on treasury history until both have refreshed the cache.
 
@@ -243,10 +259,10 @@ Nothing in this section is an MCP tool, a route, or a button in v1.0.0. The type
 | Moderation queue | No queue. An update is public when it is in the pinned commit and the signature checks pass |
 | Council wallet or Squads signature as the approval | Approval is a detached signature from the node's allowlist (`hub/signers.json`), at the configured threshold. Squads in this version is a read-only decode of the two published treasury multisigs |
 | On-chain anchors for update hashes, on Solana mainnet or z.ink | The pin is the git commit plus the manifest sha256. There is no memo and no anchor account |
-| Self-claim button on `/plain/` | A person signs a claim with the `hub-claim` command. A hub editor commits that file. The page has no claim form |
+| Submitting a claim from `/plain/claim/` without a hub editor | `/plain/claim/` collects the wallet signature and does not publish. A hub editor still commits the file. `POST /submit` remains 404 |
 | Weekly pack, embed widget, and a DAO-tier feed for an ATMTA-hosted dashboard | Not built. `/plain/` is the public page |
 | Application form and a roster of approved ecosystems per category | `list_categories` returns ids and `members: "unknown"` |
-| Agent record keys vouched per stack (one PR to a signer-set file), a shown trust level (`single-stack` / `multi-stack`), per-key rate limits, kind-scoped signer sets | Not implemented. Drafted in [protocol/TRUST-ARCHITECTURE.md](../protocol/TRUST-ARCHITECTURE.md) and [protocol/h2h/SPEC.md](../protocol/h2h/SPEC.md) Appendix A (code items C1–C7). No wallet delegation is planned. The author signs with the key that matches `author` |
+| Agent record keys vouched per stack (one PR to a signer-set file), a shown trust level (`single-stack` / `multi-stack`), per-key rate limits | Trust level and rate limits are not implemented (C2, C3). Kind-scoped signer sets (C7) are implemented. The live sets do not use `kinds`. M6, which would scope the player wallet, is prepared and not switched. Drafted in [protocol/TRUST-ARCHITECTURE.md](../protocol/TRUST-ARCHITECTURE.md) and [protocol/h2h/SPEC.md](../protocol/h2h/SPEC.md) Appendix A. No wallet delegation is planned. The author signs with the key that matches `author` |
 | Revoking a whole signer group in one step | `HUB_REVOKED_SIGNERS` drops individual public keys when the process loads config |
 | Cloudflare Workers entry | Not included. The hub reader and the HTTP server use Node APIs. See [hosting.md](hosting.md) |
 | Moving this repository to a Council-owned GitHub organization | The public source repository is `PhoenixClaw01/sa-ecosystem-node` |

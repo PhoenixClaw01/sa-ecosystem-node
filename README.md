@@ -4,13 +4,13 @@ A read-only ecosystem node inspired by Star Atlas. It is an MCP server anyone ca
 
 This is not an ATMTA product, and the product name is not Star Atlas. It holds no funds, no game keys, and no Council keys. The server does not sign, and it does not write to any chain.
 
-**Status:** public v1.0.0. Game reads use the z.ink test realm. Treasury, proposals, and player records use public mainnet data. Licensed under [Apache-2.0](LICENSE) ([NOTICE](NOTICE)). Hub listings, guild records, descriptions, and lore are CC BY 4.0, as the hub repository states. Each project keeps the rights to its own name and logo.
+**Status:** public v1.0.1. Game reads use the z.ink test realm. Treasury, proposals, and player records use public mainnet data. Licensed under [Apache-2.0](LICENSE) ([NOTICE](NOTICE)). Hub listings, guild records, descriptions, and lore are CC BY 4.0, as the hub repository states. Each project keeps the rights to its own name and logo.
 
-The public node is [https://sa-ecosystem-node-dashboard.vercel.app](https://sa-ecosystem-node-dashboard.vercel.app) (Vercel project `sa-ecosystem-node-dashboard`, separate from the DAO Council preview). `/` on that site redirects to `/plain/`. The public hub is [sa-ecosystem-hub](https://github.com/PhoenixClaw01/sa-ecosystem-hub). Governance notes are in [phoenix-gate](https://github.com/PhoenixClaw01/phoenix-gate).
+The public node is [https://sa-ecosystem-node-dashboard.vercel.app](https://sa-ecosystem-node-dashboard.vercel.app) (Vercel project `sa-ecosystem-node-dashboard`, separate from the DAO Council preview). `/` on that site is the DAO dashboard front page. It links the live MCP Playground (`/playground/`) and the listings page (`/plain/`). The public hub is [sa-ecosystem-hub](https://github.com/PhoenixClaw01/sa-ecosystem-hub). Governance notes are in [phoenix-gate](https://github.com/PhoenixClaw01/phoenix-gate).
 
-This deployment uses threshold 2 with `HUB_ALLOW_AUTHOR_APPROVAL=true`. Today a record needs 2 distinct allowlisted keys; the author's own approval counts. The author is Phoenix Collective and the second approval is Falkor (`FC1e`). `HUB_GIT_REPO`, `HUB_GIT_COMMIT`, and `HUB_STORE_MANIFEST_HASH` are set. On 1 November 2026 the pinned commit was `f064f18db1da60c4f3e562d4064c8f344042e97e`.
+This deployment uses threshold 2 with `HUB_ALLOW_AUTHOR_APPROVAL=true`. Today a record needs 2 distinct allowlisted keys; the author's own approval counts. Since M5 the live approvals are two Phoenix agent keys in `hub/signers/agents.json`: the Phoenix Collective author and Phoenix reviewer. The player wallet stays on the default allowlist and is not that second approval. `HUB_GIT_REPO`, `HUB_GIT_COMMIT`, and `HUB_STORE_MANIFEST_HASH` are set. On 1 November 2026 the pinned commit was `f064f18db1da60c4f3e562d4064c8f344042e97e`.
 
-- [Spec v1.0.0](docs/spec.md)
+- [Spec v1.0.1](docs/spec.md)
 - [Hosting](docs/hosting.md)
 - [Decentralization](docs/decentralization.md) (what is live, then the later design)
 - [Claim and verify](docs/claim-and-verify.md)
@@ -40,7 +40,7 @@ Public RPC URLs have safe defaults (`https://testnet-rpc.z.ink` for game data). 
 | Tool | What it does |
 |---|---|
 | `list_star_systems` | Star systems on the z.ink test realm via [`@aephia/atlas-kit`](https://www.npmjs.com/package/@aephia/atlas-kit) (`zink-ptr`) |
-| `get_fleet` | One fleet by address, or the fleets owned by a profile |
+| `get_fleet` | One fleet by address, or the fleets owned by a profile. A profile read skips fleet accounts the pinned game bindings cannot decode and reports them as `unreadableFleetCount` |
 | `profile_key_audit` | Keys on a profile: scope, expiry, decoded permissions, heuristic risk flags |
 | `player_legacy` | Public mainnet record for a wallet or a player profile: profiles, creation date, faction enlistment, SAGE fleets still on the accounts, signature bands, and first and last activity. The read runs on the server |
 | `player_story` | Opt-in plain-language story built from that public record. The wallet signs a fixed sentence, published as a `story-optin` hub update. Without a valid unrevoked opt-in the tool returns `not opted in` and does not tell the story. Each claim cites a chain source. The story text has no prices and no call to action |
@@ -53,7 +53,7 @@ Public RPC URLs have safe defaults (`https://testnet-rpc.z.ink` for game data). 
 | `list_listings` | Signed business listings from that same pinned store. Filter by stream, category, or status. Expired listings stay hidden unless `includeExpired` is set, and those rows are marked expired. Each row names the signer and includes a plain `signedMeaning` line. An optional `image` is a public png, jpeg, or webp logo covered by the signature. The node does not take payment and does not upload images |
 | `search_hub` | One text query over signed listings and guild listings (names, descriptions, tags) and the display name of a player who opted in. Players who did not opt in are left out. Nothing is uploaded |
 | `list_c4_markers` | H2H feed `h2h.c4-markers.v1`: one marker per current signed listing and guild listing. Every marker is in orbit with no coordinates until a signed `c4-anchor` kind exists. Also `GET /c4-markers.json` |
-| `list_community_tools` | H2H feed `h2h.community-tools.v1`: the curated list in `protocol/h2h/community-tools.json`. Add a tool with one PR. Also `GET /community-tools.json` |
+| `list_community_tools` | H2H feed `h2h.community-tools.v1`: the curated list in `protocol/h2h/community-tools.json`, including the Community developers and Game publisher packages categories. Add a tool with one PR. Every row is a pointer only. Also `GET /community-tools.json` |
 | `claim_status` | Claim state for one listing identity, or for every claim in the pinned hub. Players need a matching player-profile key. Guilds and businesses need a curator countersign. X and Discord stay self-attested unless a trusted verifier attestation is current |
 | `data_health` | Freshness and the last error for the cache, galaxy, the Council sheet, and a Solana balance read |
 | `list_proposals` | Live GET of `https://galaxy.staratlas.com/proposals` |
@@ -76,7 +76,7 @@ Other builders' stacks and their agent harnesses can work with this node over gi
 
 ## Signed hub updates
 
-Schema `sa-ecosystem-node.hub-update.v1`. A document is `{ "payload", "signature", "approvals" }`. The payload fields are `v` (1), `id`, `created_at` (UTC with milliseconds), `author` (base58 Solana address), `kind` (`announcement`, `proposal-note`, `payment-note`, `status`, `signer-change`, `listing`, `guild`, `story-optin`, `claim`, or `attestation`), `body`, `refs` (`pip` and `txs`), and `prev`. A `signer-change` also has `change` (`op` of `add` or `remove`, `publicKey`, and `set`). A `listing` also has `listing`. A `guild` also has `guild`. A `story-optin` also has `storyOptIn`. `prev` is null on the first update. After that it is the sha256 hex of the previous payload's canonical JSON. `approvals` is a list of `{ "publicKey", "signature" }`.
+Schema `sa-ecosystem-node.hub-update.v1`. A document is `{ "payload", "signature", "approvals" }`. The payload fields are `v` (1), `id`, `created_at` (UTC with milliseconds), `author` (base58 Solana address), `kind` (`announcement`, `proposal-note`, `payment-note`, `status`, `signer-change`, `listing`, `guild`, `story-optin`, `claim`, `attestation`, or `reputation-link`), `body`, `refs` (`pip` and `txs`), and `prev`. A `signer-change` also has `change` (`op` of `add` or `remove`, `publicKey`, and `set`). A `listing` also has `listing`. A `guild` also has `guild`. A `story-optin` also has `storyOptIn`. A `reputation-link` also has `reputationLink`. `prev` is null on the first update. After that it is the sha256 hex of the previous payload's canonical JSON. `approvals` is a list of `{ "publicKey", "signature" }`.
 
 Canonical JSON sorts keys and has no whitespace. The author signs the UTF-8 bytes of `sa-ecosystem-node:hub-update:v1\n` plus that canonical JSON. Each approver signs the UTF-8 bytes of `sa-ecosystem-node:hub-approval:v1\n` plus the sha256 hex of the same canonical JSON. Signatures are detached ed25519, stored as base58.
 
@@ -90,7 +90,7 @@ At threshold 1 the author's own approval counts. A verified update has `selfAppr
 
 `HUB_REVOKED_SIGNERS` (or `hub.revokedSigners`) is a local list of signer public keys. It takes effect when the process loads config, without a new hub commit. The key can remain in `hub/signers.json`. An approval from a revoked key does not count. An update whose only valid approvals are from revoked keys is rejected as `revoked_signer`, which is distinct from `unknown_signer`. One non-revoked approval still is not enough when the threshold is 2. Revoking a whole signer group is not implemented.
 
-An approval is a detached ed25519 signature over the approval message above. That is the same byte string a Solana wallet signs with `signMessage` (Phantom signs a `Uint8Array` and returns a 64-byte ed25519 signature). It is not a transaction, and it moves no funds. The node checks the signature against the public key on the allowlist. To the node, a wallet signature and an agent machine key signature (a key from `npm run hub-keygen`) are the same thing: detached ed25519 over the same bytes. The planned policy is agent keys for everyday records (listings, guilds, tools, anchors) and a player's own wallet for that player's identity and publishing (`story-optin`, player claims). See [protocol/TRUST-ARCHITECTURE.md](protocol/TRUST-ARCHITECTURE.md).
+An approval is a detached ed25519 signature over the approval message above. That is the same byte string a Solana wallet signs with `signMessage` (Phantom signs a `Uint8Array` and returns a 64-byte ed25519 signature). It is not a transaction, and it moves no funds. The node checks the signature against the public key on the allowlist. To the node, a wallet signature and an agent machine key signature (a key from `npm run hub-keygen`) are the same thing: detached ed25519 over the same bytes. The planned policy is agent keys for everyday records (listings, guilds, tools, anchors) and a player's own wallet for that player's identity and publishing (`story-optin`, `reputation-link`, player claims). `reputation-link` is built as a kind. Limiting a signer set to those kinds is still planned. See [protocol/TRUST-ARCHITECTURE.md](protocol/TRUST-ARCHITECTURE.md).
 
 Each returned update includes `signedBy` and `approvedBy`. `signedBy` lists the author and every key whose signature verified, including an author who did not count as an approver. `approvedBy` lists only the keys whose approvals counted toward the threshold. At threshold 2 or higher the author's own approval is left out of `approvedBy` unless the node is configured to count it. A signer-change never counts the author.
 
@@ -104,7 +104,9 @@ A `guild` listing is a separate hub update kind, because listings do not have a 
 
 A `story-optin` records one player's permission to tell a public story. It uses the same author, threshold, revocation, and manifest-pin checks as the other kinds. The `storyOptIn` fields are `action` (`allow` or `revoke`), `wallet` (the player's base58 address), `date` (`YYYY-MM-DD`), and `signature` (the player's detached ed25519 signature, base58). Unknown fields are rejected. The signature must match the wallet over one fixed sentence for this hub. Allow: `I allow sa-ecosystem-node to tell my public Star Atlas story. Wallet: <address>. Date: <YYYY-MM-DD>. Hub: <id>. Links: yes.` or `I allow sa-ecosystem-node to tell my public Star Atlas story. Wallet: <address>. Date: <YYYY-MM-DD>. Hub: <id>. Links: no.` Revoke: `I revoke sa-ecosystem-node from telling my public Star Atlas story. Wallet: <address>. Date: <YYYY-MM-DD>. Hub: <id>.` `<id>` is the normalized `HUB_GIT_REPO` URL, such as `https://github.com/owner/repo`. It is not the manifest file name. The hub id and the links choice are not fields the hub author sets. Each `story-optin` from `hub_updates` has `consent` of `valid` or `inert`. `valid` means the player signature matches this hub. It does not mean that sentence is the current opt-in. A signature for another repository, a bad player signature, or a pin that is not a valid https repository URL is `inert` and does not grant consent. The update stays in the chain, so later listings and signer updates are kept. A date after the current UTC date stays in the chain and does not count until that date. An allow whose date is on or before the latest revoke date does not restore consent. When more than one allow is in force, the latest signed date wins. `npm run hub-add-update -- --kind story-optin --story-optin <json> --hub-repo <url>` embeds that signature and checks it against that repository URL before it writes. When `--hub-repo` is omitted, the command uses the store's git origin URL. The node does not keep a second copy of the opt-in.
 
-Claims and verifier attestations are a separate path. A player, guild, or business can bind one public key (for a player, their own wallet) to one listing identity and then maintain that identity without being added to `hub/signers.json`. The human steps, the record formats, and the optional Discord verifier are in [docs/claim-and-verify.md](docs/claim-and-verify.md).
+A `reputation-link` records one player's choice to show a wallet next to one public profile. It uses the same author, threshold, revocation, and manifest-pin checks as the other kinds. The `reputationLink` fields are `action` (`link` or `unlink`), `wallet` (the player's base58 address), `profile` (a public profile name or a profile address), `date` (`YYYY-MM-DD`), and `signature` (the player's detached ed25519 signature, base58). Unknown fields are rejected. The scope is not a field. The signature must match the wallet over one fixed sentence for this hub. Link: `I link wallet <address> to public profile <profile> on hub <id>. Scope: legacy. Date: <YYYY-MM-DD>.` `Scope` is `legacy`, `fleets`, `guild`, or `story`. `legacy` is the smallest, and a link does not grant any other scope. Unlink: `I unlink wallet <address> from public profile <profile> on hub <id>. Date: <YYYY-MM-DD>.` `<id>` is the normalized `HUB_GIT_REPO` URL, such as `https://github.com/owner/repo`. It is not the manifest file name. Each `reputation-link` from `hub_updates` has `consent` of `valid` or `inert`, and `linkShown`. `valid` means the player signature matches this hub. `linkShown` is true only when that scope is still on display. An unlink hides every scope for that wallet and profile from that date on, including a link dated the same day. The update stays in the chain. One counting link per wallet per UTC day. A second link that day does not add a scope. A date after the current UTC date does not count until that date. A signature for another repository is `inert`. `npm run hub-add-update -- --kind reputation-link --reputation-link <json> --hub-repo <url>` checks the player signature before it writes. This kind does not change which signer set the node trusts. The steps are in [docs/reputation-link.md](docs/reputation-link.md).
+
+Claims and verifier attestations are a separate path. A player, guild, or business can bind one public key (for a player, their own wallet) to one listing identity and then maintain that identity without being added to `hub/signers.json`. `/plain/claim/` collects that player's signature and does not publish it. Discord identify stays on the operator machine. The human steps, the record formats, and the optional Discord verifier are in [docs/claim-and-verify.md](docs/claim-and-verify.md).
 
 `list_listings` can filter by `stream`, `category`, and `status`. A listing whose `expiresAt` is before the current UTC date is left out unless the caller passes `includeExpired`. Those rows have `expired` set to true. A listing is still shown on its expiry date. Each row includes `signerDisplayName`, the author's label from the trusted signer file, and `signedMeaning`. The line is `Signed by <display name>. This signature means that signer published this listing. It does not move money, and this node never handles payment.` When the author key has no label, the line says `an allowlisted wallet`. `signedBy` and `approvedBy` are the same lists `hub_updates` returns.
 
@@ -124,15 +126,18 @@ A host with the `git` binary checks out that commit. A host without it, includin
 
 ## Operator runbook
 
-This repository does not contain signing secrets. `hub/signers.json` ships with three public keys. The public deployment uses threshold 2 with `HUB_ALLOW_AUTHOR_APPROVAL=true`. Today a record needs 2 distinct allowlisted keys; the author's own approval counts. That pair is Phoenix Collective, plus Falkor (`FC1e`). The example config stays at threshold 1 for a local dry run. A fourth slot may be added later.
+This repository does not contain signing secrets. `hub/signers.json` ships with three public keys. The public deployment uses threshold 2 with `HUB_ALLOW_AUTHOR_APPROVAL=true`. Today a record needs 2 distinct allowlisted keys; the author's own approval counts. Since M5 that pair is the two Phoenix agent keys in `hub/signers/agents.json` (the Phoenix Collective author and Phoenix reviewer). The player wallet stays on the default allowlist. The example config stays at threshold 1 for a local dry run. A fourth slot may be added later.
 
-| Label | Public key | Who signs | How the approval is produced |
+The shipped label strings in `protocol/h2h/card.json` and the signer files use the role names in the table below.
+
+| Role | Public key | Who signs | How the approval is produced |
 |---|---|---|---|
-| Falkor | `FC1eRr99GGJZuc4KZeUivBpbSMGvjcBB839KaEfAuhcq` | Falkor wallet owner | Wallet `signMessage` on the printed bytes. The owner does not export the key |
+| player wallet | the player-wallet public key in `hub/signers.json` | player wallet | Wallet `signMessage` on the printed bytes. The owner does not export the key |
 | GaliaMeta DAC | `EU7zwmY8QP7B9FFUUyMu1eTNkrwuj27NQkgEmNMWreq1` | GaliaMeta DAC wallet owner | Same `signMessage` flow |
-| Phoenix Collective (Falkor's team) | `G2PhCi6MApcuC6f5o2CDQBWDnJt9hRcozHuuN55PYisU` | Collective author | A new ed25519 key from `hub-keygen`, kept outside this repository |
+| Phoenix Collective author | `G2PhCi6MApcuC6f5o2CDQBWDnJt9hRcozHuuN55PYisU` | Phoenix Collective author | A new ed25519 key from `hub-keygen`, kept outside this repository |
+| Phoenix reviewer | `AANzSFjMzGuKn5gC1YygMsZZGeLUiMM9HAmKH6n2YqgH` | Phoenix reviewer | A second agent record key from `hub-keygen`, on a different machine, kept outside this repository |
 
-The public deployment is threshold `2` with `HUB_ALLOW_AUTHOR_APPROVAL=true`. Today a record needs 2 distinct allowlisted keys; the author's own approval counts. The author is Phoenix Collective (`G2PhCi6MApcuC6f5o2CDQBWDnJt9hRcozHuuN55PYisU`) and Falkor (`FC1eRr99GGJZuc4KZeUivBpbSMGvjcBB839KaEfAuhcq`) adds the second. GaliaMeta DAC stays on the allowlist and is not required for that pair. The same wallet twice counts once. Without `HUB_ALLOW_AUTHOR_APPROVAL`, the author's approval would not count at threshold 2, and that is not this deployment. The example config stays at threshold 1 for a local dry run: one distinct allowlisted approval is enough, including the author's own approval, and that result is `selfApproved: true` when no other key approved. Publish a store commit whose updates already have the Collective signature and Falkor's approval before raising a local node to threshold 2, then pin that commit.
+The public deployment is threshold `2` with `HUB_ALLOW_AUTHOR_APPROVAL=true`. Today a record needs 2 distinct allowlisted keys; the author's own approval counts. Since M5 the author is the Phoenix Collective author (`G2PhCi6MApcuC6f5o2CDQBWDnJt9hRcozHuuN55PYisU`) and Phoenix reviewer (`AANzSFjMzGuKn5gC1YygMsZZGeLUiMM9HAmKH6n2YqgH`) is the second approval. The player wallet stays on the default allowlist and is not required for that pair. GaliaMeta DAC stays on the default allowlist and is not required for that pair. The same key twice counts once. Without `HUB_ALLOW_AUTHOR_APPROVAL`, the author's approval would not count at threshold 2, and that is not this deployment. The example config stays at threshold 1 for a local dry run: one distinct allowlisted approval is enough, including the author's own approval, and that result is `selfApproved: true` when no other key approved. Publish a store commit whose updates already have the Phoenix Collective author's signature and the Phoenix reviewer's approval before raising a local node to threshold 2, then pin that commit.
 
 The public node sets `HUB_GIT_REPO` to `https://github.com/PhoenixClaw01/sa-ecosystem-hub`, `HUB_APPROVAL_THRESHOLD` to `2`, and `HUB_ALLOW_AUTHOR_APPROVAL` to `true`. On 1 November 2026 `HUB_GIT_COMMIT` was `f064f18db1da60c4f3e562d4064c8f344042e97e`, and `HUB_STORE_MANIFEST_HASH` was the sha256 of `hub-manifest.json` at that commit: `1fd4536e3a5b4176beebc04c16c53834092f519d98c0e30172862a2f24ae24f2`. Leave the three pin variables unset on a local process that should not serve the hub. Do not add a submit tool.
 
@@ -142,25 +147,14 @@ The agent generates one fresh key. It is not a copy of a wallet key.
 
 ```bash
 mkdir -p "$HOME/.config/sa-ecosystem-node"
-npm run hub-keygen -- --label "Phoenix Collective" --out "$HOME/.config/sa-ecosystem-node/phoenix-collective.keypair.json"
+npm run hub-keygen -- --label "Phoenix Collective author" --out "$HOME/.config/sa-ecosystem-node/phoenix-collective.keypair.json"
 ```
 
 The command refuses a path inside this repository and sets the file mode to `0600`. Stdout is the public key, then one JSON object for the `signers` array. The secret is not printed. `*.keypair.json` is gitignored, and the file still stays outside this repository and outside the public store.
 
 ### Allowlist
 
-Ask each owner for the wallet address their wallet displays. The shipped file is the live allowlist. Live approvals are by Falkor and Phoenix Collective. GaliaMeta DAC is on the same list. A fourth slot may be added later.
-
-```json
-{
-  "v": 1,
-  "signers": [
-    { "label": "Falkor", "publicKey": "FC1eRr99GGJZuc4KZeUivBpbSMGvjcBB839KaEfAuhcq" },
-    { "label": "GaliaMeta DAC", "publicKey": "EU7zwmY8QP7B9FFUUyMu1eTNkrwuj27NQkgEmNMWreq1" },
-    { "label": "Phoenix Collective (Falkor's team)", "publicKey": "G2PhCi6MApcuC6f5o2CDQBWDnJt9hRcozHuuN55PYisU" }
-  ]
-}
-```
+The shipped file is the default allowlist. Since M5, live approvals on everyday records are the two Phoenix agent keys in `hub/signers/agents.json`. The player wallet and GaliaMeta DAC stay on the default list. A fourth slot may be added later. Open `hub/signers.json` for the shipped public keys. Do not copy a personal name into a new label.
 
 ### Public store
 
@@ -185,7 +179,7 @@ sha256sum hub-manifest.json
 
 ### Author an update
 
-The agent writes the payload with `author` set to the Collective public key, then signs it with the Collective key file:
+The Phoenix Collective author writes the payload with `author` set to the Phoenix Collective author public key, then signs it with that key file:
 
 ```bash
 npm run sign-hub-update -- \
@@ -196,7 +190,7 @@ npm run sign-hub-update -- \
 
 ### Wallet approval, without exporting a key
 
-Falkor and GaliaMeta DAC each do this. The Collective agent can do it from the key file instead, shown at the end of this section.
+The player wallet and GaliaMeta DAC each do this. The Phoenix Collective author can do it from the key file instead, shown at the end of this section.
 
 Print the exact bytes:
 
@@ -233,17 +227,17 @@ npm run sign-hub-update -- \
   --approve ./update.signed.json \
   --public-key "<wallet address>" \
   --signature "<signature hex>" \
-  --out ./update.falkor.json
+  --out ./update.player.json
 ```
 
-Repeat for the next wallet, using the file that already has the first approval as `--approve`. The public deployment sets `HUB_APPROVAL_THRESHOLD=2` and `HUB_ALLOW_AUTHOR_APPROVAL=true`: the Collective author signs, and Falkor (`FC1e`) approves. Those two approvals meet the threshold. Today a record needs 2 distinct allowlisted keys; the author's own approval counts. GaliaMeta DAC can still approve, and is not required for that pair. A local dry run at threshold 1 still accepts one wallet.
+Repeat for the next key, using the file that already has the first approval as `--approve`. The public deployment sets `HUB_APPROVAL_THRESHOLD=2` and `HUB_ALLOW_AUTHOR_APPROVAL=true`: the Phoenix Collective author signs, and Phoenix reviewer approves. Those two approvals meet the threshold. Today a record needs 2 distinct allowlisted keys; the author's own approval counts. The player wallet stays on the default allowlist. With both sets trusted, that key still counts on everyday records, because a trusted set counts its keys on every kind (`src/hub/update.ts`). Kind scoping is planned for M6 and is not live. The player wallet is not required for the live pair. GaliaMeta DAC can still approve, and is not required for that pair. A local dry run at threshold 1 still accepts one wallet.
 
-The Collective agent can approve with its key file. That signature is over the same bytes:
+The Phoenix Collective author can approve with its key file. That signature is over the same bytes:
 
 ```bash
 npm run sign-hub-update -- \
   --keypair "$HOME/.config/sa-ecosystem-node/phoenix-collective.keypair.json" \
-  --approve ./update.falkor.json \
+  --approve ./update.player.json \
   --out ./update.approved.json
 ```
 
@@ -260,7 +254,7 @@ npm run hub-add-update -- \
 
 `--keypair` is optional. On a file that already has an author signature, it adds one detached approval. On an unsigned payload it signs as the author, and `--approve` also attaches that key's approval. The key file must hold no funds. The secret is not printed. If that key is the only approver, stderr warns that the update is self-approved.
 
-Flags can build the payload instead of a file: `--id`, `--kind`, `--body`, `--author`, `--prev`, `--created-at`, `--pip`, and repeated `--tx`. `--kind listing` also needs `--listing` set to the listing JSON object, which may include `image`. Set `listingId` on every new listing. `--kind guild` also needs `--guild` set to the guild JSON object. `--kind story-optin` also needs `--story-optin` set to the opt-in JSON object, including the player's signature, and `--hub-repo` set to the https repository URL. `--prev` is the chain pointer, the sha256 of the previous payload. Omit it and the command uses the store tip.
+Flags can build the payload instead of a file: `--id`, `--kind`, `--body`, `--author`, `--prev`, `--created-at`, `--pip`, and repeated `--tx`. `--kind listing` also needs `--listing` set to the listing JSON object, which may include `image`. Set `listingId` on every new listing. `--kind guild` also needs `--guild` set to the guild JSON object. `--kind story-optin` also needs `--story-optin` set to the opt-in JSON object, including the player's signature, and `--hub-repo` set to the https repository URL. `--kind reputation-link` also needs `--reputation-link` set to the link JSON object, including the player's signature, and `--hub-repo` set to that same URL. `--prev` is the chain pointer, the sha256 of the previous payload. Omit it and the command uses the store tip.
 
 Every new DAO tool returns `dataMode` (`live` or `cached`), `asOf`, and `sources`. Galaxy tools fetch on each call. Treasury tools only read `data/treasury-cache.json`. They do not refresh it and they do not write. A missing or unusable cache is an error, not an empty ledger.
 
@@ -275,7 +269,7 @@ Two wallets are scanned. Both are named on the public knowledge base and in the 
 
 Sources: [knowledge base](https://star-atlas-dao.gitbook.io/knowledge-base/overview/treasury), [PIP-23](https://govern.staratlas.com/proposals/0ecf2928-15df-497e-8b67-d87eda030d5a). The retired pre-multisig address `DRGThVUMGEYcsoTERhmkFSa5q7HVjxBQdKwMNjyvehD1` is recorded in code and is not scanned.
 
-The refresh is idempotent and resumable. It is the only writer of the cache. A scheduled run passes `--incremental`. It fetches signatures newer than each cached cursor, then continues the older walk from the oldest parsed signature while that walk is unfinished. Both walks stay inside the page cap, so one run stays short and the history completes over later runs. A run without that flag continues the older walk with no newer-signature pass:
+The refresh is idempotent and resumable. It is the only writer of the cache. Pass `--incremental` to fetch signatures newer than each cached cursor, then continue the older walk from the oldest parsed signature while that walk is unfinished. Both walks stay inside the page cap, so one run stays short and the history completes over later runs. A run without that flag continues the older walk with no newer-signature pass:
 
 ```bash
 npm run refresh-treasury
@@ -323,15 +317,17 @@ The MCP server is the product. The dashboard is a thin demo of the same balance 
 `SOLANA_RPC_URL` defaults to `https://solana-rpc.publicnode.com`. `SOLANA_RPC_FALLBACK_URLS` defaults to `https://api.mainnet-beta.solana.com`. Both are public endpoints. No API key is required. Set either variable to point the open-source server at your own RPC.
 
 - **Local.** `npm start` serves Streamable HTTP. `npm run start:stdio` speaks MCP on stdin. The cache file is `TREASURY_CACHE_PATH` (default `data/treasury-cache.json`).
-- **Vercel, public node.** Project `sa-ecosystem-node-dashboard` is separate from the DAO Council preview. Root Directory is `dashboard` and the production branch is `main`. `PUBLIC_HOME=plain`. The function is the committed bundle `dashboard/api/mcp.js` (`npm run build:dashboard-mcp`). It inlines this repo's dependencies, so the deploy does not install the parent package and Vercel does not compile TypeScript for that route. The function is capped at 25 seconds. `dashboard/package.json` asks for Node.js 22. The `HUB_*` values are listed in [docs/hosting.md](docs/hosting.md).
+- **Vercel, public node.** Project `sa-ecosystem-node-dashboard` is separate from the DAO Council preview. Root Directory is `dashboard` and the production branch is `main`. The function is the committed bundle `dashboard/api/mcp.js` (`npm run build:dashboard-mcp`). It inlines this repo's dependencies, so the deploy does not install the parent package and Vercel does not compile TypeScript for that route. The function is capped at 25 seconds. `dashboard/package.json` asks for Node.js 22. The `HUB_*` values are listed in [docs/hosting.md](docs/hosting.md).
 - **Vercel, repo root.** `api/mcp.ts` re-exports the same handler. The root `vercel.json` rewrites `/mcp` to it. That file is not what the public node deploys.
 - **Cloudflare or any other host.** The Solana client is fetch-only and sends the allow-listed read methods. Set `SOLANA_RPC_URL` to the RPC that host can reach. This repo does not ship a Workers entry.
 
-Live balances still answer when the cache file is absent. History and payment tools fail closed without it. The server process does not refresh the cache. `npm run refresh-treasury` does, with read methods only. A scheduled refresh runs every 3 hours (`17 */3 * * *`), about 240 runs in a 30-day month: about 240 Actions minutes if each run bills one minute, or about 480 if install pushes a run into a second minute.
+Live balances still answer when the cache file is absent. History and payment tools fail closed without it. The server process does not refresh the cache. `npm run refresh-treasury` does, with read methods only.
 
 ## Public MCP endpoint
 
-The live read-only endpoint is [https://sa-ecosystem-node-dashboard.vercel.app/api/mcp](https://sa-ecosystem-node-dashboard.vercel.app/api/mcp). No API key. A short discovery file is at [https://sa-ecosystem-node-dashboard.vercel.app/.well-known/mcp.json](https://sa-ecosystem-node-dashboard.vercel.app/.well-known/mcp.json).
+The live read-only endpoint is [https://sa-ecosystem-node-dashboard.vercel.app/api/mcp](https://sa-ecosystem-node-dashboard.vercel.app/api/mcp). No sign-in and no API key. A short discovery file is at [https://sa-ecosystem-node-dashboard.vercel.app/.well-known/mcp.json](https://sa-ecosystem-node-dashboard.vercel.app/.well-known/mcp.json). [`server.json`](server.json) is the MCP Registry document for that remote endpoint (`io.github.PhoenixClaw01/sa-ecosystem-node`, schema `2025-12-11`). This repository does not publish that file to the registry.
+
+Tool-outcome telemetry is off unless an operator sets `MCP_TELEMETRY_URL`. A stock node makes no telemetry request. The event is the tool name, time, a coarse environment, a coarse client family, the outcome, a result count, latency, and an error class, plus fixed enum fields. It does not include wallet addresses, search text, or IP addresses. See [docs/telemetry.md](docs/telemetry.md).
 
 Cursor, in `~/.cursor/mcp.json` or the project `.cursor/mcp.json`:
 
@@ -364,15 +360,15 @@ Each request has a 20 second timeout, a 512 KiB request-body cap, and a 512 KiB 
 
 `list_proposals` returns 20 proposals by default and at most 100. The page includes `nextCursor`. Pass that value back as `cursor` to read the next page.
 
-The dashboard Ask the MCP panel still reads `dashboard/data/mcp-recorded.json`. It does not call this endpoint.
+The MCP Playground at `/playground/` calls this endpoint from the browser, on whatever origin serves it. `dashboard/data/mcp-recorded.json` is still generated for CI and is not served.
 
-On the public Vercel project `sa-ecosystem-node-dashboard`, leave Root Directory as `dashboard` and the production branch as `main`. Leave the install command empty: the MCP route is already bundled, and a parent `npm ci` is not used. Confirm the Node.js version is 22.x. Set `PUBLIC_HOME=plain` and the `HUB_*` pins from [docs/hosting.md](docs/hosting.md). `SOLANA_RPC_URL` and `SOLANA_RPC_FALLBACK_URLS` are optional; unset, they stay on the public defaults. Do not add an API key. `dashboard/vercel.json` includes `ata.js`, `squads.js`, `data/treasury-cache.json`, and `hub/signers.json` in the function. `hub/signers.json` there is a byte-for-byte copy of the repository `hub/signers.json`, written by `npm run build:dashboard-mcp`. Do not edit the copy. The cache job commits `dashboard/data/treasury-cache.json`. A missing match does not fail the deploy. If that file is absent, `treasury_history` and `ecofund_limit` say the cache is not yet populated and include no figures. Payment and flow tools fail closed until the file is present. On 1 November 2026 `data_health` on the public node reported `treasury_cache` ok, and `treasury_history` returned cached series. `data_health` and `treasury_balances` can read live balances without that file. The bundle carries `ata.js` and `squads.js` inside it, so the function does not `require()` those scripts. When `git` is not on the function, a pinned `github.com` hub is read over HTTPS. Docker and the other container hosts still use `git`.
+On the public Vercel project `sa-ecosystem-node-dashboard`, leave Root Directory as `dashboard` and the production branch as `main`. Leave the install command empty: the MCP route is already bundled, and a parent `npm ci` is not used. Confirm the Node.js version is 22.x. Set the `HUB_*` pins from [docs/hosting.md](docs/hosting.md). `SOLANA_RPC_URL` and `SOLANA_RPC_FALLBACK_URLS` are optional; unset, they stay on the public defaults. Do not add an API key. `dashboard/vercel.json` includes `data/treasury-cache.json`, `hub/signers.json`, and `hub/signers/agents.json` in the function. `ata.js` and `squads.js` are inlined in the bundle and listed in `dashboard/.vercelignore`, so the deploy does not ship them as separate files. `hub/signers.json` there is a byte-for-byte copy of the repository `hub/signers.json`, written by `npm run build:dashboard-mcp`. Do not edit the copy. `dashboard/data/treasury-cache.json` is the committed cache the tools read. A missing match does not fail the deploy. If that file is absent, `treasury_history` and `ecofund_limit` say the cache is not yet populated and include no figures. Payment and flow tools fail closed until the file is present. On 1 November 2026 `data_health` on the public node reported `treasury_cache` ok, and `treasury_history` returned cached series. `data_health` and `treasury_balances` can read live balances without that file. The bundle carries `ata.js` and `squads.js` inside it, so the function does not `require()` those scripts. When `git` is not on the function, a pinned `github.com` hub is read over HTTPS. Docker and the other container hosts still use `git`.
 
 ## Deploy
 
-The files in `dashboard/` are what project `sa-ecosystem-node-dashboard` deploys. That project uses Root Directory `dashboard` and does not use the root `vercel.json`. See `dashboard/README.md`. `config.js` `rpcUrl` and `rpcFallbackUrls` mirror the MCP defaults. The page paints tiles from `readBalancesWithFallback`. It does not keep a second balance parser.
+The files in `dashboard/` are what project `sa-ecosystem-node-dashboard` deploys. That project uses Root Directory `dashboard` and does not use the root `vercel.json`. See `dashboard/README.md`. `/` serves `dashboard/index.html`, the DAO dashboard front page. `home.js` calls same-origin `/mcp` for live revenue, treasury balances, and the Ecosystem Fund limit, and paints those figures. A failed read says "Data unavailable" and shows no figure.
 
-`PUBLIC_HOME=plain` on the public node redirects a request for `/` or `/index.html` to `/plain/` with status 302. `dashboard/middleware.js` reads the variable. The MCP server does not read `PUBLIC_HOME`, and `GET /` on the local Node process stays the status document. With `PUBLIC_HOME` unset, `/` serves the dashboard page in this repository. That is not how the public node is configured.
+`/` serves `dashboard/index.html`, the DAO dashboard front page. There is no redirect. The MCP server does not read `PUBLIC_HOME`, and `GET /` on the local Node process stays the status document. `PUBLIC_HOME` is no longer read by anything and can be removed from a project.
 
 The in-memory rate limiter is a placeholder. It resets when the process restarts and is not shared across instances.
 

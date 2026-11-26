@@ -3,6 +3,7 @@ import { createNodeHandler } from "./handler.js";
 import { createPublicMcpFetch } from "./public-mcp.js";
 import { h2hCard } from "./h2h/feeds.js";
 import { createDefaultDeps } from "./runtime.js";
+import { resolveRequestWaitUntil } from "./telemetry.js";
 
 /**
  * Public read-only MCP. `npm run build:dashboard-mcp` writes the bundle to
@@ -15,6 +16,7 @@ const deps = createDefaultDeps(settings);
 const fetchMcp = createPublicMcpFetch(createNodeHandler(deps, settings), {
   maxRequestBytes: settings.maxRequestBytes,
   maxBytes: settings.maxResponseBytes,
+  waitUntil: resolveRequestWaitUntil,
   feeds: {
     c4Markers: () => deps.c4Markers({}),
     communityTools: () => deps.communityTools(),

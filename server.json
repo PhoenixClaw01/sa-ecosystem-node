@@ -1,0 +1,18 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.PhoenixClaw01/sa-ecosystem-node",
+  "title": "Star Atlas ecosystem node",
+  "description": "24 read-only Star Atlas ecosystem, DAO, and signed community tools. No sign-in or API key.",
+  "repository": {
+    "url": "https://github.com/PhoenixClaw01/sa-ecosystem-node",
+    "source": "github"
+  },
+  "version": "1.0.1",
+  "websiteUrl": "https://sa-ecosystem-node-dashboard.vercel.app",
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://sa-ecosystem-node-dashboard.vercel.app/api/mcp"
+    }
+  ]
+}

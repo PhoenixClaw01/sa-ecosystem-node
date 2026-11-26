@@ -13,32 +13,7 @@ import { createPlayerStoryReader } from "./legacy/story.js";
 import { summarizeGalaxyActivity } from "./game/summarize.js";
 import { SERVER_NAME, SERVER_VERSION } from "./version.js";
 
-export const READ_ONLY_TOOLS = [
-  "list_star_systems",
-  "get_fleet",
-  "profile_key_audit",
-  "player_legacy",
-  "player_story",
-  "dao_overview",
-  "treasury_balances",
-  "pip_tracker",
-  "galaxy_overview",
-  "list_categories",
-  "hub_updates",
-  "list_listings",
-  "search_hub",
-  "claim_status",
-  "list_c4_markers",
-  "list_community_tools",
-  "data_health",
-  "list_proposals",
-  "get_proposal_votes",
-  "dao_revenue",
-  "dao_treasury_flows",
-  "dao_payments",
-  "treasury_history",
-  "ecofund_limit",
-] as const;
+export { READ_ONLY_TOOLS } from "./tool-names.js";
 
 const DEFAULT_SYSTEM_LIMIT = 100;
 const MAX_SYSTEM_LIMIT = 500;
@@ -151,13 +126,19 @@ export function createNodeServer(deps: NodeDeps, config: Config): McpServer {
         if (!fleetAddress && !profileAddress) {
           throw new UserInputError("Provide fleetAddress or profileAddress.");
         }
-        const fleets = await deps.getFleet({ fleetAddress, profileAddress });
+        const { fleets, unreadableFleetCount } = await deps.getFleet({ fleetAddress, profileAddress });
         return jsonResult({
           readOnly: true,
           cluster: config.cluster,
           rpc: redactRpcUrl(config.zinkRpcUrl),
           disclaimer: DISCLAIMER,
           fleets,
+          unreadableFleetCount,
+          ...(unreadableFleetCount > 0
+            ? {
+                note: `${unreadableFleetCount} fleet account(s) owned by this profile could not be decoded by the pinned game bindings and were skipped.`,
+              }
+            : {}),
         });
       } catch (error) {
         return failure(error);
