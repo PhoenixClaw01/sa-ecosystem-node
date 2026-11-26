@@ -11,13 +11,14 @@ git clone https://github.com/PhoenixClaw01/sa-ecosystem-node
 cd sa-ecosystem-node
 npm ci
 npm test                 # vitest, offline, no network or keys needed
+npm run verify           # lint + typecheck + tests + build + dashboard bundle check; no keys
 npm start                # local MCP node at http://127.0.0.1:8787/mcp
 ```
 
-Before you push, run what CI runs:
+Before you push, run the same offline check CI starts with:
 
 ```bash
-npm run lint && npm run typecheck && npm test
+npm run verify
 ```
 
 ## Add a read-only tool

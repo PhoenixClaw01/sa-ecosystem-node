@@ -14,8 +14,11 @@ import {
   clientFamily,
   createToolTelemetry,
   ERROR_CLASSES,
+  isSelfTraffic,
   isTelemetryLoopbackHost,
   resolveRequestWaitUntil,
+  SELF_TRAFFIC_AGENT_HEADER,
+  SELF_TRAFFIC_SWEEP_HEADER,
   TELEMETRY_FIELDS,
   TELEMETRY_META_FIELDS,
   TOOL_OUTCOMES,
@@ -39,6 +42,7 @@ const savedEnv = {
   key: process.env.MCP_TELEMETRY_KEY,
   env: process.env.MCP_TELEMETRY_ENV,
   timeout: process.env.MCP_TELEMETRY_TIMEOUT_MS,
+  sink: process.env.MCP_TELEMETRY_SINK,
 };
 
 afterEach(() => {
@@ -46,6 +50,7 @@ afterEach(() => {
   restore("MCP_TELEMETRY_KEY", savedEnv.key);
   restore("MCP_TELEMETRY_ENV", savedEnv.env);
   restore("MCP_TELEMETRY_TIMEOUT_MS", savedEnv.timeout);
+  restore("MCP_TELEMETRY_SINK", savedEnv.sink);
 });
 
 function restore(name: string, value: string | undefined) {
@@ -58,6 +63,7 @@ function clearTelemetryEnv() {
   delete process.env.MCP_TELEMETRY_KEY;
   delete process.env.MCP_TELEMETRY_ENV;
   delete process.env.MCP_TELEMETRY_TIMEOUT_MS;
+  delete process.env.MCP_TELEMETRY_SINK;
 }
 
 function handler(reply: (body: Record<string, unknown>) => unknown): NodeHandler {
@@ -169,7 +175,7 @@ function toolCall(name: string, args: Record<string, unknown>, id = 1) {
 }
 
 describe("telemetry configuration", () => {
-  it("stays disabled and does not call fetch when the sink URL is unset", async () => {
+  it("stays off in a test process and does not call fetch when no sink is set", async () => {
     clearTelemetryEnv();
     const calls: string[] = [];
     const original = globalThis.fetch;
@@ -180,6 +186,7 @@ describe("telemetry configuration", () => {
     try {
       const disabled = createToolTelemetry();
       expect(disabled.enabled).toBe(false);
+      expect(disabled.sinkKind).toBe("off");
       const response = await call(null, toolCall("search_hub", { query: QUERY, address: WALLET }), {
         "user-agent": `SomeClient/1 ${UA_TOKEN}`,
         "x-forwarded-for": IP,
@@ -206,16 +213,17 @@ describe("telemetry configuration", () => {
     const fetchImpl = (() => {
       throw new Error("network");
     }) as typeof fetch;
-    expect(createToolTelemetry({ env: { MCP_TELEMETRY_URL: "http://telemetry.example/hook" }, fetch: fetchImpl }).enabled).toBe(false);
-    expect(createToolTelemetry({ env: { MCP_TELEMETRY_URL: "https://user:secret@telemetry.example/hook" }, fetch: fetchImpl }).enabled).toBe(false);
-    expect(createToolTelemetry({ env: {}, fetch: fetchImpl }).enabled).toBe(false);
+    expect(createToolTelemetry({ env: { MCP_TELEMETRY_SINK: "http", MCP_TELEMETRY_URL: "http://telemetry.example/hook" }, fetch: fetchImpl }).enabled).toBe(false);
+    expect(createToolTelemetry({ env: { MCP_TELEMETRY_SINK: "http", MCP_TELEMETRY_URL: "https://user:secret@telemetry.example/hook" }, fetch: fetchImpl }).enabled).toBe(false);
+    expect(createToolTelemetry({ env: { MCP_TELEMETRY_SINK: "off" }, fetch: fetchImpl }).enabled).toBe(false);
     const local = createToolTelemetry({
       env: { MCP_TELEMETRY_URL: "http://127.0.0.1:9/hook", MCP_TELEMETRY_KEY: "bad\nkey" },
       fetch: fetchImpl,
     });
     expect(local.enabled).toBe(true);
+    expect(local.sinkKind).toBe("http");
     expect(createToolTelemetry({ env: { MCP_TELEMETRY_URL: "http://[::1]:9/hook" }, fetch: fetchImpl }).enabled).toBe(true);
-    expect(createToolTelemetry({ env: { MCP_TELEMETRY_URL: "http://[2001:db8::1]/hook" }, fetch: fetchImpl }).enabled).toBe(false);
+    expect(createToolTelemetry({ env: { MCP_TELEMETRY_SINK: "http", MCP_TELEMETRY_URL: "http://[2001:db8::1]/hook" }, fetch: fetchImpl }).enabled).toBe(false);
   });
 
   it("accepts both IPv6 loopback hostname spellings", () => {
@@ -335,6 +343,7 @@ describe("public MCP telemetry", () => {
     for (const item of sent) {
       expect(item.body.env).toBe("test");
       expect(item.body.client_family).toBe("unknown");
+      expect(item.body.self_traffic).toBe(false);
       expect(item.body.called_at).toMatch(/^\d{4}-\d{2}-\d{2}T/);
       expect(item.body.latency_ms).toEqual(expect.any(Number));
       for (const key of Object.keys(item.body)) expect(allowed.has(key)).toBe(true);
@@ -564,6 +573,7 @@ describe("public MCP telemetry", () => {
   it("keeps the handler response when observe and finish throw", async () => {
     const telemetry: ToolTelemetry = {
       enabled: true,
+      sinkKind: "custom",
       async observe() {
         throw new Error(`observe ${WALLET}`);
       },
@@ -580,6 +590,134 @@ describe("public MCP telemetry", () => {
     const text = await response.text();
     expect(text).not.toContain(WALLET);
     expect(text).not.toContain("observe");
+  });
+});
+
+
+describe("stdout, no-op, and custom sinks", () => {
+  it("writes one JSON line to stdout by default outside tests", async () => {
+    const lines: string[] = [];
+    const telemetry = createToolTelemetry({
+      env: { MCP_TELEMETRY_ENV: "local" },
+      write: (line) => {
+        lines.push(line);
+      },
+    });
+    expect(telemetry.enabled).toBe(true);
+    expect(telemetry.sinkKind).toBe("stdout");
+    const response = await call(telemetry, toolCall("list_categories", {}), undefined, () =>
+      okResult(1, { categories: ["events"] }),
+    );
+    expect(response.status).toBe(200);
+    await telemetry.settled();
+    expect(lines).toHaveLength(1);
+    expect(lines[0]?.includes("\n")).toBe(false);
+    const event = JSON.parse(lines[0] ?? "null") as Record<string, unknown>;
+    expect(event).toMatchObject({
+      tool: "list_categories",
+      outcome: "ok",
+      result_count: 1,
+      client_family: "unknown",
+      self_traffic: false,
+      env: "local",
+    });
+    expect(event.called_at).toMatch(/^\d{4}-\d{2}-\d{2}T/);
+    expect(event.latency_ms).toEqual(expect.any(Number));
+    const encoded = JSON.stringify(event);
+    for (const secret of SECRETS) expect(encoded).not.toContain(secret);
+    expect(encoded).not.toContain("user-agent");
+    expect(event).not.toHaveProperty("ip");
+    expect(event).not.toHaveProperty("authorization");
+  });
+
+  it("turns off when MCP_TELEMETRY_SINK is off", async () => {
+    const lines: string[] = [];
+    const telemetry = createToolTelemetry({
+      env: { MCP_TELEMETRY_SINK: "off", MCP_TELEMETRY_ENV: "local" },
+      write: (line) => {
+        lines.push(line);
+      },
+    });
+    expect(telemetry.enabled).toBe(false);
+    const response = await call(telemetry, toolCall("list_categories", {}));
+    expect(response.status).toBe(200);
+    await telemetry.settled();
+    expect(lines).toEqual([]);
+  });
+
+  it("delivers the sealed event to a custom sink and survives a sink throw", async () => {
+    const seen: Record<string, unknown>[] = [];
+    const ok = createToolTelemetry({
+      env: { MCP_TELEMETRY_ENV: "test" },
+      sink: (event) => {
+        seen.push(event);
+      },
+    });
+    expect(ok.sinkKind).toBe("custom");
+    const first = await call(ok, toolCall("list_categories", {}), undefined, () => okResult(1, { categories: ["events"] }));
+    expect(first.status).toBe(200);
+    await ok.settled();
+    expect(seen[0]).toMatchObject({ tool: "list_categories", outcome: "ok", self_traffic: false });
+
+    const failing = createToolTelemetry({
+      env: { MCP_TELEMETRY_ENV: "test" },
+      sink: () => {
+        throw new Error(`sink down ${ERROR_TOKEN}`);
+      },
+    });
+    const started = Date.now();
+    const second = await call(failing, toolCall("list_categories", {}), undefined, () => okResult(1, { categories: ["events"] }));
+    expect(second.status).toBe(200);
+    expect(await second.json()).toMatchObject({ result: { structuredContent: { categories: ["events"] } } });
+    await failing.settled();
+    expect(Date.now() - started).toBeLessThan(500);
+  });
+
+  it("writes stdout even when a custom write throws", async () => {
+    const telemetry = createToolTelemetry({
+      env: { MCP_TELEMETRY_SINK: "stdout", MCP_TELEMETRY_ENV: "local" },
+      write: () => {
+        throw new Error(`write failed ${ERROR_TOKEN}`);
+      },
+    });
+    const response = await call(telemetry, toolCall("list_categories", {}), undefined, () => okResult(1, { categories: ["events"] }));
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({ result: { structuredContent: { categories: ["events"] } } });
+    const text = await (await call(telemetry, toolCall("list_categories", {}), undefined, () => okResult(2, { categories: ["events"] }))).text();
+    expect(text).not.toContain(ERROR_TOKEN);
+  });
+});
+
+describe("self-traffic detection", () => {
+  it("is true for the operator headers and known smoke user agents, and never copies those values", async () => {
+    const headers = new Headers({ [SELF_TRAFFIC_AGENT_HEADER]: "smoke-token" });
+    expect(isSelfTraffic(headers, "curl/8.5.0")).toBe(true);
+    expect(isSelfTraffic(new Headers({ [SELF_TRAFFIC_SWEEP_HEADER]: "nightly" }), "curl/8.5.0")).toBe(true);
+    expect(isSelfTraffic(new Headers(), "PhoenixCollectiveAgent/1.0")).toBe(true);
+    expect(isSelfTraffic(new Headers(), "phoenix-mcp-smoke")).toBe(true);
+    expect(isSelfTraffic(new Headers(), "curl/8.5.0")).toBe(false);
+    expect(isSelfTraffic(null, "Mozilla/5.0")).toBe(false);
+
+    const cases: { headers?: Record<string, string>; expectSelf: boolean }[] = [
+      { headers: { [SELF_TRAFFIC_AGENT_HEADER]: `secret-${UA_TOKEN}` }, expectSelf: true },
+      { headers: { [SELF_TRAFFIC_SWEEP_HEADER]: `sweep-${QUERY}` }, expectSelf: true },
+      { headers: { "user-agent": `PhoenixCollectiveAgent ${UA_TOKEN}` }, expectSelf: true },
+      { headers: { "user-agent": `SomeClient/1 ${UA_TOKEN}`, "x-forwarded-for": IP }, expectSelf: false },
+    ];
+    for (const item of cases) {
+      const { telemetry, sent } = collectingTelemetry();
+      const response = await call(telemetry, toolCall("list_categories", { query: QUERY }), item.headers, () =>
+        okResult(1, { categories: ["events"] }),
+      );
+      expect(response.status).toBe(200);
+      await telemetry.settled();
+      expect(sent[0]?.body.self_traffic).toBe(item.expectSelf);
+      const encoded = JSON.stringify(sent[0]?.body);
+      for (const secret of SECRETS) expect(encoded).not.toContain(secret);
+      expect(encoded).not.toContain("smoke-token");
+      expect(encoded).not.toContain("x-phoenix-agent");
+      expect(encoded).not.toContain("x-phoenix-sweep");
+    }
   });
 });
 

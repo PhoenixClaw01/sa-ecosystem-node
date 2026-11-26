@@ -1,5 +1,6 @@
--- Optional tool-outcome table for an operator who turns telemetry on.
--- The node does not create this table, and it sends nothing until MCP_TELEMETRY_URL is set.
+-- Optional tool-outcome table for an operator who also posts events over HTTP.
+-- The node does not create this table. Stdout JSON lines are on by default and
+-- do not use this table. HTTP POST stays off until MCP_TELEMETRY_URL is set.
 -- Do not add columns for wallet addresses, player ids, search text, IP addresses, or request bodies.
 -- Those values are not in the event. The checks match the sealed event enums.
 
@@ -35,6 +36,7 @@ create table if not exists mcp_tool_calls (
   called_at timestamptz not null,
   env text not null check (env ~ '^[a-z0-9_-]{1,24}$'),
   client_family text not null check (client_family in ('cursor', 'claude', 'vscode', 'chatgpt', 'browser', 'node', 'unknown')),
+  self_traffic boolean not null default false,
   outcome text not null check (outcome in ('ok', 'empty', 'unmatched', 'invalid_args', 'error')),
   result_count integer check (result_count is null or result_count >= 0),
   latency_ms integer not null check (latency_ms >= 0),

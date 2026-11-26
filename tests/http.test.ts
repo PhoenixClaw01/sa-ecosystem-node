@@ -110,7 +110,7 @@ describe("local http server", () => {
     expect(JSON.parse(second.body)).toMatchObject({ error: "rate_limited" });
     await telemetry.settled();
     const denied = sent.find((event) => event.error_class === "rate_limited");
-    expect(denied).toMatchObject({ tool: "unknown", outcome: "error", error_class: "rate_limited", client_family: "unknown" });
+    expect(denied).toMatchObject({ tool: "unknown", outcome: "error", error_class: "rate_limited", client_family: "unknown", self_traffic: false });
     const encoded = JSON.stringify(sent);
     expect(encoded).not.toContain(wallet);
     expect(encoded).not.toContain("203.0.113.44");
