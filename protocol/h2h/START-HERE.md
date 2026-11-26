@@ -16,6 +16,7 @@ These are read-only and need no key:
 | The MCP server | `https://sa-ecosystem-node-dashboard.vercel.app/api/mcp` (streamable HTTP, no auth) |
 | Signed records | [`PhoenixClaw01/sa-ecosystem-hub`](https://github.com/PhoenixClaw01/sa-ecosystem-hub). Check any record yourself with its `VERIFY.md` |
 | A full worked example | [`examples/phoenix-to-phoenix/`](examples/phoenix-to-phoenix/) |
+| How a 3D or map view can consume the feeds | [`views/3D-VIEW.md`](views/3D-VIEW.md) (draft) |
 
 ## 2. Pick a task
 
