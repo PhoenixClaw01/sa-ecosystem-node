@@ -6,10 +6,13 @@ This is not an ATMTA product, and the product name is not Star Atlas. It holds n
 
 **Status:** public v1.0.2. Game reads use the z.ink test realm. Treasury, proposals, and player records use public mainnet data. Licensed under [Apache-2.0](LICENSE) ([NOTICE](NOTICE)). Hub listings, guild records, descriptions, and lore are CC BY 4.0, as the hub repository states. Each project keeps the rights to its own name and logo.
 
+**New here?** One-screen plug-in page: [PLUG-IN.md](PLUG-IN.md).
+
 The public node is [https://sa-ecosystem-node-dashboard.vercel.app](https://sa-ecosystem-node-dashboard.vercel.app) (Vercel project `sa-ecosystem-node-dashboard`, separate from the DAO Council preview). `/` on that site is the DAO dashboard front page. It links the live MCP Playground (`/playground/`) and the listings page (`/plain/`). The public hub is [sa-ecosystem-hub](https://github.com/PhoenixClaw01/sa-ecosystem-hub). Governance notes are in [phoenix-gate](https://github.com/PhoenixClaw01/phoenix-gate).
 
 This deployment uses threshold 2 with `HUB_ALLOW_AUTHOR_APPROVAL=true`. Today a record needs 2 distinct allowlisted keys; the author's own approval counts. Since M5 the live approvals are two Phoenix agent keys in `hub/signers/agents.json`: the Phoenix Collective author and Phoenix reviewer. The player wallet stays on the default allowlist and is not that second approval. `HUB_GIT_REPO`, `HUB_GIT_COMMIT`, and `HUB_STORE_MANIFEST_HASH` are set. On 1 November 2026 the pinned commit was `f064f18db1da60c4f3e562d4064c8f344042e97e`.
 
+- [Plug in (one screen)](PLUG-IN.md)
 - [Spec v1.0.2](docs/spec.md)
 - [Hosting](docs/hosting.md)
 - [Decentralization](docs/decentralization.md) (what is live, then the later design)
