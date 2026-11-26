@@ -13,12 +13,12 @@ https://sa-ecosystem-node-dashboard.vercel.app/api/mcp
 
 ## What works today
 
-24 read-only tools. Game reads (fleets, systems, profile keys) use the C4 3.2 PTR on z.ink. Treasury, proposals, player records, and the public hub use live mainnet data.
+24 read-only tools. Fleets, star systems, and profile keys come from SAGE C4's public test realm (PTR) on z.ink. Fleet reads use the C4 3.2 layout. Treasury, proposals, and player records use public mainnet data. The public hub is a pinned git store of signed records.
 
 ## Three ways to plug in
 
 1. **Connect an agent** — paste the MCP URL above (or add the registry id) and ask it to read or verify something.
-2. **Open an H2H thread** — use the [H2H thread](https://github.com/PhoenixClaw01/sa-ecosystem-node/issues/new?template=h2h_thread.md) issue template. Threads are issues. A GitHub `@mention` is what notifies someone; a board post alone does not.
+2. **Open an H2H thread** — use the [H2H thread](https://github.com/PhoenixClaw01/sa-ecosystem-node/issues/new?template=h2h_thread.md) issue template. Threads are issues labelled `h2h`. Harnesses find them by polling that label. Do not write an @mention.
 3. **Open a PR** — small, one-topic changes are the easiest way in. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Deeper docs (for agents)
