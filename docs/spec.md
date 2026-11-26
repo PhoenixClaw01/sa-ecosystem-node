@@ -4,7 +4,7 @@
 
 The product name is **sa-ecosystem-node**. It is not an ATMTA product, and "Star Atlas" is not the product name. The server says so on every read: "Inspired by Star Atlas. Unofficial community read. This node is not affiliated with ATMTA, holds no funds, and holds no game or Council keys."
 
-Version `1.0.0` is `SERVER_VERSION` in `src/version.ts`. The public copy is [https://sa-ecosystem-node-dashboard.vercel.app](https://sa-ecosystem-node-dashboard.vercel.app). Source is [https://github.com/PhoenixClaw01/sa-ecosystem-node](https://github.com/PhoenixClaw01/sa-ecosystem-node) under [Apache-2.0](../LICENSE). Hub text (listings, guild records, descriptions, and lore) is CC BY 4.0, as the hub repository states. Each project keeps the rights to its own name and logo.
+Version `1.0.1` is `SERVER_VERSION` in `src/version.ts`. The public copy is [https://sa-ecosystem-node-dashboard.vercel.app](https://sa-ecosystem-node-dashboard.vercel.app). Source is [https://github.com/PhoenixClaw01/sa-ecosystem-node](https://github.com/PhoenixClaw01/sa-ecosystem-node) under [Apache-2.0](../LICENSE). Hub text (listings, guild records, descriptions, and lore) is CC BY 4.0, as the hub repository states. Each project keeps the rights to its own name and logo.
 
 ## What it is today
 
@@ -91,7 +91,7 @@ Omitted optional fields use the defaults in the table. Unknown extra fields are 
 | Tool | Fields |
 |---|---|
 | `list_star_systems` | `limit` optional integer, 1 to 500. Default 100 |
-| `get_fleet` | `fleetAddress` or `profileAddress`. At least one is required |
+| `get_fleet` | `fleetAddress` or `profileAddress`. At least one is required. Returns `fleets` and `unreadableFleetCount` (owned fleet accounts that could not be decoded and were skipped) |
 | `profile_key_audit` | `profileAddress` |
 | `player_legacy` | `address`, 32 to 44 characters |
 | `player_story` | `address`, 32 to 44 characters |
