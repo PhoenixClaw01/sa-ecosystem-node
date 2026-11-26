@@ -1513,17 +1513,17 @@ function assertIs(_arg) {
 function assertNever(_x) {
   throw new Error("Unexpected value in exhaustive check");
 }
-function assert(_8) {
+function assert(_2) {
 }
 function getEnumValues(entries) {
-  const numericValues = Object.values(entries).filter((v8) => typeof v8 === "number");
-  const values = Object.entries(entries).filter(([k, _8]) => numericValues.indexOf(+k) === -1).map(([_8, v8]) => v8);
+  const numericValues = Object.values(entries).filter((v2) => typeof v2 === "number");
+  const values = Object.entries(entries).filter(([k, _2]) => numericValues.indexOf(+k) === -1).map(([_2, v2]) => v2);
   return values;
 }
 function joinValues(array2, separator = "|") {
   return array2.map((val) => stringifyPrimitive(val)).join(separator);
 }
-function jsonStringifyReplacer(_8, value) {
+function jsonStringifyReplacer(_2, value) {
   if (typeof value === "bigint")
     return value.toString();
   return value;
@@ -1575,9 +1575,9 @@ function defineLazy(object2, key, getter) {
       }
       return value;
     },
-    set(v8) {
+    set(v2) {
       Object.defineProperty(object2, key, {
-        value: v8
+        value: v2
         // configurable: true,
       });
     },
@@ -1699,17 +1699,17 @@ var allowsEval = /* @__PURE__ */ cached(() => {
     return false;
   }
   try {
-    const F11 = Function;
-    new F11("");
+    const F10 = Function;
+    new F10("");
     return true;
-  } catch (_8) {
+  } catch (_2) {
     return false;
   }
 });
-function isPlainObject(o6) {
-  if (isObject(o6) === false)
+function isPlainObject(o3) {
+  if (isObject(o3) === false)
     return false;
-  const ctor = o6.constructor;
+  const ctor = o3.constructor;
   if (ctor === void 0)
     return true;
   if (typeof ctor !== "function")
@@ -1722,16 +1722,16 @@ function isPlainObject(o6) {
   }
   return true;
 }
-function shallowClone(o6) {
-  if (isPlainObject(o6))
-    return { ...o6 };
-  if (Array.isArray(o6))
-    return [...o6];
-  if (o6 instanceof Map)
-    return new Map(o6);
-  if (o6 instanceof Set)
-    return new Set(o6);
-  return o6;
+function shallowClone(o3) {
+  if (isPlainObject(o3))
+    return { ...o3 };
+  if (Array.isArray(o3))
+    return [...o3];
+  if (o3 instanceof Map)
+    return new Map(o3);
+  if (o3 instanceof Set)
+    return new Set(o3);
+  return o3;
 }
 function numKeys(data) {
   let keyCount = 0;
@@ -1823,31 +1823,31 @@ function normalizeParams(_params) {
 function createTransparentProxy(getter) {
   let target;
   return new Proxy({}, {
-    get(_8, prop, receiver) {
+    get(_2, prop, receiver) {
       target ?? (target = getter());
       return Reflect.get(target, prop, receiver);
     },
-    set(_8, prop, value, receiver) {
+    set(_2, prop, value, receiver) {
       target ?? (target = getter());
       return Reflect.set(target, prop, value, receiver);
     },
-    has(_8, prop) {
+    has(_2, prop) {
       target ?? (target = getter());
       return Reflect.has(target, prop);
     },
-    deleteProperty(_8, prop) {
+    deleteProperty(_2, prop) {
       target ?? (target = getter());
       return Reflect.deleteProperty(target, prop);
     },
-    ownKeys(_8) {
+    ownKeys(_2) {
       target ?? (target = getter());
       return Reflect.ownKeys(target);
     },
-    getOwnPropertyDescriptor(_8, prop) {
+    getOwnPropertyDescriptor(_2, prop) {
       target ?? (target = getter());
       return Reflect.getOwnPropertyDescriptor(target, prop);
     },
-    defineProperty(_8, prop, descriptor) {
+    defineProperty(_2, prop, descriptor) {
       target ?? (target = getter());
       return Reflect.defineProperty(target, prop, descriptor);
     }
@@ -1939,8 +1939,8 @@ function safeExtend(schema, shape2) {
   }
   return clone(schema, mergeDefs(schema._zod.def, { shape: extended(schema, shape2) }));
 }
-function merge(a, b8) {
-  if (!b8?._zod?.def) {
+function merge(a, b2) {
+  if (!b2?._zod?.def) {
     throw new Error("Invalid input to merge: expected an object schema. To merge a plain shape, use `.extend()`.");
   }
   if (a._zod.def.checks?.length) {
@@ -1948,13 +1948,13 @@ function merge(a, b8) {
   }
   const newShape = {};
   mirrorShape(newShape, a, Reflect.ownKeys(sourceShape(a)));
-  mirrorShape(newShape, b8, Reflect.ownKeys(sourceShape(b8)));
+  mirrorShape(newShape, b2, Reflect.ownKeys(sourceShape(b2)));
   const def = mergeDefs(a._zod.def, {
     shape: newShape,
     get catchall() {
-      return b8._zod.def.catchall;
+      return b2._zod.def.catchall;
     },
-    checks: b8._zod.def.checks ?? []
+    checks: b2._zod.def.checks ?? []
   });
   return clone(a, def);
 }
@@ -1979,21 +1979,21 @@ function required(Class2, schema, mask) {
   ));
   return clone(schema, mergeDefs(schema._zod.def, { shape: newShape }));
 }
-function aborted(x8, startIndex = 0) {
-  if (x8.aborted === true)
+function aborted(x3, startIndex = 0) {
+  if (x3.aborted === true)
     return true;
-  for (let i = startIndex; i < x8.issues.length; i++) {
-    if (x8.issues[i]?.continue !== true) {
+  for (let i = startIndex; i < x3.issues.length; i++) {
+    if (x3.issues[i]?.continue !== true) {
       return true;
     }
   }
   return false;
 }
-function explicitlyAborted(x8, startIndex = 0) {
-  if (x8.aborted === true)
+function explicitlyAborted(x3, startIndex = 0) {
+  if (x3.aborted === true)
     return true;
-  for (let i = startIndex; i < x8.issues.length; i++) {
-    if (x8.issues[i]?.continue === false) {
+  for (let i = startIndex; i < x3.issues.length; i++) {
+    if (x3.issues[i]?.continue === false) {
       return true;
     }
   }
@@ -2013,10 +2013,10 @@ function unwrapMessage(message) {
 function sizeCaps(defChecks) {
   const caps = [];
   for (const ch of defChecks ?? []) {
-    const d = ch._zod.def;
-    if (!/_(length|size)$|_equals$/.test(d.check))
+    const d3 = ch._zod.def;
+    if (!/_(length|size)$|_equals$/.test(d3.check))
       break;
-    const max = d.maximum ?? d.length ?? d.size;
+    const max = d3.maximum ?? d3.length ?? d3.size;
     if (max >= 0)
       caps.push([max, ch]);
   }
@@ -2116,9 +2116,9 @@ function issue(...args) {
   return { ...iss };
 }
 function cleanEnum(obj) {
-  return Object.entries(obj).filter(([k, _8]) => {
+  return Object.entries(obj).filter(([k, _2]) => {
     return Number.isNaN(Number.parseInt(k, 10));
-  }).map((el) => el[1]);
+  }).map((el2) => el2[1]);
 }
 function base64ToUint8Array(base642) {
   const binaryString = atob(base642);
@@ -2155,7 +2155,7 @@ function hexToUint8Array(hex) {
   return bytes;
 }
 function uint8ArrayToHex(bytes) {
-  return Array.from(bytes).map((b8) => b8.toString(16).padStart(2, "0")).join("");
+  return Array.from(bytes).map((b2) => b2.toString(16).padStart(2, "0")).join("");
 }
 var Class = class {
   constructor(..._args) {
@@ -2307,7 +2307,7 @@ function $constructor(name, initializer3, proto, params) {
   const zodProto = {};
   function Internals(def) {
     this.def = def;
-    this.constr = _8;
+    this.constr = _2;
     this.traits = /* @__PURE__ */ new Set();
   }
   Internals.prototype = zodProto;
@@ -2329,16 +2329,16 @@ function $constructor(name, initializer3, proto, params) {
     if (initialized) {
       const own2 = Object.getPrototypeOf(inst);
       const ctorProto = inst._zod.constr.prototype;
-      let up = own2;
-      while (up && up !== ctorProto)
-        up = Object.getPrototypeOf(up);
-      const target = up ?? own2;
+      let up2 = own2;
+      while (up2 && up2 !== ctorProto)
+        up2 = Object.getPrototypeOf(up2);
+      const target = up2 ?? own2;
       if (!initialized.has(target)) {
         initialized.add(target);
         members(target, protoMembers);
       }
     }
-    const proto2 = _8.prototype;
+    const proto2 = _2.prototype;
     for (const k in proto2) {
       if (!Object.prototype.hasOwnProperty.call(proto2, k))
         continue;
@@ -2351,7 +2351,7 @@ function $constructor(name, initializer3, proto, params) {
   class Definition extends Parent {
   }
   Object.defineProperty(Definition, "name", { value: name });
-  function _8(def) {
+  function _2(def) {
     const inst = params?.Parent ? newError(Definition) : this;
     init(inst, def);
     const deferred = inst._zod.deferred;
@@ -2366,16 +2366,16 @@ function $constructor(name, initializer3, proto, params) {
       pp(inst);
     return inst;
   }
-  Object.defineProperty(_8, "init", { value: init });
-  Object.defineProperty(_8, Symbol.hasInstance, {
+  Object.defineProperty(_2, "init", { value: init });
+  Object.defineProperty(_2, Symbol.hasInstance, {
     value: (inst) => {
       if (params?.Parent && inst instanceof params.Parent)
         return true;
       return inst?._zod?.traits?.has(name);
     }
   });
-  Object.defineProperty(_8, "name", { value: name });
-  return _8;
+  Object.defineProperty(_2, "name", { value: name });
+  return _2;
 }
 var $ZodAsyncError = class extends Error {
   constructor() {
@@ -2480,23 +2480,23 @@ function formatError(error2, mapper = (issue2) => issue2.message) {
           let curr = fieldErrors;
           let i = 0;
           while (i < fullpath.length) {
-            const el = fullpath[i];
+            const el2 = fullpath[i];
             const terminal = i === fullpath.length - 1;
-            if (el === "_errors") {
+            if (el2 === "_errors") {
               if (terminal)
                 curr._errors.push(mapper(issue2));
               i++;
               continue;
             }
-            if (!Object.prototype.hasOwnProperty.call(curr, el)) {
-              Object.defineProperty(curr, el, {
+            if (!Object.prototype.hasOwnProperty.call(curr, el2)) {
+              Object.defineProperty(curr, el2, {
                 value: { _errors: [] },
                 enumerable: true,
                 writable: true,
                 configurable: true
               });
             }
-            const node2 = curr[el];
+            const node2 = curr[el2];
             if (terminal) {
               node2._errors.push(mapper(issue2));
             }
@@ -2523,9 +2523,9 @@ var _parse = (_Err) => {
       throw new $ZodAsyncError();
     }
     if (result.issues.length) {
-      const e8 = new (_params?.Err ?? _Err)(result.issues.map((iss) => finalizeIssue(iss, ctx, config())));
-      captureStackTrace(e8, _params?.callee ?? fn2);
-      throw e8;
+      const e5 = new (_params?.Err ?? _Err)(result.issues.map((iss) => finalizeIssue(iss, ctx, config())));
+      captureStackTrace(e5, _params?.callee ?? fn2);
+      throw e5;
     }
     return result.value;
   };
@@ -2538,9 +2538,9 @@ var _parseAsync = (_Err) => {
     if (result instanceof Promise)
       result = await result;
     if (result.issues.length) {
-      const e8 = new (params?.Err ?? _Err)(result.issues.map((iss) => finalizeIssue(iss, ctx, config())));
-      captureStackTrace(e8, params?.callee ?? fn2);
-      throw e8;
+      const e5 = new (params?.Err ?? _Err)(result.issues.map((iss) => finalizeIssue(iss, ctx, config())));
+      captureStackTrace(e5, params?.callee ?? fn2);
+      throw e5;
     }
     return result.value;
   };
@@ -2566,8 +2566,8 @@ function failure(Err, issues, ctx) {
       }
       return error2;
     },
-    set error(e8) {
-      error2 = e8;
+    set error(e5) {
+      error2 = e5;
       issues = void 0;
       ctx = void 0;
     }
@@ -3063,17 +3063,17 @@ var Doc = class {
       return;
     }
     const content = arg;
-    const lines = content.split("\n").filter((x8) => x8);
-    const minIndent = Math.min(...lines.map((x8) => x8.length - x8.trimStart().length));
-    const dedented = lines.map((x8) => x8.slice(minIndent)).map((x8) => " ".repeat(this.indent * 2) + x8);
+    const lines = content.split("\n").filter((x3) => x3);
+    const minIndent = Math.min(...lines.map((x3) => x3.length - x3.trimStart().length));
+    const dedented = lines.map((x3) => x3.slice(minIndent)).map((x3) => " ".repeat(this.indent * 2) + x3);
     for (const line of dedented) {
       this.content.push(line);
     }
   }
   compile() {
-    const F11 = Function;
+    const F10 = Function;
     const content = this?.content ?? [``];
-    const factory = new F11(...Object.keys(this.closed), `return function (${this.args.join(", ")}) {
+    const factory = new F10(...Object.keys(this.closed), `return function (${this.args.join(", ")}) {
 ${content.join("\n")}
 };`);
     return factory(...Object.values(this.closed));
@@ -3123,13 +3123,13 @@ var $ZodType = /* @__PURE__ */ $constructor("$ZodType", (inst, def) => {
           continue;
         }
         const currLen = payload.issues.length;
-        const _8 = ch._zod.check(payload);
-        if (_8 instanceof Promise && ctx?.async === false) {
+        const _2 = ch._zod.check(payload);
+        if (_2 instanceof Promise && ctx?.async === false) {
           throw new $ZodAsyncError();
         }
-        if (asyncResult || _8 instanceof Promise) {
+        if (asyncResult || _2 instanceof Promise) {
           asyncResult = (asyncResult ?? Promise.resolve()).then(async () => {
-            await _8;
+            await _2;
             const nextLen = payload.issues.length;
             if (nextLen === currLen)
               return;
@@ -3210,7 +3210,7 @@ function standardProps(inst) {
         const r = inst._zod.run({ value, issues: [] }, ctx);
         if (!(r instanceof Promise))
           return toStandardResult(r, ctx);
-      } catch (_8) {
+      } catch (_2) {
       }
       return validateAsync2(inst, value);
     },
@@ -3221,11 +3221,11 @@ function standardProps(inst) {
 var $ZodString = /* @__PURE__ */ $constructor("$ZodString", (inst, def) => {
   $ZodType.init(inst, def);
   inst._zod.pattern = def.pattern ?? anyString;
-  inst._zod.parse = (payload, _8) => {
+  inst._zod.parse = (payload, _2) => {
     if (def.coerce)
       try {
         payload.value = String(payload.value);
-      } catch (_10) {
+      } catch (_9) {
       }
     if (typeof payload.value === "string")
       return payload;
@@ -3258,10 +3258,10 @@ var $ZodUUID = /* @__PURE__ */ $constructor("$ZodUUID", (inst, def) => {
       v7: 7,
       v8: 8
     };
-    const v8 = versionMap[def.version];
-    if (v8 === void 0)
+    const v2 = versionMap[def.version];
+    if (v2 === void 0)
       throw new Error(`Invalid UUID version: "${def.version}"`);
-    def.pattern ?? (def.pattern = uuid(v8));
+    def.pattern ?? (def.pattern = uuid(v2));
   } else
     def.pattern ?? (def.pattern = uuid());
   $ZodStringFormat.init(inst, def);
@@ -3370,7 +3370,7 @@ var $ZodURL = /* @__PURE__ */ $constructor("$ZodURL", (inst, def) => {
       }
       payload.value = def.normalize ? url2.href : stripTabAndNewline(trimmed);
       return;
-    } catch (_8) {
+    } catch (_2) {
       payload.issues.push({
         code: "invalid_format",
         format: "url",
@@ -3583,7 +3583,7 @@ var $ZodNumber = /* @__PURE__ */ $constructor("$ZodNumber", (inst, def) => {
     if (def.coerce)
       try {
         payload.value = Number(payload.value);
-      } catch (_8) {
+      } catch (_2) {
       }
     const input = payload.value;
     if (typeof input === "number" && !Number.isNaN(input) && Number.isFinite(input)) {
@@ -3611,7 +3611,7 @@ var $ZodBoolean = /* @__PURE__ */ $constructor("$ZodBoolean", (inst, def) => {
     if (def.coerce)
       try {
         payload.value = Boolean(payload.value);
-      } catch (_8) {
+      } catch (_2) {
       }
     const input = payload.value;
     if (typeof input === "boolean")
@@ -3632,7 +3632,7 @@ var $ZodBigInt = /* @__PURE__ */ $constructor("$ZodBigInt", (inst, def) => {
     if (def.coerce)
       try {
         payload.value = BigInt(payload.value);
-      } catch (_8) {
+      } catch (_2) {
       }
     if (typeof payload.value === "bigint")
       return payload;
@@ -3854,7 +3854,7 @@ function handleCatchall(proms, input, payload, ctx, def, inst, abortEarly) {
     }
     const r = _catchall.run({ value: input[key], issues: [] }, ctx);
     if (r instanceof Promise) {
-      proms.push(r.then((r10) => handlePropertyResult(r10, payload, key, input, optin, optout)));
+      proms.push(r.then((r2) => handlePropertyResult(r2, payload, key, input, optin, optout)));
     } else {
       handlePropertyResult(r, payload, key, input, optin, optout);
     }
@@ -3899,8 +3899,8 @@ var $ZodObject = /* @__PURE__ */ $constructor("$ZodObject", (inst, def) => {
         if (!Object.prototype.hasOwnProperty.call(propValues, key)) {
           assignProp(propValues, key, /* @__PURE__ */ new Set());
         }
-        for (const v8 of field.values)
-          propValues[key].add(v8);
+        for (const v2 of field.values)
+          propValues[key].add(v2);
         if (field.optin !== void 0)
           propValues[key].add(void 0);
       }
@@ -3937,12 +3937,12 @@ var $ZodObject = /* @__PURE__ */ $constructor("$ZodObject", (inst, def) => {
       }
       if (key === "__proto__")
         continue;
-      const el = shape2[key];
-      const optin = el._zod.optin;
-      const optout = el._zod.optout;
-      const r = el._zod.run({ value: input[key], issues: [] }, ctx);
+      const el2 = shape2[key];
+      const optin = el2._zod.optin;
+      const optout = el2._zod.optout;
+      const r = el2._zod.run({ value: input[key], issues: [] }, ctx);
       if (r instanceof Promise) {
-        proms.push(r.then((r10) => handlePropertyResult(r10, payload, key, input, optin, optout)));
+        proms.push(r.then((r2) => handlePropertyResult(r2, payload, key, input, optin, optout)));
       } else {
         handlePropertyResult(r, payload, key, input, optin, optout);
       }
@@ -4102,18 +4102,18 @@ function handleUnionResults(results, final, inst, ctx) {
 }
 var $ZodUnion = /* @__PURE__ */ $constructor("$ZodUnion", (inst, def) => {
   $ZodType.init(inst, def);
-  defineLazyInternal(inst, "optin", (zod) => zod.def.options.some((o6) => o6._zod.optin === "defaulted") ? "defaulted" : zod.def.options.some((o6) => o6._zod.optin !== void 0) ? "optional" : void 0);
-  defineLazyInternal(inst, "optout", (zod) => zod.def.options.some((o6) => o6._zod.optout === "optional") ? "optional" : void 0);
+  defineLazyInternal(inst, "optin", (zod) => zod.def.options.some((o3) => o3._zod.optin === "defaulted") ? "defaulted" : zod.def.options.some((o3) => o3._zod.optin !== void 0) ? "optional" : void 0);
+  defineLazyInternal(inst, "optout", (zod) => zod.def.options.some((o3) => o3._zod.optout === "optional") ? "optional" : void 0);
   defineLazyInternal(inst, "values", (zod) => {
-    if (zod.def.options.every((o6) => o6._zod.values)) {
+    if (zod.def.options.every((o3) => o3._zod.values)) {
       return new Set(zod.def.options.flatMap((option) => Array.from(option._zod.values)));
     }
     return void 0;
   });
   defineLazyInternal(inst, "pattern", (zod) => {
-    if (zod.def.options.every((o6) => o6._zod.pattern)) {
-      const patterns = zod.def.options.map((o6) => o6._zod.pattern);
-      return new RegExp(`^(${patterns.map((p) => cleanRegex(p.source)).join("|")})$`);
+    if (zod.def.options.every((o3) => o3._zod.pattern)) {
+      const patterns = zod.def.options.map((o3) => o3._zod.pattern);
+      return new RegExp(`^(${patterns.map((p3) => cleanRegex(p3.source)).join("|")})$`);
     }
     return void 0;
   });
@@ -4176,11 +4176,11 @@ var $ZodDiscriminatedUnion = /* @__PURE__ */ $constructor("$ZodDiscriminatedUnio
         throw new Error(`Invalid discriminated union option at index "${zod.def.options.indexOf(option)}"`);
       if (pv[zod.def.discriminator]?.has(void 0))
         undefinedCount++;
-      for (const [k, v8] of Object.entries(pv)) {
+      for (const [k, v2] of Object.entries(pv)) {
         if (!Object.prototype.hasOwnProperty.call(propValues, k)) {
           assignProp(propValues, k, /* @__PURE__ */ new Set());
         }
-        for (const val of v8) {
+        for (const val of v2) {
           propValues[k].add(val);
         }
       }
@@ -4243,23 +4243,23 @@ var $ZodIntersection = /* @__PURE__ */ $constructor("$ZodIntersection", (inst, d
     return handleIntersectionResults(payload, left, right);
   };
 });
-function mergeValues(a, b8) {
-  if (a === b8) {
+function mergeValues(a, b2) {
+  if (a === b2) {
     return { valid: true, data: a };
   }
-  if (a instanceof Date && b8 instanceof Date && +a === +b8) {
+  if (a instanceof Date && b2 instanceof Date && +a === +b2) {
     return { valid: true, data: a };
   }
-  if (isPlainObject(a) && isPlainObject(b8)) {
-    const bKeys = Object.keys(b8);
+  if (isPlainObject(a) && isPlainObject(b2)) {
+    const bKeys = Object.keys(b2);
     const sharedKeys = Object.keys(a).filter((key) => bKeys.indexOf(key) !== -1);
-    const newObj = { ...a, ...b8 };
+    const newObj = { ...a, ...b2 };
     if (Object.prototype.hasOwnProperty.call(newObj, "__proto__"))
       delete newObj.__proto__;
     for (const key of sharedKeys) {
       if (key === "__proto__")
         continue;
-      const sharedValue = mergeValues(a[key], b8[key]);
+      const sharedValue = mergeValues(a[key], b2[key]);
       if (!sharedValue.valid) {
         return {
           valid: false,
@@ -4270,14 +4270,14 @@ function mergeValues(a, b8) {
     }
     return { valid: true, data: newObj };
   }
-  if (Array.isArray(a) && Array.isArray(b8)) {
-    if (a.length !== b8.length) {
+  if (Array.isArray(a) && Array.isArray(b2)) {
+    if (a.length !== b2.length) {
       return { valid: false, mergeErrorPath: [] };
     }
     const newArray = [];
     for (let index = 0; index < a.length; index++) {
       const itemA = a[index];
-      const itemB = b8[index];
+      const itemB = b2[index];
       const sharedValue = mergeValues(itemA, itemB);
       if (!sharedValue.valid) {
         return {
@@ -4323,7 +4323,7 @@ function handleIntersectionResults(result, left, right) {
     if (!collect(iss, "r"))
       result.issues.push(iss);
   }
-  const bothKeys = [...unrecKeys].filter(([, f10]) => f10.l && f10.r).map(([k]) => k);
+  const bothKeys = [...unrecKeys].filter(([, f2]) => f2.l && f2.r).map(([k]) => k);
   if (bothKeys.length) {
     const aggregated = unrecIssue ? bothKeys.filter((k) => unrecIssue.keys.includes(k)) : [];
     if (aggregated.length)
@@ -4504,7 +4504,7 @@ var $ZodEnum = /* @__PURE__ */ $constructor("$ZodEnum", (inst, def) => {
   inst._zod.values = valuesSet;
   defineLazyInternal(inst, "pattern", (zod) => {
     const patternValues = getEnumValues(zod.def.entries).filter((k) => propertyKeyTypes.has(typeof k));
-    return new RegExp(patternValues.length ? `^(${patternValues.map((o6) => escapeRegex(o6.toString())).join("|")})$` : "^[^\\s\\S]$");
+    return new RegExp(patternValues.length ? `^(${patternValues.map((o3) => escapeRegex(o3.toString())).join("|")})$` : "^[^\\s\\S]$");
   });
   inst._zod.parse = (payload, _ctx) => {
     const input = payload.value;
@@ -4526,7 +4526,7 @@ var $ZodLiteral = /* @__PURE__ */ $constructor("$ZodLiteral", (inst, def) => {
   inst._zod.values = values;
   defineLazyInternal(inst, "pattern", (zod) => {
     const vals = zod.def.values;
-    return new RegExp(vals.length ? `^(${vals.map((o6) => typeof o6 === "string" ? escapeRegex(o6) : o6 ? escapeRegex(o6.toString()) : String(o6)).join("|")})$` : "^[^\\s\\S]$");
+    return new RegExp(vals.length ? `^(${vals.map((o3) => typeof o3 === "string" ? escapeRegex(o3) : o3 ? escapeRegex(o3.toString()) : String(o3)).join("|")})$` : "^[^\\s\\S]$");
   });
   inst._zod.parse = (payload, _ctx) => {
     const input = payload.value;
@@ -4660,8 +4660,8 @@ var $ZodPrefault = /* @__PURE__ */ $constructor("$ZodPrefault", (inst, def) => {
 var $ZodNonOptional = /* @__PURE__ */ $constructor("$ZodNonOptional", (inst, def) => {
   $ZodType.init(inst, def);
   defineLazyInternal(inst, "values", (zod) => {
-    const v8 = zod.def.innerType._zod.values;
-    return v8 ? new Set([...v8].filter((x8) => x8 !== void 0)) : void 0;
+    const v2 = zod.def.innerType._zod.values;
+    return v2 ? new Set([...v2].filter((x3) => x3 !== void 0)) : void 0;
   });
   inst._zod.parse = (payload, ctx) => {
     const result = def.innerType._zod.run(payload, ctx);
@@ -4771,10 +4771,10 @@ function handleReadonlyResult(payload) {
 var $ZodLazy = /* @__PURE__ */ $constructor("$ZodLazy", (inst, def) => {
   $ZodType.init(inst, def);
   defineLazy(inst._zod, "innerType", () => {
-    const d = def;
-    if (!d._cachedInner)
-      d._cachedInner = def.getter();
-    return d._cachedInner;
+    const d3 = def;
+    if (!d3._cachedInner)
+      d3._cachedInner = def.getter();
+    return d3._cachedInner;
   });
   defineLazyInternal(inst, "pattern", (zod) => zod.innerType?._zod?.pattern);
   defineLazyInternal(inst, "propValues", (zod) => zod.innerType?._zod?.propValues);
@@ -4788,14 +4788,14 @@ var $ZodLazy = /* @__PURE__ */ $constructor("$ZodLazy", (inst, def) => {
 var $ZodCustom = /* @__PURE__ */ $constructor("$ZodCustom", (inst, def) => {
   $ZodCheck.init(inst, def);
   $ZodType.init(inst, def);
-  inst._zod.parse = (payload, _8) => {
+  inst._zod.parse = (payload, _2) => {
     return payload;
   };
   inst._zod.check = (payload) => {
     const input = payload.value;
     const r = def.fn(input);
     if (r instanceof Promise) {
-      return r.then((r10) => handleRefineResult(r10, payload, input, inst));
+      return r.then((r2) => handleRefineResult(r2, payload, input, inst));
     }
     handleRefineResult(r, payload, input, inst);
     return;
@@ -4882,8 +4882,8 @@ function isRecursive(inst, stack, resolve) {
       check(def.element);
       break;
     case "tuple":
-      for (const el of def.items)
-        check(el);
+      for (const el2 of def.items)
+        check(el2);
       check(def.rest);
       break;
     case "record":
@@ -4895,8 +4895,8 @@ function isRecursive(inst, stack, resolve) {
       check(def.valueType);
       break;
     case "union":
-      for (const el of def.options)
-        check(el);
+      for (const el2 of def.options)
+        check(el2);
       break;
     case "intersection":
       check(def.left);
@@ -4962,8 +4962,8 @@ function isRecursive(inst, stack, resolve) {
         if (value._zod)
           check(value);
         else if (Array.isArray(value))
-          for (const el of value)
-            check(el);
+          for (const el2 of value)
+            check(el2);
       }
     }
   }
@@ -5198,7 +5198,7 @@ var error = () => {
         return `Invalid key in ${issue2.origin}`;
       case "invalid_union":
         if (issue2.options && Array.isArray(issue2.options) && issue2.options.length > 0) {
-          const opts = issue2.options.map((o6) => `'${o6}'`).join(" | ");
+          const opts = issue2.options.map((o3) => `'${o3}'`).join(" | ");
           return `Invalid discriminator value. Expected ${opts}`;
         }
         if (issue2.inclusive === false) {
@@ -5247,12 +5247,12 @@ var $ZodRegistry = class {
     return this;
   }
   get(schema) {
-    const p = schema._zod.parent;
-    if (p) {
-      const pm = { ...this.get(p) ?? {} };
+    const p3 = schema._zod.parent;
+    if (p3) {
+      const pm = { ...this.get(p3) ?? {} };
       delete pm.id;
-      const f10 = { ...pm, ...this._map.get(schema) };
-      return Object.keys(f10).length ? f10 : void 0;
+      const f2 = { ...pm, ...this._map.get(schema) };
+      return Object.keys(f2).length ? f2 : void 0;
     }
     return this._map.get(schema);
   }
@@ -5740,10 +5740,10 @@ function _endsWith(suffix, params) {
   });
 }
 // @__NO_SIDE_EFFECTS__
-function _overwrite(tx2) {
+function _overwrite(tx) {
   return new $ZodCheckOverwrite({
     check: "overwrite",
-    tx: tx2
+    tx
   });
 }
 // @__NO_SIDE_EFFECTS__
@@ -6104,7 +6104,7 @@ function foldIntersection(json) {
   for (const key of FOLDABLE_KEYS)
     if (key in json)
       return;
-  const unions = allOf.filter((m6) => UNION_KEYS.some((k) => Array.isArray(m6[k])));
+  const unions = allOf.filter((m3) => UNION_KEYS.some((k) => Array.isArray(m3[k])));
   let folded = null;
   if (!unions.length) {
     folded = foldObjects(allOf);
@@ -6113,9 +6113,9 @@ function foldIntersection(json) {
     const keyword = UNION_KEYS.find((k) => Array.isArray(union2[k]));
     if (Object.keys(union2).length !== 1)
       return;
-    const rest = allOf.filter((m6) => m6 !== union2);
+    const rest = allOf.filter((m3) => m3 !== union2);
     const branches = union2[keyword].map((branch) => foldObjects([...rest, branch]));
-    if (branches.some((b8) => !b8))
+    if (branches.some((b2) => !b2))
       return;
     folded = { [keyword]: branches };
   }
@@ -6372,7 +6372,7 @@ var addPattern = (agg, pattern) => {
   agg.patterns.add(pattern);
 };
 var intersectMime = (agg, mime) => {
-  agg.mime = agg.mime ? agg.mime.filter((m6) => mime.includes(m6)) : [...mime];
+  agg.mime = agg.mime ? agg.mime.filter((m3) => mime.includes(m3)) : [...mime];
 };
 var setFormat = (agg, format) => {
   agg.format = format;
@@ -6450,7 +6450,7 @@ var exactPatterns = /* @__PURE__ */ new Map([
   [base64Charset, base64],
   [base64urlCharset, base64url]
 ]);
-var exactPattern = (p) => exactPatterns.get(p) ?? p;
+var exactPattern = (p3) => exactPatterns.get(p3) ?? p3;
 var stringProcessor = (schema, ctx, _json, _params) => {
   const json = _json;
   json.type = "string";
@@ -6522,7 +6522,7 @@ var numberProcessor = (schema, ctx, _json, params) => {
     if (first !== void 0)
       json.multipleOf = first;
     if (rest.length)
-      json.allOf = [...json.allOf ?? [], ...rest.map((m6) => ({ multipleOf: m6 }))];
+      json.allOf = [...json.allOf ?? [], ...rest.map((m3) => ({ multipleOf: m3 }))];
   }
 };
 var booleanProcessor = (_schema, _ctx, json, _params) => {
@@ -6566,9 +6566,9 @@ var enumProcessor = (schema, _ctx, json, _params) => {
     json.not = {};
     return;
   }
-  if (values.every((v8) => typeof v8 === "number"))
+  if (values.every((v2) => typeof v2 === "number"))
     json.type = "number";
-  if (values.every((v8) => typeof v8 === "string"))
+  if (values.every((v2) => typeof v2 === "string"))
     json.type = "string";
   json.enum = values;
 };
@@ -6601,13 +6601,13 @@ var literalProcessor = (schema, ctx, json, params) => {
       json.const = val;
     }
   } else {
-    if (vals.every((v8) => typeof v8 === "number"))
+    if (vals.every((v2) => typeof v2 === "number"))
       json.type = "number";
-    if (vals.every((v8) => typeof v8 === "string"))
+    if (vals.every((v2) => typeof v2 === "string"))
       json.type = "string";
-    if (vals.every((v8) => typeof v8 === "boolean"))
+    if (vals.every((v2) => typeof v2 === "boolean"))
       json.type = "boolean";
-    if (vals.every((v8) => v8 === null))
+    if (vals.every((v2) => v2 === null))
       json.type = "null";
     json.enum = vals;
   }
@@ -6640,7 +6640,7 @@ var fileProcessor = (schema, _ctx, json, _params) => {
   else if (mime.length === 1)
     _json.contentMediaType = mime[0];
   else
-    _json.anyOf = mime.map((m6) => ({ contentMediaType: m6 }));
+    _json.anyOf = mime.map((m3) => ({ contentMediaType: m3 }));
 };
 var successProcessor = (_schema, _ctx, json, _params) => {
   json.type = "boolean";
@@ -6725,7 +6725,7 @@ var objectProcessor = (schema, ctx, _json, params) => {
 var unionProcessor = (schema, ctx, json, params) => {
   const def = schema._zod.def;
   const isExclusive = def.inclusive === false;
-  const options = def.options.map((x8, i) => processSchema(x8, ctx, {
+  const options = def.options.map((x3, i) => processSchema(x3, ctx, {
     ...params,
     path: [...params.path, isExclusive ? "oneOf" : "anyOf", i]
   }));
@@ -6741,14 +6741,14 @@ var intersectionProcessor = (schema, ctx, json, params) => {
     ...params,
     path: [...params.path, "allOf", 0]
   });
-  const b8 = processSchema(def.right, ctx, {
+  const b2 = processSchema(def.right, ctx, {
     ...params,
     path: [...params.path, "allOf", 1]
   });
   const isSimpleIntersection = (val) => "allOf" in val && Object.keys(val).length === 1;
   const allOf = [
     ...isSimpleIntersection(a) ? a.allOf : [a],
-    ...isSimpleIntersection(b8) ? b8.allOf : [b8]
+    ...isSimpleIntersection(b2) ? b2.allOf : [b2]
   ];
   json.allOf = allOf;
   ctx.intersections.push(allOf);
@@ -6759,7 +6759,7 @@ var tupleProcessor = (schema, ctx, _json, params) => {
   json.type = "array";
   const prefixPath = ctx.target === "draft-2020-12" ? "prefixItems" : "items";
   const restPath = ctx.target === "draft-2020-12" ? "items" : ctx.target === "openapi-3.0" ? "items" : "additionalItems";
-  const prefixItems = def.items.map((x8, i) => processSchema(x8, ctx, {
+  const prefixItems = def.items.map((x3, i) => processSchema(x3, ctx, {
     ...params,
     path: [...params.path, prefixPath, i]
   }));
@@ -6839,11 +6839,11 @@ function stringifyKeyNames(bySchema, json, visited) {
   const types = Array.isArray(json.type) ? json.type : [json.type];
   const numericType = !types.includes("string") && types.some((t) => t === "number" || t === "integer");
   const values = json.enum ?? (json.const !== void 0 ? [json.const] : void 0);
-  if (!numericType && !values?.some((v8) => typeof v8 === "number"))
+  if (!numericType && !values?.some((v2) => typeof v2 === "number"))
     return json;
   const { minimum, maximum, exclusiveMinimum, exclusiveMaximum, multipleOf, format, id, ...rest } = json;
   if (rest.enum)
-    rest.enum = rest.enum.map((v8) => typeof v8 === "number" ? String(v8) : v8);
+    rest.enum = rest.enum.map((v2) => typeof v2 === "number" ? String(v2) : v2);
   else if (typeof rest.const === "number")
     rest.const = String(rest.const);
   if (!numericType)
@@ -6917,7 +6917,7 @@ var recordProcessor = (schema, ctx, _json, params) => {
   const keyValues = keyType._zod.values;
   const omittableOnInput = ctx.io === "input" && inputOptin(def.valueType) !== void 0;
   if (keyValues && !def.partial && !omittableOnInput) {
-    const validKeyValues = [...keyValues].filter((v8) => typeof v8 === "string" || typeof v8 === "number");
+    const validKeyValues = [...keyValues].filter((v2) => typeof v2 === "string" || typeof v2 === "number");
     if (validKeyValues.length > 0) {
       json.required = validKeyValues.map(String);
     }
@@ -6943,7 +6943,7 @@ var nonoptionalProcessor = (schema, ctx, _json, params) => {
 var UNREPRESENTABLE_DEFAULT = /* @__PURE__ */ Symbol();
 function serializeDefaultValue(value, schema, ctx, json, params) {
   let unrepresentable = false;
-  const serialized = JSON.stringify(value, (_8, val) => {
+  const serialized = JSON.stringify(value, (_2, val) => {
     if (typeof val !== "bigint")
       return val;
     unrepresentable = true;
@@ -7068,7 +7068,7 @@ function toJSONSchema(input, params) {
     const ctx2 = initializeContext({ ...params, processors: allProcessors });
     const defs = {};
     for (const entry of registry2._idmap.entries()) {
-      const [_8, schema] = entry;
+      const [_2, schema] = entry;
       processSchema(schema, ctx2);
     }
     const schemas = {};
@@ -7227,14 +7227,14 @@ var ZodType = /* @__PURE__ */ $constructor("ZodType", (inst, def) => {
   and(arg) {
     return intersection(this, arg);
   },
-  transform(tx2) {
-    return pipe(this, transform(tx2));
+  transform(tx) {
+    return pipe(this, transform(tx));
   },
-  default(d) {
-    return _default(this, d);
+  default(d3) {
+    return _default(this, d3);
   },
-  prefault(d) {
-    return prefault(this, d);
+  prefault(d3) {
+    return prefault(this, d3);
   },
   catch(params) {
     return _catch(this, params);
@@ -7966,7 +7966,7 @@ var ZodEnum = /* @__PURE__ */ $constructor("ZodEnum", (inst, def) => {
   };
 });
 function _enum(values, params) {
-  const entries = Array.isArray(values) ? Object.fromEntries(values.map((v8) => [v8, v8])) : values;
+  const entries = Array.isArray(values) ? Object.fromEntries(values.map((v2) => [v2, v2])) : values;
   return new ZodEnum({
     type: "enum",
     entries,
@@ -9059,8 +9059,8 @@ var SafeUrlSchema = url().superRefine((val, ctx) => {
     return NEVER;
   }
 }).refine((url2) => {
-  const u10 = new URL(url2);
-  return u10.protocol !== "javascript:" && u10.protocol !== "data:" && u10.protocol !== "vbscript:";
+  const u2 = new URL(url2);
+  return u2.protocol !== "javascript:" && u2.protocol !== "data:" && u2.protocol !== "vbscript:";
 }, { message: "URL cannot use javascript:, data:, or vbscript: scheme" });
 var OAuthProtectedResourceMetadataSchema = looseObject({
   resource: string2().url(),
@@ -10367,12 +10367,12 @@ function wrapOutputSchemaForLegacy(natural) {
     if (!parentIsNameMap && establishesNewBase(node2["$id"])) return node2;
     const out = {};
     let convertedRecursion = false;
-    for (const [k, v8] of Object.entries(node2)) if (parentIsNameMap) out[k] = rewriteRefs(v8, false);
-    else if ((k === "$ref" || k === "$dynamicRef") && typeof v8 === "string") out[k] = v8 === "#" ? "#/properties/result" : v8.startsWith("#/") ? `#/properties/result${v8.slice(1)}` : v8;
-    else if (k === "$recursiveRef" && v8 === "#" && convertRecursiveRefs) convertedRecursion = true;
-    else if (REF_REWRITE_DATA_POSITION_KEYS.has(k)) out[k] = v8;
-    else if (REF_REWRITE_NAME_MAP_KEYS.has(k)) out[k] = rewriteRefs(v8, true);
-    else out[k] = rewriteRefs(v8, false);
+    for (const [k, v2] of Object.entries(node2)) if (parentIsNameMap) out[k] = rewriteRefs(v2, false);
+    else if ((k === "$ref" || k === "$dynamicRef") && typeof v2 === "string") out[k] = v2 === "#" ? "#/properties/result" : v2.startsWith("#/") ? `#/properties/result${v2.slice(1)}` : v2;
+    else if (k === "$recursiveRef" && v2 === "#" && convertRecursiveRefs) convertedRecursion = true;
+    else if (REF_REWRITE_DATA_POSITION_KEYS.has(k)) out[k] = v2;
+    else if (REF_REWRITE_NAME_MAP_KEYS.has(k)) out[k] = rewriteRefs(v2, true);
+    else out[k] = rewriteRefs(v2, false);
     if (convertedRecursion) if ("$ref" in out) out["allOf"] = [...Array.isArray(out["allOf"]) ? out["allOf"] : [], { $ref: "#/properties/result" }];
     else out["$ref"] = "#/properties/result";
     return out;
@@ -10440,60 +10440,60 @@ var resultMethodKeys = {
 var maps$1;
 function registryMaps() {
   if (maps$1) return maps$1;
-  const s10 = buildSchemas2025();
+  const s2 = buildSchemas2025();
   maps$1 = {
     requestSchemas: {
-      ping: s10.PingRequestSchema,
-      initialize: s10.InitializeRequestSchema,
-      "completion/complete": s10.CompleteRequestSchema,
-      "logging/setLevel": s10.SetLevelRequestSchema,
-      "prompts/get": s10.GetPromptRequestSchema,
-      "prompts/list": s10.ListPromptsRequestSchema,
-      "resources/list": s10.ListResourcesRequestSchema,
-      "resources/templates/list": s10.ListResourceTemplatesRequestSchema,
-      "resources/read": s10.ReadResourceRequestSchema,
-      "resources/subscribe": s10.SubscribeRequestSchema,
-      "resources/unsubscribe": s10.UnsubscribeRequestSchema,
-      "tools/call": s10.CallToolRequestSchema,
-      "tools/list": s10.ListToolsRequestSchema,
-      "tasks/get": s10.GetTaskRequestSchema,
-      "tasks/result": s10.GetTaskPayloadRequestSchema,
-      "tasks/list": s10.ListTasksRequestSchema,
-      "tasks/cancel": s10.CancelTaskRequestSchema,
-      "sampling/createMessage": s10.CreateMessageRequestSchema,
-      "elicitation/create": s10.ElicitRequestSchema,
-      "roots/list": s10.ListRootsRequestSchema
+      ping: s2.PingRequestSchema,
+      initialize: s2.InitializeRequestSchema,
+      "completion/complete": s2.CompleteRequestSchema,
+      "logging/setLevel": s2.SetLevelRequestSchema,
+      "prompts/get": s2.GetPromptRequestSchema,
+      "prompts/list": s2.ListPromptsRequestSchema,
+      "resources/list": s2.ListResourcesRequestSchema,
+      "resources/templates/list": s2.ListResourceTemplatesRequestSchema,
+      "resources/read": s2.ReadResourceRequestSchema,
+      "resources/subscribe": s2.SubscribeRequestSchema,
+      "resources/unsubscribe": s2.UnsubscribeRequestSchema,
+      "tools/call": s2.CallToolRequestSchema,
+      "tools/list": s2.ListToolsRequestSchema,
+      "tasks/get": s2.GetTaskRequestSchema,
+      "tasks/result": s2.GetTaskPayloadRequestSchema,
+      "tasks/list": s2.ListTasksRequestSchema,
+      "tasks/cancel": s2.CancelTaskRequestSchema,
+      "sampling/createMessage": s2.CreateMessageRequestSchema,
+      "elicitation/create": s2.ElicitRequestSchema,
+      "roots/list": s2.ListRootsRequestSchema
     },
     notificationSchemas: {
-      "notifications/cancelled": s10.CancelledNotificationSchema,
-      "notifications/progress": s10.ProgressNotificationSchema,
-      "notifications/initialized": s10.InitializedNotificationSchema,
-      "notifications/roots/list_changed": s10.RootsListChangedNotificationSchema,
-      "notifications/tasks/status": s10.TaskStatusNotificationSchema,
-      "notifications/message": s10.LoggingMessageNotificationSchema,
-      "notifications/resources/updated": s10.ResourceUpdatedNotificationSchema,
-      "notifications/resources/list_changed": s10.ResourceListChangedNotificationSchema,
-      "notifications/tools/list_changed": s10.ToolListChangedNotificationSchema,
-      "notifications/prompts/list_changed": s10.PromptListChangedNotificationSchema,
-      "notifications/elicitation/complete": s10.ElicitationCompleteNotificationSchema
+      "notifications/cancelled": s2.CancelledNotificationSchema,
+      "notifications/progress": s2.ProgressNotificationSchema,
+      "notifications/initialized": s2.InitializedNotificationSchema,
+      "notifications/roots/list_changed": s2.RootsListChangedNotificationSchema,
+      "notifications/tasks/status": s2.TaskStatusNotificationSchema,
+      "notifications/message": s2.LoggingMessageNotificationSchema,
+      "notifications/resources/updated": s2.ResourceUpdatedNotificationSchema,
+      "notifications/resources/list_changed": s2.ResourceListChangedNotificationSchema,
+      "notifications/tools/list_changed": s2.ToolListChangedNotificationSchema,
+      "notifications/prompts/list_changed": s2.PromptListChangedNotificationSchema,
+      "notifications/elicitation/complete": s2.ElicitationCompleteNotificationSchema
     },
     resultSchemas: {
-      ping: s10.EmptyResultSchema,
-      initialize: s10.InitializeResultSchema,
-      "completion/complete": s10.CompleteResultSchema,
-      "logging/setLevel": s10.EmptyResultSchema,
-      "prompts/get": s10.GetPromptResultSchema,
-      "prompts/list": s10.ListPromptsResultSchema,
-      "resources/list": s10.ListResourcesResultSchema,
-      "resources/templates/list": s10.ListResourceTemplatesResultSchema,
-      "resources/read": s10.ReadResourceResultSchema,
-      "resources/subscribe": s10.EmptyResultSchema,
-      "resources/unsubscribe": s10.EmptyResultSchema,
-      "tools/call": s10.CallToolResultWireSchema,
-      "tools/list": s10.ListToolsResultSchema,
-      "sampling/createMessage": s10.CreateMessageResultWithToolsSchema,
-      "elicitation/create": s10.ElicitResultSchema,
-      "roots/list": s10.ListRootsResultSchema
+      ping: s2.EmptyResultSchema,
+      initialize: s2.InitializeResultSchema,
+      "completion/complete": s2.CompleteResultSchema,
+      "logging/setLevel": s2.EmptyResultSchema,
+      "prompts/get": s2.GetPromptResultSchema,
+      "prompts/list": s2.ListPromptsResultSchema,
+      "resources/list": s2.ListResourcesResultSchema,
+      "resources/templates/list": s2.ListResourceTemplatesResultSchema,
+      "resources/read": s2.ReadResourceResultSchema,
+      "resources/subscribe": s2.EmptyResultSchema,
+      "resources/unsubscribe": s2.EmptyResultSchema,
+      "tools/call": s2.CallToolResultWireSchema,
+      "tools/list": s2.ListToolsResultSchema,
+      "sampling/createMessage": s2.CreateMessageResultWithToolsSchema,
+      "elicitation/create": s2.ElicitResultSchema,
+      "roots/list": s2.ListRootsResultSchema
     }
   };
   return maps$1;
@@ -10557,8 +10557,8 @@ var rev2025Codec = {
   validateInputRequest: () => NOT_IN_ERA$1,
   validateInputResponse: () => NOT_IN_ERA$1,
   samplingResultVariant: ((hasTools, raw) => {
-    const s10 = buildSchemas2025();
-    return triState$1(hasTools ? s10.CreateMessageResultWithToolsSchema : s10.CreateMessageResultSchema, raw);
+    const s2 = buildSchemas2025();
+    return triState$1(hasTools ? s2.CreateMessageResultWithToolsSchema : s2.CreateMessageResultSchema, raw);
   }),
   outboundEnvelope: (_material) => void 0,
   validateEnvelopeMeta: (_meta) => [],
@@ -11715,16 +11715,16 @@ var INPUT_REQUEST_METHODS_2026 = [
 var maps;
 function inputSchemaMaps() {
   if (maps) return maps;
-  const s10 = buildSchemas2026();
+  const s2 = buildSchemas2026();
   maps = {
     request: {
       "elicitation/create": object({
         method: literal("elicitation/create"),
-        params: s10.ElicitRequestParamsSchema
+        params: s2.ElicitRequestParamsSchema
       }),
       "sampling/createMessage": object({
         method: literal("sampling/createMessage"),
-        params: s10.CreateMessageRequestParamsSchema
+        params: s2.CreateMessageRequestParamsSchema
       }),
       "roots/list": object({
         method: literal("roots/list"),
@@ -11732,9 +11732,9 @@ function inputSchemaMaps() {
       })
     },
     response: {
-      "elicitation/create": s10.ElicitResultSchema,
-      "sampling/createMessage": s10.CreateMessageResultSchema,
-      "roots/list": s10.ListRootsResultSchema
+      "elicitation/create": s2.ElicitResultSchema,
+      "sampling/createMessage": s2.CreateMessageResultSchema,
+      "roots/list": s2.ListRootsResultSchema
     }
   };
   return maps;
@@ -11953,17 +11953,17 @@ var rev2026Codec = {
 var wireResultSchemasMemo;
 function getWireResultSchemas() {
   if (wireResultSchemasMemo) return wireResultSchemasMemo;
-  const s10 = buildSchemas2026();
+  const s2 = buildSchemas2026();
   wireResultSchemasMemo = {
-    "tools/call": s10.CallToolResultSchema,
-    "tools/list": s10.ListToolsResultSchema,
-    "prompts/get": s10.GetPromptResultSchema,
-    "prompts/list": s10.ListPromptsResultSchema,
-    "resources/list": s10.ListResourcesResultSchema,
-    "resources/templates/list": s10.ListResourceTemplatesResultSchema,
-    "resources/read": s10.ReadResourceResultSchema,
-    "completion/complete": s10.CompleteResultSchema,
-    "server/discover": s10.DiscoverResultSchema
+    "tools/call": s2.CallToolResultSchema,
+    "tools/list": s2.ListToolsResultSchema,
+    "prompts/get": s2.GetPromptResultSchema,
+    "prompts/list": s2.ListPromptsResultSchema,
+    "resources/list": s2.ListResourcesResultSchema,
+    "resources/templates/list": s2.ListResourceTemplatesResultSchema,
+    "resources/read": s2.ReadResourceResultSchema,
+    "completion/complete": s2.CompleteResultSchema,
+    "server/discover": s2.DiscoverResultSchema
   };
   return wireResultSchemasMemo;
 }
@@ -12711,13 +12711,13 @@ function isProvablyObjectShapedRoot(schema, root = schema) {
     "allOf"
   ]) {
     const members2 = schema[key];
-    if (Array.isArray(members2) && members2.length > 0) return members2.every((m6) => m6 !== null && typeof m6 === "object" && (m6.type === "object" || isProvablyObjectShapedRoot(m6, "$id" in m6 ? {} : root)));
+    if (Array.isArray(members2) && members2.length > 0) return members2.every((m3) => m3 !== null && typeof m3 === "object" && (m3.type === "object" || isProvablyObjectShapedRoot(m3, "$id" in m3 ? {} : root)));
   }
   return false;
 }
 function formatIssue(issue2) {
   if (!issue2.path?.length) return issue2.message;
-  return `${issue2.path.map((p) => String(typeof p === "object" ? p.key : p)).join(".")}: ${issue2.message}`;
+  return `${issue2.path.map((p3) => String(typeof p3 === "object" ? p3.key : p3)).join(".")}: ${issue2.message}`;
 }
 async function validateStandardSchema(schema, data) {
   const result = await schema["~standard"].validate(data);
@@ -13130,7 +13130,7 @@ var _isSpecType = {};
 function register(key, schema) {
   const name = key.slice(0, -6);
   _specTypeSchemas[name] = schema;
-  _isSpecType[name] = (v8) => schema.safeParse(v8).success;
+  _isSpecType[name] = (v2) => schema.safeParse(v2).success;
 }
 for (const key of SPEC_SCHEMA_KEYS) register(key, schemas_exports2[key]);
 for (const [key, schema] of Object.entries(authSchemas)) register(key, schema);
@@ -14110,23 +14110,23 @@ function validateAndWarnToolName(name) {
   issueToolNameWarning(name, result.warnings);
   return result.isValid;
 }
-function isZodV4Schema(v8) {
-  return typeof v8 === "object" && v8 !== null && "_zod" in v8;
+function isZodV4Schema(v2) {
+  return typeof v2 === "object" && v2 !== null && "_zod" in v2;
 }
-function looksLikeZodV3(v8) {
-  return typeof v8 === "object" && v8 !== null && !("_zod" in v8) && "_def" in v8 && typeof v8._def?.typeName === "string";
+function looksLikeZodV3(v2) {
+  return typeof v2 === "object" && v2 !== null && !("_zod" in v2) && "_def" in v2 && typeof v2._def?.typeName === "string";
 }
 function isZodRawShape(obj) {
   if (typeof obj !== "object" || obj === null) return false;
   if (isStandardSchema(obj)) return false;
   const proto = Object.getPrototypeOf(obj);
   if (proto !== Object.prototype && proto !== null) return false;
-  return Object.values(obj).every((v8) => isZodV4Schema(v8));
+  return Object.values(obj).every((v2) => isZodV4Schema(v2));
 }
 function normalizeRawShapeSchema(schema) {
   if (schema === void 0) return void 0;
   if (isZodRawShape(schema)) return object(schema);
-  if (typeof schema === "object" && schema !== null && !isStandardSchema(schema) && Object.values(schema).some((v8) => looksLikeZodV3(v8))) throw new TypeError("Raw-shape inputSchema/outputSchema/argsSchema fields must be Zod v4 schemas. Got a Zod v3 field schema. Import from `zod/v4` (or upgrade your zod import), or wrap with `z.object({...})` yourself.");
+  if (typeof schema === "object" && schema !== null && !isStandardSchema(schema) && Object.values(schema).some((v2) => looksLikeZodV3(v2))) throw new TypeError("Raw-shape inputSchema/outputSchema/argsSchema fields must be Zod v4 schemas. Got a Zod v3 field schema. Import from `zod/v4` (or upgrade your zod import), or wrap with `z.object({...})` yourself.");
   if (!isStandardSchema(schema)) throw new TypeError("inputSchema/outputSchema/argsSchema must be a Standard Schema (e.g. z.object({...})) or a raw Zod shape ({ field: z.string() }).");
   return schema;
 }
@@ -14140,10 +14140,10 @@ var require_code$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
   exports._CodeOrName = _CodeOrName;
   exports.IDENTIFIER = /^[a-z$_][a-z$_0-9]*$/i;
   var Name = class extends _CodeOrName {
-    constructor(s10) {
+    constructor(s2) {
       super();
-      if (!exports.IDENTIFIER.test(s10)) throw new Error("CodeGen: name must be a valid identifier");
-      this.str = s10;
+      if (!exports.IDENTIFIER.test(s2)) throw new Error("CodeGen: name must be a valid identifier");
+      this.str = s2;
     }
     toString() {
       return this.str;
@@ -14171,7 +14171,7 @@ var require_code$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
     }
     get str() {
       var _a4;
-      return (_a4 = this._str) !== null && _a4 !== void 0 ? _a4 : this._str = this._items.reduce((s10, c) => `${s10}${c}`, "");
+      return (_a4 = this._str) !== null && _a4 !== void 0 ? _a4 : this._str = this._items.reduce((s2, c) => `${s2}${c}`, "");
     }
     get names() {
       var _a4;
@@ -14183,7 +14183,7 @@ var require_code$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
   };
   exports._Code = _Code;
   exports.nil = new _Code("");
-  function _8(strs, ...args) {
+  function _2(strs, ...args) {
     const code = [strs[0]];
     let i = 0;
     while (i < args.length) {
@@ -14192,7 +14192,7 @@ var require_code$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
     }
     return new _Code(code);
   }
-  exports._ = _8;
+  exports._ = _2;
   const plus = new _Code("+");
   function str(strs, ...args) {
     const expr = [safeStringify(strs[0])];
@@ -14226,34 +14226,34 @@ var require_code$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
       i++;
     }
   }
-  function mergeExprItems(a, b8) {
-    if (b8 === '""') return a;
-    if (a === '""') return b8;
+  function mergeExprItems(a, b2) {
+    if (b2 === '""') return a;
+    if (a === '""') return b2;
     if (typeof a == "string") {
-      if (b8 instanceof Name || a[a.length - 1] !== '"') return;
-      if (typeof b8 != "string") return `${a.slice(0, -1)}${b8}"`;
-      if (b8[0] === '"') return a.slice(0, -1) + b8.slice(1);
+      if (b2 instanceof Name || a[a.length - 1] !== '"') return;
+      if (typeof b2 != "string") return `${a.slice(0, -1)}${b2}"`;
+      if (b2[0] === '"') return a.slice(0, -1) + b2.slice(1);
       return;
     }
-    if (typeof b8 == "string" && b8[0] === '"' && !(a instanceof Name)) return `"${a}${b8.slice(1)}`;
+    if (typeof b2 == "string" && b2[0] === '"' && !(a instanceof Name)) return `"${a}${b2.slice(1)}`;
   }
-  function strConcat(c1, c22) {
-    return c22.emptyStr() ? c1 : c1.emptyStr() ? c22 : str`${c1}${c22}`;
+  function strConcat(c1, c2) {
+    return c2.emptyStr() ? c1 : c1.emptyStr() ? c2 : str`${c1}${c2}`;
   }
   exports.strConcat = strConcat;
-  function interpolate(x8) {
-    return typeof x8 == "number" || typeof x8 == "boolean" || x8 === null ? x8 : safeStringify(Array.isArray(x8) ? x8.join(",") : x8);
+  function interpolate(x3) {
+    return typeof x3 == "number" || typeof x3 == "boolean" || x3 === null ? x3 : safeStringify(Array.isArray(x3) ? x3.join(",") : x3);
   }
-  function stringify2(x8) {
-    return new _Code(safeStringify(x8));
+  function stringify2(x3) {
+    return new _Code(safeStringify(x3));
   }
   exports.stringify = stringify2;
-  function safeStringify(x8) {
-    return JSON.stringify(x8).replace(/\u2028/g, "\\u2028").replace(/\u2029/g, "\\u2029");
+  function safeStringify(x3) {
+    return JSON.stringify(x3).replace(/\u2028/g, "\\u2028").replace(/\u2029/g, "\\u2029");
   }
   exports.safeStringify = safeStringify;
   function getProperty(key) {
-    return typeof key == "string" && exports.IDENTIFIER.test(key) ? new _Code(`.${key}`) : _8`[${key}]`;
+    return typeof key == "string" && exports.IDENTIFIER.test(key) ? new _Code(`.${key}`) : _2`[${key}]`;
   }
   exports.getProperty = getProperty;
   function getEsmExportName(key) {
@@ -14261,8 +14261,8 @@ var require_code$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
     throw new Error(`CodeGen: invalid export name: ${key}, use explicit $id name mapping`);
   }
   exports.getEsmExportName = getEsmExportName;
-  function regexpCode(rx) {
-    return new _Code(rx.toString());
+  function regexpCode(rx2) {
+    return new _Code(rx2.toString());
   }
   exports.regexpCode = regexpCode;
 }));
@@ -14352,9 +14352,9 @@ var require_scope = /* @__PURE__ */ __commonJSMin(((exports) => {
         if (_name) return _name;
       } else vs2 = this._values[prefix] = /* @__PURE__ */ new Map();
       vs2.set(valueKey, name);
-      const s10 = this._scope[prefix] || (this._scope[prefix] = []);
-      const itemIndex = s10.length;
-      s10[itemIndex] = value.ref;
+      const s2 = this._scope[prefix] || (this._scope[prefix] = []);
+      const itemIndex = s2.length;
+      s2[itemIndex] = value.ref;
       name.setValue(value, {
         property: prefix,
         itemIndex
@@ -14658,15 +14658,15 @@ var require_codegen = /* @__PURE__ */ __commonJSMin(((exports) => {
       super.optimizeNodes();
       const cond = this.condition;
       if (cond === true) return this.nodes;
-      let e8 = this.else;
-      if (e8) {
-        const ns3 = e8.optimizeNodes();
-        e8 = this.else = Array.isArray(ns3) ? new Else(ns3) : ns3;
+      let e5 = this.else;
+      if (e5) {
+        const ns3 = e5.optimizeNodes();
+        e5 = this.else = Array.isArray(ns3) ? new Else(ns3) : ns3;
       }
-      if (e8) {
-        if (cond === false) return e8 instanceof If2 ? e8 : e8.nodes;
+      if (e5) {
+        if (cond === false) return e5 instanceof If2 ? e5 : e5.nodes;
         if (this.nodes.length) return this;
-        return new If2(not(cond), e8 instanceof If2 ? [e8] : e8.nodes);
+        return new If2(not(cond), e5 instanceof If2 ? [e5] : e5.nodes);
       }
       if (cond === false || !this.nodes.length) return void 0;
       return this;
@@ -14994,13 +14994,13 @@ var require_codegen = /* @__PURE__ */ __commonJSMin(((exports) => {
       this._currNode.nodes.push(node2);
       this._nodes.push(node2);
     }
-    _endBlockNode(N1, N22) {
+    _endBlockNode(N12, N22) {
       const n = this._currNode;
-      if (n instanceof N1 || N22 && n instanceof N22) {
+      if (n instanceof N12 || N22 && n instanceof N22) {
         this._nodes.pop();
         return this;
       }
-      throw new Error(`CodeGen: not in block "${N22 ? `${N1.kind}/${N22.kind}` : N1.kind}"`);
+      throw new Error(`CodeGen: not in block "${N22 ? `${N12.kind}/${N22.kind}` : N12.kind}"`);
     }
     _elseNode(node2) {
       const n = this._currNode;
@@ -15043,15 +15043,15 @@ var require_codegen = /* @__PURE__ */ __commonJSMin(((exports) => {
       delete names[n.str];
       return c;
     }
-    function canOptimize(e8) {
-      return e8 instanceof code_1._Code && e8._items.some((c) => c instanceof code_1.Name && names[c.str] === 1 && constants3[c.str] !== void 0);
+    function canOptimize(e5) {
+      return e5 instanceof code_1._Code && e5._items.some((c) => c instanceof code_1.Name && names[c.str] === 1 && constants3[c.str] !== void 0);
     }
   }
   function subtractNames(names, from) {
     for (const n in from) names[n] = (names[n] || 0) - (from[n] || 0);
   }
-  function not(x8) {
-    return typeof x8 == "boolean" || typeof x8 == "number" || x8 === null ? !x8 : (0, code_1._)`!${par(x8)}`;
+  function not(x3) {
+    return typeof x3 == "boolean" || typeof x3 == "number" || x3 === null ? !x3 : (0, code_1._)`!${par(x3)}`;
   }
   exports.not = not;
   const andCode = mappend(exports.operators.AND);
@@ -15065,10 +15065,10 @@ var require_codegen = /* @__PURE__ */ __commonJSMin(((exports) => {
   }
   exports.or = or2;
   function mappend(op) {
-    return (x8, y10) => x8 === code_1.nil ? y10 : y10 === code_1.nil ? x8 : (0, code_1._)`${par(x8)} ${op} ${par(y10)}`;
+    return (x3, y2) => x3 === code_1.nil ? y2 : y2 === code_1.nil ? x3 : (0, code_1._)`${par(x3)} ${op} ${par(y2)}`;
   }
-  function par(x8) {
-    return x8 instanceof code_1.Name ? x8 : (0, code_1._)`(${x8})`;
+  function par(x3) {
+    return x3 instanceof code_1.Name ? x3 : (0, code_1._)`(${x3})`;
   }
 }));
 var require_util = /* @__PURE__ */ __commonJSMin(((exports) => {
@@ -15082,19 +15082,19 @@ var require_util = /* @__PURE__ */ __commonJSMin(((exports) => {
     return hash;
   }
   exports.toHash = toHash;
-  function alwaysValidSchema(it2, schema) {
+  function alwaysValidSchema(it3, schema) {
     if (typeof schema == "boolean") return schema;
     if (Object.keys(schema).length === 0) return true;
-    checkUnknownRules(it2, schema);
-    return !schemaHasRules(schema, it2.self.RULES.all);
+    checkUnknownRules(it3, schema);
+    return !schemaHasRules(schema, it3.self.RULES.all);
   }
   exports.alwaysValidSchema = alwaysValidSchema;
-  function checkUnknownRules(it2, schema = it2.schema) {
-    const { opts, self } = it2;
+  function checkUnknownRules(it3, schema = it3.schema) {
+    const { opts, self } = it3;
     if (!opts.strictSchema) return;
     if (typeof schema === "boolean") return;
     const rules2 = self.RULES.keywords;
-    for (const key in schema) if (!rules2[key]) checkStrictMode(it2, `unknown keyword: "${key}"`);
+    for (const key in schema) if (!rules2[key]) checkStrictMode(it3, `unknown keyword: "${key}"`);
   }
   exports.checkUnknownRules = checkUnknownRules;
   function schemaHasRules(schema, rules2) {
@@ -15134,9 +15134,9 @@ var require_util = /* @__PURE__ */ __commonJSMin(((exports) => {
     return str.replace(/~1/g, "/").replace(/~0/g, "~");
   }
   exports.unescapeJsonPointer = unescapeJsonPointer;
-  function eachItem(xs2, f10) {
-    if (Array.isArray(xs2)) for (const x8 of xs2) f10(x8);
-    else f10(xs2);
+  function eachItem(xs2, f2) {
+    if (Array.isArray(xs2)) for (const x3 of xs2) f2(x3);
+    else f2(xs2);
   }
   exports.eachItem = eachItem;
   function makeMergeEvaluated({ mergeNames, mergeToName, mergeValues: mergeValues2, resultToName }) {
@@ -15170,22 +15170,22 @@ var require_util = /* @__PURE__ */ __commonJSMin(((exports) => {
       resultToName: (gen, items) => gen.var("items", items)
     })
   };
-  function evaluatedPropsToName(gen, ps3) {
-    if (ps3 === true) return gen.var("props", true);
+  function evaluatedPropsToName(gen, ps2) {
+    if (ps2 === true) return gen.var("props", true);
     const props = gen.var("props", (0, codegen_1._)`{}`);
-    if (ps3 !== void 0) setEvaluated(gen, props, ps3);
+    if (ps2 !== void 0) setEvaluated(gen, props, ps2);
     return props;
   }
   exports.evaluatedPropsToName = evaluatedPropsToName;
-  function setEvaluated(gen, props, ps3) {
-    Object.keys(ps3).forEach((p) => gen.assign((0, codegen_1._)`${props}${(0, codegen_1.getProperty)(p)}`, true));
+  function setEvaluated(gen, props, ps2) {
+    Object.keys(ps2).forEach((p3) => gen.assign((0, codegen_1._)`${props}${(0, codegen_1.getProperty)(p3)}`, true));
   }
   exports.setEvaluated = setEvaluated;
   const snippets = {};
-  function useFunc(gen, f10) {
+  function useFunc(gen, f2) {
     return gen.scopeValue("func", {
-      ref: f10,
-      code: snippets[f10.code] || (snippets[f10.code] = new code_1._Code(f10.code))
+      ref: f2,
+      code: snippets[f2.code] || (snippets[f2.code] = new code_1._Code(f2.code))
     });
   }
   exports.useFunc = useFunc;
@@ -15202,11 +15202,11 @@ var require_util = /* @__PURE__ */ __commonJSMin(((exports) => {
     return jsPropertySyntax ? (0, codegen_1.getProperty)(dataProp).toString() : "/" + escapeJsonPointer(dataProp);
   }
   exports.getErrorPath = getErrorPath;
-  function checkStrictMode(it2, msg, mode = it2.opts.strictSchema) {
+  function checkStrictMode(it3, msg, mode = it3.opts.strictSchema) {
     if (!mode) return;
     msg = `strict mode: ${msg}`;
     if (mode === true) throw new Error(msg);
-    it2.self.logger.warn(msg);
+    it3.self.logger.warn(msg);
   }
   exports.checkStrictMode = checkStrictMode;
 }));
@@ -15242,18 +15242,18 @@ var require_errors = /* @__PURE__ */ __commonJSMin(((exports) => {
   exports.keywordError = { message: ({ keyword }) => (0, codegen_1.str)`must pass "${keyword}" keyword validation` };
   exports.keyword$DataError = { message: ({ keyword, schemaType }) => schemaType ? (0, codegen_1.str)`"${keyword}" keyword must be ${schemaType} ($data)` : (0, codegen_1.str)`"${keyword}" keyword is invalid ($data)` };
   function reportError(cxt, error2 = exports.keywordError, errorPaths, overrideAllErrors) {
-    const { it: it2 } = cxt;
-    const { gen, compositeRule, allErrors } = it2;
+    const { it: it3 } = cxt;
+    const { gen, compositeRule, allErrors } = it3;
     const errObj = errorObjectCode(cxt, error2, errorPaths);
     if (overrideAllErrors !== null && overrideAllErrors !== void 0 ? overrideAllErrors : compositeRule || allErrors) addError(gen, errObj);
-    else returnErrors(it2, (0, codegen_1._)`[${errObj}]`);
+    else returnErrors(it3, (0, codegen_1._)`[${errObj}]`);
   }
   exports.reportError = reportError;
   function reportExtraError(cxt, error2 = exports.keywordError, errorPaths) {
-    const { it: it2 } = cxt;
-    const { gen, compositeRule, allErrors } = it2;
+    const { it: it3 } = cxt;
+    const { gen, compositeRule, allErrors } = it3;
     addError(gen, errorObjectCode(cxt, error2, errorPaths));
-    if (!(compositeRule || allErrors)) returnErrors(it2, names_1.default.vErrors);
+    if (!(compositeRule || allErrors)) returnErrors(it3, names_1.default.vErrors);
   }
   exports.reportExtraError = reportExtraError;
   function resetErrorsCount(gen, errsCount) {
@@ -15261,14 +15261,14 @@ var require_errors = /* @__PURE__ */ __commonJSMin(((exports) => {
     gen.if((0, codegen_1._)`${names_1.default.vErrors} !== null`, () => gen.if(errsCount, () => gen.assign((0, codegen_1._)`${names_1.default.vErrors}.length`, errsCount), () => gen.assign(names_1.default.vErrors, null)));
   }
   exports.resetErrorsCount = resetErrorsCount;
-  function extendErrors({ gen, keyword, schemaValue, data, errsCount, it: it2 }) {
+  function extendErrors({ gen, keyword, schemaValue, data, errsCount, it: it3 }) {
     if (errsCount === void 0) throw new Error("ajv implementation error");
     const err = gen.name("err");
     gen.forRange("i", errsCount, names_1.default.errors, (i) => {
       gen.const(err, (0, codegen_1._)`${names_1.default.vErrors}[${i}]`);
-      gen.if((0, codegen_1._)`${err}.instancePath === undefined`, () => gen.assign((0, codegen_1._)`${err}.instancePath`, (0, codegen_1.strConcat)(names_1.default.instancePath, it2.errorPath)));
-      gen.assign((0, codegen_1._)`${err}.schemaPath`, (0, codegen_1.str)`${it2.errSchemaPath}/${keyword}`);
-      if (it2.opts.verbose) {
+      gen.if((0, codegen_1._)`${err}.instancePath === undefined`, () => gen.assign((0, codegen_1._)`${err}.instancePath`, (0, codegen_1.strConcat)(names_1.default.instancePath, it3.errorPath)));
+      gen.assign((0, codegen_1._)`${err}.schemaPath`, (0, codegen_1.str)`${it3.errSchemaPath}/${keyword}`);
+      if (it3.opts.verbose) {
         gen.assign((0, codegen_1._)`${err}.schema`, schemaValue);
         gen.assign((0, codegen_1._)`${err}.data`, data);
       }
@@ -15280,9 +15280,9 @@ var require_errors = /* @__PURE__ */ __commonJSMin(((exports) => {
     gen.if((0, codegen_1._)`${names_1.default.vErrors} === null`, () => gen.assign(names_1.default.vErrors, (0, codegen_1._)`[${err}]`), (0, codegen_1._)`${names_1.default.vErrors}.push(${err})`);
     gen.code((0, codegen_1._)`${names_1.default.errors}++`);
   }
-  function returnErrors(it2, errs) {
-    const { gen, validateName, schemaEnv } = it2;
-    if (schemaEnv.$async) gen.throw((0, codegen_1._)`new ${it2.ValidationError}(${errs})`);
+  function returnErrors(it3, errs) {
+    const { gen, validateName, schemaEnv } = it3;
+    if (schemaEnv.$async) gen.throw((0, codegen_1._)`new ${it3.ValidationError}(${errs})`);
     else {
       gen.assign((0, codegen_1._)`${validateName}.errors`, errs);
       gen.return(false);
@@ -15303,8 +15303,8 @@ var require_errors = /* @__PURE__ */ __commonJSMin(((exports) => {
     return errorObject(cxt, error2, errorPaths);
   }
   function errorObject(cxt, error2, errorPaths = {}) {
-    const { gen, it: it2 } = cxt;
-    const keyValues = [errorInstancePath(it2, errorPaths), errorSchemaPath(cxt, errorPaths)];
+    const { gen, it: it3 } = cxt;
+    const keyValues = [errorInstancePath(it3, errorPaths), errorSchemaPath(cxt, errorPaths)];
     extraErrorProps(cxt, error2, keyValues);
     return gen.object(...keyValues);
   }
@@ -15318,8 +15318,8 @@ var require_errors = /* @__PURE__ */ __commonJSMin(((exports) => {
     return [E.schemaPath, schPath];
   }
   function extraErrorProps(cxt, { params, message }, keyValues) {
-    const { keyword, data, schemaValue, it: it2 } = cxt;
-    const { opts, propertyName, topSchemaRef, schemaPath } = it2;
+    const { keyword, data, schemaValue, it: it3 } = cxt;
+    const { opts, propertyName, topSchemaRef, schemaPath } = it3;
     keyValues.push([E.keyword, keyword], [E.params, typeof params == "function" ? params(cxt) : params || (0, codegen_1._)`{}`]);
     if (opts.messages) keyValues.push([E.message, typeof message == "function" ? message(cxt) : message]);
     if (opts.verbose) keyValues.push([E.schema, schemaValue], [E.parentSchema, (0, codegen_1._)`${topSchemaRef}${schemaPath}`], [names_1.default.data, data]);
@@ -15333,9 +15333,9 @@ var require_boolSchema = /* @__PURE__ */ __commonJSMin(((exports) => {
   const codegen_1 = require_codegen();
   const names_1 = require_names();
   const boolError = { message: "boolean schema is false" };
-  function topBoolOrEmptySchema(it2) {
-    const { gen, schema, validateName } = it2;
-    if (schema === false) falseSchemaError(it2, false);
+  function topBoolOrEmptySchema(it3) {
+    const { gen, schema, validateName } = it3;
+    if (schema === false) falseSchemaError(it3, false);
     else if (typeof schema == "object" && schema.$async === true) gen.return(names_1.default.data);
     else {
       gen.assign((0, codegen_1._)`${validateName}.errors`, null);
@@ -15343,16 +15343,16 @@ var require_boolSchema = /* @__PURE__ */ __commonJSMin(((exports) => {
     }
   }
   exports.topBoolOrEmptySchema = topBoolOrEmptySchema;
-  function boolOrEmptySchema(it2, valid) {
-    const { gen, schema } = it2;
+  function boolOrEmptySchema(it3, valid) {
+    const { gen, schema } = it3;
     if (schema === false) {
       gen.var(valid, false);
-      falseSchemaError(it2);
+      falseSchemaError(it3);
     } else gen.var(valid, true);
   }
   exports.boolOrEmptySchema = boolOrEmptySchema;
-  function falseSchemaError(it2, overrideAllErrors) {
-    const { gen, data } = it2;
+  function falseSchemaError(it3, overrideAllErrors) {
+    const { gen, data } = it3;
     const cxt = {
       gen,
       keyword: "false schema",
@@ -15361,7 +15361,7 @@ var require_boolSchema = /* @__PURE__ */ __commonJSMin(((exports) => {
       schemaCode: false,
       schemaValue: false,
       params: {},
-      it: it2
+      it: it3
     };
     (0, errors_1.reportError)(cxt, boolError, void 0, overrideAllErrors);
   }
@@ -15378,8 +15378,8 @@ var require_rules = /* @__PURE__ */ __commonJSMin(((exports) => {
     "object",
     "array"
   ]);
-  function isJSONType(x8) {
-    return typeof x8 == "string" && jsonTypes.has(x8);
+  function isJSONType(x3) {
+    return typeof x3 == "string" && jsonTypes.has(x3);
   }
   exports.isJSONType = isJSONType;
   function getRules() {
@@ -15464,21 +15464,21 @@ var require_dataType = /* @__PURE__ */ __commonJSMin(((exports) => {
     return types;
   }
   exports.getSchemaTypes = getSchemaTypes;
-  function getJSONTypes(ts2) {
-    const types = Array.isArray(ts2) ? ts2 : ts2 ? [ts2] : [];
+  function getJSONTypes(ts3) {
+    const types = Array.isArray(ts3) ? ts3 : ts3 ? [ts3] : [];
     if (types.every(rules_1.isJSONType)) return types;
     throw new Error("type must be JSONType or JSONType[]: " + types.join(","));
   }
   exports.getJSONTypes = getJSONTypes;
-  function coerceAndCheckDataType(it2, types) {
-    const { gen, data, opts } = it2;
+  function coerceAndCheckDataType(it3, types) {
+    const { gen, data, opts } = it3;
     const coerceTo = coerceToTypes(types, opts.coerceTypes);
-    const checkTypes = types.length > 0 && !(coerceTo.length === 0 && types.length === 1 && (0, applicability_1.schemaHasRulesForType)(it2, types[0]));
+    const checkTypes = types.length > 0 && !(coerceTo.length === 0 && types.length === 1 && (0, applicability_1.schemaHasRulesForType)(it3, types[0]));
     if (checkTypes) {
       const wrongType = checkDataTypes(types, data, opts.strictNumbers, DataType.Wrong);
       gen.if(wrongType, () => {
-        if (coerceTo.length) coerceData(it2, types, coerceTo);
-        else reportTypeError(it2);
+        if (coerceTo.length) coerceData(it3, types, coerceTo);
+        else reportTypeError(it3);
       });
     }
     return checkTypes;
@@ -15494,19 +15494,19 @@ var require_dataType = /* @__PURE__ */ __commonJSMin(((exports) => {
   function coerceToTypes(types, coerceTypes) {
     return coerceTypes ? types.filter((t) => COERCIBLE.has(t) || coerceTypes === "array" && t === "array") : [];
   }
-  function coerceData(it2, types, coerceTo) {
-    const { gen, data, opts } = it2;
+  function coerceData(it3, types, coerceTo) {
+    const { gen, data, opts } = it3;
     const dataType = gen.let("dataType", (0, codegen_1._)`typeof ${data}`);
     const coerced = gen.let("coerced", (0, codegen_1._)`undefined`);
     if (opts.coerceTypes === "array") gen.if((0, codegen_1._)`${dataType} == 'object' && Array.isArray(${data}) && ${data}.length == 1`, () => gen.assign(data, (0, codegen_1._)`${data}[0]`).assign(dataType, (0, codegen_1._)`typeof ${data}`).if(checkDataTypes(types, data, opts.strictNumbers), () => gen.assign(coerced, data)));
     gen.if((0, codegen_1._)`${coerced} !== undefined`);
     for (const t of coerceTo) if (COERCIBLE.has(t) || t === "array" && opts.coerceTypes === "array") coerceSpecificType(t);
     gen.else();
-    reportTypeError(it2);
+    reportTypeError(it3);
     gen.endIf();
     gen.if((0, codegen_1._)`${coerced} !== undefined`, () => {
       gen.assign(data, coerced);
-      assignParentData(it2, coerced);
+      assignParentData(it3, coerced);
     });
     function coerceSpecificType(t) {
       switch (t) {
@@ -15584,14 +15584,14 @@ var require_dataType = /* @__PURE__ */ __commonJSMin(((exports) => {
     message: ({ schema }) => `must be ${schema}`,
     params: ({ schema, schemaValue }) => typeof schema == "string" ? (0, codegen_1._)`{type: ${schema}}` : (0, codegen_1._)`{type: ${schemaValue}}`
   };
-  function reportTypeError(it2) {
-    const cxt = getTypeErrorContext(it2);
+  function reportTypeError(it3) {
+    const cxt = getTypeErrorContext(it3);
     (0, errors_1.reportError)(cxt, typeError);
   }
   exports.reportTypeError = reportTypeError;
-  function getTypeErrorContext(it2) {
-    const { gen, data, schema } = it2;
-    const schemaCode = (0, util_1.schemaRefOrVal)(it2, schema, "type");
+  function getTypeErrorContext(it3) {
+    const { gen, data, schema } = it3;
+    const schemaCode = (0, util_1.schemaRefOrVal)(it3, schema, "type");
     return {
       gen,
       keyword: "type",
@@ -15601,7 +15601,7 @@ var require_dataType = /* @__PURE__ */ __commonJSMin(((exports) => {
       schemaValue: schemaCode,
       parentSchema: schema,
       params: {},
-      it: it2
+      it: it3
     };
   }
 }));
@@ -15610,18 +15610,18 @@ var require_defaults = /* @__PURE__ */ __commonJSMin(((exports) => {
   exports.assignDefaults = void 0;
   const codegen_1 = require_codegen();
   const util_1 = require_util();
-  function assignDefaults(it2, ty2) {
-    const { properties, items } = it2.schema;
-    if (ty2 === "object" && properties) for (const key in properties) assignDefault(it2, key, properties[key].default);
-    else if (ty2 === "array" && Array.isArray(items)) items.forEach((sch, i) => assignDefault(it2, i, sch.default));
+  function assignDefaults(it3, ty) {
+    const { properties, items } = it3.schema;
+    if (ty === "object" && properties) for (const key in properties) assignDefault(it3, key, properties[key].default);
+    else if (ty === "array" && Array.isArray(items)) items.forEach((sch, i) => assignDefault(it3, i, sch.default));
   }
   exports.assignDefaults = assignDefaults;
-  function assignDefault(it2, prop, defaultValue) {
-    const { gen, compositeRule, data, opts } = it2;
+  function assignDefault(it3, prop, defaultValue) {
+    const { gen, compositeRule, data, opts } = it3;
     if (defaultValue === void 0) return;
     const childData = (0, codegen_1._)`${data}${(0, codegen_1.getProperty)(prop)}`;
     if (compositeRule) {
-      (0, util_1.checkStrictMode)(it2, `default is ignored for: ${childData}`);
+      (0, util_1.checkStrictMode)(it3, `default is ignored for: ${childData}`);
       return;
     }
     let condition = (0, codegen_1._)`${childData} === undefined`;
@@ -15637,8 +15637,8 @@ var require_code = /* @__PURE__ */ __commonJSMin(((exports) => {
   const names_1 = require_names();
   const util_2 = require_util();
   function checkReportMissingProp(cxt, prop) {
-    const { gen, data, it: it2 } = cxt;
-    gen.if(noPropertyInData(gen, data, prop, it2.opts.ownProperties), () => {
+    const { gen, data, it: it3 } = cxt;
+    gen.if(noPropertyInData(gen, data, prop, it3.opts.ownProperties), () => {
       cxt.setParams({ missingProperty: (0, codegen_1._)`${prop}` }, true);
       cxt.error();
     });
@@ -15675,42 +15675,42 @@ var require_code = /* @__PURE__ */ __commonJSMin(((exports) => {
   }
   exports.noPropertyInData = noPropertyInData;
   function allSchemaProperties(schemaMap) {
-    return schemaMap ? Object.keys(schemaMap).filter((p) => p !== "__proto__") : [];
+    return schemaMap ? Object.keys(schemaMap).filter((p3) => p3 !== "__proto__") : [];
   }
   exports.allSchemaProperties = allSchemaProperties;
-  function schemaProperties(it2, schemaMap) {
-    return allSchemaProperties(schemaMap).filter((p) => !(0, util_1.alwaysValidSchema)(it2, schemaMap[p]));
+  function schemaProperties(it3, schemaMap) {
+    return allSchemaProperties(schemaMap).filter((p3) => !(0, util_1.alwaysValidSchema)(it3, schemaMap[p3]));
   }
   exports.schemaProperties = schemaProperties;
-  function callValidateCode({ schemaCode, data, it: { gen, topSchemaRef, schemaPath, errorPath }, it: it2 }, func, context, passSchema) {
+  function callValidateCode({ schemaCode, data, it: { gen, topSchemaRef, schemaPath, errorPath }, it: it3 }, func, context, passSchema) {
     const dataAndSchema = passSchema ? (0, codegen_1._)`${schemaCode}, ${data}, ${topSchemaRef}${schemaPath}` : data;
     const valCxt = [
       [names_1.default.instancePath, (0, codegen_1.strConcat)(names_1.default.instancePath, errorPath)],
-      [names_1.default.parentData, it2.parentData],
-      [names_1.default.parentDataProperty, it2.parentDataProperty],
+      [names_1.default.parentData, it3.parentData],
+      [names_1.default.parentDataProperty, it3.parentDataProperty],
       [names_1.default.rootData, names_1.default.rootData]
     ];
-    if (it2.opts.dynamicRef) valCxt.push([names_1.default.dynamicAnchors, names_1.default.dynamicAnchors]);
+    if (it3.opts.dynamicRef) valCxt.push([names_1.default.dynamicAnchors, names_1.default.dynamicAnchors]);
     const args = (0, codegen_1._)`${dataAndSchema}, ${gen.object(...valCxt)}`;
     return context !== codegen_1.nil ? (0, codegen_1._)`${func}.call(${context}, ${args})` : (0, codegen_1._)`${func}(${args})`;
   }
   exports.callValidateCode = callValidateCode;
   const newRegExp = (0, codegen_1._)`new RegExp`;
   function usePattern({ gen, it: { opts } }, pattern) {
-    const u10 = opts.unicodeRegExp ? "u" : "";
+    const u2 = opts.unicodeRegExp ? "u" : "";
     const { regExp } = opts.code;
-    const rx = regExp(pattern, u10);
+    const rx2 = regExp(pattern, u2);
     return gen.scopeValue("pattern", {
-      key: rx.toString(),
-      ref: rx,
-      code: (0, codegen_1._)`${regExp.code === "new RegExp" ? newRegExp : (0, util_2.useFunc)(gen, regExp)}(${pattern}, ${u10})`
+      key: rx2.toString(),
+      ref: rx2,
+      code: (0, codegen_1._)`${regExp.code === "new RegExp" ? newRegExp : (0, util_2.useFunc)(gen, regExp)}(${pattern}, ${u2})`
     });
   }
   exports.usePattern = usePattern;
   function validateArray(cxt) {
-    const { gen, data, keyword, it: it2 } = cxt;
+    const { gen, data, keyword, it: it3 } = cxt;
     const valid = gen.name("valid");
-    if (it2.allErrors) {
+    if (it3.allErrors) {
       const validArr = gen.let("valid", true);
       validateItems(() => gen.assign(validArr, false));
       return validArr;
@@ -15732,9 +15732,9 @@ var require_code = /* @__PURE__ */ __commonJSMin(((exports) => {
   }
   exports.validateArray = validateArray;
   function validateUnion(cxt) {
-    const { gen, schema, keyword, it: it2 } = cxt;
+    const { gen, schema, keyword, it: it3 } = cxt;
     if (!Array.isArray(schema)) throw new Error("ajv implementation error");
-    if (schema.some((sch) => (0, util_1.alwaysValidSchema)(it2, sch)) && !it2.opts.unevaluated) return;
+    if (schema.some((sch) => (0, util_1.alwaysValidSchema)(it3, sch)) && !it3.opts.unevaluated) return;
     const valid = gen.let("valid", false);
     const schValid = gen.name("_valid");
     gen.block(() => schema.forEach((_sch, i) => {
@@ -15758,15 +15758,15 @@ var require_keyword = /* @__PURE__ */ __commonJSMin(((exports) => {
   const code_1 = require_code();
   const errors_1 = require_errors();
   function macroKeywordCode(cxt, def) {
-    const { gen, keyword, schema, parentSchema, it: it2 } = cxt;
-    const macroSchema = def.macro.call(it2.self, schema, parentSchema, it2);
+    const { gen, keyword, schema, parentSchema, it: it3 } = cxt;
+    const macroSchema = def.macro.call(it3.self, schema, parentSchema, it3);
     const schemaRef = useKeyword(gen, keyword, macroSchema);
-    if (it2.opts.validateSchema !== false) it2.self.validateSchema(macroSchema, true);
+    if (it3.opts.validateSchema !== false) it3.self.validateSchema(macroSchema, true);
     const valid = gen.name("valid");
     cxt.subschema({
       schema: macroSchema,
       schemaPath: codegen_1.nil,
-      errSchemaPath: `${it2.errSchemaPath}/${keyword}`,
+      errSchemaPath: `${it3.errSchemaPath}/${keyword}`,
       topSchemaRef: schemaRef,
       compositeRule: true
     }, valid);
@@ -15775,9 +15775,9 @@ var require_keyword = /* @__PURE__ */ __commonJSMin(((exports) => {
   exports.macroKeywordCode = macroKeywordCode;
   function funcKeywordCode(cxt, def) {
     var _a4;
-    const { gen, keyword, schema, parentSchema, $data, it: it2 } = cxt;
-    checkAsyncKeyword(it2, def);
-    const validateRef = useKeyword(gen, keyword, !$data && def.compile ? def.compile.call(it2.self, schema, parentSchema, it2) : def.validate);
+    const { gen, keyword, schema, parentSchema, $data, it: it3 } = cxt;
+    checkAsyncKeyword(it3, def);
+    const validateRef = useKeyword(gen, keyword, !$data && def.compile ? def.compile.call(it3.self, schema, parentSchema, it3) : def.validate);
     const valid = gen.let("valid");
     cxt.block$data(valid, validateKeyword);
     cxt.ok((_a4 = def.valid) !== null && _a4 !== void 0 ? _a4 : valid);
@@ -15794,7 +15794,7 @@ var require_keyword = /* @__PURE__ */ __commonJSMin(((exports) => {
     }
     function validateAsync3() {
       const ruleErrs = gen.let("ruleErrs", null);
-      gen.try(() => assignValid((0, codegen_1._)`await `), (e8) => gen.assign(valid, false).if((0, codegen_1._)`${e8} instanceof ${it2.ValidationError}`, () => gen.assign(ruleErrs, (0, codegen_1._)`${e8}.errors`), () => gen.throw(e8)));
+      gen.try(() => assignValid((0, codegen_1._)`await `), (e5) => gen.assign(valid, false).if((0, codegen_1._)`${e5} instanceof ${it3.ValidationError}`, () => gen.assign(ruleErrs, (0, codegen_1._)`${e5}.errors`), () => gen.throw(e5)));
       return ruleErrs;
     }
     function validateSync() {
@@ -15804,7 +15804,7 @@ var require_keyword = /* @__PURE__ */ __commonJSMin(((exports) => {
       return validateErrs;
     }
     function assignValid(_await = def.async ? (0, codegen_1._)`await ` : codegen_1.nil) {
-      const passCxt = it2.opts.passContext ? names_1.default.this : names_1.default.self;
+      const passCxt = it3.opts.passContext ? names_1.default.this : names_1.default.self;
       const passSchema = !("compile" in def && !$data || def.schema === false);
       gen.assign(valid, (0, codegen_1._)`${_await}${(0, code_1.callValidateCode)(cxt, validateRef, passCxt, passSchema)}`, def.modifying);
     }
@@ -15815,8 +15815,8 @@ var require_keyword = /* @__PURE__ */ __commonJSMin(((exports) => {
   }
   exports.funcKeywordCode = funcKeywordCode;
   function modifyData(cxt) {
-    const { gen, data, it: it2 } = cxt;
-    gen.if(it2.parentData, () => gen.assign(data, (0, codegen_1._)`${it2.parentData}[${it2.parentDataProperty}]`));
+    const { gen, data, it: it3 } = cxt;
+    gen.if(it3.parentData, () => gen.assign(data, (0, codegen_1._)`${it3.parentData}[${it3.parentDataProperty}]`));
   }
   function addErrs(cxt, errs) {
     const { gen } = cxt;
@@ -15858,18 +15858,18 @@ var require_subschema = /* @__PURE__ */ __commonJSMin(((exports) => {
   exports.extendSubschemaMode = exports.extendSubschemaData = exports.getSubschema = void 0;
   const codegen_1 = require_codegen();
   const util_1 = require_util();
-  function getSubschema(it2, { keyword, schemaProp, schema, schemaPath, errSchemaPath, topSchemaRef }) {
+  function getSubschema(it3, { keyword, schemaProp, schema, schemaPath, errSchemaPath, topSchemaRef }) {
     if (keyword !== void 0 && schema !== void 0) throw new Error('both "keyword" and "schema" passed, only one allowed');
     if (keyword !== void 0) {
-      const sch = it2.schema[keyword];
+      const sch = it3.schema[keyword];
       return schemaProp === void 0 ? {
         schema: sch,
-        schemaPath: (0, codegen_1._)`${it2.schemaPath}${(0, codegen_1.getProperty)(keyword)}`,
-        errSchemaPath: `${it2.errSchemaPath}/${keyword}`
+        schemaPath: (0, codegen_1._)`${it3.schemaPath}${(0, codegen_1.getProperty)(keyword)}`,
+        errSchemaPath: `${it3.errSchemaPath}/${keyword}`
       } : {
         schema: sch[schemaProp],
-        schemaPath: (0, codegen_1._)`${it2.schemaPath}${(0, codegen_1.getProperty)(keyword)}${(0, codegen_1.getProperty)(schemaProp)}`,
-        errSchemaPath: `${it2.errSchemaPath}/${keyword}/${(0, util_1.escapeFragment)(schemaProp)}`
+        schemaPath: (0, codegen_1._)`${it3.schemaPath}${(0, codegen_1.getProperty)(keyword)}${(0, codegen_1.getProperty)(schemaProp)}`,
+        errSchemaPath: `${it3.errSchemaPath}/${keyword}/${(0, util_1.escapeFragment)(schemaProp)}`
       };
     }
     if (schema !== void 0) {
@@ -15884,12 +15884,12 @@ var require_subschema = /* @__PURE__ */ __commonJSMin(((exports) => {
     throw new Error('either "keyword" or "schema" must be passed');
   }
   exports.getSubschema = getSubschema;
-  function extendSubschemaData(subschema, it2, { dataProp, dataPropType: dpType, data, dataTypes, propertyName }) {
+  function extendSubschemaData(subschema, it3, { dataProp, dataPropType: dpType, data, dataTypes, propertyName }) {
     if (data !== void 0 && dataProp !== void 0) throw new Error('both "data" and "dataProp" passed, only one allowed');
-    const { gen } = it2;
+    const { gen } = it3;
     if (dataProp !== void 0) {
-      const { errorPath, dataPathArr, opts } = it2;
-      dataContextProps(gen.let("data", (0, codegen_1._)`${it2.data}${(0, codegen_1.getProperty)(dataProp)}`, true));
+      const { errorPath, dataPathArr, opts } = it3;
+      dataContextProps(gen.let("data", (0, codegen_1._)`${it3.data}${(0, codegen_1.getProperty)(dataProp)}`, true));
       subschema.errorPath = (0, codegen_1.str)`${errorPath}${(0, util_1.getErrorPath)(dataProp, dpType, opts.jsPropertySyntax)}`;
       subschema.parentDataProperty = (0, codegen_1._)`${dataProp}`;
       subschema.dataPathArr = [...dataPathArr, subschema.parentDataProperty];
@@ -15901,11 +15901,11 @@ var require_subschema = /* @__PURE__ */ __commonJSMin(((exports) => {
     if (dataTypes) subschema.dataTypes = dataTypes;
     function dataContextProps(_nextData) {
       subschema.data = _nextData;
-      subschema.dataLevel = it2.dataLevel + 1;
+      subschema.dataLevel = it3.dataLevel + 1;
       subschema.dataTypes = [];
-      it2.definedProperties = /* @__PURE__ */ new Set();
-      subschema.parentData = it2.data;
-      subschema.dataNames = [...it2.dataNames, _nextData];
+      it3.definedProperties = /* @__PURE__ */ new Set();
+      subschema.parentData = it3.data;
+      subschema.dataNames = [...it3.dataNames, _nextData];
     }
   }
   exports.extendSubschemaData = extendSubschemaData;
@@ -15919,31 +15919,31 @@ var require_subschema = /* @__PURE__ */ __commonJSMin(((exports) => {
   exports.extendSubschemaMode = extendSubschemaMode;
 }));
 var require_fast_deep_equal = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-  module.exports = function equal(a, b8) {
-    if (a === b8) return true;
-    if (a && b8 && typeof a == "object" && typeof b8 == "object") {
-      if (a.constructor !== b8.constructor) return false;
+  module.exports = function equal(a, b2) {
+    if (a === b2) return true;
+    if (a && b2 && typeof a == "object" && typeof b2 == "object") {
+      if (a.constructor !== b2.constructor) return false;
       var length, i, keys;
       if (Array.isArray(a)) {
         length = a.length;
-        if (length != b8.length) return false;
-        for (i = length; i-- !== 0; ) if (!equal(a[i], b8[i])) return false;
+        if (length != b2.length) return false;
+        for (i = length; i-- !== 0; ) if (!equal(a[i], b2[i])) return false;
         return true;
       }
-      if (a.constructor === RegExp) return a.source === b8.source && a.flags === b8.flags;
-      if (a.valueOf !== Object.prototype.valueOf) return a.valueOf() === b8.valueOf();
-      if (a.toString !== Object.prototype.toString) return a.toString() === b8.toString();
+      if (a.constructor === RegExp) return a.source === b2.source && a.flags === b2.flags;
+      if (a.valueOf !== Object.prototype.valueOf) return a.valueOf() === b2.valueOf();
+      if (a.toString !== Object.prototype.toString) return a.toString() === b2.toString();
       keys = Object.keys(a);
       length = keys.length;
-      if (length !== Object.keys(b8).length) return false;
-      for (i = length; i-- !== 0; ) if (!Object.prototype.hasOwnProperty.call(b8, keys[i])) return false;
+      if (length !== Object.keys(b2).length) return false;
+      for (i = length; i-- !== 0; ) if (!Object.prototype.hasOwnProperty.call(b2, keys[i])) return false;
       for (i = length; i-- !== 0; ) {
         var key = keys[i];
-        if (!equal(a[key], b8[key])) return false;
+        if (!equal(a[key], b2[key])) return false;
       }
       return true;
     }
-    return a !== a && b8 !== b8;
+    return a !== a && b2 !== b2;
   };
 }));
 var require_json_schema_traverse = /* @__PURE__ */ __commonJSMin(((exports, module) => {
@@ -16084,8 +16084,8 @@ var require_resolve = /* @__PURE__ */ __commonJSMin(((exports) => {
     return _getFullPath(resolver, resolver.parse(id));
   }
   exports.getFullPath = getFullPath;
-  function _getFullPath(resolver, p) {
-    return resolver.serialize(p).split("#")[0] + "#";
+  function _getFullPath(resolver, p3) {
+    return resolver.serialize(p3).split("#")[0] + "#";
   }
   exports._getFullPath = _getFullPath;
   const TRAILING_SLASH_HASH = /#\/?$/;
@@ -16107,7 +16107,7 @@ var require_resolve = /* @__PURE__ */ __commonJSMin(((exports) => {
     const pathPrefix = getFullPath(uriResolver, schId, false);
     const localRefs = {};
     const schemaRefs = /* @__PURE__ */ new Set();
-    traverse(schema, { allKeys: true }, (sch, jsonPtr, _8, parentJsonPtr) => {
+    traverse(schema, { allKeys: true }, (sch, jsonPtr, _2, parentJsonPtr) => {
       if (parentJsonPtr === void 0) return;
       const fullPath = pathPrefix + jsonPtr;
       let innerBaseId = baseIds[parentJsonPtr];
@@ -16161,15 +16161,15 @@ var require_validate = /* @__PURE__ */ __commonJSMin(((exports) => {
   const resolve_1 = require_resolve();
   const util_1 = require_util();
   const errors_1 = require_errors();
-  function validateFunctionCode(it2) {
-    if (isSchemaObj(it2)) {
-      checkKeywords(it2);
-      if (schemaCxtHasRules(it2)) {
-        topSchemaObjCode(it2);
+  function validateFunctionCode(it3) {
+    if (isSchemaObj(it3)) {
+      checkKeywords(it3);
+      if (schemaCxtHasRules(it3)) {
+        topSchemaObjCode(it3);
         return;
       }
     }
-    validateFunction(it2, () => (0, boolSchema_1.topBoolOrEmptySchema)(it2));
+    validateFunction(it3, () => (0, boolSchema_1.topBoolOrEmptySchema)(it3));
   }
   exports.validateFunctionCode = validateFunctionCode;
   function validateFunction({ gen, validateName, schema, schemaEnv, opts }, body) {
@@ -16198,78 +16198,78 @@ var require_validate = /* @__PURE__ */ __commonJSMin(((exports) => {
       if (opts.dynamicRef) gen.var(names_1.default.dynamicAnchors, (0, codegen_1._)`{}`);
     });
   }
-  function topSchemaObjCode(it2) {
-    const { schema, opts, gen } = it2;
-    validateFunction(it2, () => {
-      if (opts.$comment && schema.$comment) commentKeyword(it2);
-      checkNoDefault(it2);
+  function topSchemaObjCode(it3) {
+    const { schema, opts, gen } = it3;
+    validateFunction(it3, () => {
+      if (opts.$comment && schema.$comment) commentKeyword(it3);
+      checkNoDefault(it3);
       gen.let(names_1.default.vErrors, null);
       gen.let(names_1.default.errors, 0);
-      if (opts.unevaluated) resetEvaluated(it2);
-      typeAndKeywords(it2);
-      returnResults(it2);
+      if (opts.unevaluated) resetEvaluated(it3);
+      typeAndKeywords(it3);
+      returnResults(it3);
     });
   }
-  function resetEvaluated(it2) {
-    const { gen, validateName } = it2;
-    it2.evaluated = gen.const("evaluated", (0, codegen_1._)`${validateName}.evaluated`);
-    gen.if((0, codegen_1._)`${it2.evaluated}.dynamicProps`, () => gen.assign((0, codegen_1._)`${it2.evaluated}.props`, (0, codegen_1._)`undefined`));
-    gen.if((0, codegen_1._)`${it2.evaluated}.dynamicItems`, () => gen.assign((0, codegen_1._)`${it2.evaluated}.items`, (0, codegen_1._)`undefined`));
+  function resetEvaluated(it3) {
+    const { gen, validateName } = it3;
+    it3.evaluated = gen.const("evaluated", (0, codegen_1._)`${validateName}.evaluated`);
+    gen.if((0, codegen_1._)`${it3.evaluated}.dynamicProps`, () => gen.assign((0, codegen_1._)`${it3.evaluated}.props`, (0, codegen_1._)`undefined`));
+    gen.if((0, codegen_1._)`${it3.evaluated}.dynamicItems`, () => gen.assign((0, codegen_1._)`${it3.evaluated}.items`, (0, codegen_1._)`undefined`));
   }
   function funcSourceUrl(schema, opts) {
     const schId = typeof schema == "object" && schema[opts.schemaId];
     return schId && (opts.code.source || opts.code.process) ? (0, codegen_1._)`/*# sourceURL=${schId} */` : codegen_1.nil;
   }
-  function subschemaCode(it2, valid) {
-    if (isSchemaObj(it2)) {
-      checkKeywords(it2);
-      if (schemaCxtHasRules(it2)) {
-        subSchemaObjCode(it2, valid);
+  function subschemaCode(it3, valid) {
+    if (isSchemaObj(it3)) {
+      checkKeywords(it3);
+      if (schemaCxtHasRules(it3)) {
+        subSchemaObjCode(it3, valid);
         return;
       }
     }
-    (0, boolSchema_1.boolOrEmptySchema)(it2, valid);
+    (0, boolSchema_1.boolOrEmptySchema)(it3, valid);
   }
   function schemaCxtHasRules({ schema, self }) {
     if (typeof schema == "boolean") return !schema;
     for (const key in schema) if (self.RULES.all[key]) return true;
     return false;
   }
-  function isSchemaObj(it2) {
-    return typeof it2.schema != "boolean";
+  function isSchemaObj(it3) {
+    return typeof it3.schema != "boolean";
   }
-  function subSchemaObjCode(it2, valid) {
-    const { schema, gen, opts } = it2;
-    if (opts.$comment && schema.$comment) commentKeyword(it2);
-    updateContext(it2);
-    checkAsyncSchema(it2);
+  function subSchemaObjCode(it3, valid) {
+    const { schema, gen, opts } = it3;
+    if (opts.$comment && schema.$comment) commentKeyword(it3);
+    updateContext(it3);
+    checkAsyncSchema(it3);
     const errsCount = gen.const("_errs", names_1.default.errors);
-    typeAndKeywords(it2, errsCount);
+    typeAndKeywords(it3, errsCount);
     gen.var(valid, (0, codegen_1._)`${errsCount} === ${names_1.default.errors}`);
   }
-  function checkKeywords(it2) {
-    (0, util_1.checkUnknownRules)(it2);
-    checkRefsAndKeywords(it2);
+  function checkKeywords(it3) {
+    (0, util_1.checkUnknownRules)(it3);
+    checkRefsAndKeywords(it3);
   }
-  function typeAndKeywords(it2, errsCount) {
-    if (it2.opts.jtd) return schemaKeywords(it2, [], false, errsCount);
-    const types = (0, dataType_1.getSchemaTypes)(it2.schema);
-    schemaKeywords(it2, types, !(0, dataType_1.coerceAndCheckDataType)(it2, types), errsCount);
+  function typeAndKeywords(it3, errsCount) {
+    if (it3.opts.jtd) return schemaKeywords(it3, [], false, errsCount);
+    const types = (0, dataType_1.getSchemaTypes)(it3.schema);
+    schemaKeywords(it3, types, !(0, dataType_1.coerceAndCheckDataType)(it3, types), errsCount);
   }
-  function checkRefsAndKeywords(it2) {
-    const { schema, errSchemaPath, opts, self } = it2;
+  function checkRefsAndKeywords(it3) {
+    const { schema, errSchemaPath, opts, self } = it3;
     if (schema.$ref && opts.ignoreKeywordsWithRef && (0, util_1.schemaHasRulesButRef)(schema, self.RULES)) self.logger.warn(`$ref: keywords ignored in schema at path "${errSchemaPath}"`);
   }
-  function checkNoDefault(it2) {
-    const { schema, opts } = it2;
-    if (schema.default !== void 0 && opts.useDefaults && opts.strictSchema) (0, util_1.checkStrictMode)(it2, "default is ignored in the schema root");
+  function checkNoDefault(it3) {
+    const { schema, opts } = it3;
+    if (schema.default !== void 0 && opts.useDefaults && opts.strictSchema) (0, util_1.checkStrictMode)(it3, "default is ignored in the schema root");
   }
-  function updateContext(it2) {
-    const schId = it2.schema[it2.opts.schemaId];
-    if (schId) it2.baseId = (0, resolve_1.resolveUrl)(it2.opts.uriResolver, it2.baseId, schId);
+  function updateContext(it3) {
+    const schId = it3.schema[it3.opts.schemaId];
+    if (schId) it3.baseId = (0, resolve_1.resolveUrl)(it3.opts.uriResolver, it3.baseId, schId);
   }
-  function checkAsyncSchema(it2) {
-    if (it2.schema.$async && !it2.schemaEnv.$async) throw new Error("async schema in sync schema");
+  function checkAsyncSchema(it3) {
+    if (it3.schema.$async && !it3.schemaEnv.$async) throw new Error("async schema in sync schema");
   }
   function commentKeyword({ gen, schemaEnv, schema, errSchemaPath, opts }) {
     const msg = schema.$comment;
@@ -16280,12 +16280,12 @@ var require_validate = /* @__PURE__ */ __commonJSMin(((exports) => {
       gen.code((0, codegen_1._)`${names_1.default.self}.opts.$comment(${msg}, ${schemaPath}, ${rootName}.schema)`);
     }
   }
-  function returnResults(it2) {
-    const { gen, schemaEnv, validateName, ValidationError, opts } = it2;
+  function returnResults(it3) {
+    const { gen, schemaEnv, validateName, ValidationError, opts } = it3;
     if (schemaEnv.$async) gen.if((0, codegen_1._)`${names_1.default.errors} === 0`, () => gen.return(names_1.default.data), () => gen.throw((0, codegen_1._)`new ${ValidationError}(${names_1.default.vErrors})`));
     else {
       gen.assign((0, codegen_1._)`${validateName}.errors`, names_1.default.vErrors);
-      if (opts.unevaluated) assignEvaluated(it2);
+      if (opts.unevaluated) assignEvaluated(it3);
       gen.return((0, codegen_1._)`${names_1.default.errors} === 0`);
     }
   }
@@ -16293,14 +16293,14 @@ var require_validate = /* @__PURE__ */ __commonJSMin(((exports) => {
     if (props instanceof codegen_1.Name) gen.assign((0, codegen_1._)`${evaluated2}.props`, props);
     if (items instanceof codegen_1.Name) gen.assign((0, codegen_1._)`${evaluated2}.items`, items);
   }
-  function schemaKeywords(it2, types, typeErrors, errsCount) {
-    const { gen, schema, data, allErrors, opts, self } = it2;
+  function schemaKeywords(it3, types, typeErrors, errsCount) {
+    const { gen, schema, data, allErrors, opts, self } = it3;
     const { RULES } = self;
     if (schema.$ref && (opts.ignoreKeywordsWithRef || !(0, util_1.schemaHasRulesButRef)(schema, RULES))) {
-      gen.block(() => keywordCode(it2, "$ref", RULES.all.$ref.definition));
+      gen.block(() => keywordCode(it3, "$ref", RULES.all.$ref.definition));
       return;
     }
-    if (!opts.jtd) checkStrictTypes(it2, types);
+    if (!opts.jtd) checkStrictTypes(it3, types);
     gen.block(() => {
       for (const group of RULES.rules) groupKeywords(group);
       groupKeywords(RULES.post);
@@ -16309,91 +16309,91 @@ var require_validate = /* @__PURE__ */ __commonJSMin(((exports) => {
       if (!(0, applicability_1.shouldUseGroup)(schema, group)) return;
       if (group.type) {
         gen.if((0, dataType_2.checkDataType)(group.type, data, opts.strictNumbers));
-        iterateKeywords(it2, group);
+        iterateKeywords(it3, group);
         if (types.length === 1 && types[0] === group.type && typeErrors) {
           gen.else();
-          (0, dataType_2.reportTypeError)(it2);
+          (0, dataType_2.reportTypeError)(it3);
         }
         gen.endIf();
-      } else iterateKeywords(it2, group);
+      } else iterateKeywords(it3, group);
       if (!allErrors) gen.if((0, codegen_1._)`${names_1.default.errors} === ${errsCount || 0}`);
     }
   }
-  function iterateKeywords(it2, group) {
-    const { gen, schema, opts: { useDefaults } } = it2;
-    if (useDefaults) (0, defaults_1.assignDefaults)(it2, group.type);
+  function iterateKeywords(it3, group) {
+    const { gen, schema, opts: { useDefaults } } = it3;
+    if (useDefaults) (0, defaults_1.assignDefaults)(it3, group.type);
     gen.block(() => {
-      for (const rule of group.rules) if ((0, applicability_1.shouldUseRule)(schema, rule)) keywordCode(it2, rule.keyword, rule.definition, group.type);
+      for (const rule of group.rules) if ((0, applicability_1.shouldUseRule)(schema, rule)) keywordCode(it3, rule.keyword, rule.definition, group.type);
     });
   }
-  function checkStrictTypes(it2, types) {
-    if (it2.schemaEnv.meta || !it2.opts.strictTypes) return;
-    checkContextTypes(it2, types);
-    if (!it2.opts.allowUnionTypes) checkMultipleTypes(it2, types);
-    checkKeywordTypes(it2, it2.dataTypes);
+  function checkStrictTypes(it3, types) {
+    if (it3.schemaEnv.meta || !it3.opts.strictTypes) return;
+    checkContextTypes(it3, types);
+    if (!it3.opts.allowUnionTypes) checkMultipleTypes(it3, types);
+    checkKeywordTypes(it3, it3.dataTypes);
   }
-  function checkContextTypes(it2, types) {
+  function checkContextTypes(it3, types) {
     if (!types.length) return;
-    if (!it2.dataTypes.length) {
-      it2.dataTypes = types;
+    if (!it3.dataTypes.length) {
+      it3.dataTypes = types;
       return;
     }
     types.forEach((t) => {
-      if (!includesType(it2.dataTypes, t)) strictTypesError(it2, `type "${t}" not allowed by context "${it2.dataTypes.join(",")}"`);
+      if (!includesType(it3.dataTypes, t)) strictTypesError(it3, `type "${t}" not allowed by context "${it3.dataTypes.join(",")}"`);
     });
-    narrowSchemaTypes(it2, types);
+    narrowSchemaTypes(it3, types);
   }
-  function checkMultipleTypes(it2, ts2) {
-    if (ts2.length > 1 && !(ts2.length === 2 && ts2.includes("null"))) strictTypesError(it2, "use allowUnionTypes to allow union type keyword");
+  function checkMultipleTypes(it3, ts3) {
+    if (ts3.length > 1 && !(ts3.length === 2 && ts3.includes("null"))) strictTypesError(it3, "use allowUnionTypes to allow union type keyword");
   }
-  function checkKeywordTypes(it2, ts2) {
-    const rules2 = it2.self.RULES.all;
+  function checkKeywordTypes(it3, ts3) {
+    const rules2 = it3.self.RULES.all;
     for (const keyword in rules2) {
       const rule = rules2[keyword];
-      if (typeof rule == "object" && (0, applicability_1.shouldUseRule)(it2.schema, rule)) {
+      if (typeof rule == "object" && (0, applicability_1.shouldUseRule)(it3.schema, rule)) {
         const { type } = rule.definition;
-        if (type.length && !type.some((t) => hasApplicableType(ts2, t))) strictTypesError(it2, `missing type "${type.join(",")}" for keyword "${keyword}"`);
+        if (type.length && !type.some((t) => hasApplicableType(ts3, t))) strictTypesError(it3, `missing type "${type.join(",")}" for keyword "${keyword}"`);
       }
     }
   }
   function hasApplicableType(schTs, kwdT) {
     return schTs.includes(kwdT) || kwdT === "number" && schTs.includes("integer");
   }
-  function includesType(ts2, t) {
-    return ts2.includes(t) || t === "integer" && ts2.includes("number");
+  function includesType(ts3, t) {
+    return ts3.includes(t) || t === "integer" && ts3.includes("number");
   }
-  function narrowSchemaTypes(it2, withTypes) {
-    const ts2 = [];
-    for (const t of it2.dataTypes) if (includesType(withTypes, t)) ts2.push(t);
-    else if (withTypes.includes("integer") && t === "number") ts2.push("integer");
-    it2.dataTypes = ts2;
+  function narrowSchemaTypes(it3, withTypes) {
+    const ts3 = [];
+    for (const t of it3.dataTypes) if (includesType(withTypes, t)) ts3.push(t);
+    else if (withTypes.includes("integer") && t === "number") ts3.push("integer");
+    it3.dataTypes = ts3;
   }
-  function strictTypesError(it2, msg) {
-    const schemaPath = it2.schemaEnv.baseId + it2.errSchemaPath;
+  function strictTypesError(it3, msg) {
+    const schemaPath = it3.schemaEnv.baseId + it3.errSchemaPath;
     msg += ` at "${schemaPath}" (strictTypes)`;
-    (0, util_1.checkStrictMode)(it2, msg, it2.opts.strictTypes);
+    (0, util_1.checkStrictMode)(it3, msg, it3.opts.strictTypes);
   }
   var KeywordCxt = class {
-    constructor(it2, def, keyword) {
-      (0, keyword_1.validateKeywordUsage)(it2, def, keyword);
-      this.gen = it2.gen;
-      this.allErrors = it2.allErrors;
+    constructor(it3, def, keyword) {
+      (0, keyword_1.validateKeywordUsage)(it3, def, keyword);
+      this.gen = it3.gen;
+      this.allErrors = it3.allErrors;
       this.keyword = keyword;
-      this.data = it2.data;
-      this.schema = it2.schema[keyword];
-      this.$data = def.$data && it2.opts.$data && this.schema && this.schema.$data;
-      this.schemaValue = (0, util_1.schemaRefOrVal)(it2, this.schema, keyword, this.$data);
+      this.data = it3.data;
+      this.schema = it3.schema[keyword];
+      this.$data = def.$data && it3.opts.$data && this.schema && this.schema.$data;
+      this.schemaValue = (0, util_1.schemaRefOrVal)(it3, this.schema, keyword, this.$data);
       this.schemaType = def.schemaType;
-      this.parentSchema = it2.schema;
+      this.parentSchema = it3.schema;
       this.params = {};
-      this.it = it2;
+      this.it = it3;
       this.def = def;
-      if (this.$data) this.schemaCode = it2.gen.const("vSchema", getData(this.$data, it2));
+      if (this.$data) this.schemaCode = it3.gen.const("vSchema", getData(this.$data, it3));
       else {
         this.schemaCode = this.schemaValue;
         if (!(0, keyword_1.validSchemaType)(this.schema, def.schemaType, def.allowUndefined)) throw new Error(`${keyword} value must be ${JSON.stringify(def.schemaType)}`);
       }
-      if ("code" in def ? def.trackErrors : def.errors !== false) this.errsCount = it2.gen.const("_errs", names_1.default.errors);
+      if ("code" in def ? def.trackErrors : def.errors !== false) this.errsCount = it3.gen.const("_errs", names_1.default.errors);
     }
     result(condition, successAction, failAction) {
       this.failResult((0, codegen_1.not)(condition), successAction, failAction);
@@ -16473,13 +16473,13 @@ var require_validate = /* @__PURE__ */ __commonJSMin(((exports) => {
       gen.else();
     }
     invalid$data() {
-      const { gen, schemaCode, schemaType, def, it: it2 } = this;
+      const { gen, schemaCode, schemaType, def, it: it3 } = this;
       return (0, codegen_1.or)(wrong$DataType(), invalid$DataSchema());
       function wrong$DataType() {
         if (schemaType.length) {
           if (!(schemaCode instanceof codegen_1.Name)) throw new Error("ajv implementation error");
           const st2 = Array.isArray(schemaType) ? schemaType : [schemaType];
-          return (0, codegen_1._)`${(0, dataType_2.checkDataTypes)(st2, schemaCode, it2.opts.strictNumbers, dataType_2.DataType.Wrong)}`;
+          return (0, codegen_1._)`${(0, dataType_2.checkDataTypes)(st2, schemaCode, it3.opts.strictNumbers, dataType_2.DataType.Wrong)}`;
         }
         return codegen_1.nil;
       }
@@ -16505,22 +16505,22 @@ var require_validate = /* @__PURE__ */ __commonJSMin(((exports) => {
       return nextContext;
     }
     mergeEvaluated(schemaCxt, toName) {
-      const { it: it2, gen } = this;
-      if (!it2.opts.unevaluated) return;
-      if (it2.props !== true && schemaCxt.props !== void 0) it2.props = util_1.mergeEvaluated.props(gen, schemaCxt.props, it2.props, toName);
-      if (it2.items !== true && schemaCxt.items !== void 0) it2.items = util_1.mergeEvaluated.items(gen, schemaCxt.items, it2.items, toName);
+      const { it: it3, gen } = this;
+      if (!it3.opts.unevaluated) return;
+      if (it3.props !== true && schemaCxt.props !== void 0) it3.props = util_1.mergeEvaluated.props(gen, schemaCxt.props, it3.props, toName);
+      if (it3.items !== true && schemaCxt.items !== void 0) it3.items = util_1.mergeEvaluated.items(gen, schemaCxt.items, it3.items, toName);
     }
     mergeValidEvaluated(schemaCxt, valid) {
-      const { it: it2, gen } = this;
-      if (it2.opts.unevaluated && (it2.props !== true || it2.items !== true)) {
+      const { it: it3, gen } = this;
+      if (it3.opts.unevaluated && (it3.props !== true || it3.items !== true)) {
         gen.if(valid, () => this.mergeEvaluated(schemaCxt, codegen_1.Name));
         return true;
       }
     }
   };
   exports.KeywordCxt = KeywordCxt;
-  function keywordCode(it2, keyword, def, ruleType) {
-    const cxt = new KeywordCxt(it2, def, keyword);
+  function keywordCode(it3, keyword, def, ruleType) {
+    const cxt = new KeywordCxt(it3, def, keyword);
     if ("code" in def) def.code(cxt, ruleType);
     else if (cxt.$data && def.validate) (0, keyword_1.funcKeywordCode)(cxt, def);
     else if ("macro" in def) (0, keyword_1.macroKeywordCode)(cxt, def);
@@ -16539,14 +16539,14 @@ var require_validate = /* @__PURE__ */ __commonJSMin(((exports) => {
     } else {
       const matches = RELATIVE_JSON_POINTER.exec($data);
       if (!matches) throw new Error(`Invalid JSON-pointer: ${$data}`);
-      const up = +matches[1];
+      const up2 = +matches[1];
       jsonPointer = matches[2];
       if (jsonPointer === "#") {
-        if (up >= dataLevel) throw new Error(errorMsg("property/index", up));
-        return dataPathArr[dataLevel - up];
+        if (up2 >= dataLevel) throw new Error(errorMsg("property/index", up2));
+        return dataPathArr[dataLevel - up2];
       }
-      if (up > dataLevel) throw new Error(errorMsg("data", up));
-      data = dataNames[dataLevel - up];
+      if (up2 > dataLevel) throw new Error(errorMsg("data", up2));
+      data = dataNames[dataLevel - up2];
       if (!jsonPointer) return data;
     }
     let expr = data;
@@ -16556,8 +16556,8 @@ var require_validate = /* @__PURE__ */ __commonJSMin(((exports) => {
       expr = (0, codegen_1._)`${expr} && ${data}`;
     }
     return expr;
-    function errorMsg(pointerType, up) {
-      return `Cannot access ${pointerType} ${up} levels up, current level is ${dataLevel}`;
+    function errorMsg(pointerType, up2) {
+      return `Cannot access ${pointerType} ${up2} levels up, current level is ${dataLevel}`;
     }
   }
   exports.getData = getData;
@@ -16689,11 +16689,11 @@ var require_compile = /* @__PURE__ */ __commonJSMin(((exports) => {
       }
       sch.validate = validate2;
       return sch;
-    } catch (e8) {
+    } catch (e5) {
       delete sch.validate;
       delete sch.validateName;
       if (sourceCode) this.logger.error("Error compiling schema, function code:", sourceCode);
-      throw e8;
+      throw e5;
     } finally {
       this._compilations.delete(sch);
     }
@@ -16727,8 +16727,8 @@ var require_compile = /* @__PURE__ */ __commonJSMin(((exports) => {
     for (const sch of this._compilations) if (sameSchemaEnv(sch, schEnv)) return sch;
   }
   exports.getCompilingSchema = getCompilingSchema;
-  function sameSchemaEnv(s12, s22) {
-    return s12.schema === s22.schema && s12.root === s22.root && s12.baseId === s22.baseId;
+  function sameSchemaEnv(s1, s2) {
+    return s1.schema === s2.schema && s1.root === s2.root && s1.baseId === s2.baseId;
   }
   function resolve(root, ref) {
     let sch;
@@ -16736,16 +16736,16 @@ var require_compile = /* @__PURE__ */ __commonJSMin(((exports) => {
     return sch || this.schemas[ref] || resolveSchema.call(this, root, ref);
   }
   function resolveSchema(root, ref) {
-    const p = this.opts.uriResolver.parse(ref);
-    const refPath = (0, resolve_1._getFullPath)(this.opts.uriResolver, p);
+    const p3 = this.opts.uriResolver.parse(ref);
+    const refPath = (0, resolve_1._getFullPath)(this.opts.uriResolver, p3);
     let baseId = (0, resolve_1.getFullPath)(this.opts.uriResolver, root.baseId, void 0);
-    if (Object.keys(root.schema).length > 0 && refPath === baseId) return getJsonPointer.call(this, p, root);
+    if (Object.keys(root.schema).length > 0 && refPath === baseId) return getJsonPointer.call(this, p3, root);
     const id = (0, resolve_1.normalizeId)(refPath);
     const schOrRef = this.refs[id] || this.schemas[id];
     if (typeof schOrRef == "string") {
       const sch = resolveSchema.call(this, root, schOrRef);
       if (typeof (sch === null || sch === void 0 ? void 0 : sch.schema) !== "object") return;
-      return getJsonPointer.call(this, p, sch);
+      return getJsonPointer.call(this, p3, sch);
     }
     if (typeof (schOrRef === null || schOrRef === void 0 ? void 0 : schOrRef.schema) !== "object") return;
     if (!schOrRef.validate) compileSchema.call(this, schOrRef);
@@ -16761,7 +16761,7 @@ var require_compile = /* @__PURE__ */ __commonJSMin(((exports) => {
         baseId
       });
     }
-    return getJsonPointer.call(this, p, schOrRef);
+    return getJsonPointer.call(this, p3, schOrRef);
   }
   exports.resolveSchema = resolveSchema;
   const PREVENT_SCOPE_CHANGE = /* @__PURE__ */ new Set([
@@ -16824,10 +16824,10 @@ var require_utils = /* @__PURE__ */ __commonJSMin(((exports, module) => {
     const HEX_DIGITS = "0123456789ABCDEF";
     for (let i = 0; i < 256; i++) BYTE_HEX[i] = "%" + HEX_DIGITS[i >> 4] + HEX_DIGITS[i & 15];
   }
-  function percentEncodeNonAscii(cp2) {
-    if (cp2 < 2048) return BYTE_HEX[192 | cp2 >> 6] + BYTE_HEX[128 | cp2 & 63];
-    if (cp2 < 65536) return BYTE_HEX[224 | cp2 >> 12] + BYTE_HEX[128 | cp2 >> 6 & 63] + BYTE_HEX[128 | cp2 & 63];
-    return BYTE_HEX[240 | cp2 >> 18] + BYTE_HEX[128 | cp2 >> 12 & 63] + BYTE_HEX[128 | cp2 >> 6 & 63] + BYTE_HEX[128 | cp2 & 63];
+  function percentEncodeNonAscii(cp) {
+    if (cp < 2048) return BYTE_HEX[192 | cp >> 6] + BYTE_HEX[128 | cp & 63];
+    if (cp < 65536) return BYTE_HEX[224 | cp >> 12] + BYTE_HEX[128 | cp >> 6 & 63] + BYTE_HEX[128 | cp & 63];
+    return BYTE_HEX[240 | cp >> 18] + BYTE_HEX[128 | cp >> 12 & 63] + BYTE_HEX[128 | cp >> 6 & 63] + BYTE_HEX[128 | cp & 63];
   }
   function stringArrayToHexStripped(input) {
     let acc = "";
@@ -17046,9 +17046,9 @@ var require_utils = /* @__PURE__ */ __commonJSMin(((exports, module) => {
   const HOST_DELIM_RE = /[@/?#:]/g;
   const HOST_DELIM_NO_COLON_RE = /[@/?#]/g;
   function reescapeHostDelimiters(host, isIP3) {
-    const re3 = isIP3 ? HOST_DELIM_NO_COLON_RE : HOST_DELIM_RE;
-    re3.lastIndex = 0;
-    return host.replace(re3, (ch) => HOST_DELIMS[ch]);
+    const re2 = isIP3 ? HOST_DELIM_NO_COLON_RE : HOST_DELIM_RE;
+    re2.lastIndex = 0;
+    return host.replace(re2, (ch) => HOST_DELIMS[ch]);
   }
   function normalizePercentEncoding(input, decodeUnreserved = false) {
     if (input.indexOf("%") === -1) return input;
@@ -17167,8 +17167,8 @@ var require_utils = /* @__PURE__ */ __commonJSMin(((exports, module) => {
   function encodeFragment(input) {
     return encodeComponent(input, isQueryFragmentCharacter);
   }
-  function isEscapeSafe(cp2) {
-    return cp2 >= 48 && cp2 <= 57 || cp2 >= 65 && cp2 <= 90 || cp2 >= 97 && cp2 <= 122 || cp2 === 42 || cp2 === 43 || cp2 === 45 || cp2 === 46 || cp2 === 47 || cp2 === 64 || cp2 === 95;
+  function isEscapeSafe(cp) {
+    return cp >= 48 && cp <= 57 || cp >= 65 && cp <= 90 || cp >= 97 && cp <= 122 || cp === 42 || cp === 43 || cp === 45 || cp === 46 || cp === 47 || cp === 64 || cp === 95;
   }
   function normalizeQueryFragmentEncoding(input) {
     let output = "";
@@ -17367,7 +17367,7 @@ var require_schemes = /* @__PURE__ */ __commonJSMin(((exports, module) => {
     parse: httpParse,
     serialize: httpSerialize
   };
-  const ws3 = {
+  const ws2 = {
     scheme: "ws",
     domainHost: true,
     parse: wsParse,
@@ -17375,9 +17375,9 @@ var require_schemes = /* @__PURE__ */ __commonJSMin(((exports, module) => {
   };
   const wss = {
     scheme: "wss",
-    domainHost: ws3.domainHost,
-    parse: ws3.parse,
-    serialize: ws3.serialize
+    domainHost: ws2.domainHost,
+    parse: ws2.parse,
+    serialize: ws2.serialize
   };
   const urn = {
     scheme: "urn",
@@ -17394,7 +17394,7 @@ var require_schemes = /* @__PURE__ */ __commonJSMin(((exports, module) => {
   const SCHEMES = {
     http,
     https,
-    ws: ws3,
+    ws: ws2,
     wss,
     urn,
     "urn:uuid": urnuuid
@@ -17527,11 +17527,11 @@ var require_fast_uri = /* @__PURE__ */ __commonJSMin(((exports, module) => {
       if (component.path && component.path[0] !== "/") uriTokens.push("/");
     }
     if (component.path !== void 0) {
-      let s10 = component.path;
-      if (!options.absolutePath && (!schemeHandler || !schemeHandler.absolutePath)) s10 = removeDotSegments(s10);
-      if (pathNoScheme) s10 = serializePathEncoding(s10, true);
-      if (authority === void 0 && s10[0] === "/" && s10[1] === "/") s10 = "/%2F" + s10.slice(2);
-      uriTokens.push(s10);
+      let s2 = component.path;
+      if (!options.absolutePath && (!schemeHandler || !schemeHandler.absolutePath)) s2 = removeDotSegments(s2);
+      if (pathNoScheme) s2 = serializePathEncoding(s2, true);
+      if (authority === void 0 && s2[0] === "/" && s2[1] === "/") s2 = "/%2F" + s2.slice(2);
+      uriTokens.push(s2);
     }
     if (component.query !== void 0) uriTokens.push("?", encodeQuery(component.query));
     if (component.fragment !== void 0) uriTokens.push("#", encodeFragment(component.fragment));
@@ -17563,8 +17563,8 @@ var require_fast_uri = /* @__PURE__ */ __commonJSMin(((exports, module) => {
   function canonicalizeHost(parsed, options, schemeHandler, isIP3) {
     if (!options.unicodeSupport && (!schemeHandler || !schemeHandler.unicodeSupport) && parsed.host && !isIPLiteral(parsed.host) && (options.domainHost || schemeHandler && schemeHandler.domainHost) && isIP3 === false && nonSimpleDomain(parsed.host)) try {
       parsed.host = new URL("http://" + parsed.host).hostname;
-    } catch (e8) {
-      parsed.error = parsed.error || "Host's domain name can not be converted to ASCII: " + e8;
+    } catch (e5) {
+      parsed.error = parsed.error || "Host's domain name can not be converted to ASCII: " + e5;
       return true;
     }
     return false;
@@ -17825,38 +17825,38 @@ var require_core$3 = /* @__PURE__ */ __commonJSMin(((exports) => {
     unicode: '"minLength"/"maxLength" account for unicode characters by default.'
   };
   const MAX_EXPRESSION = 200;
-  function requiredOptions(o6) {
-    var _a4, _b, _c3, _d2, _e2, _f, _g, _h2, _j, _k2, _l2, _m, _o2, _p, _q, _r3, _s3, _t, _u, _v, _w, _x, _y, _z, _0;
-    const s10 = o6.strict;
-    const _optz = (_a4 = o6.code) === null || _a4 === void 0 ? void 0 : _a4.optimize;
+  function requiredOptions(o3) {
+    var _a4, _b, _c2, _d, _e2, _f, _g, _h, _j, _k2, _l2, _m2, _o2, _p, _q, _r3, _s2, _t, _u, _v, _w, _x, _y, _z2, _0;
+    const s2 = o3.strict;
+    const _optz = (_a4 = o3.code) === null || _a4 === void 0 ? void 0 : _a4.optimize;
     const optimize = _optz === true || _optz === void 0 ? 1 : _optz || 0;
-    const regExp = (_c3 = (_b = o6.code) === null || _b === void 0 ? void 0 : _b.regExp) !== null && _c3 !== void 0 ? _c3 : defaultRegExp;
-    const uriResolver = (_d2 = o6.uriResolver) !== null && _d2 !== void 0 ? _d2 : uri_1.default;
+    const regExp = (_c2 = (_b = o3.code) === null || _b === void 0 ? void 0 : _b.regExp) !== null && _c2 !== void 0 ? _c2 : defaultRegExp;
+    const uriResolver = (_d = o3.uriResolver) !== null && _d !== void 0 ? _d : uri_1.default;
     return {
-      strictSchema: (_f = (_e2 = o6.strictSchema) !== null && _e2 !== void 0 ? _e2 : s10) !== null && _f !== void 0 ? _f : true,
-      strictNumbers: (_h2 = (_g = o6.strictNumbers) !== null && _g !== void 0 ? _g : s10) !== null && _h2 !== void 0 ? _h2 : true,
-      strictTypes: (_k2 = (_j = o6.strictTypes) !== null && _j !== void 0 ? _j : s10) !== null && _k2 !== void 0 ? _k2 : "log",
-      strictTuples: (_m = (_l2 = o6.strictTuples) !== null && _l2 !== void 0 ? _l2 : s10) !== null && _m !== void 0 ? _m : "log",
-      strictRequired: (_p = (_o2 = o6.strictRequired) !== null && _o2 !== void 0 ? _o2 : s10) !== null && _p !== void 0 ? _p : false,
-      code: o6.code ? {
-        ...o6.code,
+      strictSchema: (_f = (_e2 = o3.strictSchema) !== null && _e2 !== void 0 ? _e2 : s2) !== null && _f !== void 0 ? _f : true,
+      strictNumbers: (_h = (_g = o3.strictNumbers) !== null && _g !== void 0 ? _g : s2) !== null && _h !== void 0 ? _h : true,
+      strictTypes: (_k2 = (_j = o3.strictTypes) !== null && _j !== void 0 ? _j : s2) !== null && _k2 !== void 0 ? _k2 : "log",
+      strictTuples: (_m2 = (_l2 = o3.strictTuples) !== null && _l2 !== void 0 ? _l2 : s2) !== null && _m2 !== void 0 ? _m2 : "log",
+      strictRequired: (_p = (_o2 = o3.strictRequired) !== null && _o2 !== void 0 ? _o2 : s2) !== null && _p !== void 0 ? _p : false,
+      code: o3.code ? {
+        ...o3.code,
         optimize,
         regExp
       } : {
         optimize,
         regExp
       },
-      loopRequired: (_q = o6.loopRequired) !== null && _q !== void 0 ? _q : MAX_EXPRESSION,
-      loopEnum: (_r3 = o6.loopEnum) !== null && _r3 !== void 0 ? _r3 : MAX_EXPRESSION,
-      meta: (_s3 = o6.meta) !== null && _s3 !== void 0 ? _s3 : true,
-      messages: (_t = o6.messages) !== null && _t !== void 0 ? _t : true,
-      inlineRefs: (_u = o6.inlineRefs) !== null && _u !== void 0 ? _u : true,
-      schemaId: (_v = o6.schemaId) !== null && _v !== void 0 ? _v : "$id",
-      addUsedSchema: (_w = o6.addUsedSchema) !== null && _w !== void 0 ? _w : true,
-      validateSchema: (_x = o6.validateSchema) !== null && _x !== void 0 ? _x : true,
-      validateFormats: (_y = o6.validateFormats) !== null && _y !== void 0 ? _y : true,
-      unicodeRegExp: (_z = o6.unicodeRegExp) !== null && _z !== void 0 ? _z : true,
-      int32range: (_0 = o6.int32range) !== null && _0 !== void 0 ? _0 : true,
+      loopRequired: (_q = o3.loopRequired) !== null && _q !== void 0 ? _q : MAX_EXPRESSION,
+      loopEnum: (_r3 = o3.loopEnum) !== null && _r3 !== void 0 ? _r3 : MAX_EXPRESSION,
+      meta: (_s2 = o3.meta) !== null && _s2 !== void 0 ? _s2 : true,
+      messages: (_t = o3.messages) !== null && _t !== void 0 ? _t : true,
+      inlineRefs: (_u = o3.inlineRefs) !== null && _u !== void 0 ? _u : true,
+      schemaId: (_v = o3.schemaId) !== null && _v !== void 0 ? _v : "$id",
+      addUsedSchema: (_w = o3.addUsedSchema) !== null && _w !== void 0 ? _w : true,
+      validateSchema: (_x = o3.validateSchema) !== null && _x !== void 0 ? _x : true,
+      validateFormats: (_y = o3.validateFormats) !== null && _y !== void 0 ? _y : true,
+      unicodeRegExp: (_z2 = o3.unicodeRegExp) !== null && _z2 !== void 0 ? _z2 : true,
+      int32range: (_0 = o3.int32range) !== null && _0 !== void 0 ? _0 : true,
       uriResolver
     };
   }
@@ -17912,13 +17912,13 @@ var require_core$3 = /* @__PURE__ */ __commonJSMin(((exports) => {
       return this.opts.defaultMeta = typeof meta2 == "object" ? meta2[schemaId] || meta2 : void 0;
     }
     validate(schemaKeyRef, data) {
-      let v8;
+      let v2;
       if (typeof schemaKeyRef == "string") {
-        v8 = this.getSchema(schemaKeyRef);
-        if (!v8) throw new Error(`no schema with key or ref "${schemaKeyRef}"`);
-      } else v8 = this.compile(schemaKeyRef);
-      const valid = v8(data);
-      if (!("$async" in v8)) this.errors = v8.errors;
+        v2 = this.getSchema(schemaKeyRef);
+        if (!v2) throw new Error(`no schema with key or ref "${schemaKeyRef}"`);
+      } else v2 = this.compile(schemaKeyRef);
+      const valid = v2(data);
+      if (!("$async" in v2)) this.errors = v2.errors;
       return valid;
     }
     compile(schema, _meta) {
@@ -17940,10 +17940,10 @@ var require_core$3 = /* @__PURE__ */ __commonJSMin(((exports) => {
       async function _compileAsync(sch) {
         try {
           return this._compileSchemaEnv(sch);
-        } catch (e8) {
-          if (!(e8 instanceof ref_error_1.default)) throw e8;
-          checkLoaded.call(this, e8);
-          await loadMissingSchema.call(this, e8.missingSchema);
+        } catch (e5) {
+          if (!(e5 instanceof ref_error_1.default)) throw e5;
+          checkLoaded.call(this, e5);
+          await loadMissingSchema.call(this, e5.missingSchema);
           return _compileAsync.call(this, sch);
         }
       }
@@ -17956,8 +17956,8 @@ var require_core$3 = /* @__PURE__ */ __commonJSMin(((exports) => {
         if (!this.refs[ref]) this.addSchema(_schema, ref, meta2);
       }
       async function _loadSchema(ref) {
-        const p = this._loading[ref];
-        if (p) return p;
+        const p3 = this._loading[ref];
+        if (p3) return p3;
         try {
           return await (this._loading[ref] = loadSchema(ref));
         } finally {
@@ -18105,7 +18105,7 @@ var require_core$3 = /* @__PURE__ */ __commonJSMin(((exports) => {
     }
     errorsText(errors = this.errors, { separator = ", ", dataVar = "data" } = {}) {
       if (!errors || errors.length === 0) return "No errors";
-      return errors.map((e8) => `${dataVar}${e8.instancePath} ${e8.message}`).reduce((text2, msg) => text2 + separator + msg);
+      return errors.map((e5) => `${dataVar}${e5.instancePath} ${e5.message}`).reduce((text2, msg) => text2 + separator + msg);
     }
     $dataMetaSchema(metaSchema, keywordsJsonPointers) {
       const rules2 = this.RULES.all;
@@ -18316,12 +18316,12 @@ var require_ref = /* @__PURE__ */ __commonJSMin(((exports) => {
     keyword: "$ref",
     schemaType: "string",
     code(cxt) {
-      const { gen, schema: $ref, it: it2 } = cxt;
-      const { baseId, schemaEnv: env, validateName, opts, self } = it2;
+      const { gen, schema: $ref, it: it3 } = cxt;
+      const { baseId, schemaEnv: env, validateName, opts, self } = it3;
       const { root } = env;
       if (($ref === "#" || $ref === "#/") && baseId === root.baseId) return callRootRef();
       const schOrEnv = compile_1.resolveRef.call(self, root, baseId, $ref);
-      if (schOrEnv === void 0) throw new ref_error_1.default(it2.opts.uriResolver, baseId, $ref);
+      if (schOrEnv === void 0) throw new ref_error_1.default(it3.opts.uriResolver, baseId, $ref);
       if (schOrEnv instanceof compile_1.SchemaEnv) return callValidate(schOrEnv);
       return inlineRefSchema(schOrEnv);
       function callRootRef() {
@@ -18355,9 +18355,9 @@ var require_ref = /* @__PURE__ */ __commonJSMin(((exports) => {
     return sch.validate ? gen.scopeValue("validate", { ref: sch.validate }) : (0, codegen_1._)`${gen.scopeValue("wrapper", { ref: sch })}.validate`;
   }
   exports.getValidate = getValidate;
-  function callRef(cxt, v8, sch, $async) {
-    const { gen, it: it2 } = cxt;
-    const { allErrors, schemaEnv: env, opts } = it2;
+  function callRef(cxt, v2, sch, $async) {
+    const { gen, it: it3 } = cxt;
+    const { allErrors, schemaEnv: env, opts } = it3;
     const passCxt = opts.passContext ? names_1.default.this : codegen_1.nil;
     if ($async) callAsyncRef();
     else callSyncRef();
@@ -18365,18 +18365,18 @@ var require_ref = /* @__PURE__ */ __commonJSMin(((exports) => {
       if (!env.$async) throw new Error("async schema referenced by sync schema");
       const valid = gen.let("valid");
       gen.try(() => {
-        gen.code((0, codegen_1._)`await ${(0, code_1.callValidateCode)(cxt, v8, passCxt)}`);
-        addEvaluatedFrom(v8);
+        gen.code((0, codegen_1._)`await ${(0, code_1.callValidateCode)(cxt, v2, passCxt)}`);
+        addEvaluatedFrom(v2);
         if (!allErrors) gen.assign(valid, true);
-      }, (e8) => {
-        gen.if((0, codegen_1._)`!(${e8} instanceof ${it2.ValidationError})`, () => gen.throw(e8));
-        addErrorsFrom(e8);
+      }, (e5) => {
+        gen.if((0, codegen_1._)`!(${e5} instanceof ${it3.ValidationError})`, () => gen.throw(e5));
+        addErrorsFrom(e5);
         if (!allErrors) gen.assign(valid, false);
       });
       cxt.ok(valid);
     }
     function callSyncRef() {
-      cxt.result((0, code_1.callValidateCode)(cxt, v8, passCxt), () => addEvaluatedFrom(v8), () => addErrorsFrom(v8));
+      cxt.result((0, code_1.callValidateCode)(cxt, v2, passCxt), () => addEvaluatedFrom(v2), () => addErrorsFrom(v2));
     }
     function addErrorsFrom(source) {
       const errs = (0, codegen_1._)`${source}.errors`;
@@ -18385,19 +18385,19 @@ var require_ref = /* @__PURE__ */ __commonJSMin(((exports) => {
     }
     function addEvaluatedFrom(source) {
       var _a4;
-      if (!it2.opts.unevaluated) return;
+      if (!it3.opts.unevaluated) return;
       const schEvaluated = (_a4 = sch === null || sch === void 0 ? void 0 : sch.validate) === null || _a4 === void 0 ? void 0 : _a4.evaluated;
-      if (it2.props !== true) if (schEvaluated && !schEvaluated.dynamicProps) {
-        if (schEvaluated.props !== void 0) it2.props = util_1.mergeEvaluated.props(gen, schEvaluated.props, it2.props);
+      if (it3.props !== true) if (schEvaluated && !schEvaluated.dynamicProps) {
+        if (schEvaluated.props !== void 0) it3.props = util_1.mergeEvaluated.props(gen, schEvaluated.props, it3.props);
       } else {
         const props = gen.var("props", (0, codegen_1._)`${source}.evaluated.props`);
-        it2.props = util_1.mergeEvaluated.props(gen, props, it2.props, codegen_1.Name);
+        it3.props = util_1.mergeEvaluated.props(gen, props, it3.props, codegen_1.Name);
       }
-      if (it2.items !== true) if (schEvaluated && !schEvaluated.dynamicItems) {
-        if (schEvaluated.items !== void 0) it2.items = util_1.mergeEvaluated.items(gen, schEvaluated.items, it2.items);
+      if (it3.items !== true) if (schEvaluated && !schEvaluated.dynamicItems) {
+        if (schEvaluated.items !== void 0) it3.items = util_1.mergeEvaluated.items(gen, schEvaluated.items, it3.items);
       } else {
         const items = gen.var("items", (0, codegen_1._)`${source}.evaluated.items`);
-        it2.items = util_1.mergeEvaluated.items(gen, items, it2.items, codegen_1.Name);
+        it3.items = util_1.mergeEvaluated.items(gen, items, it3.items, codegen_1.Name);
       }
     }
   }
@@ -18475,8 +18475,8 @@ var require_multipleOf = /* @__PURE__ */ __commonJSMin(((exports) => {
       params: ({ schemaCode }) => (0, codegen_1._)`{multipleOf: ${schemaCode}}`
     },
     code(cxt) {
-      const { gen, data, schemaCode, it: it2 } = cxt;
-      const prec = it2.opts.multipleOfPrecision;
+      const { gen, data, schemaCode, it: it3 } = cxt;
+      const prec = it3.opts.multipleOfPrecision;
       const res = gen.let("res");
       const invalid = prec ? (0, codegen_1._)`Math.abs(Math.round(${res}) - ${res}) > 1e-${prec}` : (0, codegen_1._)`${res} !== parseInt(${res})`;
       cxt.fail$data((0, codegen_1._)`(${schemaCode} === 0 || (${res} = ${data}/${schemaCode}, ${invalid}))`);
@@ -18522,9 +18522,9 @@ var require_limitLength = /* @__PURE__ */ __commonJSMin(((exports) => {
       params: ({ schemaCode }) => (0, codegen_1._)`{limit: ${schemaCode}}`
     },
     code(cxt) {
-      const { keyword, data, schemaCode, it: it2 } = cxt;
+      const { keyword, data, schemaCode, it: it3 } = cxt;
       const op = keyword === "maxLength" ? codegen_1.operators.GT : codegen_1.operators.LT;
-      const len = it2.opts.unicode === false ? (0, codegen_1._)`${data}.length` : (0, codegen_1._)`${(0, util_1.useFunc)(cxt.gen, ucs2length_1.default)}(${data})`;
+      const len = it3.opts.unicode === false ? (0, codegen_1._)`${data}.length` : (0, codegen_1._)`${(0, util_1.useFunc)(cxt.gen, ucs2length_1.default)}(${data})`;
       cxt.fail$data((0, codegen_1._)`${len} ${op} ${schemaCode}`);
     }
   };
@@ -18545,13 +18545,13 @@ var require_pattern = /* @__PURE__ */ __commonJSMin(((exports) => {
       params: ({ schemaCode }) => (0, codegen_1._)`{pattern: ${schemaCode}}`
     },
     code(cxt) {
-      const { gen, data, $data, schema, schemaCode, it: it2 } = cxt;
-      const u10 = it2.opts.unicodeRegExp ? "u" : "";
+      const { gen, data, $data, schema, schemaCode, it: it3 } = cxt;
+      const u2 = it3.opts.unicodeRegExp ? "u" : "";
       if ($data) {
-        const { regExp } = it2.opts.code;
+        const { regExp } = it3.opts.code;
         const regExpCode = regExp.code === "new RegExp" ? (0, codegen_1._)`new RegExp` : (0, util_1.useFunc)(gen, regExp);
         const valid = gen.let("valid");
-        gen.try(() => gen.assign(valid, (0, codegen_1._)`${regExpCode}(${schemaCode}, ${u10}).test(${data})`), () => gen.assign(valid, false));
+        gen.try(() => gen.assign(valid, (0, codegen_1._)`${regExpCode}(${schemaCode}, ${u2}).test(${data})`), () => gen.assign(valid, false));
         cxt.fail$data((0, codegen_1._)`!${valid}`);
       } else {
         const regExp = (0, code_1.usePattern)(cxt, schema);
@@ -18599,18 +18599,18 @@ var require_required = /* @__PURE__ */ __commonJSMin(((exports) => {
       params: ({ params: { missingProperty } }) => (0, codegen_1._)`{missingProperty: ${missingProperty}}`
     },
     code(cxt) {
-      const { gen, schema, schemaCode, data, $data, it: it2 } = cxt;
-      const { opts } = it2;
+      const { gen, schema, schemaCode, data, $data, it: it3 } = cxt;
+      const { opts } = it3;
       if (!$data && schema.length === 0) return;
       const useLoop = schema.length >= opts.loopRequired;
-      if (it2.allErrors) allErrorsMode();
+      if (it3.allErrors) allErrorsMode();
       else exitOnErrorMode();
       if (opts.strictRequired) {
         const props = cxt.parentSchema.properties;
         const { definedProperties } = cxt.it;
         for (const requiredKey of schema) if ((props === null || props === void 0 ? void 0 : props[requiredKey]) === void 0 && !definedProperties.has(requiredKey)) {
-          const msg = `required property "${requiredKey}" is not defined at "${it2.schemaEnv.baseId + it2.errSchemaPath}" (strictRequired)`;
-          (0, util_1.checkStrictMode)(it2, msg, it2.opts.strictRequired);
+          const msg = `required property "${requiredKey}" is not defined at "${it3.schemaEnv.baseId + it3.errSchemaPath}" (strictRequired)`;
+          (0, util_1.checkStrictMode)(it3, msg, it3.opts.strictRequired);
         }
       }
       function allErrorsMode() {
@@ -18694,7 +18694,7 @@ var require_uniqueItems = /* @__PURE__ */ __commonJSMin(((exports) => {
       params: ({ params: { i, j } }) => (0, codegen_1._)`{i: ${i}, j: ${j}}`
     },
     code(cxt) {
-      const { gen, data, $data, schema, parentSchema, schemaCode, it: it2 } = cxt;
+      const { gen, data, $data, schema, parentSchema, schemaCode, it: it3 } = cxt;
       if (!$data && !schema) return;
       const valid = gen.let("valid");
       const itemTypes = parentSchema.items ? (0, dataType_1.getSchemaTypes)(parentSchema.items) : [];
@@ -18715,7 +18715,7 @@ var require_uniqueItems = /* @__PURE__ */ __commonJSMin(((exports) => {
       }
       function loopN(i, j) {
         const item = gen.name("item");
-        const wrongType = (0, dataType_1.checkDataTypes)(itemTypes, item, it2.opts.strictNumbers, dataType_1.DataType.Wrong);
+        const wrongType = (0, dataType_1.checkDataTypes)(itemTypes, item, it3.opts.strictNumbers, dataType_1.DataType.Wrong);
         const indices = gen.const("indices", (0, codegen_1._)`{}`);
         gen.for((0, codegen_1._)`;${i}--;`, () => {
           gen.let(item, (0, codegen_1._)`${data}[${i}]`);
@@ -18774,9 +18774,9 @@ var require_enum = /* @__PURE__ */ __commonJSMin(((exports) => {
       params: ({ schemaCode }) => (0, codegen_1._)`{allowedValues: ${schemaCode}}`
     },
     code(cxt) {
-      const { gen, data, $data, schema, schemaCode, it: it2 } = cxt;
+      const { gen, data, $data, schema, schemaCode, it: it3 } = cxt;
       if (!$data && schema.length === 0) throw new Error("enum must have non-empty array");
-      const useLoop = schema.length >= it2.opts.loopEnum;
+      const useLoop = schema.length >= it3.opts.loopEnum;
       let eql;
       const getEql = () => eql !== null && eql !== void 0 ? eql : eql = (0, util_1.useFunc)(gen, equal_1.default);
       let valid;
@@ -18791,7 +18791,7 @@ var require_enum = /* @__PURE__ */ __commonJSMin(((exports) => {
       cxt.pass(valid);
       function loopEnum() {
         gen.assign(valid, false);
-        gen.forOf("v", schemaCode, (v8) => gen.if((0, codegen_1._)`${getEql()}(${data}, ${v8})`, () => gen.assign(valid, true).break()));
+        gen.forOf("v", schemaCode, (v2) => gen.if((0, codegen_1._)`${getEql()}(${data}, ${v2})`, () => gen.assign(valid, true).break()));
       }
       function equalCode(vSchema, i) {
         const sch = schema[i];
@@ -18850,23 +18850,23 @@ var require_additionalItems = /* @__PURE__ */ __commonJSMin(((exports) => {
       params: ({ params: { len } }) => (0, codegen_1._)`{limit: ${len}}`
     },
     code(cxt) {
-      const { parentSchema, it: it2 } = cxt;
+      const { parentSchema, it: it3 } = cxt;
       const { items } = parentSchema;
       if (!Array.isArray(items)) {
-        (0, util_1.checkStrictMode)(it2, '"additionalItems" is ignored when "items" is not an array of schemas');
+        (0, util_1.checkStrictMode)(it3, '"additionalItems" is ignored when "items" is not an array of schemas');
         return;
       }
       validateAdditionalItems(cxt, items);
     }
   };
   function validateAdditionalItems(cxt, items) {
-    const { gen, schema, data, keyword, it: it2 } = cxt;
-    it2.items = true;
+    const { gen, schema, data, keyword, it: it3 } = cxt;
+    it3.items = true;
     const len = gen.const("len", (0, codegen_1._)`${data}.length`);
     if (schema === false) {
       cxt.setParams({ len: items.length });
       cxt.pass((0, codegen_1._)`${len} <= ${items.length}`);
-    } else if (typeof schema == "object" && !(0, util_1.alwaysValidSchema)(it2, schema)) {
+    } else if (typeof schema == "object" && !(0, util_1.alwaysValidSchema)(it3, schema)) {
       const valid = gen.var("valid", (0, codegen_1._)`${len} <= ${items.length}`);
       gen.if((0, codegen_1.not)(valid), () => validateItems(valid));
       cxt.ok(valid);
@@ -18878,7 +18878,7 @@ var require_additionalItems = /* @__PURE__ */ __commonJSMin(((exports) => {
           dataProp: i,
           dataPropType: util_1.Type.Num
         }, valid);
-        if (!it2.allErrors) gen.if((0, codegen_1.not)(valid), () => gen.break());
+        if (!it3.allErrors) gen.if((0, codegen_1.not)(valid), () => gen.break());
       });
     }
   }
@@ -18901,21 +18901,21 @@ var require_items = /* @__PURE__ */ __commonJSMin(((exports) => {
     ],
     before: "uniqueItems",
     code(cxt) {
-      const { schema, it: it2 } = cxt;
+      const { schema, it: it3 } = cxt;
       if (Array.isArray(schema)) return validateTuple(cxt, "additionalItems", schema);
-      it2.items = true;
-      if ((0, util_1.alwaysValidSchema)(it2, schema)) return;
+      it3.items = true;
+      if ((0, util_1.alwaysValidSchema)(it3, schema)) return;
       cxt.ok((0, code_1.validateArray)(cxt));
     }
   };
   function validateTuple(cxt, extraItems, schArr = cxt.schema) {
-    const { gen, parentSchema, data, keyword, it: it2 } = cxt;
+    const { gen, parentSchema, data, keyword, it: it3 } = cxt;
     checkStrictTuple(parentSchema);
-    if (it2.opts.unevaluated && schArr.length && it2.items !== true) it2.items = util_1.mergeEvaluated.items(gen, schArr.length, it2.items);
+    if (it3.opts.unevaluated && schArr.length && it3.items !== true) it3.items = util_1.mergeEvaluated.items(gen, schArr.length, it3.items);
     const valid = gen.name("valid");
     const len = gen.const("len", (0, codegen_1._)`${data}.length`);
     schArr.forEach((sch, i) => {
-      if ((0, util_1.alwaysValidSchema)(it2, sch)) return;
+      if ((0, util_1.alwaysValidSchema)(it3, sch)) return;
       gen.if((0, codegen_1._)`${len} > ${i}`, () => cxt.subschema({
         keyword,
         schemaProp: i,
@@ -18924,12 +18924,12 @@ var require_items = /* @__PURE__ */ __commonJSMin(((exports) => {
       cxt.ok(valid);
     });
     function checkStrictTuple(sch) {
-      const { opts, errSchemaPath } = it2;
-      const l8 = schArr.length;
-      const fullTuple = l8 === sch.minItems && (l8 === sch.maxItems || sch[extraItems] === false);
+      const { opts, errSchemaPath } = it3;
+      const l3 = schArr.length;
+      const fullTuple = l3 === sch.minItems && (l3 === sch.maxItems || sch[extraItems] === false);
       if (opts.strictTuples && !fullTuple) {
-        const msg = `"${keyword}" is ${l8}-tuple, but minItems or maxItems/${extraItems} are not specified or different at path "${errSchemaPath}"`;
-        (0, util_1.checkStrictMode)(it2, msg, opts.strictTuples);
+        const msg = `"${keyword}" is ${l3}-tuple, but minItems or maxItems/${extraItems} are not specified or different at path "${errSchemaPath}"`;
+        (0, util_1.checkStrictMode)(it3, msg, opts.strictTuples);
       }
     }
   }
@@ -18964,10 +18964,10 @@ var require_items2020 = /* @__PURE__ */ __commonJSMin(((exports) => {
       params: ({ params: { len } }) => (0, codegen_1._)`{limit: ${len}}`
     },
     code(cxt) {
-      const { schema, parentSchema, it: it2 } = cxt;
+      const { schema, parentSchema, it: it3 } = cxt;
       const { prefixItems } = parentSchema;
-      it2.items = true;
-      if ((0, util_1.alwaysValidSchema)(it2, schema)) return;
+      it3.items = true;
+      if ((0, util_1.alwaysValidSchema)(it3, schema)) return;
       if (prefixItems) (0, additionalItems_1.validateAdditionalItems)(cxt, prefixItems);
       else cxt.ok((0, code_1.validateArray)(cxt));
     }
@@ -18989,11 +18989,11 @@ var require_contains = /* @__PURE__ */ __commonJSMin(((exports) => {
       params: ({ params: { min, max } }) => max === void 0 ? (0, codegen_1._)`{minContains: ${min}}` : (0, codegen_1._)`{minContains: ${min}, maxContains: ${max}}`
     },
     code(cxt) {
-      const { gen, schema, parentSchema, data, it: it2 } = cxt;
+      const { gen, schema, parentSchema, data, it: it3 } = cxt;
       let min;
       let max;
       const { minContains, maxContains } = parentSchema;
-      if (it2.opts.next) {
+      if (it3.opts.next) {
         min = minContains === void 0 ? 1 : minContains;
         max = maxContains;
       } else min = 1;
@@ -19003,21 +19003,21 @@ var require_contains = /* @__PURE__ */ __commonJSMin(((exports) => {
         max
       });
       if (max === void 0 && min === 0) {
-        (0, util_1.checkStrictMode)(it2, `"minContains" == 0 without "maxContains": "contains" keyword ignored`);
+        (0, util_1.checkStrictMode)(it3, `"minContains" == 0 without "maxContains": "contains" keyword ignored`);
         return;
       }
       if (max !== void 0 && min > max) {
-        (0, util_1.checkStrictMode)(it2, `"minContains" > "maxContains" is always invalid`);
+        (0, util_1.checkStrictMode)(it3, `"minContains" > "maxContains" is always invalid`);
         cxt.fail();
         return;
       }
-      if ((0, util_1.alwaysValidSchema)(it2, schema)) {
+      if ((0, util_1.alwaysValidSchema)(it3, schema)) {
         let cond = (0, codegen_1._)`${len} >= ${min}`;
         if (max !== void 0) cond = (0, codegen_1._)`${cond} && ${len} <= ${max}`;
         cxt.pass(cond);
         return;
       }
-      it2.items = true;
+      it3.items = true;
       const valid = gen.name("valid");
       if (max === void 0 && min === 1) validateItems(valid, () => gen.if(valid, () => gen.break()));
       else if (min === 0) {
@@ -19095,19 +19095,19 @@ var require_dependencies = /* @__PURE__ */ __commonJSMin(((exports) => {
     return [propertyDeps, schemaDeps];
   }
   function validatePropertyDeps(cxt, propertyDeps = cxt.schema) {
-    const { gen, data, it: it2 } = cxt;
+    const { gen, data, it: it3 } = cxt;
     if (Object.keys(propertyDeps).length === 0) return;
     const missing = gen.let("missing");
     for (const prop in propertyDeps) {
       const deps2 = propertyDeps[prop];
       if (deps2.length === 0) continue;
-      const hasProperty = (0, code_1.propertyInData)(gen, data, prop, it2.opts.ownProperties);
+      const hasProperty = (0, code_1.propertyInData)(gen, data, prop, it3.opts.ownProperties);
       cxt.setParams({
         property: prop,
         depsCount: deps2.length,
         deps: deps2.join(", ")
       });
-      if (it2.allErrors) gen.if(hasProperty, () => {
+      if (it3.allErrors) gen.if(hasProperty, () => {
         for (const depProp of deps2) (0, code_1.checkReportMissingProp)(cxt, depProp);
       });
       else {
@@ -19119,11 +19119,11 @@ var require_dependencies = /* @__PURE__ */ __commonJSMin(((exports) => {
   }
   exports.validatePropertyDeps = validatePropertyDeps;
   function validateSchemaDeps(cxt, schemaDeps = cxt.schema) {
-    const { gen, data, keyword, it: it2 } = cxt;
+    const { gen, data, keyword, it: it3 } = cxt;
     const valid = gen.name("valid");
     for (const prop in schemaDeps) {
-      if ((0, util_1.alwaysValidSchema)(it2, schemaDeps[prop])) continue;
-      gen.if((0, code_1.propertyInData)(gen, data, prop, it2.opts.ownProperties), () => {
+      if ((0, util_1.alwaysValidSchema)(it3, schemaDeps[prop])) continue;
+      gen.if((0, code_1.propertyInData)(gen, data, prop, it3.opts.ownProperties), () => {
         const schCxt = cxt.subschema({
           keyword,
           schemaProp: prop
@@ -19149,8 +19149,8 @@ var require_propertyNames = /* @__PURE__ */ __commonJSMin(((exports) => {
       params: ({ params }) => (0, codegen_1._)`{propertyName: ${params.propertyName}}`
     },
     code(cxt) {
-      const { gen, schema, data, it: it2 } = cxt;
-      if ((0, util_1.alwaysValidSchema)(it2, schema)) return;
+      const { gen, schema, data, it: it3 } = cxt;
+      if ((0, util_1.alwaysValidSchema)(it3, schema)) return;
       const valid = gen.name("valid");
       gen.forIn("key", data, (key) => {
         cxt.setParams({ propertyName: key });
@@ -19163,7 +19163,7 @@ var require_propertyNames = /* @__PURE__ */ __commonJSMin(((exports) => {
         }, valid);
         gen.if((0, codegen_1.not)(valid), () => {
           cxt.error(true);
-          if (!it2.allErrors) gen.break();
+          if (!it3.allErrors) gen.break();
         });
       });
       cxt.ok(valid);
@@ -19188,11 +19188,11 @@ var require_additionalProperties = /* @__PURE__ */ __commonJSMin(((exports) => {
       params: ({ params }) => (0, codegen_1._)`{additionalProperty: ${params.additionalProperty}}`
     },
     code(cxt) {
-      const { gen, schema, parentSchema, data, errsCount, it: it2 } = cxt;
+      const { gen, schema, parentSchema, data, errsCount, it: it3 } = cxt;
       if (!errsCount) throw new Error("ajv implementation error");
-      const { allErrors, opts } = it2;
-      it2.props = true;
-      if (opts.removeAdditional !== "all" && (0, util_1.alwaysValidSchema)(it2, schema)) return;
+      const { allErrors, opts } = it3;
+      it3.props = true;
+      if (opts.removeAdditional !== "all" && (0, util_1.alwaysValidSchema)(it3, schema)) return;
       const props = (0, code_1.allSchemaProperties)(parentSchema.properties);
       const patProps = (0, code_1.allSchemaProperties)(parentSchema.patternProperties);
       checkAdditionalProperties();
@@ -19206,11 +19206,11 @@ var require_additionalProperties = /* @__PURE__ */ __commonJSMin(((exports) => {
       function isAdditional(key) {
         let definedProp;
         if (props.length > 8) {
-          const propsSchema = (0, util_1.schemaRefOrVal)(it2, parentSchema.properties, "properties");
+          const propsSchema = (0, util_1.schemaRefOrVal)(it3, parentSchema.properties, "properties");
           definedProp = (0, code_1.isOwnProperty)(gen, propsSchema, key);
-        } else if (props.length) definedProp = (0, codegen_1.or)(...props.map((p) => (0, codegen_1._)`${key} === ${p}`));
+        } else if (props.length) definedProp = (0, codegen_1.or)(...props.map((p3) => (0, codegen_1._)`${key} === ${p3}`));
         else definedProp = codegen_1.nil;
-        if (patProps.length) definedProp = (0, codegen_1.or)(definedProp, ...patProps.map((p) => (0, codegen_1._)`${(0, code_1.usePattern)(cxt, p)}.test(${key})`));
+        if (patProps.length) definedProp = (0, codegen_1.or)(definedProp, ...patProps.map((p3) => (0, codegen_1._)`${(0, code_1.usePattern)(cxt, p3)}.test(${key})`));
         return (0, codegen_1.not)(definedProp);
       }
       function deleteAdditional(key) {
@@ -19227,7 +19227,7 @@ var require_additionalProperties = /* @__PURE__ */ __commonJSMin(((exports) => {
           if (!allErrors) gen.break();
           return;
         }
-        if (typeof schema == "object" && !(0, util_1.alwaysValidSchema)(it2, schema)) {
+        if (typeof schema == "object" && !(0, util_1.alwaysValidSchema)(it3, schema)) {
           const valid = gen.name("valid");
           if (opts.removeAdditional === "failing") {
             applyAdditionalSchema(key, valid, false);
@@ -19269,27 +19269,27 @@ var require_properties = /* @__PURE__ */ __commonJSMin(((exports) => {
     type: "object",
     schemaType: "object",
     code(cxt) {
-      const { gen, schema, parentSchema, data, it: it2 } = cxt;
-      if (it2.opts.removeAdditional === "all" && parentSchema.additionalProperties === void 0) additionalProperties_1.default.code(new validate_1.KeywordCxt(it2, additionalProperties_1.default, "additionalProperties"));
+      const { gen, schema, parentSchema, data, it: it3 } = cxt;
+      if (it3.opts.removeAdditional === "all" && parentSchema.additionalProperties === void 0) additionalProperties_1.default.code(new validate_1.KeywordCxt(it3, additionalProperties_1.default, "additionalProperties"));
       const allProps = (0, code_1.allSchemaProperties)(schema);
-      for (const prop of allProps) it2.definedProperties.add(prop);
-      if (it2.opts.unevaluated && allProps.length && it2.props !== true) it2.props = util_1.mergeEvaluated.props(gen, (0, util_1.toHash)(allProps), it2.props);
-      const properties = allProps.filter((p) => !(0, util_1.alwaysValidSchema)(it2, schema[p]));
+      for (const prop of allProps) it3.definedProperties.add(prop);
+      if (it3.opts.unevaluated && allProps.length && it3.props !== true) it3.props = util_1.mergeEvaluated.props(gen, (0, util_1.toHash)(allProps), it3.props);
+      const properties = allProps.filter((p3) => !(0, util_1.alwaysValidSchema)(it3, schema[p3]));
       if (properties.length === 0) return;
       const valid = gen.name("valid");
       for (const prop of properties) {
         if (hasDefault(prop)) applyPropertySchema(prop);
         else {
-          gen.if((0, code_1.propertyInData)(gen, data, prop, it2.opts.ownProperties));
+          gen.if((0, code_1.propertyInData)(gen, data, prop, it3.opts.ownProperties));
           applyPropertySchema(prop);
-          if (!it2.allErrors) gen.else().var(valid, true);
+          if (!it3.allErrors) gen.else().var(valid, true);
           gen.endIf();
         }
         cxt.it.definedProperties.add(prop);
         cxt.ok(valid);
       }
       function hasDefault(prop) {
-        return it2.opts.useDefaults && !it2.compositeRule && schema[prop].default !== void 0;
+        return it3.opts.useDefaults && !it3.compositeRule && schema[prop].default !== void 0;
       }
       function applyPropertySchema(prop) {
         cxt.subschema({
@@ -19313,20 +19313,20 @@ var require_patternProperties = /* @__PURE__ */ __commonJSMin(((exports) => {
     type: "object",
     schemaType: "object",
     code(cxt) {
-      const { gen, schema, data, parentSchema, it: it2 } = cxt;
-      const { opts } = it2;
+      const { gen, schema, data, parentSchema, it: it3 } = cxt;
+      const { opts } = it3;
       const patterns = (0, code_1.allSchemaProperties)(schema);
-      const alwaysValidPatterns = patterns.filter((p) => (0, util_1.alwaysValidSchema)(it2, schema[p]));
-      if (patterns.length === 0 || alwaysValidPatterns.length === patterns.length && (!it2.opts.unevaluated || it2.props === true)) return;
+      const alwaysValidPatterns = patterns.filter((p3) => (0, util_1.alwaysValidSchema)(it3, schema[p3]));
+      if (patterns.length === 0 || alwaysValidPatterns.length === patterns.length && (!it3.opts.unevaluated || it3.props === true)) return;
       const checkProperties = opts.strictSchema && !opts.allowMatchingProperties && parentSchema.properties;
       const valid = gen.name("valid");
-      if (it2.props !== true && !(it2.props instanceof codegen_1.Name)) it2.props = (0, util_2.evaluatedPropsToName)(gen, it2.props);
-      const { props } = it2;
+      if (it3.props !== true && !(it3.props instanceof codegen_1.Name)) it3.props = (0, util_2.evaluatedPropsToName)(gen, it3.props);
+      const { props } = it3;
       validatePatternProperties();
       function validatePatternProperties() {
         for (const pat of patterns) {
           if (checkProperties) checkMatchingProperties(pat);
-          if (it2.allErrors) validateProperties(pat);
+          if (it3.allErrors) validateProperties(pat);
           else {
             gen.var(valid, true);
             validateProperties(pat);
@@ -19335,7 +19335,7 @@ var require_patternProperties = /* @__PURE__ */ __commonJSMin(((exports) => {
         }
       }
       function checkMatchingProperties(pat) {
-        for (const prop in checkProperties) if (new RegExp(pat).test(prop)) (0, util_1.checkStrictMode)(it2, `property ${prop} matches pattern ${pat} (use allowMatchingProperties)`);
+        for (const prop in checkProperties) if (new RegExp(pat).test(prop)) (0, util_1.checkStrictMode)(it3, `property ${prop} matches pattern ${pat} (use allowMatchingProperties)`);
       }
       function validateProperties(pat) {
         gen.forIn("key", data, (key) => {
@@ -19347,8 +19347,8 @@ var require_patternProperties = /* @__PURE__ */ __commonJSMin(((exports) => {
               dataProp: key,
               dataPropType: util_2.Type.Str
             }, valid);
-            if (it2.opts.unevaluated && props !== true) gen.assign((0, codegen_1._)`${props}[${key}]`, true);
-            else if (!alwaysValid && !it2.allErrors) gen.if((0, codegen_1.not)(valid), () => gen.break());
+            if (it3.opts.unevaluated && props !== true) gen.assign((0, codegen_1._)`${props}[${key}]`, true);
+            else if (!alwaysValid && !it3.allErrors) gen.if((0, codegen_1.not)(valid), () => gen.break());
           });
         });
       }
@@ -19364,8 +19364,8 @@ var require_not = /* @__PURE__ */ __commonJSMin(((exports) => {
     schemaType: ["object", "boolean"],
     trackErrors: true,
     code(cxt) {
-      const { gen, schema, it: it2 } = cxt;
-      if ((0, util_1.alwaysValidSchema)(it2, schema)) {
+      const { gen, schema, it: it3 } = cxt;
+      if ((0, util_1.alwaysValidSchema)(it3, schema)) {
         cxt.fail();
         return;
       }
@@ -19406,9 +19406,9 @@ var require_oneOf = /* @__PURE__ */ __commonJSMin(((exports) => {
       params: ({ params }) => (0, codegen_1._)`{passingSchemas: ${params.passing}}`
     },
     code(cxt) {
-      const { gen, schema, parentSchema, it: it2 } = cxt;
+      const { gen, schema, parentSchema, it: it3 } = cxt;
       if (!Array.isArray(schema)) throw new Error("ajv implementation error");
-      if (it2.opts.discriminator && parentSchema.discriminator) return;
+      if (it3.opts.discriminator && parentSchema.discriminator) return;
       const schArr = schema;
       const valid = gen.let("valid", false);
       const passing = gen.let("passing", null);
@@ -19419,7 +19419,7 @@ var require_oneOf = /* @__PURE__ */ __commonJSMin(((exports) => {
       function validateOneOf() {
         schArr.forEach((sch, i) => {
           let schCxt;
-          if ((0, util_1.alwaysValidSchema)(it2, sch)) gen.var(schValid, true);
+          if ((0, util_1.alwaysValidSchema)(it3, sch)) gen.var(schValid, true);
           else schCxt = cxt.subschema({
             keyword: "oneOf",
             schemaProp: i,
@@ -19444,11 +19444,11 @@ var require_allOf = /* @__PURE__ */ __commonJSMin(((exports) => {
     keyword: "allOf",
     schemaType: "array",
     code(cxt) {
-      const { gen, schema, it: it2 } = cxt;
+      const { gen, schema, it: it3 } = cxt;
       if (!Array.isArray(schema)) throw new Error("ajv implementation error");
       const valid = gen.name("valid");
       schema.forEach((sch, i) => {
-        if ((0, util_1.alwaysValidSchema)(it2, sch)) return;
+        if ((0, util_1.alwaysValidSchema)(it3, sch)) return;
         const schCxt = cxt.subschema({
           keyword: "allOf",
           schemaProp: i
@@ -19473,10 +19473,10 @@ var require_if = /* @__PURE__ */ __commonJSMin(((exports) => {
       params: ({ params }) => (0, codegen_1._)`{failingKeyword: ${params.ifClause}}`
     },
     code(cxt) {
-      const { gen, parentSchema, it: it2 } = cxt;
-      if (parentSchema.then === void 0 && parentSchema.else === void 0) (0, util_1.checkStrictMode)(it2, '"if" without "then" and "else" is ignored');
-      const hasThen = hasSchema(it2, "then");
-      const hasElse = hasSchema(it2, "else");
+      const { gen, parentSchema, it: it3 } = cxt;
+      if (parentSchema.then === void 0 && parentSchema.else === void 0) (0, util_1.checkStrictMode)(it3, '"if" without "then" and "else" is ignored');
+      const hasThen = hasSchema(it3, "then");
+      const hasElse = hasSchema(it3, "else");
       if (!hasThen && !hasElse) return;
       const valid = gen.let("valid", true);
       const schValid = gen.name("_valid");
@@ -19509,9 +19509,9 @@ var require_if = /* @__PURE__ */ __commonJSMin(((exports) => {
       }
     }
   };
-  function hasSchema(it2, keyword) {
-    const schema = it2.schema[keyword];
-    return schema !== void 0 && !(0, util_1.alwaysValidSchema)(it2, schema);
+  function hasSchema(it3, keyword) {
+    const schema = it3.schema[keyword];
+    return schema !== void 0 && !(0, util_1.alwaysValidSchema)(it3, schema);
   }
   exports.default = def;
 }));
@@ -19521,8 +19521,8 @@ var require_thenElse = /* @__PURE__ */ __commonJSMin(((exports) => {
   const def = {
     keyword: ["then", "else"],
     schemaType: ["object", "boolean"],
-    code({ keyword, parentSchema, it: it2 }) {
-      if (parentSchema.if === void 0) (0, util_1.checkStrictMode)(it2, `"${keyword}" without "if" is ignored`);
+    code({ keyword, parentSchema, it: it3 }) {
+      if (parentSchema.if === void 0) (0, util_1.checkStrictMode)(it3, `"${keyword}" without "if" is ignored`);
     }
   };
   exports.default = def;
@@ -19579,8 +19579,8 @@ var require_format$2 = /* @__PURE__ */ __commonJSMin(((exports) => {
       params: ({ schemaCode }) => (0, codegen_1._)`{format: ${schemaCode}}`
     },
     code(cxt, ruleType) {
-      const { gen, data, $data, schema, schemaCode, it: it2 } = cxt;
-      const { opts, errSchemaPath, schemaEnv, self } = it2;
+      const { gen, data, $data, schema, schemaCode, it: it3 } = cxt;
+      const { opts, errSchemaPath, schemaEnv, self } = it3;
       if (!opts.validateFormats) return;
       if ($data) validate$DataFormat();
       else validateFormat();
@@ -19718,9 +19718,9 @@ var require_discriminator = /* @__PURE__ */ __commonJSMin(((exports) => {
       params: ({ params: { discrError, tag, tagName } }) => (0, codegen_1._)`{error: ${discrError}, tag: ${tagName}, tagValue: ${tag}}`
     },
     code(cxt) {
-      const { gen, data, schema, parentSchema, it: it2 } = cxt;
+      const { gen, data, schema, parentSchema, it: it3 } = cxt;
       const { oneOf } = parentSchema;
-      if (!it2.opts.discriminator) throw new Error("discriminator: requires discriminator option");
+      if (!it3.opts.discriminator) throw new Error("discriminator: requires discriminator option");
       const tagName = schema.propertyName;
       if (typeof tagName != "string") throw new Error("discriminator: requires propertyName");
       if (schema.mapping) throw new Error("discriminator: mapping is not supported");
@@ -19764,11 +19764,11 @@ var require_discriminator = /* @__PURE__ */ __commonJSMin(((exports) => {
         let tagRequired = true;
         for (let i = 0; i < oneOf.length; i++) {
           let sch = oneOf[i];
-          if ((sch === null || sch === void 0 ? void 0 : sch.$ref) && !(0, util_1.schemaHasRulesButRef)(sch, it2.self.RULES)) {
+          if ((sch === null || sch === void 0 ? void 0 : sch.$ref) && !(0, util_1.schemaHasRulesButRef)(sch, it3.self.RULES)) {
             const ref = sch.$ref;
-            sch = compile_1.resolveRef.call(it2.self, it2.schemaEnv.root, it2.baseId, ref);
+            sch = compile_1.resolveRef.call(it3.self, it3.schemaEnv.root, it3.baseId, ref);
             if (sch instanceof compile_1.SchemaEnv) sch = sch.schema;
-            if (sch === void 0) throw new ref_error_1.default(it2.opts.uriResolver, it2.baseId, ref);
+            if (sch === void 0) throw new ref_error_1.default(it3.opts.uriResolver, it3.baseId, ref);
           }
           const propSch = (_a4 = sch === null || sch === void 0 ? void 0 : sch.properties) === null || _a4 === void 0 ? void 0 : _a4[tagName];
           if (typeof propSch != "object") throw new Error(`discriminator: oneOf subschemas (or referenced schemas) must have "properties/${tagName}"`);
@@ -19942,7 +19942,7 @@ var require_ajv = /* @__PURE__ */ __commonJSMin(((exports, module) => {
   var Ajv2 = class extends core_1.default {
     _addVocabularies() {
       super._addVocabularies();
-      draft7_1.default.forEach((v8) => this.addVocabulary(v8));
+      draft7_1.default.forEach((v2) => this.addVocabulary(v2));
       if (this.opts.discriminator) this.addKeyword(discriminator_1.default);
     }
     _addDefaultMetaSchema() {
@@ -20033,11 +20033,11 @@ var require_dynamicAnchor = /* @__PURE__ */ __commonJSMin(((exports) => {
     code: (cxt) => dynamicAnchor(cxt, cxt.schema)
   };
   function dynamicAnchor(cxt, anchor2) {
-    const { gen, it: it2 } = cxt;
-    it2.schemaEnv.root.dynamicAnchors[anchor2] = true;
-    const v8 = (0, codegen_1._)`${names_1.default.dynamicAnchors}${(0, codegen_1.getProperty)(anchor2)}`;
-    const validate2 = it2.errSchemaPath === "#" ? it2.validateName : _getValidate(cxt);
-    gen.if((0, codegen_1._)`!${v8}`, () => gen.assign(v8, validate2));
+    const { gen, it: it3 } = cxt;
+    it3.schemaEnv.root.dynamicAnchors[anchor2] = true;
+    const v2 = (0, codegen_1._)`${names_1.default.dynamicAnchors}${(0, codegen_1.getProperty)(anchor2)}`;
+    const validate2 = it3.errSchemaPath === "#" ? it3.validateName : _getValidate(cxt);
+    gen.if((0, codegen_1._)`!${v2}`, () => gen.assign(v2, validate2));
   }
   exports.dynamicAnchor = dynamicAnchor;
   function _getValidate(cxt) {
@@ -20069,20 +20069,20 @@ var require_dynamicRef = /* @__PURE__ */ __commonJSMin(((exports) => {
     code: (cxt) => dynamicRef(cxt, cxt.schema)
   };
   function dynamicRef(cxt, ref) {
-    const { gen, keyword, it: it2 } = cxt;
+    const { gen, keyword, it: it3 } = cxt;
     if (ref[0] !== "#") throw new Error(`"${keyword}" only supports hash fragment reference`);
     const anchor2 = ref.slice(1);
-    if (it2.allErrors) _dynamicRef();
+    if (it3.allErrors) _dynamicRef();
     else {
       const valid = gen.let("valid", false);
       _dynamicRef(valid);
       cxt.ok(valid);
     }
     function _dynamicRef(valid) {
-      if (it2.schemaEnv.root.dynamicAnchors[anchor2]) {
-        const v8 = gen.let("_v", (0, codegen_1._)`${names_1.default.dynamicAnchors}${(0, codegen_1.getProperty)(anchor2)}`);
-        gen.if(v8, _callRef(v8, valid), _callRef(it2.validateName, valid));
-      } else _callRef(it2.validateName, valid)();
+      if (it3.schemaEnv.root.dynamicAnchors[anchor2]) {
+        const v2 = gen.let("_v", (0, codegen_1._)`${names_1.default.dynamicAnchors}${(0, codegen_1.getProperty)(anchor2)}`);
+        gen.if(v2, _callRef(v2, valid), _callRef(it3.validateName, valid));
+      } else _callRef(it3.validateName, valid)();
     }
     function _callRef(validate2, valid) {
       return valid ? () => gen.block(() => {
@@ -20162,8 +20162,8 @@ var require_limitContains = /* @__PURE__ */ __commonJSMin(((exports) => {
     keyword: ["maxContains", "minContains"],
     type: "array",
     schemaType: "number",
-    code({ keyword, parentSchema, it: it2 }) {
-      if (parentSchema.contains === void 0) (0, util_1.checkStrictMode)(it2, `"${keyword}" without "contains" is ignored`);
+    code({ keyword, parentSchema, it: it3 }) {
+      if (parentSchema.contains === void 0) (0, util_1.checkStrictMode)(it3, `"${keyword}" without "contains" is ignored`);
     }
   };
   exports.default = def;
@@ -20195,12 +20195,12 @@ var require_unevaluatedProperties = /* @__PURE__ */ __commonJSMin(((exports) => 
       params: ({ params }) => (0, codegen_1._)`{unevaluatedProperty: ${params.unevaluatedProperty}}`
     },
     code(cxt) {
-      const { gen, schema, data, errsCount, it: it2 } = cxt;
+      const { gen, schema, data, errsCount, it: it3 } = cxt;
       if (!errsCount) throw new Error("ajv implementation error");
-      const { allErrors, props } = it2;
+      const { allErrors, props } = it3;
       if (props instanceof codegen_1.Name) gen.if((0, codegen_1._)`${props} !== true`, () => gen.forIn("key", data, (key) => gen.if(unevaluatedDynamic(props, key), () => unevaluatedPropCode(key))));
       else if (props !== true) gen.forIn("key", data, (key) => props === void 0 ? unevaluatedPropCode(key) : gen.if(unevaluatedStatic(props, key), () => unevaluatedPropCode(key)));
-      it2.props = true;
+      it3.props = true;
       cxt.ok((0, codegen_1._)`${errsCount} === ${names_1.default.errors}`);
       function unevaluatedPropCode(key) {
         if (schema === false) {
@@ -20209,7 +20209,7 @@ var require_unevaluatedProperties = /* @__PURE__ */ __commonJSMin(((exports) => 
           if (!allErrors) gen.break();
           return;
         }
-        if (!(0, util_1.alwaysValidSchema)(it2, schema)) {
+        if (!(0, util_1.alwaysValidSchema)(it3, schema)) {
           const valid = gen.name("valid");
           cxt.subschema({
             keyword: "unevaluatedProperties",
@@ -20223,9 +20223,9 @@ var require_unevaluatedProperties = /* @__PURE__ */ __commonJSMin(((exports) => 
         return (0, codegen_1._)`!${evaluatedProps} || !${evaluatedProps}[${key}]`;
       }
       function unevaluatedStatic(evaluatedProps, key) {
-        const ps3 = [];
-        for (const p in evaluatedProps) if (evaluatedProps[p] === true) ps3.push((0, codegen_1._)`${key} !== ${p}`);
-        return (0, codegen_1.and)(...ps3);
+        const ps2 = [];
+        for (const p3 in evaluatedProps) if (evaluatedProps[p3] === true) ps2.push((0, codegen_1._)`${key} !== ${p3}`);
+        return (0, codegen_1.and)(...ps2);
       }
     }
   };
@@ -20244,19 +20244,19 @@ var require_unevaluatedItems = /* @__PURE__ */ __commonJSMin(((exports) => {
       params: ({ params: { len } }) => (0, codegen_1._)`{limit: ${len}}`
     },
     code(cxt) {
-      const { gen, schema, data, it: it2 } = cxt;
-      const items = it2.items || 0;
+      const { gen, schema, data, it: it3 } = cxt;
+      const items = it3.items || 0;
       if (items === true) return;
       const len = gen.const("len", (0, codegen_1._)`${data}.length`);
       if (schema === false) {
         cxt.setParams({ len: items });
         cxt.fail((0, codegen_1._)`${len} > ${items}`);
-      } else if (typeof schema == "object" && !(0, util_1.alwaysValidSchema)(it2, schema)) {
+      } else if (typeof schema == "object" && !(0, util_1.alwaysValidSchema)(it3, schema)) {
         const valid = gen.var("valid", (0, codegen_1._)`${len} <= ${items}`);
         gen.if((0, codegen_1.not)(valid), () => validateItems(valid, items));
         cxt.ok(valid);
       }
-      it2.items = true;
+      it3.items = true;
       function validateItems(valid, from) {
         gen.forRange("i", from, len, (i) => {
           cxt.subschema({
@@ -20264,7 +20264,7 @@ var require_unevaluatedItems = /* @__PURE__ */ __commonJSMin(((exports) => {
             dataProp: i,
             dataPropType: util_1.Type.Num
           }, valid);
-          if (!it2.allErrors) gen.if((0, codegen_1.not)(valid), () => gen.break());
+          if (!it3.allErrors) gen.if((0, codegen_1.not)(valid), () => gen.break());
         });
       }
     }
@@ -20601,7 +20601,7 @@ var require__2019 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
     _addVocabularies() {
       super._addVocabularies();
       this.addVocabulary(dynamic_1.default);
-      draft7_1.default.forEach((v8) => this.addVocabulary(v8));
+      draft7_1.default.forEach((v2) => this.addVocabulary(v2));
       this.addVocabulary(next_1.default);
       this.addVocabulary(unevaluated_1.default);
       if (this.opts.discriminator) this.addKeyword(discriminator_1.default);
@@ -21048,7 +21048,7 @@ var require__2020 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
     }
     _addVocabularies() {
       super._addVocabularies();
-      draft2020_1.default.forEach((v8) => this.addVocabulary(v8));
+      draft2020_1.default.forEach((v2) => this.addVocabulary(v2));
       if (this.opts.discriminator) this.addKeyword(discriminator_1.default);
     }
     _addDefaultMetaSchema() {
@@ -21225,36 +21225,36 @@ var require_formats = /* @__PURE__ */ __commonJSMin(((exports) => {
     return function time3(str) {
       const matches = TIME.exec(str);
       if (!matches) return false;
-      const hr3 = +matches[1];
+      const hr2 = +matches[1];
       const min = +matches[2];
       const sec = +matches[3];
-      const tz = matches[4];
+      const tz2 = matches[4];
       const tzSign = matches[5] === "-" ? -1 : 1;
       const tzH = +(matches[6] || 0);
       const tzM = +(matches[7] || 0);
-      if (tzH > 23 || tzM > 59 || strictTimeZone && !tz) return false;
-      if (hr3 <= 23 && min <= 59 && sec < 60) return true;
+      if (tzH > 23 || tzM > 59 || strictTimeZone && !tz2) return false;
+      if (hr2 <= 23 && min <= 59 && sec < 60) return true;
       const utcMin = min - tzM * tzSign;
-      const utcHr = hr3 - tzH * tzSign - (utcMin < 0 ? 1 : 0);
+      const utcHr = hr2 - tzH * tzSign - (utcMin < 0 ? 1 : 0);
       return (utcHr === 23 || utcHr === -1) && (utcMin === 59 || utcMin === -1) && sec < 61;
     };
   }
-  function compareTime(s12, s22) {
-    if (!(s12 && s22)) return void 0;
-    const t1 = (/* @__PURE__ */ new Date("2020-01-01T" + s12)).valueOf();
-    const t22 = (/* @__PURE__ */ new Date("2020-01-01T" + s22)).valueOf();
-    if (!(t1 && t22)) return void 0;
-    return t1 - t22;
+  function compareTime(s1, s2) {
+    if (!(s1 && s2)) return void 0;
+    const t1 = (/* @__PURE__ */ new Date("2020-01-01T" + s1)).valueOf();
+    const t2 = (/* @__PURE__ */ new Date("2020-01-01T" + s2)).valueOf();
+    if (!(t1 && t2)) return void 0;
+    return t1 - t2;
   }
-  function compareIsoTime(t1, t22) {
-    if (!(t1 && t22)) return void 0;
+  function compareIsoTime(t1, t2) {
+    if (!(t1 && t2)) return void 0;
     const a1 = TIME.exec(t1);
-    const a22 = TIME.exec(t22);
+    const a22 = TIME.exec(t2);
     if (!(a1 && a22)) return void 0;
     t1 = a1[1] + a1[2] + a1[3];
-    t22 = a22[1] + a22[2] + a22[3];
-    if (t1 > t22) return 1;
-    if (t1 < t22) return -1;
+    t2 = a22[1] + a22[2] + a22[3];
+    if (t1 > t2) return 1;
+    if (t1 < t2) return -1;
     return 0;
   }
   const DATE_TIME_SEPARATOR = /t|\s/i;
@@ -21275,10 +21275,10 @@ var require_formats = /* @__PURE__ */ __commonJSMin(((exports) => {
   function compareIsoDateTime(dt1, dt2) {
     if (!(dt1 && dt2)) return void 0;
     const [d1, t1] = dt1.split(DATE_TIME_SEPARATOR);
-    const [d22, t22] = dt2.split(DATE_TIME_SEPARATOR);
+    const [d22, t2] = dt2.split(DATE_TIME_SEPARATOR);
     const res = compareDate(d1, d22);
     if (res === void 0) return void 0;
-    return res || compareTime(t1, t22);
+    return res || compareTime(t1, t2);
   }
   const NOT_URI_FRAGMENT = /\/|:/;
   const URI = /^(?:[a-z][a-z0-9+\-.]*:)(?:\/?\/(?:(?:[a-z0-9\-._~!$&'()*+,;=:]|%[0-9a-f]{2})*@)?(?:\[(?:(?:(?:(?:[0-9a-f]{1,4}:){6}|::(?:[0-9a-f]{1,4}:){5}|(?:[0-9a-f]{1,4})?::(?:[0-9a-f]{1,4}:){4}|(?:(?:[0-9a-f]{1,4}:){0,1}[0-9a-f]{1,4})?::(?:[0-9a-f]{1,4}:){3}|(?:(?:[0-9a-f]{1,4}:){0,2}[0-9a-f]{1,4})?::(?:[0-9a-f]{1,4}:){2}|(?:(?:[0-9a-f]{1,4}:){0,3}[0-9a-f]{1,4})?::[0-9a-f]{1,4}:|(?:(?:[0-9a-f]{1,4}:){0,4}[0-9a-f]{1,4})?::)(?:[0-9a-f]{1,4}:[0-9a-f]{1,4}|(?:(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d\d?))|(?:(?:[0-9a-f]{1,4}:){0,5}[0-9a-f]{1,4})?::[0-9a-f]{1,4}|(?:(?:[0-9a-f]{1,4}:){0,6}[0-9a-f]{1,4})?::)|[Vv][0-9a-f]+\.[a-z0-9\-._~!$&'()*+,;=:]+)\]|(?:(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d\d?)|(?:[a-z0-9\-._~!$&'()*+,;=]|%[0-9a-f]{2})*)(?::\d*)?(?:\/(?:[a-z0-9\-._~!$&'()*+,;=:@]|%[0-9a-f]{2})*)*|\/(?:(?:[a-z0-9\-._~!$&'()*+,;=:@]|%[0-9a-f]{2})+(?:\/(?:[a-z0-9\-._~!$&'()*+,;=:@]|%[0-9a-f]{2})*)*)?|(?:[a-z0-9\-._~!$&'()*+,;=:@]|%[0-9a-f]{2})+(?:\/(?:[a-z0-9\-._~!$&'()*+,;=:@]|%[0-9a-f]{2})*)*)(?:\?(?:[a-z0-9\-._~!$&'()*+,;=:@/?]|%[0-9a-f]{2})*)?(?:#(?:[a-z0-9\-._~!$&'()*+,;=:@/?]|%[0-9a-f]{2})*)?$/i;
@@ -21307,7 +21307,7 @@ var require_formats = /* @__PURE__ */ __commonJSMin(((exports) => {
     try {
       new RegExp(str);
       return true;
-    } catch (e8) {
+    } catch (e5) {
       return false;
     }
   }
@@ -21351,10 +21351,10 @@ var require_limit = /* @__PURE__ */ __commonJSMin(((exports) => {
     $data: true,
     error: error2,
     code(cxt) {
-      const { gen, data, schemaCode, keyword, it: it2 } = cxt;
-      const { opts, self } = it2;
+      const { gen, data, schemaCode, keyword, it: it3 } = cxt;
+      const { opts, self } = it3;
       if (!opts.validateFormats) return;
-      const fCxt = new ajv_1.KeywordCxt(it2, self.RULES.all.format.definition, "format");
+      const fCxt = new ajv_1.KeywordCxt(it3, self.RULES.all.format.definition, "format");
       if (fCxt.$data) validate$DataFormat();
       else validateFormat();
       function validate$DataFormat() {
@@ -21407,15 +21407,15 @@ var require_dist = /* @__PURE__ */ __commonJSMin(((exports, module) => {
     return ajv;
   };
   formatsPlugin.get = (name, mode = "full") => {
-    const f10 = (mode === "fast" ? formats_1.fastFormats : formats_1.fullFormats)[name];
-    if (!f10) throw new Error(`Unknown format "${name}"`);
-    return f10;
+    const f2 = (mode === "fast" ? formats_1.fastFormats : formats_1.fullFormats)[name];
+    if (!f2) throw new Error(`Unknown format "${name}"`);
+    return f2;
   };
   function addFormats2(ajv, list, fs3, exportName) {
     var _a4;
     var _b;
     (_a4 = (_b = ajv.opts.code).formats) !== null && _a4 !== void 0 || (_b.formats = (0, codegen_1._)`require("ajv-formats/dist/formats").${exportName}`);
-    for (const f10 of list) ajv.addFormat(f10, fs3[f10]);
+    for (const f2 of list) ajv.addFormat(f2, fs3[f2]);
   }
   module.exports = exports = formatsPlugin;
   Object.defineProperty(exports, "__esModule", { value: true });
@@ -22833,7 +22833,7 @@ var McpServer = class {
     this.server.assertCanSetRequestHandler("resources/read");
     this.server.registerCapabilities({ resources: { listChanged: this.server.getCapabilities().resources?.listChanged ?? true } });
     this.server.setRequestHandler("resources/list", async (_request, ctx) => {
-      const resources = Object.entries(this._registeredResources).filter(([_8, resource]) => resource.enabled).map(([uri, resource]) => ({
+      const resources = Object.entries(this._registeredResources).filter(([_2, resource]) => resource.enabled).map(([uri, resource]) => ({
         uri,
         name: resource.name,
         ...resource.metadata
@@ -22993,7 +22993,7 @@ var McpServer = class {
     };
     this._registeredResourceTemplates[name] = registeredResourceTemplate;
     const variableNames = template.uriTemplate.variableNames;
-    if (Array.isArray(variableNames) && variableNames.some((v8) => !!template.completeCallback(v8))) this.setCompletionRequestHandler();
+    if (Array.isArray(variableNames) && variableNames.some((v2) => !!template.completeCallback(v2))) this.setCompletionRequestHandler();
     return registeredResourceTemplate;
   }
   _createRegisteredPrompt(name, title, description, argsSchema, callback, icons, scopeChallenge, _meta) {
@@ -23961,7 +23961,7 @@ data:
         return new Response(null, { status: 202 });
       }
       const streamId = crypto.randomUUID();
-      const initRequest = messages.find((m6) => isInitializeRequest(m6));
+      const initRequest = messages.find((m3) => isInitializeRequest(m3));
       const clientProtocolVersion = initRequest ? initRequest.params.protocolVersion : req.headers.get("mcp-protocol-version") ?? DEFAULT_NEGOTIATED_PROTOCOL_VERSION;
       if (this._enableJsonResponse) return new Promise((resolve) => {
         this._streamMapping.set(streamId, {
@@ -24147,7 +24147,7 @@ data:
     }
     if (isJSONRPCResultResponse(message) || isJSONRPCErrorResponse(message)) {
       this._requestResponseMap.set(requestId, message);
-      const relatedIds = [...this._requestToStreamMapping.entries()].filter(([_8, sid]) => sid === streamId).map(([id]) => id);
+      const relatedIds = [...this._requestToStreamMapping.entries()].filter(([_2, sid]) => sid === streamId).map(([id]) => id);
       if (relatedIds.every((id) => this._requestResponseMap.has(id))) {
         if (!stream) {
           if (this._enableJsonResponse) throw new Error(`No connection established for request ID: ${String(requestId)}`);
@@ -25863,7 +25863,7 @@ var PROGRAM_RULES = [
     discriminators: [
       {
         bytes: PROFILE_DISCRIMINATOR,
-        pubkeyOffsets: Array.from({ length: MAX_PROFILE_KEY_SLOTS }, (_8, slot) => PROFILE_KEY_OFFSET + slot * PROFILE_KEY_STRIDE)
+        pubkeyOffsets: Array.from({ length: MAX_PROFILE_KEY_SLOTS }, (_2, slot) => PROFILE_KEY_OFFSET + slot * PROFILE_KEY_STRIDE)
       },
       { bytes: PLAYER_NAME_DISCRIMINATOR, pubkeyOffsets: [PLAYER_NAME_PROFILE_OFFSET] }
     ]
@@ -26231,7 +26231,7 @@ function createRpcClient(url2, fetchImpl = fetch, options) {
         }
         byId.set(item.id, item);
       }
-      return requests.map((_8, index) => {
+      return requests.map((_2, index) => {
         const item = byId.get(index);
         if (!item) throw new SafeClientError("Solana RPC batch omitted a response.");
         return unwrap(item, index);
@@ -27627,11 +27627,11 @@ function parseClaim(value) {
     if (typeof record4.playerProfile !== "string" || !validAddress2(record4.playerProfile)) return null;
     playerProfile = record4.playerProfile;
   }
-  let x8;
+  let x3;
   if (keys.includes("x")) {
     const parsed = parseX(record4.x);
     if (!parsed) return null;
-    x8 = parsed;
+    x3 = parsed;
   }
   let discord;
   if (keys.includes("discord")) {
@@ -27667,7 +27667,7 @@ function parseClaim(value) {
     subject: record4.subject,
     identity,
     ...playerProfile ? { playerProfile } : {},
-    ...x8 ? { x: x8 } : {},
+    ...x3 ? { x: x3 } : {},
     ...discord ? { discord } : {},
     ...showHandles ? { showHandles } : {},
     ...targetId ? { targetId } : {},
@@ -28154,7 +28154,7 @@ function parseHubPayload(value) {
   if (Object.keys(refs).length !== 2) return null;
   if (refs.pip !== null && (typeof refs.pip !== "string" || !ID_PATTERN2.test(refs.pip))) return null;
   if (!Array.isArray(refs.txs) || refs.txs.length > TXS_MAX) return null;
-  if (refs.txs.some((tx2) => typeof tx2 !== "string" || !TX_PATTERN.test(tx2))) return null;
+  if (refs.txs.some((tx) => typeof tx !== "string" || !TX_PATTERN.test(tx))) return null;
   const txs = [...refs.txs];
   if (new Set(txs).size !== txs.length) return null;
   txs.sort();
@@ -29221,7 +29221,7 @@ function presentClaim(candidate, rows) {
   const identity = candidate.identity;
   const showHandles = claim2.showHandles === true;
   const discord = linkState("discord", claim2, rows);
-  const x8 = linkState("x", claim2, rows);
+  const x3 = linkState("x", claim2, rows);
   const discordHandle = showHandles ? optedHandle("discord", claim2, rows) : void 0;
   const xHandle = showHandles ? optedHandle("x", claim2, rows) : void 0;
   return {
@@ -29235,7 +29235,7 @@ function presentClaim(candidate, rows) {
     active: candidate.state === "active",
     profile: candidate.profile,
     discord,
-    x: x8,
+    x: x3,
     showHandles,
     ...discordHandle ? { discordHandle } : {},
     ...xHandle ? { xHandle } : {},
@@ -29460,15 +29460,15 @@ function classifyFile(root, relative) {
   return "file";
 }
 function readRegular(file) {
-  let fd2;
+  let fd;
   try {
-    fd2 = openSync(file, constants.O_RDONLY | constants.O_NOFOLLOW);
-    const stat = fstatSync(fd2);
+    fd = openSync(file, constants.O_RDONLY | constants.O_NOFOLLOW);
+    const stat = fstatSync(fd);
     if (!stat.isFile() || stat.size > MAX_FILE_BYTES) return null;
     const bytes = Buffer.alloc(stat.size);
     let offset = 0;
     while (offset < bytes.length) {
-      const got = readSync(fd2, bytes, offset, bytes.length - offset, offset);
+      const got = readSync(fd, bytes, offset, bytes.length - offset, offset);
       if (got <= 0) return null;
       offset += got;
     }
@@ -29476,7 +29476,7 @@ function readRegular(file) {
   } catch {
     return null;
   } finally {
-    if (fd2 !== void 0) closeSync(fd2);
+    if (fd !== void 0) closeSync(fd);
   }
 }
 function directoryTree(root) {
@@ -30900,13 +30900,13 @@ function normalizeMarkersQuery(query) {
   };
 }
 async function listC4Markers(source, allowlist, threshold, query = {}, signerSets, options, labels = /* @__PURE__ */ new Map(), now = /* @__PURE__ */ new Date()) {
-  const q11 = normalizeMarkersQuery(query);
+  const q9 = normalizeMarkersQuery(query);
   const pinned = Boolean(source.repo?.trim() && source.commit?.trim() && source.manifestHash?.trim());
   const markers = [];
   let sourceUrl = null;
-  if (pinned && q11.anchored !== true) {
-    if (q11.kind !== "guild") {
-      const listings = await listListings(source, allowlist, threshold, q11.stream ? { stream: q11.stream } : {}, signerSets, options, labels, now);
+  if (pinned && q9.anchored !== true) {
+    if (q9.kind !== "guild") {
+      const listings = await listListings(source, allowlist, threshold, q9.stream ? { stream: q9.stream } : {}, signerSets, options, labels, now);
       sourceUrl = listings.sourceUrl;
       for (const listing of listings.listings) {
         markers.push({
@@ -30927,7 +30927,7 @@ async function listC4Markers(source, allowlist, threshold, query = {}, signerSet
         });
       }
     }
-    if (q11.kind !== "listing" && !q11.stream) {
+    if (q9.kind !== "listing" && !q9.stream) {
       const guilds = await readHubUpdates(source, allowlist, threshold, "guild", signerSets, { ...options, now });
       sourceUrl = sourceUrl ?? guilds.sourceUrl;
       for (const update of guilds.updates) {
@@ -32872,21 +32872,21 @@ function readSignerBytes(filePath) {
   if (typeof constants2.O_NOFOLLOW !== "number") {
     throw new Error("O_NOFOLLOW is required to read the signer allowlist.");
   }
-  let fd2;
+  let fd;
   try {
-    fd2 = openSync2(filePath, constants2.O_RDONLY | constants2.O_NOFOLLOW);
-    const stat = fstatSync2(fd2);
+    fd = openSync2(filePath, constants2.O_RDONLY | constants2.O_NOFOLLOW);
+    const stat = fstatSync2(fd);
     if (!stat.isFile() || stat.size > MAX_SIGNER_BYTES) throw new Error("not a regular file");
     const bytes = Buffer.alloc(stat.size);
     let offset = 0;
     while (offset < bytes.length) {
-      const got = readSync2(fd2, bytes, offset, bytes.length - offset, offset);
+      const got = readSync2(fd, bytes, offset, bytes.length - offset, offset);
       if (got <= 0) throw new Error("short read");
       offset += got;
     }
     return bytes;
   } finally {
-    if (fd2 !== void 0) closeSync2(fd2);
+    if (fd !== void 0) closeSync2(fd);
   }
 }
 function readSignerFile(filePath) {
@@ -34405,11 +34405,11 @@ function getErrorMessage(code, context = {}) {
     return `${decodingAdviceMessage}\``;
   }
 }
-function isSolanaError(e8, code) {
-  const isSolanaError2 = e8 instanceof Error && e8.name === "SolanaError";
+function isSolanaError(e5, code) {
+  const isSolanaError2 = e5 instanceof Error && e5.name === "SolanaError";
   if (isSolanaError2) {
     if (code !== void 0) {
-      return e8.context.__code === code;
+      return e5.context.__code === code;
     }
     return true;
   }
@@ -34741,13 +34741,6 @@ function combineCodec(encoder, decoder) {
     write: encoder.write
   };
 }
-function assertByteArrayIsNotEmptyForCodec(codecDescription, bytes, offset = 0) {
-  if (bytes.length - offset <= 0) {
-    throw new SolanaError(SOLANA_ERROR__CODECS__CANNOT_DECODE_EMPTY_BYTE_ARRAY, {
-      codecDescription
-    });
-  }
-}
 function assertByteArrayHasEnoughBytesForCodec(codecDescription, expected, bytes, offset = 0) {
   const bytesLength = bytes.length - offset;
   if (bytesLength < expected) {
@@ -34757,20 +34750,6 @@ function assertByteArrayHasEnoughBytesForCodec(codecDescription, expected, bytes
       expected
     });
   }
-}
-function toArrayBuffer(bytes, offset, length) {
-  const bytesOffset = bytes.byteOffset + (offset ?? 0);
-  const bytesLength = length ?? bytes.byteLength;
-  let buffer;
-  if (typeof SharedArrayBuffer === "undefined") {
-    buffer = bytes.buffer;
-  } else if (bytes.buffer instanceof SharedArrayBuffer) {
-    buffer = new ArrayBuffer(bytes.length);
-    new Uint8Array(buffer).set(new Uint8Array(bytes));
-  } else {
-    buffer = bytes.buffer;
-  }
-  return (bytesOffset === 0 || bytesOffset === -bytes.byteLength) && bytesLength === bytes.byteLength ? buffer : buffer.slice(bytesOffset, bytesOffset + bytesLength);
 }
 function fixEncoderSize(encoder, fixedBytes) {
   return createEncoder({
@@ -34976,19 +34955,19 @@ function mod(a) {
   const r = a % P;
   return r >= 0n ? r : P + r;
 }
-function pow2(x8, power) {
-  let r = x8;
+function pow2(x3, power) {
+  let r = x3;
   while (power-- > 0n) {
     r *= r;
     r %= P;
   }
   return r;
 }
-function pow_2_252_3(x8) {
-  const x22 = x8 * x8 % P;
-  const b22 = x22 * x8 % P;
-  const b42 = pow2(b22, 2n) * b22 % P;
-  const b52 = pow2(b42, 1n) * x8 % P;
+function pow_2_252_3(x3) {
+  const x22 = x3 * x3 % P;
+  const b2 = x22 * x3 % P;
+  const b42 = pow2(b2, 2n) * b2 % P;
+  const b52 = pow2(b42, 1n) * x3 % P;
   const b10 = pow2(b52, 5n) * b52 % P;
   const b20 = pow2(b10, 10n) * b10 % P;
   const b40 = pow2(b20, 20n) * b20 % P;
@@ -34996,38 +34975,38 @@ function pow_2_252_3(x8) {
   const b160 = pow2(b80, 80n) * b80 % P;
   const b240 = pow2(b160, 80n) * b80 % P;
   const b250 = pow2(b240, 10n) * b10 % P;
-  const pow_p_5_8 = pow2(b250, 2n) * x8 % P;
+  const pow_p_5_8 = pow2(b250, 2n) * x3 % P;
   return pow_p_5_8;
 }
-function uvRatio(u10, v8) {
-  const v32 = mod(v8 * v8 * v8);
-  const v72 = mod(v32 * v32 * v8);
-  const pow = pow_2_252_3(u10 * v72);
-  let x8 = mod(u10 * v32 * pow);
-  const vx2 = mod(v8 * x8 * x8);
-  const root1 = x8;
-  const root2 = mod(x8 * RM1);
-  const useRoot1 = vx2 === u10;
-  const useRoot2 = vx2 === mod(-u10);
-  const noRoot = vx2 === mod(-u10 * RM1);
-  if (useRoot1) x8 = root1;
-  if (useRoot2 || noRoot) x8 = root2;
-  if ((mod(x8) & 1n) === 1n) x8 = mod(-x8);
+function uvRatio(u2, v2) {
+  const v32 = mod(v2 * v2 * v2);
+  const v72 = mod(v32 * v32 * v2);
+  const pow = pow_2_252_3(u2 * v72);
+  let x3 = mod(u2 * v32 * pow);
+  const vx2 = mod(v2 * x3 * x3);
+  const root1 = x3;
+  const root2 = mod(x3 * RM1);
+  const useRoot1 = vx2 === u2;
+  const useRoot2 = vx2 === mod(-u2);
+  const noRoot = vx2 === mod(-u2 * RM1);
+  if (useRoot1) x3 = root1;
+  if (useRoot2 || noRoot) x3 = root2;
+  if ((mod(x3) & 1n) === 1n) x3 = mod(-x3);
   if (!useRoot1 && !useRoot2) {
     return null;
   }
-  return x8;
+  return x3;
 }
-function pointIsOnCurve(y10, lastByte) {
-  const y22 = mod(y10 * y10);
-  const u10 = mod(y22 - 1n);
-  const v8 = mod(D * y22 + 1n);
-  const x8 = uvRatio(u10, v8);
-  if (x8 === null) {
+function pointIsOnCurve(y2, lastByte) {
+  const y22 = mod(y2 * y2);
+  const u2 = mod(y22 - 1n);
+  const v2 = mod(D * y22 + 1n);
+  const x3 = uvRatio(u2, v2);
+  if (x3 === null) {
     return false;
   }
   const isLastByteOdd = (lastByte & 128) !== 0;
-  if (x8 === 0n && isLastByteOdd) {
+  if (x3 === 0n && isLastByteOdd) {
     return false;
   }
   return true;
@@ -35049,8 +35028,8 @@ function compressedPointBytesAreOnCurve(bytes) {
   if (bytes.byteLength !== 32) {
     return false;
   }
-  const y10 = decompressPointBytes(bytes);
-  return pointIsOnCurve(y10, bytes[31]);
+  const y2 = decompressPointBytes(bytes);
+  return pointIsOnCurve(y2, bytes[31]);
 }
 var MAX_SEED_LENGTH = 32;
 var MAX_SEEDS = 16;
@@ -35123,11 +35102,11 @@ async function getProgramDerivedAddress({
         seeds: [...seeds, new Uint8Array([bumpSeed])]
       });
       return [address2, bumpSeed];
-    } catch (e8) {
-      if (isSolanaError(e8, SOLANA_ERROR__ADDRESSES__INVALID_SEEDS_POINT_ON_CURVE)) {
+    } catch (e5) {
+      if (isSolanaError(e5, SOLANA_ERROR__ADDRESSES__INVALID_SEEDS_POINT_ON_CURVE)) {
         bumpSeed--;
       } else {
-        throw e8;
+        throw e5;
       }
     }
   }
@@ -35162,35 +35141,12 @@ function numberEncoderFactory(input) {
     }
   });
 }
-function numberDecoderFactory(input) {
-  return createDecoder({
-    fixedSize: input.size,
-    read(bytes, offset = 0) {
-      assertByteArrayIsNotEmptyForCodec(input.name, bytes, offset);
-      assertByteArrayHasEnoughBytesForCodec(input.name, input.size, bytes, offset);
-      const view = new DataView(toArrayBuffer(bytes, offset, input.size));
-      return [input.get(view, isLittleEndian(input.config)), offset + input.size];
-    }
-  });
-}
-var getI64Decoder = (config2 = {}) => numberDecoderFactory({
-  config: config2,
-  get: (view, le) => view.getBigInt64(0, le),
-  name: "i64",
-  size: 8
-});
 var getU16Encoder = (config2 = {}) => numberEncoderFactory({
   config: config2,
   name: "u16",
   range: [0, Number("0xffff")],
   set: (view, value, le) => view.setUint16(0, Number(value), le),
   size: 2
-});
-var getU32Decoder = (config2 = {}) => numberDecoderFactory({
-  config: config2,
-  get: (view, le) => view.getUint32(0, le),
-  name: "u32",
-  size: 4
 });
 var getU64Encoder = (config2 = {}) => numberEncoderFactory({
   config: config2,
@@ -35199,53 +35155,6 @@ var getU64Encoder = (config2 = {}) => numberEncoderFactory({
   set: (view, value, le) => view.setBigUint64(0, BigInt(value), le),
   size: 8
 });
-var getU64Decoder = (config2 = {}) => numberDecoderFactory({
-  config: config2,
-  get: (view, le) => view.getBigUint64(0, le),
-  name: "u64",
-  size: 8
-});
-var getU8Decoder = () => numberDecoderFactory({
-  get: (view) => view.getUint8(0),
-  name: "u8",
-  size: 1
-});
-
-// node_modules/@solana/codecs-data-structures/dist/index.node.mjs
-function sumCodecSizes(sizes) {
-  return sizes.reduce((all, size) => all === null || size === null ? null : all + size, 0);
-}
-function getFixedSize(codec) {
-  return isFixedSize(codec) ? codec.fixedSize : null;
-}
-function getMaxSize(codec) {
-  return isFixedSize(codec) ? codec.fixedSize : codec.maxSize ?? null;
-}
-function getBytesDecoder() {
-  return createDecoder({
-    read: (bytes, offset) => {
-      const slice = bytes.slice(offset);
-      return [slice, offset + slice.length];
-    }
-  });
-}
-function getStructDecoder(fields) {
-  const fieldCodecs = fields.map(([, codec]) => codec);
-  const fixedSize = sumCodecSizes(fieldCodecs.map(getFixedSize));
-  const maxSize = sumCodecSizes(fieldCodecs.map(getMaxSize)) ?? void 0;
-  return createDecoder({
-    ...fixedSize === null ? { maxSize } : { fixedSize },
-    read: (bytes, offset) => {
-      const struct = {};
-      fields.forEach(([key, codec]) => {
-        const [value, newOffset] = codec.read(bytes, offset);
-        offset = newOffset;
-        struct[key] = value;
-      });
-      return [struct, offset];
-    }
-  });
-}
 
 // node_modules/@solana/options/dist/index.node.mjs
 var isSome = (option) => option.__option === "Some";
@@ -35319,7 +35228,7 @@ function getAbortablePromise(promise, abortSignal) {
       // This promise only ever rejects if the signal is aborted. Otherwise it idles forever.
       // It's important that this come before the input promise; in the event of an abort, we
       // want to throw even if the input promise's result is ready
-      new Promise((_8, reject) => {
+      new Promise((_2, reject) => {
         if (abortSignal.aborted) {
           reject(abortSignal.reason);
         } else {
@@ -35412,7 +35321,7 @@ var LOADING_STATE = Object.freeze({
 
 // node_modules/@solana/rpc-spec-types/dist/index.node.mjs
 function parseJsonWithBigInts(json) {
-  return JSON.parse(wrapIntegersInBigIntValueObject(json), (_8, value) => {
+  return JSON.parse(wrapIntegersInBigIntValueObject(json), (_2, value) => {
     return isBigIntValueObject(value) ? unwrapBigIntValueObject(value) : value;
   });
 }
@@ -35485,7 +35394,7 @@ function createRpcMessage(request) {
 }
 function stringifyJsonWithBigInts(value, space) {
   return unwrapBigIntValueObject2(
-    JSON.stringify(value, (_8, v8) => typeof v8 === "bigint" ? wrapBigIntValueObject2(v8) : v8, space)
+    JSON.stringify(value, (_2, v2) => typeof v2 === "bigint" ? wrapBigIntValueObject2(v2) : v2, space)
   );
 }
 function wrapBigIntValueObject2(value) {
@@ -35507,12 +35416,12 @@ function makeProxy(rpcConfig) {
     deleteProperty() {
       return false;
     },
-    get(target, p, receiver) {
-      if (p === "then") {
+    get(target, p3, receiver) {
+      if (p3 === "then") {
         return void 0;
       }
       return function(...rawParams) {
-        const methodName = p.toString();
+        const methodName = p3.toString();
         const getApiPlan = Reflect.get(target, methodName, receiver);
         if (!getApiPlan) {
           throw new SolanaError(SOLANA_ERROR__RPC__API_PLAN_MISSING_FOR_RPC_METHOD, {
@@ -35547,8 +35456,8 @@ function createJsonRpcApi(config2) {
       return false;
     },
     get(...args) {
-      const [_8, p] = args;
-      const methodName = p.toString();
+      const [_2, p3] = args;
+      const methodName = p3.toString();
       return function(...rawParams) {
         const rawRequest = Object.freeze({ methodName, params: rawParams });
         const request = config2?.requestTransformer ? config2?.requestTransformer(rawRequest) : rawRequest;
@@ -35645,7 +35554,7 @@ function applyDefaultCommitment({
       if (!paramInTargetPosition[commitmentPropertyName] || paramInTargetPosition[commitmentPropertyName] === "finalized") {
         const nextParams = [...params];
         const {
-          [commitmentPropertyName]: _8,
+          [commitmentPropertyName]: _2,
           // eslint-disable-line @typescript-eslint/no-unused-vars
           ...rest
         } = paramInTargetPosition;
@@ -36306,11 +36215,11 @@ function getRpcTransportWithRequestCoalescing(transport, getDeduplicationKey) {
             ...request,
             signal: abortController.signal
           });
-        } catch (e23) {
-          if (e23 === (EXPLICIT_ABORT_TOKEN ||= createExplicitAbortToken())) {
+        } catch (e22) {
+          if (e22 === (EXPLICIT_ABORT_TOKEN ||= createExplicitAbortToken())) {
             return;
           }
-          throw e23;
+          throw e22;
         }
       })();
       coalescedRequestsByDeduplicationKey[deduplicationKey] = {
@@ -36324,7 +36233,7 @@ function getRpcTransportWithRequestCoalescing(transport, getDeduplicationKey) {
     if (signal) {
       const responsePromise = coalescedRequest.responsePromise;
       return await new Promise((resolve, reject) => {
-        const handleAbort = (e23) => {
+        const handleAbort = (e22) => {
           signal.removeEventListener("abort", handleAbort);
           coalescedRequest.numConsumers -= 1;
           queueMicrotask(() => {
@@ -36333,7 +36242,7 @@ function getRpcTransportWithRequestCoalescing(transport, getDeduplicationKey) {
               abortController.abort(EXPLICIT_ABORT_TOKEN ||= createExplicitAbortToken());
             }
           });
-          reject(e23.target.reason);
+          reject(e22.target.reason);
         };
         signal.addEventListener("abort", handleAbort);
         responsePromise.then(resolve).catch(reject).finally(() => {
@@ -36556,6 +36465,12 @@ function waitForRegistry(context, promise, callerSignal) {
 
 // node_modules/@aephia/atlas-kit/dist/client/deployments.js
 var ZINK_PTR_GAME_ADDRESS = "EKEj47SzaCjPM3m4T4vRXrrsVtkEmiNgPMMFye3AkXj4";
+var ZINK_PTR_PROGRAM_ADDRESSES = Object.freeze({
+  sage: "C4SAgeKLgb3pTLWhVr6NRwWyYFuTR7ZeSXFrzoLwfMzF",
+  playerProfile: "C4PRoFNroxxzdgeCoM31LJjYRg7kT6ymogSTAT99iD1u",
+  profileFaction: "C4FACQA1PpNRKrjQ2862ABNR42DTz7EzGj1uhTNFASwP"
+});
+var ZINK_PTR_SELECTED_REFERENCE_RELEASE = "0ee605b6b22a4c27623b2a984649cfeb83384fce78f0b1fe0a19ff1ad25fbcce";
 var ZINK_PTR_RESOURCE_MINTS = Object.freeze({
   ammo: "685bCa46wVHzz3yL1vZx2bmKpNKKGGWxzoAqpznawaMB",
   food: "FDWYLLYMMP6grfB9wW5HmnuLbDtnx8EqudaFvZoTzeD4",
@@ -36887,10 +36802,10 @@ function isRawAccount(value) {
   const account = value;
   return isProviderAddress(account.address) && isProviderAddress(account.owner) && typeof account.lamports === "bigint" && account.data instanceof Uint8Array && typeof account.data.byteLength === "number" && typeof account.executable === "boolean" && typeof account.slot === "bigint" && (account.commitment === "processed" || account.commitment === "confirmed" || account.commitment === "finalized");
 }
-function cacheKey2(cluster, definition, address2, definitionId) {
+function cacheKey2(cluster, programAddress, definition, address2, definitionId) {
   return JSON.stringify([
     clusterName(cluster),
-    definition.programAddress,
+    programAddress,
     definition.type,
     address2,
     definitionId
@@ -37050,9 +36965,16 @@ async function discoverWalletProfileCandidates(context, wallet2, options) {
 function contextCommitment(context, requested) {
   return requested ?? CONTEXT_DISCOVERY_RUNTIME.get(context)?.defaultCommitment ?? DEFAULT_COMMITMENT2;
 }
-function validateAndDecode(definition, account, source, fetchedAt) {
-  if (account.owner !== definition.programAddress) {
-    throw new InvalidAccountOwnerError(definition.type, account.address, definition.programAddress, account.owner);
+function definitionProgramAddress(programs, definition) {
+  const program = definition.program;
+  if (program !== "sage" && program !== "playerProfile" && program !== "profileFaction")
+    throw new SageSdkError("ACCOUNT_DECODE_FAILED", `The ${definition.type} account definition names its owning program as ${String(program)}. Set program to 'sage', 'playerProfile' or 'profileFaction' in the account definition before retrying.`, { accountType: definition.type });
+  return programs[program];
+}
+function validateAndDecode(programs, definition, account, source, fetchedAt) {
+  const programAddress = definitionProgramAddress(programs, definition);
+  if (account.owner !== programAddress) {
+    throw new InvalidAccountOwnerError(definition.type, account.address, programAddress, account.owner);
   }
   if (definition.discriminator.length === 0) {
     throw new AccountDecodeError(definition.type, account.address, new TypeError("Account definitions require a non-empty discriminator. Fix the generated account definition before retrying."));
@@ -37070,7 +36992,7 @@ function validateAndDecode(definition, account, source, fetchedAt) {
   }
   let data;
   try {
-    data = deepFreeze(definition.decode(account));
+    data = deepFreeze(definition.decode(account, programs));
   } catch (cause) {
     if (cause instanceof SageSdkError) {
       throw cause;
@@ -37083,7 +37005,7 @@ function validateAndDecode(definition, account, source, fetchedAt) {
     commitment: account.commitment,
     data,
     fetchedAt,
-    programAddress: definition.programAddress,
+    programAddress,
     slot: account.slot,
     source: deepFreeze({ ...source })
   };
@@ -37095,7 +37017,7 @@ function copyRawAccount(account) {
     data: new Uint8Array(account.data)
   });
 }
-function createDataPort(cluster, provider, indexer, subscriptionProvider, defaultCommitment, defaultMaxAgeMs, isDisposed, lifecycle, maxAccountDataBytes, maxCacheEntries, maxDiscoveryResults, maxReadManyAccounts, trackSubscription) {
+function createDataPort(cluster, programs, provider, indexer, subscriptionProvider, defaultCommitment, defaultMaxAgeMs, isDisposed, lifecycle, maxAccountDataBytes, maxCacheEntries, maxDiscoveryResults, maxReadManyAccounts, trackSubscription) {
   const cache = /* @__PURE__ */ new Map();
   const cacheKeysByAddress = /* @__PURE__ */ new Map();
   const activeCacheKeysByAddress = /* @__PURE__ */ new Map();
@@ -37155,7 +37077,7 @@ function createDataPort(cluster, provider, indexer, subscriptionProvider, defaul
     return id;
   }
   function keyFor(definition, address2) {
-    return cacheKey2(cluster, definition, address2, definitionId(definition));
+    return cacheKey2(cluster, definitionProgramAddress(programs, definition), definition, address2, definitionId(definition));
   }
   function rememberCacheKey(key, address2, programAddress) {
     const keys = cacheKeysByAddress.get(address2) ?? /* @__PURE__ */ new Map();
@@ -37192,7 +37114,7 @@ function createDataPort(cluster, provider, indexer, subscriptionProvider, defaul
   function validateAndTimestamp(definition, account, source) {
     const fetchedAt = Date.now();
     const fetchedAtMonotonicMs = performance.now();
-    const snapshot = validateAndDecode(definition, account, source, fetchedAt);
+    const snapshot = validateAndDecode(programs, definition, account, source, fetchedAt);
     snapshotFetchTimes.set(snapshot, fetchedAtMonotonicMs);
     return snapshot;
   }
@@ -37419,7 +37341,7 @@ function createDataPort(cluster, provider, indexer, subscriptionProvider, defaul
     const registryKey = JSON.stringify([
       "indexer",
       definition.type,
-      discoveryReadKey(definition.programAddress, filters3, commitment, discoveryInvalidationGeneration, addressReconciliationGeneration)
+      discoveryReadKey(definitionProgramAddress(programs, definition), filters3, commitment, discoveryInvalidationGeneration, addressReconciliationGeneration)
     ]);
     const existing = indexerReads.get(registryKey);
     if (existing !== void 0)
@@ -37437,7 +37359,7 @@ function createDataPort(cluster, provider, indexer, subscriptionProvider, defaul
           accountType: definition.type,
           commitment,
           filters: copyProviderDiscoveryFilters(filters3),
-          programAddress: definition.programAddress,
+          programAddress: definitionProgramAddress(programs, definition),
           signal: lifecycle.signal
         });
         if (isDisposed())
@@ -37553,7 +37475,7 @@ function createDataPort(cluster, provider, indexer, subscriptionProvider, defaul
     };
     const registryKey = definedReadKey(key, commitment, invalidationGeneration, store);
     definedReads.set(registryKey, read);
-    rememberActiveCacheKey(key, address2, definition.programAddress);
+    rememberActiveCacheKey(key, address2, definitionProgramAddress(programs, definition));
     const operationInvalidationSequence = invalidationSequence;
     const operation = (async () => {
       try {
@@ -37599,7 +37521,7 @@ function createDataPort(cluster, provider, indexer, subscriptionProvider, defaul
   async function targetedDiscovery(definition, providerFilters, commitment, store, operationInvalidationSequence, signal, minimumSequence = 0) {
     let accounts;
     try {
-      const discoveryRead = sharedDiscovery(definition.programAddress, providerFilters, commitment, discoveryInvalidatedAt.get(definition.programAddress) ?? 0, reconciliationGeneration, minimumSequence);
+      const discoveryRead = sharedDiscovery(definitionProgramAddress(programs, definition), providerFilters, commitment, discoveryInvalidatedAt.get(definitionProgramAddress(programs, definition)) ?? 0, reconciliationGeneration, minimumSequence);
       accounts = await waitForCaller(discoveryRead.promise, signal);
     } catch (cause) {
       if (signal?.aborted === true) {
@@ -37690,7 +37612,7 @@ function createDataPort(cluster, provider, indexer, subscriptionProvider, defaul
     invalidate(definition, address2) {
       assertActive();
       const key = keyFor(definition, address2);
-      invalidateKey(key, address2, definition.programAddress);
+      invalidateKey(key, address2, definitionProgramAddress(programs, definition));
     },
     async read(definition, address2, options) {
       const snapshot = await readOptional(definition, address2, options);
@@ -37718,7 +37640,7 @@ function createDataPort(cluster, provider, indexer, subscriptionProvider, defaul
       const providerFilters = copyProviderDiscoveryFilters(request.filters);
       const metadataFilters = copyReadMetaFilters(request.filters);
       if (indexer !== void 0 && request.strategy !== "direct" && request.strategy !== "derived") {
-        const candidates = await waitForCaller(sharedIndexerDiscovery(indexer, definition, providerFilters, commitment, discoveryInvalidatedAt.get(definition.programAddress) ?? 0, reconciliationGeneration), request.signal);
+        const candidates = await waitForCaller(sharedIndexerDiscovery(indexer, definition, providerFilters, commitment, discoveryInvalidatedAt.get(definitionProgramAddress(programs, definition)) ?? 0, reconciliationGeneration), request.signal);
         const uniqueCandidates = [...new Set(candidates)];
         primeRawBatchReads(uniqueCandidates, commitment, (candidate) => minimumRawReadSequence.get(keyFor(definition, candidate)) ?? 0);
         let validated;
@@ -38174,7 +38096,7 @@ function createDataPort(cluster, provider, indexer, subscriptionProvider, defaul
           coalescedErrors.set(error2.code, count2);
           emitDiagnostic({
             accountType: definition.type,
-            address: error2.address ?? definition.programAddress,
+            address: error2.address ?? definitionProgramAddress(programs, definition),
             coalescedCount: count2,
             errorCode: error2.code,
             kind: "subscription-error-coalesced"
@@ -38307,7 +38229,7 @@ function createDataPort(cluster, provider, indexer, subscriptionProvider, defaul
         registrationAttempt = Promise.resolve().then(() => programProvider.subscribeProgram({
           commitment,
           filters: filters3,
-          programAddress: definition.programAddress,
+          programAddress: definitionProgramAddress(programs, definition),
           signal
         }, (event) => void enqueue(event)));
         void registrationAttempt.catch(() => void 0);
@@ -38333,11 +38255,39 @@ function createDataPort(cluster, provider, indexer, subscriptionProvider, defaul
     }
   });
 }
+function configuredPrograms(programs) {
+  if (programs === void 0)
+    return ZINK_PTR_PROGRAM_ADDRESSES;
+  const configured = {
+    sage: programs.sage,
+    playerProfile: programs.playerProfile,
+    profileFaction: programs.profileFaction
+  };
+  for (const [program, address2] of Object.entries(configured)) {
+    if (typeof address2 !== "string" || !isAddress(address2))
+      throw new InvalidDerivationInputError(`Context ${program} program address`, String(address2), "Pass the z.ink/Solana addresses of the deployment's sage, playerProfile and profileFaction programs when creating the SAGE context.");
+  }
+  if (new Set(Object.values(configured)).size !== 3)
+    throw new InvalidDerivationInputError("Context program addresses", Object.values(configured).join(", "), "The sage, playerProfile and profileFaction programs are three different programs. Pass the deployment's own address for each.");
+  return Object.freeze(configured);
+}
+function configuredSelectedReferenceRelease(options, programs) {
+  const release = options.selectedReferenceRelease;
+  if (release === null)
+    return void 0;
+  if (release === void 0)
+    return options.cluster === "zink-ptr" && programs.sage === ZINK_PTR_PROGRAM_ADDRESSES.sage ? ZINK_PTR_SELECTED_REFERENCE_RELEASE : void 0;
+  if (typeof release !== "string" || !/^[0-9a-f]{64}$/.test(release))
+    throw new InvalidDerivationInputError("Context selectedReferenceRelease", String(release), "Pass the deployment's selected-reference release as 64 lowercase hex characters (32 bytes), or null to assemble without reference accounts.");
+  return release;
+}
 function createSageContext(options) {
   if (options.cluster !== "zink-ptr" && options.game === void 0) {
     throw new MissingGameContextError();
   }
   const game = options.game ?? ZINK_PTR_GAME_ADDRESS;
+  const programs = configuredPrograms(options.programs);
+  const selectedReferenceRelease = configuredSelectedReferenceRelease(options, programs);
   const defaultMaxAgeMs = configuredMaxAgeMs(options.defaultMaxAgeMs);
   const maxAccountDataBytes = configuredLimit("maxAccountDataBytes", options.maxAccountDataBytes, DEFAULT_MAX_ACCOUNT_DATA_BYTES2);
   const maxCacheEntries = configuredLimit("maxCacheEntries", options.maxCacheEntries, DEFAULT_MAX_CACHE_ENTRIES);
@@ -38356,12 +38306,14 @@ function createSageContext(options) {
     maxAccountDataBytes,
     maxDiscoveryResults
   });
-  const data = createDataPort(options.cluster, provider, options.discovery?.indexer, options.subscriptions, options.commitment ?? DEFAULT_COMMITMENT2, defaultMaxAgeMs, () => disposed, lifecycle, maxAccountDataBytes, maxCacheEntries, maxDiscoveryResults, maxReadManyAccounts, trackSubscription);
+  const data = createDataPort(options.cluster, programs, provider, options.discovery?.indexer, options.subscriptions, options.commitment ?? DEFAULT_COMMITMENT2, defaultMaxAgeMs, () => disposed, lifecycle, maxAccountDataBytes, maxCacheEntries, maxDiscoveryResults, maxReadManyAccounts, trackSubscription);
   const context = {
     cluster: options.cluster,
     data,
     game,
+    programs,
     ...options.registrySnapshotStore === void 0 ? {} : { registrySnapshotStore: options.registrySnapshotStore },
+    ...selectedReferenceRelease === void 0 ? {} : { selectedReferenceRelease },
     ...options.writeRpc === void 0 ? {} : { writeRpc: options.writeRpc },
     async dispose() {
       if (!disposed) {
@@ -38390,727 +38342,760 @@ function entityRef(type, address2) {
 }
 
 // node_modules/@staratlas/dev-sage/dist/dist.es.js
-var RN = 1;
-var IN = 2;
-var hN = 3;
-var DN = 4;
-var TN = 5;
-var wN = 6;
-var VN = 7;
-var WN = 8;
-var EN = 9;
-var _N = 10;
-var MN = 11;
-var xN = 12;
-var ON = -32700;
-var NN = -32603;
-var kN = -32602;
-var LN = -32601;
-var FN = -32600;
-var UN = -32019;
-var BN = -32018;
-var zN = -32017;
-var HN = -32016;
-var GN = -32015;
-var jN = -32014;
-var YN = -32013;
-var XN = -32012;
-var $N = -32011;
-var KN = -32010;
-var JN = -32009;
-var qN = -32008;
-var ZN = -32007;
-var QN = -32006;
-var e22 = -32005;
-var r2 = -32004;
-var a2 = -32003;
-var t2 = -32002;
-var n2 = -32001;
-var o2 = 28e5;
-var i2 = 2800001;
-var c2 = 2800002;
-var l2 = 2800003;
-var s2 = 2800004;
-var u2 = 2800005;
-var d2 = 2800006;
-var f2 = 2800007;
-var g2 = 2800008;
-var m2 = 2800009;
-var y2 = 2800010;
-var A2 = 2800011;
-var p2 = 323e4;
-var P2 = 32300001;
-var b2 = 3230002;
-var C2 = 3230003;
-var v2 = 3230004;
-var S2 = 361e4;
-var R2 = 3610001;
-var I2 = 3610002;
-var h2 = 3610003;
-var D2 = 3610004;
-var T2 = 3610005;
-var w2 = 3610006;
-var V2 = 3610007;
-var W2 = 3611e3;
-var E2 = 3704e3;
-var _2 = 3704001;
-var M2 = 3704002;
-var x2 = 3704003;
-var O2 = 3704004;
-var N2 = 3704005;
-var k2 = 3704006;
-var L2 = 3712e3;
-var F2 = 4128e3;
-var U2 = 4128001;
-var B2 = 4128002;
-var qa = 4615e3;
-var z2 = 4615001;
-var H2 = 4615002;
-var G2 = 4615003;
-var j2 = 4615004;
-var Y2 = 4615005;
-var X2 = 4615006;
-var $2 = 4615007;
-var K2 = 4615008;
-var J2 = 4615009;
-var q2 = 4615010;
-var Z2 = 4615011;
-var Q2 = 4615012;
-var e32 = 4615013;
-var r3 = 4615014;
-var a3 = 4615015;
-var t3 = 4615016;
-var n3 = 4615017;
-var o3 = 4615018;
-var i3 = 4615019;
-var c3 = 4615020;
-var l3 = 4615021;
-var s3 = 4615022;
-var u3 = 4615023;
-var d3 = 4615024;
-var f3 = 4615025;
-var g3 = 4615026;
-var m3 = 4615027;
-var y3 = 4615028;
-var A3 = 4615029;
-var p3 = 4615030;
-var P3 = 4615031;
-var b3 = 4615032;
-var C3 = 4615033;
-var v3 = 4615034;
-var S3 = 4615035;
-var R3 = 4615036;
-var I3 = 4615037;
-var h3 = 4615038;
-var D3 = 4615039;
-var T3 = 4615040;
-var w3 = 4615041;
-var V3 = 4615042;
-var W3 = 4615043;
-var E3 = 4615044;
-var _3 = 4615045;
-var M3 = 4615046;
-var x3 = 4615047;
-var O3 = 4615048;
-var N3 = 4615049;
-var k3 = 4615050;
-var L3 = 4615051;
-var F3 = 4615052;
-var U3 = 4615053;
-var B3 = 4615054;
-var z3 = 5508e3;
-var H3 = 5508001;
-var G3 = 5508002;
-var j3 = 5508003;
-var Y3 = 5508004;
-var X3 = 5508005;
-var $3 = 5508006;
-var K3 = 5508007;
-var J3 = 5508008;
-var q3 = 5508009;
-var Z3 = 5508010;
-var Q3 = 5508011;
-var e9 = 5508012;
-var r9 = 5607e3;
-var a9 = 5607001;
-var t9 = 5607002;
-var n9 = 5607003;
-var o9 = 5607004;
-var i9 = 5607005;
-var c9 = 5607006;
-var l9 = 5607007;
-var s9 = 5607008;
-var u9 = 5607009;
-var d9 = 5607010;
-var f9 = 5607011;
-var g9 = 5607012;
-var m9 = 5607013;
-var y9 = 5607014;
-var A9 = 5607015;
-var p9 = 5607016;
-var P9 = 5607017;
-var b9 = 5663e3;
-var C9 = 5663001;
-var v9 = 5663002;
-var S9 = 5663003;
-var R9 = 5663004;
-var I9 = 5663005;
-var h9 = 5663006;
-var D9 = 5663007;
-var T9 = 5663008;
-var w9 = 5663009;
-var V9 = 5663010;
-var W9 = 5663011;
-var E9 = 5663012;
-var _9 = 5663013;
-var M9 = 5663014;
-var x9 = 5663015;
-var O9 = 5663016;
-var N9 = 5663017;
-var k9 = 5663018;
-var L9 = 5663019;
-var F9 = 5663020;
-var U9 = 5663021;
-var B9 = 5663022;
-var z9 = 5663023;
-var H9 = 5663024;
-var G9 = 5663025;
-var j9 = 5663026;
-var Y9 = 5663027;
-var X9 = 5663028;
-var $9 = 5663029;
-var K9 = 5663030;
-var J9 = 5663031;
-var q9 = 5663032;
-var Z9 = 5663033;
-var Q9 = 5663034;
-var ek = 5663035;
-var rk = 705e4;
-var ak = 7050001;
-var tk = 7050002;
-var nk = 7050003;
-var ok = 7050004;
-var ik = 7050005;
-var ck = 7050006;
-var lk = 7050007;
-var sk = 7050008;
-var uk = 7050009;
-var dk = 7050010;
-var fk = 7050011;
-var gk = 7050012;
-var mk = 7050013;
-var yk = 7050014;
-var Ak = 7050015;
-var pk = 7050016;
-var Pk = 7050017;
-var bk = 7050018;
-var Ck = 7050019;
-var vk = 7050020;
-var Sk = 7050021;
-var Rk = 7050022;
-var Ik = 7050023;
-var hk = 7050024;
-var Dk = 7050025;
-var Tk = 7050026;
-var wk = 7050027;
-var Vk = 7050028;
-var Wk = 7050029;
-var Ek = 7050030;
-var _k = 7050031;
-var Mk = 7050032;
-var xk = 7050033;
-var Ok = 7050034;
-var Nk = 7050035;
-var kk = 7050036;
-var Lk = 7618e3;
-var Fk = 7618001;
-var Uk = 7618002;
-var Bk = 7618003;
-var zk = 7618004;
-var Hk = 7618005;
-var Gk = 7618006;
-var jk = 7618007;
-var Yk = 7618008;
-var Xk = 7618009;
-var tc = 8078e3;
-var nc = 8078001;
-var $k = 8078002;
-var Kk = 8078003;
-var Jk = 8078004;
-var qk = 8078005;
-var Zk = 8078006;
-var Qk = 8078007;
-var oc = 8078008;
-var e4 = 8078009;
-var ic = 8078010;
-var cc = 8078011;
-var r4 = 8078012;
-var a4 = 8078013;
-var t4 = 8078014;
-var n4 = 8078015;
-var o4 = 8078016;
-var i4 = 8078017;
-var c4 = 8078018;
-var l4 = 8078019;
-var s4 = 8078020;
-var u4 = 8078021;
-var bt = 8078022;
-var d4 = 8078023;
-var f4 = 8078024;
-var g4 = 8078025;
-var m4 = 809e4;
-var y4 = 8090001;
-var A4 = 8090002;
-var p4 = 8090003;
-var P4 = 8090004;
-var b4 = 8090005;
-var C4 = 8090006;
-var v4 = 8090007;
-var S4 = 8090008;
-var R4 = 8090009;
-var I4 = 8090010;
-var h4 = 8090011;
-var D4 = 8090012;
-var T4 = 81e5;
-var w4 = 8100001;
-var V4 = 8100002;
-var W4 = 8100003;
-var E4 = 819e4;
-var _4 = 8190001;
-var M4 = 8190002;
-var x4 = 8190003;
-var O4 = 8190004;
-var N4 = 85e5;
-var k4 = 8500001;
-var L4 = 8500002;
-var F4 = 8500003;
-var U4 = 8500004;
-var B4 = 8500005;
-var z4 = 8500006;
-var H4 = 89e5;
-var G4 = 8900001;
-var j4 = 8900002;
-var Y4 = 99e5;
-var X4 = 9900001;
-var $4 = 9900002;
-var K4 = 9900003;
-var J4 = 9900004;
-var q4 = 9900005;
-var Z4 = 9900006;
-function lc(e8) {
-  return Array.isArray(e8) ? "%5B" + e8.map(lc).join(
+var Oc = "u26f6-combat-v1";
+var Ia = 5;
+var ha = 6;
+var Nc = 7;
+function Vt(e5) {
+  switch (e5) {
+    case 0:
+      return "legacy-whole";
+    case 1:
+      return "sealed-whole";
+    case 2:
+      return "xp-v1-whole";
+    case Ia:
+      return "xp-v1-q6";
+    case ha:
+      return "council-selected-q6";
+    case Nc:
+      return "council-fresh-pending-q6";
+    default:
+      throw new RangeError(`Unknown or retired SAGE Game phase ${e5}`);
+  }
+}
+var it = 1;
+function c6(e5) {
+  if (Vt(e5), e5 !== Ia && e5 !== ha)
+    throw new RangeError(`Expected active Q6 Game phase 5/6; got ${e5}`);
+}
+function l6(e5) {
+  if (e5 !== it)
+    throw new RangeError(
+      `Expected SAGE Fleet.version ${it} for ${Oc}; got ${e5}`
+    );
+}
+var s6 = 1;
+var u6 = 2;
+var d6 = 3;
+var f6 = 4;
+var g6 = 5;
+var m6 = 6;
+var y6 = 7;
+var A6 = 8;
+var p6 = 9;
+var P6 = 10;
+var b6 = 11;
+var C6 = 12;
+var v6 = -32700;
+var S6 = -32603;
+var R6 = -32602;
+var I6 = -32601;
+var h6 = -32600;
+var D6 = -32019;
+var T6 = -32018;
+var w6 = -32017;
+var V6 = -32016;
+var W6 = -32015;
+var E6 = -32014;
+var M6 = -32013;
+var _6 = -32012;
+var x6 = -32011;
+var O6 = -32010;
+var N6 = -32009;
+var k6 = -32008;
+var L6 = -32007;
+var F6 = -32006;
+var U6 = -32005;
+var B6 = -32004;
+var z6 = -32003;
+var H6 = -32002;
+var G6 = -32001;
+var j6 = 28e5;
+var Y6 = 2800001;
+var X6 = 2800002;
+var $6 = 2800003;
+var K6 = 2800004;
+var J6 = 2800005;
+var q6 = 2800006;
+var Z6 = 2800007;
+var Q6 = 2800008;
+var ek = 2800009;
+var rk = 2800010;
+var ak = 2800011;
+var tk = 323e4;
+var nk = 32300001;
+var ok = 3230002;
+var ik = 3230003;
+var ck = 3230004;
+var lk = 361e4;
+var sk = 3610001;
+var uk = 3610002;
+var dk = 3610003;
+var fk = 3610004;
+var gk = 3610005;
+var mk = 3610006;
+var yk = 3610007;
+var Ak = 3611e3;
+var pk = 3704e3;
+var Pk = 3704001;
+var bk = 3704002;
+var Ck = 3704003;
+var vk = 3704004;
+var Sk = 3704005;
+var Rk = 3704006;
+var Ik = 3712e3;
+var hk = 4128e3;
+var Dk = 4128001;
+var Tk = 4128002;
+var ct = 4615e3;
+var wk = 4615001;
+var Vk = 4615002;
+var Wk = 4615003;
+var Ek = 4615004;
+var Mk = 4615005;
+var _k = 4615006;
+var xk = 4615007;
+var Ok = 4615008;
+var Nk = 4615009;
+var kk = 4615010;
+var Lk = 4615011;
+var Fk = 4615012;
+var Uk = 4615013;
+var Bk = 4615014;
+var zk = 4615015;
+var Hk = 4615016;
+var Gk = 4615017;
+var jk = 4615018;
+var Yk = 4615019;
+var Xk = 4615020;
+var $k = 4615021;
+var Kk = 4615022;
+var Jk = 4615023;
+var qk = 4615024;
+var Zk = 4615025;
+var Qk = 4615026;
+var e4 = 4615027;
+var r4 = 4615028;
+var a4 = 4615029;
+var t4 = 4615030;
+var n4 = 4615031;
+var o4 = 4615032;
+var i4 = 4615033;
+var c4 = 4615034;
+var l4 = 4615035;
+var s4 = 4615036;
+var u4 = 4615037;
+var d4 = 4615038;
+var f4 = 4615039;
+var g4 = 4615040;
+var m4 = 4615041;
+var y4 = 4615042;
+var A4 = 4615043;
+var p4 = 4615044;
+var P4 = 4615045;
+var b4 = 4615046;
+var C4 = 4615047;
+var v4 = 4615048;
+var S4 = 4615049;
+var R4 = 4615050;
+var I4 = 4615051;
+var h4 = 4615052;
+var D4 = 4615053;
+var T4 = 4615054;
+var w4 = 5508e3;
+var V4 = 5508001;
+var W4 = 5508002;
+var E4 = 5508003;
+var M4 = 5508004;
+var _4 = 5508005;
+var x4 = 5508006;
+var O4 = 5508007;
+var N4 = 5508008;
+var k4 = 5508009;
+var L4 = 5508010;
+var F4 = 5508011;
+var U4 = 5508012;
+var B4 = 5607e3;
+var z4 = 5607001;
+var H4 = 5607002;
+var G4 = 5607003;
+var j4 = 5607004;
+var Y4 = 5607005;
+var X4 = 5607006;
+var $4 = 5607007;
+var K4 = 5607008;
+var J4 = 5607009;
+var q4 = 5607010;
+var Z4 = 5607011;
+var Q4 = 5607012;
+var e7 = 5607013;
+var r7 = 5607014;
+var a7 = 5607015;
+var t7 = 5607016;
+var n7 = 5607017;
+var o7 = 5663e3;
+var i7 = 5663001;
+var c7 = 5663002;
+var l7 = 5663003;
+var s7 = 5663004;
+var u7 = 5663005;
+var d7 = 5663006;
+var f7 = 5663007;
+var g7 = 5663008;
+var m7 = 5663009;
+var y7 = 5663010;
+var A7 = 5663011;
+var p7 = 5663012;
+var P7 = 5663013;
+var b7 = 5663014;
+var C7 = 5663015;
+var v7 = 5663016;
+var S7 = 5663017;
+var R7 = 5663018;
+var I7 = 5663019;
+var h7 = 5663020;
+var D7 = 5663021;
+var T7 = 5663022;
+var w7 = 5663023;
+var V7 = 5663024;
+var W7 = 5663025;
+var E7 = 5663026;
+var M7 = 5663027;
+var _7 = 5663028;
+var x7 = 5663029;
+var O7 = 5663030;
+var N7 = 5663031;
+var k7 = 5663032;
+var L7 = 5663033;
+var F7 = 5663034;
+var U7 = 5663035;
+var B7 = 705e4;
+var z7 = 7050001;
+var H7 = 7050002;
+var G7 = 7050003;
+var j7 = 7050004;
+var Y7 = 7050005;
+var X7 = 7050006;
+var $7 = 7050007;
+var K7 = 7050008;
+var J7 = 7050009;
+var q7 = 7050010;
+var Z7 = 7050011;
+var Q7 = 7050012;
+var eL = 7050013;
+var rL = 7050014;
+var aL = 7050015;
+var tL = 7050016;
+var nL = 7050017;
+var oL = 7050018;
+var iL = 7050019;
+var cL = 7050020;
+var lL = 7050021;
+var sL = 7050022;
+var uL = 7050023;
+var dL = 7050024;
+var fL = 7050025;
+var gL = 7050026;
+var mL = 7050027;
+var yL = 7050028;
+var AL = 7050029;
+var pL = 7050030;
+var PL = 7050031;
+var bL = 7050032;
+var CL = 7050033;
+var vL = 7050034;
+var SL = 7050035;
+var RL = 7050036;
+var IL = 7618e3;
+var hL = 7618001;
+var DL = 7618002;
+var TL = 7618003;
+var wL = 7618004;
+var VL = 7618005;
+var WL = 7618006;
+var EL = 7618007;
+var ML = 7618008;
+var _L = 7618009;
+var kc = 8078e3;
+var Lc = 8078001;
+var xL = 8078002;
+var OL = 8078003;
+var NL = 8078004;
+var kL = 8078005;
+var LL = 8078006;
+var FL = 8078007;
+var Fc = 8078008;
+var UL = 8078009;
+var Uc = 8078010;
+var Bc = 8078011;
+var BL = 8078012;
+var zL = 8078013;
+var HL = 8078014;
+var GL = 8078015;
+var jL = 8078016;
+var YL = 8078017;
+var XL = 8078018;
+var $L = 8078019;
+var KL = 8078020;
+var JL = 8078021;
+var Wt = 8078022;
+var qL = 8078023;
+var ZL = 8078024;
+var QL = 8078025;
+var eF = 809e4;
+var rF = 8090001;
+var aF = 8090002;
+var tF = 8090003;
+var nF = 8090004;
+var oF = 8090005;
+var iF = 8090006;
+var cF = 8090007;
+var lF = 8090008;
+var sF = 8090009;
+var uF = 8090010;
+var dF = 8090011;
+var fF = 8090012;
+var gF = 81e5;
+var mF = 8100001;
+var yF = 8100002;
+var AF = 8100003;
+var pF = 819e4;
+var PF = 8190001;
+var bF = 8190002;
+var CF = 8190003;
+var vF = 8190004;
+var SF = 85e5;
+var RF = 8500001;
+var IF = 8500002;
+var hF = 8500003;
+var DF = 8500004;
+var TF = 8500005;
+var wF = 8500006;
+var VF = 89e5;
+var WF = 8900001;
+var EF = 8900002;
+var MF = 99e5;
+var _F = 9900001;
+var xF = 9900002;
+var OF = 9900003;
+var NF = 9900004;
+var kF = 9900005;
+var LF = 9900006;
+function zc(e5) {
+  return Array.isArray(e5) ? "%5B" + e5.map(zc).join(
     "%2C%20"
     /* ", " */
   ) + /* "]" */
-  "%5D" : typeof e8 == "bigint" ? `${e8}n` : encodeURIComponent(
+  "%5D" : typeof e5 == "bigint" ? `${e5}n` : encodeURIComponent(
     String(
-      e8 != null && Object.getPrototypeOf(e8) === null ? (
+      e5 != null && Object.getPrototypeOf(e5) === null ? (
         // Plain objects with no prototype don't have a `toString` method.
         // Convert them before stringifying them.
-        { ...e8 }
-      ) : e8
+        { ...e5 }
+      ) : e5
     )
   );
 }
-function Q4([e8, t]) {
-  return `${e8}=${lc(t)}`;
+function FF([e5, t]) {
+  return `${e5}=${zc(t)}`;
 }
-function e6(e8) {
-  const t = Object.entries(e8).map(Q4).join("&");
+function UF(e5) {
+  const t = Object.entries(e5).map(FF).join("&");
   return btoa(t);
 }
-var r6 = {
-  [p2]: "Account not found at address: $address",
-  [v2]: "Not all accounts were decoded. Encoded accounts found at addresses: $addresses.",
-  [C2]: "Expected decoded account at address: $address",
-  [b2]: "Failed to decode account data at address: $address",
-  [P2]: "Accounts not found at addresses: $addresses",
-  [m2]: "Unable to find a viable program address bump seed.",
-  [c2]: "$putativeAddress is not a base58-encoded address.",
-  [o2]: "Expected base58 encoded address to decode to a byte array of length 32. Actual length: $actualLength.",
-  [l2]: "The `CryptoKey` must be an `Ed25519` public key.",
-  [A2]: "$putativeOffCurveAddress is not a base58-encoded off-curve address.",
-  [g2]: "Invalid seeds; point must fall off the Ed25519 curve.",
-  [s2]: "Expected given program derived address to have the following format: [Address, ProgramDerivedAddressBump].",
-  [d2]: "A maximum of $maxSeeds seeds, including the bump seed, may be supplied when creating an address. Received: $actual.",
-  [f2]: "The seed at index $index with length $actual exceeds the maximum length of $maxSeedLength bytes.",
-  [u2]: "Expected program derived address bump to be in the range [0, 255], got: $bump.",
-  [y2]: "Program address cannot end with PDA marker.",
-  [i2]: "Expected base58-encoded address string of length in the range [32, 44]. Actual length: $actualLength.",
-  [DN]: "Expected base58-encoded blockhash string of length in the range [32, 44]. Actual length: $actualLength.",
-  [RN]: "The network has progressed past the last block for which this transaction could have been committed.",
-  [tc]: "Codec [$codecDescription] cannot decode empty byte arrays.",
-  [bt]: "Enum codec cannot use lexical values [$stringValues] as discriminators. Either remove all lexical values or set `useValuesAsDiscriminators` to `false`.",
-  [s4]: "Sentinel [$hexSentinel] must not be present in encoded bytes [$hexEncodedBytes].",
-  [qk]: "Encoder and decoder must have the same fixed size, got [$encoderFixedSize] and [$decoderFixedSize].",
-  [Zk]: "Encoder and decoder must have the same max size, got [$encoderMaxSize] and [$decoderMaxSize].",
-  [Jk]: "Encoder and decoder must either both be fixed-size or variable-size.",
-  [oc]: "Enum discriminator out of range. Expected a number in [$formattedValidDiscriminators], got $discriminator.",
-  [$k]: "Expected a fixed-size codec, got a variable-size one.",
-  [a4]: "Codec [$codecDescription] expected a positive byte length, got $bytesLength.",
-  [Kk]: "Expected a variable-size codec, got a fixed-size one.",
-  [l4]: "Codec [$codecDescription] expected zero-value [$hexZeroValue] to have the same size as the provided fixed-size item [$expectedSize bytes].",
-  [nc]: "Codec [$codecDescription] expected $expected bytes, got $bytesLength.",
-  [c4]: "Expected byte array constant [$hexConstant] to be present in data [$hexData] at offset [$offset].",
-  [e4]: "Invalid discriminated union variant. Expected one of [$variants], got $value.",
-  [ic]: "Invalid enum variant. Expected one of [$stringValues] or a number in [$formattedNumericalValues], got $variant.",
-  [n4]: "Invalid literal union variant. Expected one of [$variants], got $value.",
-  [Qk]: "Expected [$codecDescription] to have $expected items, got $actual.",
-  [r4]: "Invalid value $value for base $base with alphabet $alphabet.",
-  [o4]: "Literal union discriminator out of range. Expected a number between $minRange and $maxRange, got $discriminator.",
-  [cc]: "Codec [$codecDescription] expected number to be in the range [$min, $max], got $value.",
-  [t4]: "Codec [$codecDescription] expected offset to be in the range [0, $bytesLength], got $offset.",
-  [u4]: "Expected sentinel [$hexSentinel] to be present in decoded bytes [$hexDecodedBytes].",
-  [i4]: "Union variant out of range. Expected an index between $minRange and $maxRange, got $variant.",
-  [d4]: "This decoder expected a byte array of exactly $expectedLength bytes, but $numExcessBytes unexpected excess bytes remained after decoding. Are you sure that you have chosen the correct decoder for this data?",
-  [f4]: "Invalid pattern match value. The provided value does not match any of the specified patterns.",
-  [g4]: "Invalid pattern match bytes. The provided byte array does not match any of the specified patterns.",
-  [W2]: "No random values implementation could be found.",
-  [MN]: "Failed to send transaction$causeMessage",
-  [xN]: "Failed to send transactions$causeMessages",
-  [v4]: "Fixed-point operation `$operation` of kind `$kind` overflowed. Expected a raw bigint in [$min, $max], got $result.",
-  [R4]: "Fixed-point division by zero for value of kind `$kind` ($signedness, $totalBits bits).",
-  [p4]: "`fractionalBits` ($fractionalBits) must not exceed `totalBits` ($totalBits).",
-  [A4]: "Invalid `decimals`. Expected a non-negative integer, got $decimals.",
-  [y4]: "Invalid `fractionalBits`. Expected a non-negative integer, got $fractionalBits.",
-  [b4]: "Invalid string `$input` for fixed-point value of kind `$kind`.",
-  [m4]: "Invalid `totalBits`. Expected a positive integer, got $totalBits.",
-  [C4]: "Invalid ratio $numerator/$denominator for fixed-point value of kind `$kind`. Denominator must be non-zero.",
-  [h4]: "Fixed-point value of kind `$kind` has a malformed `raw` field. Expected a bigint, got `$raw`.",
-  [S4]: "Fixed-point `$operation` operation expected $expectedKind ($expectedSignedness, $expectedTotalBits bits, $expectedScale $expectedScaleLabel); got $actualKind ($actualSignedness, $actualTotalBits bits, $actualScale $actualScaleLabel).",
-  [I4]: "Fixed-point operation `$operation` of kind `$kind` cannot be performed exactly; pass a rounding mode other than `strict` to allow a rounded result.",
-  [D4]: "Fixed-point codec of kind `$kind` requires `totalBits` to be a multiple of 8; got $totalBits.",
-  [P4]: "Fixed-point value of kind `$kind` is out of range for $signedness $totalBits-bit storage. Expected a raw bigint in [$min, $max], got $raw.",
-  [L2]: "Filesystem operation `$operation` is not supported in this environment.",
-  [J2]: "Instruction requires an uninitialized account",
-  [u3]: "Instruction tries to borrow reference for an account which is already borrowed",
-  [d3]: "Instruction left account with an outstanding borrowed reference",
-  [l3]: "Program other than the account's owner changed the size of the account data",
-  [Y2]: "Account data too small for instruction",
-  [s3]: "Instruction expected an executable account",
-  [M3]: "An account does not have enough lamports to be rent-exempt",
-  [O3]: "Program arithmetic overflowed",
-  [_3]: "Failed to serialize or deserialize account data",
-  [B3]: "Builtin programs must consume compute units",
-  [b3]: "Cross-program invocation call depth too deep",
-  [h3]: "Computational budget exceeded",
-  [g3]: "Custom program error: #$code",
-  [n3]: "Instruction contains duplicate accounts",
-  [f3]: "Instruction modifications of multiply-passed account differ",
-  [p3]: "Executable accounts must be rent exempt",
-  [y3]: "Instruction changed executable accounts data",
-  [A3]: "Instruction changed the balance of an executable account",
-  [o3]: "Instruction changed executable bit of an account",
-  [r3]: "Instruction modified data of an account it does not own",
-  [e32]: "Instruction spent from the balance of an account it does not own",
-  [z2]: "Generic instruction error",
-  [k3]: "Provided owner is not allowed",
-  [W3]: "Account is immutable",
-  [E3]: "Incorrect authority provided",
-  [$2]: "Incorrect program id for instruction",
-  [X2]: "Insufficient funds for instruction",
-  [j2]: "Invalid account data for instruction",
-  [x3]: "Invalid account owner",
-  [H2]: "Invalid program argument",
-  [m3]: "Program returned invalid error code",
-  [G2]: "Invalid instruction data",
-  [I3]: "Failed to reallocate account data",
-  [R3]: "Provided seeds do not result in a valid address",
-  [L3]: "Accounts data allocations exceeded the maximum allowed per transaction",
-  [F3]: "Max accounts exceeded",
-  [U3]: "Max instruction trace length exceeded",
-  [S3]: "Length of the seed is too long for address generation",
-  [C3]: "An account required by the instruction is missing",
-  [K2]: "Missing required signature for instruction",
-  [Q2]: "Instruction illegally modified the program id of an account",
-  [c3]: "Insufficient account keys for instruction",
-  [D3]: "Cross-program invocation with unauthorized signer or writable account",
-  [T3]: "Failed to create program execution environment",
-  [V3]: "Program failed to compile",
-  [w3]: "Program failed to complete",
-  [t3]: "Instruction modified data of a read-only account",
-  [a3]: "Instruction changed the balance of a read-only account",
-  [v3]: "Cross-program invocation reentrancy not allowed for this instruction",
-  [i3]: "Instruction modified rent epoch of an account",
-  [Z2]: "Sum of account balances before and after instruction do not match",
-  [q2]: "Instruction requires an initialized account",
-  [qa]: "The instruction failed with the error: $errorName",
-  [P3]: "Unsupported program id",
-  [N3]: "Unsupported sysvar",
-  [q4]: "Invalid instruction plan kind: $kind.",
-  [Uk]: "The provided instruction plan is empty.",
-  [Hk]: "No failed transaction plan result was found in the provided transaction plan result.",
-  [zk]: "This transaction plan executor does not support non-divisible sequential plans. To support them, you may create your own executor such that multi-transaction atomicity is preserved \u2014 e.g. by targetting RPCs that support transaction bundles.",
-  [Bk]: "The provided transaction plan failed to execute. See the `transactionPlanResult` attribute for more details. Note that the `cause` property is deprecated, and a future version will not set it.",
-  [Lk]: "The provided message has insufficient capacity to accommodate the next instruction(s) in this plan. Expected at least $numBytesRequired free byte(s), got $numFreeBytes byte(s).",
-  [Z4]: "Invalid transaction plan kind: $kind.",
-  [Fk]: "No more instructions to pack; the message packer has completed the instruction plan.",
-  [Gk]: "Unexpected instruction plan. Expected $expectedKind plan, got $actualKind plan.",
-  [jk]: "Unexpected transaction plan. Expected $expectedKind plan, got $actualKind plan.",
-  [Yk]: "Unexpected transaction plan result. Expected $expectedKind plan, got $actualKind plan.",
-  [Xk]: "Expected a successful transaction plan result. I.e. there is at least one failed or cancelled transaction in the plan.",
-  [F2]: "The instruction does not have any accounts.",
-  [U2]: "The instruction does not have any data.",
-  [B2]: "Expected instruction to have progress address $expectedProgramAddress, got $actualProgramAddress.",
-  [TN]: "Expected base58 encoded blockhash to decode to a byte array of length 32. Actual length: $actualLength.",
-  [IN]: "The nonce `$expectedNonceValue` is no longer valid. It has advanced to `$actualNonceValue`",
-  [$4]: "Invariant violation: Found no abortable iterable cache entry for key `$cacheKey`. It should be impossible to hit this error; please file an issue at https://sola.na/web3invariant",
-  [J4]: "Invariant violation: This data publisher does not publish to the channel named `$channelName`. Supported channels include $supportedChannelNames.",
-  [X4]: "Invariant violation: WebSocket message iterator state is corrupt; iterated without first resolving existing message promise. It should be impossible to hit this error; please file an issue at https://sola.na/web3invariant",
-  [Y4]: "Invariant violation: WebSocket message iterator is missing state storage. It should be impossible to hit this error; please file an issue at https://sola.na/web3invariant",
-  [K4]: "Invariant violation: Switch statement non-exhaustive. Received unexpected value `$unexpectedValue`. It should be impossible to hit this error; please file an issue at https://sola.na/web3invariant",
-  [NN]: "JSON-RPC error: Internal JSON-RPC error ($__serverMessage)",
-  [kN]: "JSON-RPC error: Invalid method parameter(s) ($__serverMessage)",
-  [FN]: "JSON-RPC error: The JSON sent is not a valid `Request` object ($__serverMessage)",
-  [LN]: "JSON-RPC error: The method does not exist / is not available ($__serverMessage)",
-  [ON]: "JSON-RPC error: An error occurred on the server while parsing the JSON text ($__serverMessage)",
-  [XN]: "$__serverMessage",
-  [n2]: "$__serverMessage",
-  [r2]: "$__serverMessage",
-  [jN]: "$__serverMessage",
-  [zN]: "Epoch rewards period still active at slot $slot",
-  [KN]: "$__serverMessage",
-  [JN]: "$__serverMessage",
-  [UN]: "Failed to query long-term storage; please try again",
-  [HN]: "Minimum context slot has not been reached",
-  [e22]: "Node is unhealthy; behind by $numSlotsBehind slots",
-  [qN]: "No snapshot",
-  [t2]: "Transaction simulation failed",
-  [BN]: "Rewards cannot be found because slot $slot is not the epoch boundary. This may be due to gap in the queried node's local ledger or long-term storage",
-  [ZN]: "$__serverMessage",
-  [$N]: "Transaction history is not available from this node",
-  [QN]: "$__serverMessage",
-  [YN]: "Transaction signature length mismatch",
-  [a2]: "Transaction signature verification failure",
-  [GN]: "$__serverMessage",
-  [N2]: "The grind regex `/$source/` contains the character `$character`, which is not in the base58 alphabet and can never match a Solana address.",
-  [E2]: "Key pair bytes must be of length 64, got $byteLength.",
-  [_2]: "Expected private key bytes with length 32. Actual length: $actualLength.",
-  [M2]: "Expected base58-encoded signature to decode to a byte array of length 64. Actual length: $actualLength.",
-  [O2]: "The provided private key does not match the provided public key.",
-  [x2]: "Expected base58-encoded signature string of length in the range [64, 88]. Actual length: $actualLength.",
-  [k2]: "Writing a key pair to disk is not supported in this environment.",
-  [wN]: "Lamports value must be in the range [0, 2e64-1]",
-  [VN]: "`$value` cannot be parsed as a `BigInt`",
-  [_N]: "$message",
-  [WN]: "`$value` cannot be parsed as a `Number`",
-  [hN]: "No nonce account could be found at address `$nonceAccountAddress`",
-  [n9]: "Expected base58 encoded application domain to decode to a byte array of length 32. Actual length: $actualLength.",
-  [m9]: "Attempted to sign an offchain message with an address that is not a signer for it",
-  [t9]: "Expected base58-encoded application domain string of length in the range [32, 44]. Actual length: $actualLength.",
-  [g9]: "The signer addresses in this offchain message envelope do not match the list of required signers in the message preamble. These unexpected signers were present in the envelope: `[$unexpectedSigners]`. These required signers were missing from the envelope `[$missingSigners]`.",
-  [r9]: "The message body provided has a byte-length of $actualBytes. The maximum allowable byte-length is $maxBytes",
-  [l9]: "Expected message format $expectedMessageFormat, got $actualMessageFormat",
-  [s9]: "The message length specified in the message preamble is $specifiedLength bytes. The actual length of the message is $actualLength bytes.",
-  [u9]: "Offchain message content must be non-empty",
-  [i9]: "Offchain message must specify the address of at least one required signer",
-  [d9]: "Offchain message envelope must reserve space for at least one signature",
-  [o9]: "The offchain message preamble specifies $numRequiredSignatures required signature(s), got $signaturesLength.",
-  [A9]: "The signatories of this offchain message must be listed in lexicographical order",
-  [p9]: "An address must be listed no more than once among the signatories of an offchain message",
-  [f9]: "Offchain message is missing signatures for addresses: $addresses.",
-  [P9]: "Offchain message signature verification failed. Signature mismatch for required signatories [$signatoriesWithInvalidSignatures]. Missing signatures for signatories [$signatoriesWithMissingSignatures]",
-  [a9]: "The message body provided contains characters whose codes fall outside the allowed range. In order to ensure clear-signing compatiblity with hardware wallets, the message may only contain line feeds and characters in the range [\\x20-\\x7e].",
-  [y9]: "Expected offchain message version $expectedVersion. Got $actualVersion.",
-  [c9]: "This version of Kit does not support decoding offchain messages with version $unsupportedVersion. The current max supported version is 0.",
-  [z4]: "The provided account could not be identified as an account from the $programName program.",
-  [L4]: "The provided instruction could not be identified as an instruction from the $programName program.",
-  [N4]: "The provided instruction is missing some accounts. Expected at least $expectedAccountMetas account(s), got $actualAccountMetas.",
-  [U4]: "Expected resolved instruction input '$inputName' to be non-null.",
-  [F4]: "Expected resolved instruction input '$inputName' to be of type `$expectedType`.",
-  [B4]: "Unrecognized account type '$accountType' for the $programName program.",
-  [k4]: "Unrecognized instruction type '$instructionType' for the $programName program.",
-  [E4]: "The notification name must end in 'Notifications' and the API must supply a subscription plan creator function for the notification '$notificationName'.",
-  [M4]: "WebSocket was closed before payload could be added to the send buffer",
-  [x4]: "WebSocket connection closed",
-  [O4]: "WebSocket failed to connect",
-  [_4]: "Failed to obtain a subscription id from the server",
-  [W4]: "Could not find an API plan for RPC method: `$method`",
-  [T4]: "The $argumentLabel argument to the `$methodName` RPC method$optionalPathLabel was `$value`. This number is unsafe for use with the Solana JSON-RPC because it exceeds `Number.MAX_SAFE_INTEGER`.",
-  [V4]: "HTTP error ($statusCode): $message",
-  [w4]: "HTTP header(s) forbidden: $headers. Learn more at https://developer.mozilla.org/en-US/docs/Glossary/Forbidden_header_name.",
-  [z3]: "Multiple distinct signers were identified for address `$address`. Please ensure that you are using the same signer instance for each address.",
-  [H3]: "The provided value does not implement the `KeyPairSigner` interface",
-  [j3]: "The provided value does not implement the `MessageModifyingSigner` interface",
-  [Y3]: "The provided value does not implement the `MessagePartialSigner` interface",
-  [G3]: "The provided value does not implement any of the `MessageSigner` interfaces",
-  [$3]: "The provided value does not implement the `TransactionModifyingSigner` interface",
-  [K3]: "The provided value does not implement the `TransactionPartialSigner` interface",
-  [J3]: "The provided value does not implement the `TransactionSendingSigner` interface",
-  [X3]: "The provided value does not implement any of the `TransactionSigner` interfaces",
-  [q3]: "More than one `TransactionSendingSigner` was identified.",
-  [Z3]: "No `TransactionSendingSigner` was identified. Please provide a valid `TransactionWithSingleSendingSigner` transaction.",
-  [e9]: "The wallet account $address cannot be used to create a transaction signer because it does not implement either the `solana:signTransaction` or `solana:signAndSendTransaction` feature. At least one of these features is required. The account supports the following features: $supportedFeatures.",
-  [Q3]: "Wallet account signers do not support signing multiple messages/transactions in a single operation",
-  [V2]: "Cannot export a non-extractable key.",
-  [R2]: "No digest implementation could be found.",
-  [S2]: "Cryptographic operations are only allowed in secure browser contexts. Read more here: https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts.",
-  [I2]: `This runtime does not support the generation of Ed25519 key pairs.
+var BF = {
+  [tk]: "Account not found at address: $address",
+  [ck]: "Not all accounts were decoded. Encoded accounts found at addresses: $addresses.",
+  [ik]: "Expected decoded account at address: $address",
+  [ok]: "Failed to decode account data at address: $address",
+  [nk]: "Accounts not found at addresses: $addresses",
+  [ek]: "Unable to find a viable program address bump seed.",
+  [X6]: "$putativeAddress is not a base58-encoded address.",
+  [j6]: "Expected base58 encoded address to decode to a byte array of length 32. Actual length: $actualLength.",
+  [$6]: "The `CryptoKey` must be an `Ed25519` public key.",
+  [ak]: "$putativeOffCurveAddress is not a base58-encoded off-curve address.",
+  [Q6]: "Invalid seeds; point must fall off the Ed25519 curve.",
+  [K6]: "Expected given program derived address to have the following format: [Address, ProgramDerivedAddressBump].",
+  [q6]: "A maximum of $maxSeeds seeds, including the bump seed, may be supplied when creating an address. Received: $actual.",
+  [Z6]: "The seed at index $index with length $actual exceeds the maximum length of $maxSeedLength bytes.",
+  [J6]: "Expected program derived address bump to be in the range [0, 255], got: $bump.",
+  [rk]: "Program address cannot end with PDA marker.",
+  [Y6]: "Expected base58-encoded address string of length in the range [32, 44]. Actual length: $actualLength.",
+  [f6]: "Expected base58-encoded blockhash string of length in the range [32, 44]. Actual length: $actualLength.",
+  [s6]: "The network has progressed past the last block for which this transaction could have been committed.",
+  [kc]: "Codec [$codecDescription] cannot decode empty byte arrays.",
+  [Wt]: "Enum codec cannot use lexical values [$stringValues] as discriminators. Either remove all lexical values or set `useValuesAsDiscriminators` to `false`.",
+  [KL]: "Sentinel [$hexSentinel] must not be present in encoded bytes [$hexEncodedBytes].",
+  [kL]: "Encoder and decoder must have the same fixed size, got [$encoderFixedSize] and [$decoderFixedSize].",
+  [LL]: "Encoder and decoder must have the same max size, got [$encoderMaxSize] and [$decoderMaxSize].",
+  [NL]: "Encoder and decoder must either both be fixed-size or variable-size.",
+  [Fc]: "Enum discriminator out of range. Expected a number in [$formattedValidDiscriminators], got $discriminator.",
+  [xL]: "Expected a fixed-size codec, got a variable-size one.",
+  [zL]: "Codec [$codecDescription] expected a positive byte length, got $bytesLength.",
+  [OL]: "Expected a variable-size codec, got a fixed-size one.",
+  [$L]: "Codec [$codecDescription] expected zero-value [$hexZeroValue] to have the same size as the provided fixed-size item [$expectedSize bytes].",
+  [Lc]: "Codec [$codecDescription] expected $expected bytes, got $bytesLength.",
+  [XL]: "Expected byte array constant [$hexConstant] to be present in data [$hexData] at offset [$offset].",
+  [UL]: "Invalid discriminated union variant. Expected one of [$variants], got $value.",
+  [Uc]: "Invalid enum variant. Expected one of [$stringValues] or a number in [$formattedNumericalValues], got $variant.",
+  [GL]: "Invalid literal union variant. Expected one of [$variants], got $value.",
+  [FL]: "Expected [$codecDescription] to have $expected items, got $actual.",
+  [BL]: "Invalid value $value for base $base with alphabet $alphabet.",
+  [jL]: "Literal union discriminator out of range. Expected a number between $minRange and $maxRange, got $discriminator.",
+  [Bc]: "Codec [$codecDescription] expected number to be in the range [$min, $max], got $value.",
+  [HL]: "Codec [$codecDescription] expected offset to be in the range [0, $bytesLength], got $offset.",
+  [JL]: "Expected sentinel [$hexSentinel] to be present in decoded bytes [$hexDecodedBytes].",
+  [YL]: "Union variant out of range. Expected an index between $minRange and $maxRange, got $variant.",
+  [qL]: "This decoder expected a byte array of exactly $expectedLength bytes, but $numExcessBytes unexpected excess bytes remained after decoding. Are you sure that you have chosen the correct decoder for this data?",
+  [ZL]: "Invalid pattern match value. The provided value does not match any of the specified patterns.",
+  [QL]: "Invalid pattern match bytes. The provided byte array does not match any of the specified patterns.",
+  [Ak]: "No random values implementation could be found.",
+  [b6]: "Failed to send transaction$causeMessage",
+  [C6]: "Failed to send transactions$causeMessages",
+  [cF]: "Fixed-point operation `$operation` of kind `$kind` overflowed. Expected a raw bigint in [$min, $max], got $result.",
+  [sF]: "Fixed-point division by zero for value of kind `$kind` ($signedness, $totalBits bits).",
+  [tF]: "`fractionalBits` ($fractionalBits) must not exceed `totalBits` ($totalBits).",
+  [aF]: "Invalid `decimals`. Expected a non-negative integer, got $decimals.",
+  [rF]: "Invalid `fractionalBits`. Expected a non-negative integer, got $fractionalBits.",
+  [oF]: "Invalid string `$input` for fixed-point value of kind `$kind`.",
+  [eF]: "Invalid `totalBits`. Expected a positive integer, got $totalBits.",
+  [iF]: "Invalid ratio $numerator/$denominator for fixed-point value of kind `$kind`. Denominator must be non-zero.",
+  [dF]: "Fixed-point value of kind `$kind` has a malformed `raw` field. Expected a bigint, got `$raw`.",
+  [lF]: "Fixed-point `$operation` operation expected $expectedKind ($expectedSignedness, $expectedTotalBits bits, $expectedScale $expectedScaleLabel); got $actualKind ($actualSignedness, $actualTotalBits bits, $actualScale $actualScaleLabel).",
+  [uF]: "Fixed-point operation `$operation` of kind `$kind` cannot be performed exactly; pass a rounding mode other than `strict` to allow a rounded result.",
+  [fF]: "Fixed-point codec of kind `$kind` requires `totalBits` to be a multiple of 8; got $totalBits.",
+  [nF]: "Fixed-point value of kind `$kind` is out of range for $signedness $totalBits-bit storage. Expected a raw bigint in [$min, $max], got $raw.",
+  [Ik]: "Filesystem operation `$operation` is not supported in this environment.",
+  [Nk]: "Instruction requires an uninitialized account",
+  [Jk]: "Instruction tries to borrow reference for an account which is already borrowed",
+  [qk]: "Instruction left account with an outstanding borrowed reference",
+  [$k]: "Program other than the account's owner changed the size of the account data",
+  [Mk]: "Account data too small for instruction",
+  [Kk]: "Instruction expected an executable account",
+  [b4]: "An account does not have enough lamports to be rent-exempt",
+  [v4]: "Program arithmetic overflowed",
+  [P4]: "Failed to serialize or deserialize account data",
+  [T4]: "Builtin programs must consume compute units",
+  [o4]: "Cross-program invocation call depth too deep",
+  [d4]: "Computational budget exceeded",
+  [Qk]: "Custom program error: #$code",
+  [Gk]: "Instruction contains duplicate accounts",
+  [Zk]: "Instruction modifications of multiply-passed account differ",
+  [t4]: "Executable accounts must be rent exempt",
+  [r4]: "Instruction changed executable accounts data",
+  [a4]: "Instruction changed the balance of an executable account",
+  [jk]: "Instruction changed executable bit of an account",
+  [Bk]: "Instruction modified data of an account it does not own",
+  [Uk]: "Instruction spent from the balance of an account it does not own",
+  [wk]: "Generic instruction error",
+  [R4]: "Provided owner is not allowed",
+  [A4]: "Account is immutable",
+  [p4]: "Incorrect authority provided",
+  [xk]: "Incorrect program id for instruction",
+  [_k]: "Insufficient funds for instruction",
+  [Ek]: "Invalid account data for instruction",
+  [C4]: "Invalid account owner",
+  [Vk]: "Invalid program argument",
+  [e4]: "Program returned invalid error code",
+  [Wk]: "Invalid instruction data",
+  [u4]: "Failed to reallocate account data",
+  [s4]: "Provided seeds do not result in a valid address",
+  [I4]: "Accounts data allocations exceeded the maximum allowed per transaction",
+  [h4]: "Max accounts exceeded",
+  [D4]: "Max instruction trace length exceeded",
+  [l4]: "Length of the seed is too long for address generation",
+  [i4]: "An account required by the instruction is missing",
+  [Ok]: "Missing required signature for instruction",
+  [Fk]: "Instruction illegally modified the program id of an account",
+  [Xk]: "Insufficient account keys for instruction",
+  [f4]: "Cross-program invocation with unauthorized signer or writable account",
+  [g4]: "Failed to create program execution environment",
+  [y4]: "Program failed to compile",
+  [m4]: "Program failed to complete",
+  [Hk]: "Instruction modified data of a read-only account",
+  [zk]: "Instruction changed the balance of a read-only account",
+  [c4]: "Cross-program invocation reentrancy not allowed for this instruction",
+  [Yk]: "Instruction modified rent epoch of an account",
+  [Lk]: "Sum of account balances before and after instruction do not match",
+  [kk]: "Instruction requires an initialized account",
+  [ct]: "The instruction failed with the error: $errorName",
+  [n4]: "Unsupported program id",
+  [S4]: "Unsupported sysvar",
+  [kF]: "Invalid instruction plan kind: $kind.",
+  [DL]: "The provided instruction plan is empty.",
+  [VL]: "No failed transaction plan result was found in the provided transaction plan result.",
+  [wL]: "This transaction plan executor does not support non-divisible sequential plans. To support them, you may create your own executor such that multi-transaction atomicity is preserved \u2014 e.g. by targetting RPCs that support transaction bundles.",
+  [TL]: "The provided transaction plan failed to execute. See the `transactionPlanResult` attribute for more details. Note that the `cause` property is deprecated, and a future version will not set it.",
+  [IL]: "The provided message has insufficient capacity to accommodate the next instruction(s) in this plan. Expected at least $numBytesRequired free byte(s), got $numFreeBytes byte(s).",
+  [LF]: "Invalid transaction plan kind: $kind.",
+  [hL]: "No more instructions to pack; the message packer has completed the instruction plan.",
+  [WL]: "Unexpected instruction plan. Expected $expectedKind plan, got $actualKind plan.",
+  [EL]: "Unexpected transaction plan. Expected $expectedKind plan, got $actualKind plan.",
+  [ML]: "Unexpected transaction plan result. Expected $expectedKind plan, got $actualKind plan.",
+  [_L]: "Expected a successful transaction plan result. I.e. there is at least one failed or cancelled transaction in the plan.",
+  [hk]: "The instruction does not have any accounts.",
+  [Dk]: "The instruction does not have any data.",
+  [Tk]: "Expected instruction to have progress address $expectedProgramAddress, got $actualProgramAddress.",
+  [g6]: "Expected base58 encoded blockhash to decode to a byte array of length 32. Actual length: $actualLength.",
+  [u6]: "The nonce `$expectedNonceValue` is no longer valid. It has advanced to `$actualNonceValue`",
+  [xF]: "Invariant violation: Found no abortable iterable cache entry for key `$cacheKey`. It should be impossible to hit this error; please file an issue at https://sola.na/web3invariant",
+  [NF]: "Invariant violation: This data publisher does not publish to the channel named `$channelName`. Supported channels include $supportedChannelNames.",
+  [_F]: "Invariant violation: WebSocket message iterator state is corrupt; iterated without first resolving existing message promise. It should be impossible to hit this error; please file an issue at https://sola.na/web3invariant",
+  [MF]: "Invariant violation: WebSocket message iterator is missing state storage. It should be impossible to hit this error; please file an issue at https://sola.na/web3invariant",
+  [OF]: "Invariant violation: Switch statement non-exhaustive. Received unexpected value `$unexpectedValue`. It should be impossible to hit this error; please file an issue at https://sola.na/web3invariant",
+  [S6]: "JSON-RPC error: Internal JSON-RPC error ($__serverMessage)",
+  [R6]: "JSON-RPC error: Invalid method parameter(s) ($__serverMessage)",
+  [h6]: "JSON-RPC error: The JSON sent is not a valid `Request` object ($__serverMessage)",
+  [I6]: "JSON-RPC error: The method does not exist / is not available ($__serverMessage)",
+  [v6]: "JSON-RPC error: An error occurred on the server while parsing the JSON text ($__serverMessage)",
+  [_6]: "$__serverMessage",
+  [G6]: "$__serverMessage",
+  [B6]: "$__serverMessage",
+  [E6]: "$__serverMessage",
+  [w6]: "Epoch rewards period still active at slot $slot",
+  [O6]: "$__serverMessage",
+  [N6]: "$__serverMessage",
+  [D6]: "Failed to query long-term storage; please try again",
+  [V6]: "Minimum context slot has not been reached",
+  [U6]: "Node is unhealthy; behind by $numSlotsBehind slots",
+  [k6]: "No snapshot",
+  [H6]: "Transaction simulation failed",
+  [T6]: "Rewards cannot be found because slot $slot is not the epoch boundary. This may be due to gap in the queried node's local ledger or long-term storage",
+  [L6]: "$__serverMessage",
+  [x6]: "Transaction history is not available from this node",
+  [F6]: "$__serverMessage",
+  [M6]: "Transaction signature length mismatch",
+  [z6]: "Transaction signature verification failure",
+  [W6]: "$__serverMessage",
+  [Sk]: "The grind regex `/$source/` contains the character `$character`, which is not in the base58 alphabet and can never match a Solana address.",
+  [pk]: "Key pair bytes must be of length 64, got $byteLength.",
+  [Pk]: "Expected private key bytes with length 32. Actual length: $actualLength.",
+  [bk]: "Expected base58-encoded signature to decode to a byte array of length 64. Actual length: $actualLength.",
+  [vk]: "The provided private key does not match the provided public key.",
+  [Ck]: "Expected base58-encoded signature string of length in the range [64, 88]. Actual length: $actualLength.",
+  [Rk]: "Writing a key pair to disk is not supported in this environment.",
+  [m6]: "Lamports value must be in the range [0, 2e64-1]",
+  [y6]: "`$value` cannot be parsed as a `BigInt`",
+  [P6]: "$message",
+  [A6]: "`$value` cannot be parsed as a `Number`",
+  [d6]: "No nonce account could be found at address `$nonceAccountAddress`",
+  [G4]: "Expected base58 encoded application domain to decode to a byte array of length 32. Actual length: $actualLength.",
+  [e7]: "Attempted to sign an offchain message with an address that is not a signer for it",
+  [H4]: "Expected base58-encoded application domain string of length in the range [32, 44]. Actual length: $actualLength.",
+  [Q4]: "The signer addresses in this offchain message envelope do not match the list of required signers in the message preamble. These unexpected signers were present in the envelope: `[$unexpectedSigners]`. These required signers were missing from the envelope `[$missingSigners]`.",
+  [B4]: "The message body provided has a byte-length of $actualBytes. The maximum allowable byte-length is $maxBytes",
+  [$4]: "Expected message format $expectedMessageFormat, got $actualMessageFormat",
+  [K4]: "The message length specified in the message preamble is $specifiedLength bytes. The actual length of the message is $actualLength bytes.",
+  [J4]: "Offchain message content must be non-empty",
+  [Y4]: "Offchain message must specify the address of at least one required signer",
+  [q4]: "Offchain message envelope must reserve space for at least one signature",
+  [j4]: "The offchain message preamble specifies $numRequiredSignatures required signature(s), got $signaturesLength.",
+  [a7]: "The signatories of this offchain message must be listed in lexicographical order",
+  [t7]: "An address must be listed no more than once among the signatories of an offchain message",
+  [Z4]: "Offchain message is missing signatures for addresses: $addresses.",
+  [n7]: "Offchain message signature verification failed. Signature mismatch for required signatories [$signatoriesWithInvalidSignatures]. Missing signatures for signatories [$signatoriesWithMissingSignatures]",
+  [z4]: "The message body provided contains characters whose codes fall outside the allowed range. In order to ensure clear-signing compatiblity with hardware wallets, the message may only contain line feeds and characters in the range [\\x20-\\x7e].",
+  [r7]: "Expected offchain message version $expectedVersion. Got $actualVersion.",
+  [X4]: "This version of Kit does not support decoding offchain messages with version $unsupportedVersion. The current max supported version is 0.",
+  [wF]: "The provided account could not be identified as an account from the $programName program.",
+  [IF]: "The provided instruction could not be identified as an instruction from the $programName program.",
+  [SF]: "The provided instruction is missing some accounts. Expected at least $expectedAccountMetas account(s), got $actualAccountMetas.",
+  [DF]: "Expected resolved instruction input '$inputName' to be non-null.",
+  [hF]: "Expected resolved instruction input '$inputName' to be of type `$expectedType`.",
+  [TF]: "Unrecognized account type '$accountType' for the $programName program.",
+  [RF]: "Unrecognized instruction type '$instructionType' for the $programName program.",
+  [pF]: "The notification name must end in 'Notifications' and the API must supply a subscription plan creator function for the notification '$notificationName'.",
+  [bF]: "WebSocket was closed before payload could be added to the send buffer",
+  [CF]: "WebSocket connection closed",
+  [vF]: "WebSocket failed to connect",
+  [PF]: "Failed to obtain a subscription id from the server",
+  [AF]: "Could not find an API plan for RPC method: `$method`",
+  [gF]: "The $argumentLabel argument to the `$methodName` RPC method$optionalPathLabel was `$value`. This number is unsafe for use with the Solana JSON-RPC because it exceeds `Number.MAX_SAFE_INTEGER`.",
+  [yF]: "HTTP error ($statusCode): $message",
+  [mF]: "HTTP header(s) forbidden: $headers. Learn more at https://developer.mozilla.org/en-US/docs/Glossary/Forbidden_header_name.",
+  [w4]: "Multiple distinct signers were identified for address `$address`. Please ensure that you are using the same signer instance for each address.",
+  [V4]: "The provided value does not implement the `KeyPairSigner` interface",
+  [E4]: "The provided value does not implement the `MessageModifyingSigner` interface",
+  [M4]: "The provided value does not implement the `MessagePartialSigner` interface",
+  [W4]: "The provided value does not implement any of the `MessageSigner` interfaces",
+  [x4]: "The provided value does not implement the `TransactionModifyingSigner` interface",
+  [O4]: "The provided value does not implement the `TransactionPartialSigner` interface",
+  [N4]: "The provided value does not implement the `TransactionSendingSigner` interface",
+  [_4]: "The provided value does not implement any of the `TransactionSigner` interfaces",
+  [k4]: "More than one `TransactionSendingSigner` was identified.",
+  [L4]: "No `TransactionSendingSigner` was identified. Please provide a valid `TransactionWithSingleSendingSigner` transaction.",
+  [U4]: "The wallet account $address cannot be used to create a transaction signer because it does not implement either the `solana:signTransaction` or `solana:signAndSendTransaction` feature. At least one of these features is required. The account supports the following features: $supportedFeatures.",
+  [F4]: "Wallet account signers do not support signing multiple messages/transactions in a single operation",
+  [yk]: "Cannot export a non-extractable key.",
+  [sk]: "No digest implementation could be found.",
+  [lk]: "Cryptographic operations are only allowed in secure browser contexts. Read more here: https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts.",
+  [uk]: `This runtime does not support the generation of Ed25519 key pairs.
 
 Install @solana/webcrypto-ed25519-polyfill and call its \`install\` function before generating keys in environments that do not support Ed25519.
 
 For a list of runtimes that currently support Ed25519 operations, visit https://github.com/WICG/webcrypto-secure-curves/issues/20.`,
-  [h2]: "No key export implementation could be found.",
-  [D2]: "No key generation implementation could be found.",
-  [T2]: "No signing implementation could be found.",
-  [w2]: "No signature verification implementation could be found.",
-  [EN]: "Timestamp value must be in the range [-(2n ** 63n), (2n ** 63n) - 1]. `$value` given",
-  [pk]: "Transaction processing left an account with an outstanding borrowed reference",
-  [ak]: "Account in use",
-  [tk]: "Account loaded twice",
-  [nk]: "Attempt to debit an account but found no record of a prior credit.",
-  [Ik]: "Transaction loads an address table account that doesn't exist",
-  [lk]: "This transaction has already been processed",
-  [sk]: "Blockhash not found",
-  [uk]: "Loader call chain is too deep",
-  [Ak]: "Transactions are currently disabled due to cluster maintenance",
-  [Ek]: "Transaction contains a duplicate instruction ($index) that is not allowed",
-  [ik]: "Insufficient funds for fee",
-  [_k]: "Transaction results in an account ($accountIndex) with insufficient funds for rent",
-  [ck]: "This account may not be used to pay transaction fees",
-  [fk]: "Transaction contains an invalid account reference",
-  [Dk]: "Transaction loads an address table account with invalid data",
-  [Tk]: "Transaction address table lookup uses an invalid index",
-  [hk]: "Transaction loads an address table account with an invalid owner",
-  [xk]: "LoadedAccountsDataSizeLimit set for transaction must be greater than 0.",
-  [mk]: "This program may not be used for executing instructions",
-  [wk]: "Transaction leaves an account with a lower balance than rent-exempt minimum",
-  [Ck]: "Transaction loads a writable account that cannot be written",
-  [Mk]: "Transaction exceeded max loaded accounts data size cap",
-  [dk]: "Transaction requires a fee but has no signature present",
-  [ok]: "Attempt to load a program that does not exist",
-  [Nk]: "Execution of the program referenced by account at index $accountIndex is temporarily restricted.",
-  [Ok]: "ResanitizationNeeded",
-  [yk]: "Transaction failed to sanitize accounts offsets correctly",
-  [gk]: "Transaction did not pass signature verification",
-  [Rk]: "Transaction locked too many accounts",
-  [kk]: "Sum of account balances before and after transaction do not match",
-  [rk]: "The transaction failed with the error `$errorName`",
-  [bk]: "Transaction version is unsupported",
-  [Sk]: "Transaction would exceed account data limit within the block",
-  [Wk]: "Transaction would exceed total account data limit",
-  [vk]: "Transaction would exceed max account limit within the block",
-  [Pk]: "Transaction would exceed max Block Cost Limit",
-  [Vk]: "Transaction would exceed max Vote Cost Limit",
-  [x9]: "Attempted to sign a transaction with an address that is not a signer for it",
-  [V9]: "Transaction is missing an address at index: $index.",
-  [O9]: "Transaction has no expected signers therefore it cannot be encoded",
-  [F9]: "Transaction size $transactionSize exceeds limit of $transactionSizeLimit bytes",
-  [v9]: "Transaction does not have a blockhash lifetime",
-  [S9]: "Transaction is not a durable nonce transaction",
-  [I9]: "Contents of these address lookup tables unknown: $lookupTableAddresses",
-  [h9]: "Lookup of address at index $highestRequestedIndex failed for lookup table `$lookupTableAddress`. Highest known index is $highestKnownIndex. The lookup table may have been extended since its contents were retrieved",
-  [T9]: "No fee payer set in CompiledTransaction",
-  [D9]: "Could not find program address at index $index",
-  [k9]: "Failed to estimate the compute unit consumption for this transaction message. This is likely because simulating the transaction failed. Inspect the `cause` property of this error to learn more",
-  [L9]: "Transaction failed when it was simulated in order to estimate the compute unit consumption. The compute unit estimate provided is for a transaction that failed when simulated and may not be representative of the compute units this transaction would consume if successful. Inspect the `cause` property of this error to learn more",
-  [W9]: "Transaction is missing a fee payer.",
-  [E9]: "Could not determine this transaction's signature. Make sure that the transaction has been signed by its fee payer.",
-  [M9]: "Transaction first instruction is not advance nonce account instruction.",
-  [_9]: "Transaction with no instructions cannot be durable nonce transaction.",
-  [b9]: "This transaction includes an address (`$programAddress`) which is both invoked and set as the fee payer. Program addresses may not pay fees",
-  [C9]: "This transaction includes an address (`$programAddress`) which is both invoked and marked writable. Program addresses may not be writable",
-  [N9]: "The transaction message expected the transaction to have $numRequiredSignatures signatures, got $signaturesLength.",
-  [w9]: "Transaction is missing signatures for addresses: $addresses.",
-  [R9]: "Transaction version must be in the range [0, 127]. `$actualVersion` given",
-  [U9]: "This version of Kit does not support decoding transactions with version $unsupportedVersion. The current max supported version is 1.",
-  [B9]: "The transaction has a durable nonce lifetime (with nonce `$nonce`), but the nonce account address is in a lookup table. The lifetime constraint cannot be constructed without fetching the lookup tables for the transaction.",
-  [X9]: "Invalid transaction config mask: $mask. Bits 0 and 1 must match (both set or both unset)",
-  [z9]: "Transaction message bytes are malformed: $messageBytes",
-  [H9]: "Transaction message bytes are empty, so the transaction cannot be encoded",
-  [G9]: "Transaction bytes are empty, so no transaction can be decoded",
-  [j9]: "Transaction version 0 must be encoded with signatures first. This transaction was encoded with first byte $firstByte, which is expected to be a signature count for v0 transactions.",
-  [Y9]: "The provided transaction bytes expect that there should be $numExpectedSignatures signatures, but the bytes are not long enough to contain a transaction message with this many signatures. The provided bytes are $transactionBytesLength bytes long.",
-  [$9]: "The transaction has a durable nonce lifetime, but the nonce account index is invalid. Expected a nonce account index less than $numberOfStaticAccounts, got $nonceAccountIndex.",
-  [K9]: "The transaction config value for $configName has the incorrect kind. Expected $expectedKind, got $actualKind.",
-  [J9]: "The transaction does not have the same number of instruction headers and instruction payloads. Got $numInstructionHeaders instruction headers, and $numInstructionPayloads instruction payloads.",
-  [q9]: "Transaction has $actualCount unique signer addresses but the maximum allowed is $maxAllowed",
-  [Z9]: "Transaction has $actualCount unique account addresses but the maximum allowed is $maxAllowed",
-  [Q9]: "Transaction has $actualCount instructions but the maximum allowed is $maxAllowed",
-  [ek]: "The instruction at index $instructionIndex has $actualCount account references but the maximum allowed is $maxAllowed",
-  [H4]: "Cannot $operation: no wallet connected",
-  [G4]: "No signing wallet connected (status: $status)",
-  [j4]: "Connected wallet does not support signing"
+  [dk]: "No key export implementation could be found.",
+  [fk]: "No key generation implementation could be found.",
+  [gk]: "No signing implementation could be found.",
+  [mk]: "No signature verification implementation could be found.",
+  [p6]: "Timestamp value must be in the range [-(2n ** 63n), (2n ** 63n) - 1]. `$value` given",
+  [tL]: "Transaction processing left an account with an outstanding borrowed reference",
+  [z7]: "Account in use",
+  [H7]: "Account loaded twice",
+  [G7]: "Attempt to debit an account but found no record of a prior credit.",
+  [uL]: "Transaction loads an address table account that doesn't exist",
+  [$7]: "This transaction has already been processed",
+  [K7]: "Blockhash not found",
+  [J7]: "Loader call chain is too deep",
+  [aL]: "Transactions are currently disabled due to cluster maintenance",
+  [pL]: "Transaction contains a duplicate instruction ($index) that is not allowed",
+  [Y7]: "Insufficient funds for fee",
+  [PL]: "Transaction results in an account ($accountIndex) with insufficient funds for rent",
+  [X7]: "This account may not be used to pay transaction fees",
+  [Z7]: "Transaction contains an invalid account reference",
+  [fL]: "Transaction loads an address table account with invalid data",
+  [gL]: "Transaction address table lookup uses an invalid index",
+  [dL]: "Transaction loads an address table account with an invalid owner",
+  [CL]: "LoadedAccountsDataSizeLimit set for transaction must be greater than 0.",
+  [eL]: "This program may not be used for executing instructions",
+  [mL]: "Transaction leaves an account with a lower balance than rent-exempt minimum",
+  [iL]: "Transaction loads a writable account that cannot be written",
+  [bL]: "Transaction exceeded max loaded accounts data size cap",
+  [q7]: "Transaction requires a fee but has no signature present",
+  [j7]: "Attempt to load a program that does not exist",
+  [SL]: "Execution of the program referenced by account at index $accountIndex is temporarily restricted.",
+  [vL]: "ResanitizationNeeded",
+  [rL]: "Transaction failed to sanitize accounts offsets correctly",
+  [Q7]: "Transaction did not pass signature verification",
+  [sL]: "Transaction locked too many accounts",
+  [RL]: "Sum of account balances before and after transaction do not match",
+  [B7]: "The transaction failed with the error `$errorName`",
+  [oL]: "Transaction version is unsupported",
+  [lL]: "Transaction would exceed account data limit within the block",
+  [AL]: "Transaction would exceed total account data limit",
+  [cL]: "Transaction would exceed max account limit within the block",
+  [nL]: "Transaction would exceed max Block Cost Limit",
+  [yL]: "Transaction would exceed max Vote Cost Limit",
+  [C7]: "Attempted to sign a transaction with an address that is not a signer for it",
+  [y7]: "Transaction is missing an address at index: $index.",
+  [v7]: "Transaction has no expected signers therefore it cannot be encoded",
+  [h7]: "Transaction size $transactionSize exceeds limit of $transactionSizeLimit bytes",
+  [c7]: "Transaction does not have a blockhash lifetime",
+  [l7]: "Transaction is not a durable nonce transaction",
+  [u7]: "Contents of these address lookup tables unknown: $lookupTableAddresses",
+  [d7]: "Lookup of address at index $highestRequestedIndex failed for lookup table `$lookupTableAddress`. Highest known index is $highestKnownIndex. The lookup table may have been extended since its contents were retrieved",
+  [g7]: "No fee payer set in CompiledTransaction",
+  [f7]: "Could not find program address at index $index",
+  [R7]: "Failed to estimate the compute unit consumption for this transaction message. This is likely because simulating the transaction failed. Inspect the `cause` property of this error to learn more",
+  [I7]: "Transaction failed when it was simulated in order to estimate the compute unit consumption. The compute unit estimate provided is for a transaction that failed when simulated and may not be representative of the compute units this transaction would consume if successful. Inspect the `cause` property of this error to learn more",
+  [A7]: "Transaction is missing a fee payer.",
+  [p7]: "Could not determine this transaction's signature. Make sure that the transaction has been signed by its fee payer.",
+  [b7]: "Transaction first instruction is not advance nonce account instruction.",
+  [P7]: "Transaction with no instructions cannot be durable nonce transaction.",
+  [o7]: "This transaction includes an address (`$programAddress`) which is both invoked and set as the fee payer. Program addresses may not pay fees",
+  [i7]: "This transaction includes an address (`$programAddress`) which is both invoked and marked writable. Program addresses may not be writable",
+  [S7]: "The transaction message expected the transaction to have $numRequiredSignatures signatures, got $signaturesLength.",
+  [m7]: "Transaction is missing signatures for addresses: $addresses.",
+  [s7]: "Transaction version must be in the range [0, 127]. `$actualVersion` given",
+  [D7]: "This version of Kit does not support decoding transactions with version $unsupportedVersion. The current max supported version is 1.",
+  [T7]: "The transaction has a durable nonce lifetime (with nonce `$nonce`), but the nonce account address is in a lookup table. The lifetime constraint cannot be constructed without fetching the lookup tables for the transaction.",
+  [_7]: "Invalid transaction config mask: $mask. Bits 0 and 1 must match (both set or both unset)",
+  [w7]: "Transaction message bytes are malformed: $messageBytes",
+  [V7]: "Transaction message bytes are empty, so the transaction cannot be encoded",
+  [W7]: "Transaction bytes are empty, so no transaction can be decoded",
+  [E7]: "Transaction version 0 must be encoded with signatures first. This transaction was encoded with first byte $firstByte, which is expected to be a signature count for v0 transactions.",
+  [M7]: "The provided transaction bytes expect that there should be $numExpectedSignatures signatures, but the bytes are not long enough to contain a transaction message with this many signatures. The provided bytes are $transactionBytesLength bytes long.",
+  [x7]: "The transaction has a durable nonce lifetime, but the nonce account index is invalid. Expected a nonce account index less than $numberOfStaticAccounts, got $nonceAccountIndex.",
+  [O7]: "The transaction config value for $configName has the incorrect kind. Expected $expectedKind, got $actualKind.",
+  [N7]: "The transaction does not have the same number of instruction headers and instruction payloads. Got $numInstructionHeaders instruction headers, and $numInstructionPayloads instruction payloads.",
+  [k7]: "Transaction has $actualCount unique signer addresses but the maximum allowed is $maxAllowed",
+  [L7]: "Transaction has $actualCount unique account addresses but the maximum allowed is $maxAllowed",
+  [F7]: "Transaction has $actualCount instructions but the maximum allowed is $maxAllowed",
+  [U7]: "The instruction at index $instructionIndex has $actualCount account references but the maximum allowed is $maxAllowed",
+  [VF]: "Cannot $operation: no wallet connected",
+  [WF]: "No signing wallet connected (status: $status)",
+  [EF]: "Connected wallet does not support signing"
 };
-var a6 = 1e3;
-var mr = "i";
-var lr = "t";
-function t6(e8, t = {}) {
-  const a = r6[e8];
+var zF = 1e3;
+var Pr = "i";
+var fr = "t";
+function HF(e5, t = {}) {
+  const a = BF[e5];
   if (a.length === 0)
     return "";
-  let o6;
-  function r(g6) {
-    if (o6[lr] === 2) {
-      const U8 = a.slice(o6[mr] + 1, g6);
+  let o3;
+  function r(g2) {
+    if (o3[fr] === 2) {
+      const L = a.slice(o3[Pr] + 1, g2);
       c.push(
-        U8 in t ? (
+        L in t ? (
           // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-          `${t[U8]}`
-        ) : `$${U8}`
+          `${t[L]}`
+        ) : `$${L}`
       );
-    } else o6[lr] === 1 && c.push(a.slice(o6[mr], g6));
+    } else o3[fr] === 1 && c.push(a.slice(o3[Pr], g2));
   }
   const c = [];
-  a.split("").forEach((g6, U8) => {
-    if (U8 === 0) {
-      o6 = {
-        [mr]: 0,
-        [lr]: a[0] === "\\" ? 0 : a[0] === "$" ? 2 : 1
+  a.split("").forEach((g2, L) => {
+    if (L === 0) {
+      o3 = {
+        [Pr]: 0,
+        [fr]: a[0] === "\\" ? 0 : a[0] === "$" ? 2 : 1
         /* Text */
       };
       return;
     }
-    let Z;
-    switch (o6[lr]) {
+    let J;
+    switch (o3[fr]) {
       case 0:
-        Z = {
-          [mr]: U8,
-          [lr]: 1
+        J = {
+          [Pr]: L,
+          [fr]: 1
           /* Text */
         };
         break;
       case 1:
-        g6 === "\\" ? Z = {
-          [mr]: U8,
-          [lr]: 0
+        g2 === "\\" ? J = {
+          [Pr]: L,
+          [fr]: 0
           /* EscapeSequence */
-        } : g6 === "$" && (Z = {
-          [mr]: U8,
-          [lr]: 2
+        } : g2 === "$" && (J = {
+          [Pr]: L,
+          [fr]: 2
           /* Variable */
         });
         break;
       case 2:
-        g6 === "\\" ? Z = {
-          [mr]: U8,
-          [lr]: 0
+        g2 === "\\" ? J = {
+          [Pr]: L,
+          [fr]: 0
           /* EscapeSequence */
-        } : g6 === "$" ? Z = {
-          [mr]: U8,
-          [lr]: 2
+        } : g2 === "$" ? J = {
+          [Pr]: L,
+          [fr]: 2
           /* Variable */
-        } : g6.match(/\w/) || (Z = {
-          [mr]: U8,
-          [lr]: 1
+        } : g2.match(/\w/) || (J = {
+          [Pr]: L,
+          [fr]: 1
           /* Text */
         });
         break;
     }
-    Z && (o6 !== Z && r(U8), o6 = Z);
+    J && (o3 !== J && r(L), o3 = J);
   }), r();
   let n = c.join("");
-  return e8 >= qa && e8 < qa + a6 && "index" in t && (n += ` (instruction #${t.index + 1})`), n;
+  return e5 >= ct && e5 < ct + zF && "index" in t && (n += ` (instruction #${t.index + 1})`), n;
 }
-function n6(e8, t = {}) {
+function GF(e5, t = {}) {
   if (process.env.NODE_ENV !== "production")
-    return t6(e8, t);
+    return HF(e5, t);
   {
-    let a = `Solana error #${e8}; Decode this error by running \`npx @solana/errors decode -- ${e8}`;
-    return Object.keys(t).length && (a += ` '${e6(t)}'`), `${a}\``;
+    let a = `Solana error #${e5}; Decode this error by running \`npx @solana/errors decode -- ${e5}`;
+    return Object.keys(t).length && (a += ` '${UF(t)}'`), `${a}\``;
   }
 }
-var Or = class extends Error {
+var Br = class extends Error {
   /**
    * Indicates the root cause of this {@link SolanaError}, if any.
    *
@@ -39122,852 +39107,852 @@ var Or = class extends Error {
    * Contains context that can assist in understanding or recovering from a {@link SolanaError}.
    */
   context;
-  constructor(...[e8, t]) {
-    let a, o6;
+  constructor(...[e5, t]) {
+    let a, o3;
     t && Object.entries(Object.getOwnPropertyDescriptors(t)).forEach(([c, n]) => {
-      c === "cause" ? o6 = { cause: n.value } : (a === void 0 && (a = {
-        __code: e8
+      c === "cause" ? o3 = { cause: n.value } : (a === void 0 && (a = {
+        __code: e5
       }), Object.defineProperty(a, c, n));
     });
-    const r = n6(e8, a);
-    super(r, o6), this.context = Object.freeze(
+    const r = GF(e5, a);
+    super(r, o3), this.context = Object.freeze(
       a === void 0 ? {
-        __code: e8
+        __code: e5
       } : a
     ), this.name = "SolanaError";
   }
 };
-function uc(e8) {
+function Gc(e5) {
   return Object.freeze({
-    ...e8,
-    decode: (t, a = 0) => e8.read(t, a)[0]
+    ...e5,
+    decode: (t, a = 0) => e5.read(t, a)[0]
   });
 }
-function l6(e8, t, a = 0) {
+function $F(e5, t, a = 0) {
   if (t.length - a <= 0)
-    throw new Or(tc, {
-      codecDescription: e8
+    throw new Br(kc, {
+      codecDescription: e5
     });
 }
-function s6(e8, t, a, o6 = 0) {
-  const r = a.length - o6;
+function KF(e5, t, a, o3 = 0) {
+  const r = a.length - o3;
   if (r < t)
-    throw new Or(nc, {
+    throw new Br(Lc, {
       bytesLength: r,
-      codecDescription: e8,
+      codecDescription: e5,
       expected: t
     });
 }
-function u6(e8, t, a) {
-  const o6 = e8.byteOffset + (t ?? 0), r = a ?? e8.byteLength;
+function JF(e5, t, a) {
+  const o3 = e5.byteOffset + (t ?? 0), r = a ?? e5.byteLength;
   let c;
-  return typeof SharedArrayBuffer > "u" ? c = e8.buffer : e8.buffer instanceof SharedArrayBuffer ? (c = new ArrayBuffer(e8.length), new Uint8Array(c).set(new Uint8Array(e8))) : c = e8.buffer, (o6 === 0 || o6 === -e8.byteLength) && r === e8.byteLength ? c : c.slice(o6, o6 + r);
+  return typeof SharedArrayBuffer > "u" ? c = e5.buffer : e5.buffer instanceof SharedArrayBuffer ? (c = new ArrayBuffer(e5.length), new Uint8Array(c).set(new Uint8Array(e5))) : c = e5.buffer, (o3 === 0 || o3 === -e5.byteLength) && r === e5.byteLength ? c : c.slice(o3, o3 + r);
 }
-function f6(e8, t) {
-  return uc({
-    ...e8,
-    read: (a, o6) => {
-      const [r, c] = e8.read(a, o6);
-      return [t(r, a, o6), c];
+function ZF(e5, t) {
+  return Gc({
+    ...e5,
+    read: (a, o3) => {
+      const [r, c] = e5.read(a, o3);
+      return [t(r, a, o3), c];
     }
   });
 }
-function dc(e8) {
-  return e8?.endian !== 1;
+function jc(e5) {
+  return e5?.endian !== 1;
 }
-function y6(e8) {
-  return uc({
-    fixedSize: e8.size,
+function r5(e5) {
+  return Gc({
+    fixedSize: e5.size,
     read(t, a = 0) {
-      l6(e8.name, t, a), s6(e8.name, e8.size, t, a);
-      const o6 = new DataView(u6(t, a, e8.size));
-      return [e8.get(o6, dc(e8.config)), a + e8.size];
+      $F(e5.name, t, a), KF(e5.name, e5.size, t, a);
+      const o3 = new DataView(JF(t, a, e5.size));
+      return [e5.get(o3, jc(e5.config)), a + e5.size];
     }
   });
 }
-var p6 = () => y6({
-  get: (e8) => e8.getUint8(0),
+var t5 = () => r5({
+  get: (e5) => e5.getUint8(0),
   name: "u8",
   size: 1
 });
-function fc(e8) {
-  const t = [...new Set(Object.values(e8).filter((n) => typeof n == "number"))].sort(), a = Object.fromEntries(Object.entries(e8).slice(t.length)), o6 = Object.keys(a), r = Object.values(a), c = [
-    .../* @__PURE__ */ new Set([...o6, ...r.filter((n) => typeof n == "string")])
+function Yc(e5) {
+  const t = [...new Set(Object.values(e5).filter((n) => typeof n == "number"))].sort(), a = Object.fromEntries(Object.entries(e5).slice(t.length)), o3 = Object.keys(a), r = Object.values(a), c = [
+    .../* @__PURE__ */ new Set([...o3, ...r.filter((n) => typeof n == "string")])
   ];
-  return { enumKeys: o6, enumRecord: a, enumValues: r, numericalValues: t, stringValues: c };
+  return { enumKeys: o3, enumRecord: a, enumValues: r, numericalValues: t, stringValues: c };
 }
-function b6({
-  discriminator: e8,
+function o5({
+  discriminator: e5,
   enumKeys: t,
   enumValues: a,
-  useValuesAsDiscriminators: o6
+  useValuesAsDiscriminators: o3
 }) {
-  return o6 ? gc(a, (r) => r === e8) : e8 >= 0 && e8 < t.length ? e8 : -1;
+  return o3 ? Xc(a, (r) => r === e5) : e5 >= 0 && e5 < t.length ? e5 : -1;
 }
-function gc(e8, t) {
-  let a = e8.length;
+function Xc(e5, t) {
+  let a = e5.length;
   for (; a--; )
-    if (t(e8[a], a, e8)) return a;
+    if (t(e5[a], a, e5)) return a;
   return -1;
 }
-function mc(e8) {
-  if (e8.length === 0) return "";
-  let t = [e8[0], e8[0]];
+function $c(e5) {
+  if (e5.length === 0) return "";
+  let t = [e5[0], e5[0]];
   const a = [];
-  for (let o6 = 1; o6 < e8.length; o6++) {
-    const r = e8[o6];
+  for (let o3 = 1; o3 < e5.length; o3++) {
+    const r = e5[o3];
     t[1] + 1 === r ? t[1] = r : (a.push(t[0] === t[1] ? `${t[0]}` : `${t[0]}-${t[1]}`), t = [r, r]);
   }
   return a.push(t[0] === t[1] ? `${t[0]}` : `${t[0]}-${t[1]}`), a.join(", ");
 }
-function v6(e8, t = {}) {
-  const a = t.size ?? p6(), o6 = t.useValuesAsDiscriminators ?? false, { enumKeys: r, enumValues: c, numericalValues: n } = fc(e8);
-  if (o6 && c.some((g6) => typeof g6 == "string"))
-    throw new Or(bt, {
-      stringValues: c.filter((g6) => typeof g6 == "string")
+function c5(e5, t = {}) {
+  const a = t.size ?? t5(), o3 = t.useValuesAsDiscriminators ?? false, { enumKeys: r, enumValues: c, numericalValues: n } = Yc(e5);
+  if (o3 && c.some((g2) => typeof g2 == "string"))
+    throw new Br(Wt, {
+      stringValues: c.filter((g2) => typeof g2 == "string")
     });
-  return f6(a, (g6) => {
-    const U8 = Number(g6), Z = b6({
-      discriminator: U8,
+  return ZF(a, (g2) => {
+    const L = Number(g2), J = o5({
+      discriminator: L,
       enumKeys: r,
       enumValues: c,
-      useValuesAsDiscriminators: o6
+      useValuesAsDiscriminators: o3
     });
-    if (Z < 0) {
-      const Ve2 = o6 ? n : [...Array(r.length).keys()];
-      throw new Or(oc, {
-        discriminator: U8,
-        formattedValidDiscriminators: mc(Ve2),
-        validDiscriminators: Ve2
+    if (J < 0) {
+      const le = o3 ? n : [...Array(r.length).keys()];
+      throw new Br(Fc, {
+        discriminator: L,
+        formattedValidDiscriminators: $c(le),
+        validDiscriminators: le
       });
     }
-    return c[Z];
+    return c[J];
   });
 }
-var fa = /* @__PURE__ */ ((e8) => (e8[e8.Unaligned = 0] = "Unaligned", e8[e8.Mud = 1] = "Mud", e8[e8.Oni = 2] = "Oni", e8[e8.Ustur = 3] = "Ustur", e8))(fa || {});
-function ir() {
-  return v6(fa);
+var Da = /* @__PURE__ */ ((e5) => (e5[e5.Unaligned = 0] = "Unaligned", e5[e5.Mud = 1] = "Mud", e5[e5.Oni = 2] = "Oni", e5[e5.Ustur = 3] = "Ustur", e5))(Da || {});
+function ur() {
+  return c5(Da);
 }
-var S6 = 1367932951;
-process.env.NODE_ENV !== "production" && S6 + "";
-var R6 = 1;
-var I6 = 2;
-var h6 = 3;
-var D6 = 4;
-var T6 = 5;
-var w6 = 6;
-var V6 = 7;
-var W6 = 8;
-var E6 = 9;
-var _6 = 10;
-var M6 = 11;
-var x6 = 12;
-var O6 = -32700;
-var N6 = -32603;
-var k6 = -32602;
-var L6 = -32601;
-var F6 = -32600;
-var U6 = -32019;
-var B6 = -32018;
-var z6 = -32017;
-var H6 = -32016;
-var G6 = -32015;
-var j6 = -32014;
-var Y6 = -32013;
-var X6 = -32012;
-var $6 = -32011;
-var K6 = -32010;
-var J6 = -32009;
-var q6 = -32008;
-var Z6 = -32007;
-var Q6 = -32006;
-var e7 = -32005;
-var r7 = -32004;
-var a7 = -32003;
-var t7 = -32002;
-var n7 = -32001;
-var yc = 28e5;
-var Ac = 2800001;
-var o7 = 2800002;
-var i7 = 2800003;
-var c7 = 2800004;
-var l7 = 2800005;
-var pc = 2800006;
-var Pc = 2800007;
-var Ct = 2800008;
-var bc = 2800009;
-var s7 = 2800010;
-var u7 = 2800011;
-var Cc = 323e4;
-var vc = 32300001;
-var Sc = 3230002;
-var d7 = 3230003;
-var f7 = 3230004;
-var Rc = 361e4;
-var Ic = 3610001;
-var g7 = 3610002;
-var m7 = 3610003;
-var y7 = 3610004;
-var A7 = 3610005;
-var p7 = 3610006;
-var P7 = 3610007;
-var b7 = 3611e3;
-var C7 = 3704e3;
-var v7 = 3704001;
-var S7 = 3704002;
-var R7 = 3704003;
-var I7 = 3704004;
-var h7 = 3704005;
-var D7 = 3704006;
-var T7 = 3712e3;
-var hc = 4128e3;
-var w7 = 4128001;
-var V7 = 4128002;
-var Za = 4615e3;
-var W7 = 4615001;
-var E7 = 4615002;
-var _7 = 4615003;
-var M7 = 4615004;
-var x7 = 4615005;
-var O7 = 4615006;
-var N7 = 4615007;
-var k7 = 4615008;
-var L7 = 4615009;
-var F7 = 4615010;
-var U7 = 4615011;
-var B7 = 4615012;
-var z7 = 4615013;
-var H7 = 4615014;
-var G7 = 4615015;
-var j7 = 4615016;
-var Y7 = 4615017;
-var X7 = 4615018;
-var $7 = 4615019;
-var K7 = 4615020;
-var J7 = 4615021;
-var q7 = 4615022;
-var Z7 = 4615023;
-var Q7 = 4615024;
-var eL = 4615025;
-var Dc = 4615026;
-var rL = 4615027;
-var aL = 4615028;
-var tL = 4615029;
-var nL = 4615030;
-var oL = 4615031;
-var iL = 4615032;
-var cL = 4615033;
-var lL = 4615034;
-var sL = 4615035;
-var uL = 4615036;
-var dL = 4615037;
-var fL = 4615038;
-var gL = 4615039;
-var mL = 4615040;
-var yL = 4615041;
-var AL = 4615042;
-var pL = 4615043;
-var PL = 4615044;
-var bL = 4615045;
-var CL = 4615046;
-var vL = 4615047;
-var SL = 4615048;
-var RL = 4615049;
-var IL = 4615050;
-var hL = 4615051;
-var DL = 4615052;
-var TL = 4615053;
-var wL = 4615054;
-var VL = 5508e3;
-var WL = 5508001;
-var EL = 5508002;
-var _L = 5508003;
-var ML = 5508004;
-var xL = 5508005;
-var OL = 5508006;
-var NL = 5508007;
-var kL = 5508008;
-var LL = 5508009;
-var FL = 5508010;
-var UL = 5508011;
-var BL = 5508012;
-var zL = 5607e3;
-var HL = 5607001;
-var GL = 5607002;
-var jL = 5607003;
-var YL = 5607004;
-var XL = 5607005;
-var $L = 5607006;
-var KL = 5607007;
-var JL = 5607008;
-var qL = 5607009;
-var ZL = 5607010;
-var QL = 5607011;
-var eF = 5607012;
-var rF = 5607013;
-var aF = 5607014;
-var tF = 5607015;
-var nF = 5607016;
-var oF = 5607017;
-var iF = 5663e3;
-var cF = 5663001;
-var lF = 5663002;
-var sF = 5663003;
-var uF = 5663004;
-var dF = 5663005;
-var fF = 5663006;
-var gF = 5663007;
-var mF = 5663008;
-var yF = 5663009;
-var AF = 5663010;
-var pF = 5663011;
-var PF = 5663012;
-var bF = 5663013;
-var CF = 5663014;
-var vF = 5663015;
-var SF = 5663016;
-var RF = 5663017;
-var IF = 5663018;
-var hF = 5663019;
-var DF = 5663020;
-var TF = 5663021;
-var wF = 5663022;
-var VF = 5663023;
-var WF = 5663024;
-var EF = 5663025;
-var _F = 5663026;
-var MF = 5663027;
-var xF = 5663028;
-var OF = 5663029;
-var NF = 5663030;
-var kF = 5663031;
-var LF = 5663032;
-var FF = 5663033;
-var UF = 5663034;
-var BF = 5663035;
-var zF = 705e4;
-var HF = 7050001;
-var GF = 7050002;
-var jF = 7050003;
-var YF = 7050004;
-var XF = 7050005;
-var $F = 7050006;
-var KF = 7050007;
-var JF = 7050008;
-var qF = 7050009;
-var ZF = 7050010;
-var QF = 7050011;
-var e5 = 7050012;
-var r5 = 7050013;
-var a5 = 7050014;
-var t5 = 7050015;
-var n5 = 7050016;
-var o5 = 7050017;
-var i5 = 7050018;
-var c5 = 7050019;
-var l5 = 7050020;
-var s5 = 7050021;
-var u5 = 7050022;
-var d5 = 7050023;
-var f5 = 7050024;
-var g5 = 7050025;
-var m5 = 7050026;
-var y5 = 7050027;
-var A5 = 7050028;
-var p5 = 7050029;
-var P5 = 7050030;
-var b5 = 7050031;
-var C5 = 7050032;
-var v5 = 7050033;
-var S5 = 7050034;
-var R5 = 7050035;
-var I5 = 7050036;
-var h5 = 7618e3;
-var D5 = 7618001;
-var T5 = 7618002;
-var w5 = 7618003;
-var V5 = 7618004;
-var W5 = 7618005;
-var E5 = 7618006;
-var _5 = 7618007;
-var M5 = 7618008;
-var x5 = 7618009;
-var Tc = 8078e3;
-var wc = 8078001;
-var Vc = 8078002;
-var O5 = 8078003;
-var Wc = 8078004;
-var Ec = 8078005;
-var _c = 8078006;
-var Mc = 8078007;
-var xc = 8078008;
-var Oc = 8078009;
-var Nc = 8078010;
-var kc = 8078011;
-var ia = 8078012;
-var N5 = 8078013;
-var k5 = 8078014;
-var L5 = 8078015;
-var F5 = 8078016;
-var Lc = 8078017;
-var Fc = 8078018;
-var U5 = 8078019;
-var B5 = 8078020;
-var z5 = 8078021;
-var vt = 8078022;
-var H5 = 8078023;
-var G5 = 8078024;
-var j5 = 8078025;
-var Y5 = 809e4;
-var X5 = 8090001;
-var $5 = 8090002;
-var K5 = 8090003;
-var J5 = 8090004;
-var q5 = 8090005;
-var Z5 = 8090006;
-var Q5 = 8090007;
-var eU = 8090008;
-var rU = 8090009;
-var aU = 8090010;
-var tU = 8090011;
-var nU = 8090012;
-var oU = 81e5;
-var iU = 8100001;
-var cU = 8100002;
-var lU = 8100003;
-var sU = 819e4;
-var uU = 8190001;
-var dU = 8190002;
-var fU = 8190003;
-var gU = 8190004;
+var l5 = 1367932951;
+process.env.NODE_ENV !== "production" && l5 + "";
+var s5 = 1;
+var u5 = 2;
+var d5 = 3;
+var f5 = 4;
+var g5 = 5;
+var m5 = 6;
+var y5 = 7;
+var A5 = 8;
+var p5 = 9;
+var P5 = 10;
+var b5 = 11;
+var C5 = 12;
+var v5 = -32700;
+var S5 = -32603;
+var R5 = -32602;
+var I5 = -32601;
+var h5 = -32600;
+var D5 = -32019;
+var T5 = -32018;
+var w5 = -32017;
+var V5 = -32016;
+var W5 = -32015;
+var E5 = -32014;
+var M5 = -32013;
+var _5 = -32012;
+var x5 = -32011;
+var O5 = -32010;
+var N5 = -32009;
+var k5 = -32008;
+var L5 = -32007;
+var F5 = -32006;
+var U5 = -32005;
+var B5 = -32004;
+var z5 = -32003;
+var H5 = -32002;
+var G5 = -32001;
+var Kc = 28e5;
+var Jc = 2800001;
+var j5 = 2800002;
+var Y5 = 2800003;
+var X5 = 2800004;
+var $5 = 2800005;
+var qc = 2800006;
+var Zc = 2800007;
+var Et = 2800008;
+var Qc = 2800009;
+var K5 = 2800010;
+var J5 = 2800011;
+var el = 323e4;
+var rl = 32300001;
+var al = 3230002;
+var q5 = 3230003;
+var Z5 = 3230004;
+var tl = 361e4;
+var nl = 3610001;
+var Q5 = 3610002;
+var eU = 3610003;
+var rU = 3610004;
+var aU = 3610005;
+var tU = 3610006;
+var nU = 3610007;
+var oU = 3611e3;
+var iU = 3704e3;
+var cU = 3704001;
+var lU = 3704002;
+var sU = 3704003;
+var uU = 3704004;
+var dU = 3704005;
+var fU = 3704006;
+var gU = 3712e3;
+var ol = 4128e3;
+var mU = 4128001;
+var yU = 4128002;
+var lt = 4615e3;
+var AU = 4615001;
+var pU = 4615002;
+var PU = 4615003;
+var bU = 4615004;
+var CU = 4615005;
+var vU = 4615006;
+var SU = 4615007;
+var RU = 4615008;
+var IU = 4615009;
+var hU = 4615010;
+var DU = 4615011;
+var TU = 4615012;
+var wU = 4615013;
+var VU = 4615014;
+var WU = 4615015;
+var EU = 4615016;
+var MU = 4615017;
+var _U = 4615018;
+var xU = 4615019;
+var OU = 4615020;
+var NU = 4615021;
+var kU = 4615022;
+var LU = 4615023;
+var FU = 4615024;
+var UU = 4615025;
+var il = 4615026;
+var BU = 4615027;
+var zU = 4615028;
+var HU = 4615029;
+var GU = 4615030;
+var jU = 4615031;
+var YU = 4615032;
+var XU = 4615033;
+var $U = 4615034;
+var KU = 4615035;
+var JU = 4615036;
+var qU = 4615037;
+var ZU = 4615038;
+var QU = 4615039;
+var eB = 4615040;
+var rB = 4615041;
+var aB = 4615042;
+var tB = 4615043;
+var nB = 4615044;
+var oB = 4615045;
+var iB = 4615046;
+var cB = 4615047;
+var lB = 4615048;
+var sB = 4615049;
+var uB = 4615050;
+var dB = 4615051;
+var fB = 4615052;
+var gB = 4615053;
+var mB = 4615054;
+var yB = 5508e3;
+var AB = 5508001;
+var pB = 5508002;
+var PB = 5508003;
+var bB = 5508004;
+var CB = 5508005;
+var vB = 5508006;
+var SB = 5508007;
+var RB = 5508008;
+var IB = 5508009;
+var hB = 5508010;
+var DB = 5508011;
+var TB = 5508012;
+var wB = 5607e3;
+var VB = 5607001;
+var WB = 5607002;
+var EB = 5607003;
+var MB = 5607004;
+var _B = 5607005;
+var xB = 5607006;
+var OB = 5607007;
+var NB = 5607008;
+var kB = 5607009;
+var LB = 5607010;
+var FB = 5607011;
+var UB = 5607012;
+var BB = 5607013;
+var zB = 5607014;
+var HB = 5607015;
+var GB = 5607016;
+var jB = 5607017;
+var YB = 5663e3;
+var XB = 5663001;
+var $B = 5663002;
+var KB = 5663003;
+var JB = 5663004;
+var qB = 5663005;
+var ZB = 5663006;
+var QB = 5663007;
+var ez = 5663008;
+var rz = 5663009;
+var az = 5663010;
+var tz = 5663011;
+var nz = 5663012;
+var oz = 5663013;
+var iz = 5663014;
+var cz = 5663015;
+var lz = 5663016;
+var sz = 5663017;
+var uz = 5663018;
+var dz = 5663019;
+var fz = 5663020;
+var gz = 5663021;
+var mz = 5663022;
+var yz = 5663023;
+var Az = 5663024;
+var pz = 5663025;
+var Pz = 5663026;
+var bz = 5663027;
+var Cz = 5663028;
+var vz = 5663029;
+var Sz = 5663030;
+var Rz = 5663031;
+var Iz = 5663032;
+var hz = 5663033;
+var Dz = 5663034;
+var Tz = 5663035;
+var wz = 705e4;
+var Vz = 7050001;
+var Wz = 7050002;
+var Ez = 7050003;
+var Mz = 7050004;
+var _z = 7050005;
+var xz = 7050006;
+var Oz = 7050007;
+var Nz = 7050008;
+var kz = 7050009;
+var Lz = 7050010;
+var Fz = 7050011;
+var Uz = 7050012;
+var Bz = 7050013;
+var zz = 7050014;
+var Hz = 7050015;
+var Gz = 7050016;
+var jz = 7050017;
+var Yz = 7050018;
+var Xz = 7050019;
+var $z = 7050020;
+var Kz = 7050021;
+var Jz = 7050022;
+var qz = 7050023;
+var Zz = 7050024;
+var Qz = 7050025;
+var eH = 7050026;
+var rH = 7050027;
+var aH = 7050028;
+var tH = 7050029;
+var nH = 7050030;
+var oH = 7050031;
+var iH = 7050032;
+var cH = 7050033;
+var lH = 7050034;
+var sH = 7050035;
+var uH = 7050036;
+var dH = 7618e3;
+var fH = 7618001;
+var gH = 7618002;
+var mH = 7618003;
+var yH = 7618004;
+var AH = 7618005;
+var pH = 7618006;
+var PH = 7618007;
+var bH = 7618008;
+var CH = 7618009;
+var cl = 8078e3;
+var ll = 8078001;
+var sl = 8078002;
+var vH = 8078003;
+var ul = 8078004;
+var dl = 8078005;
+var fl = 8078006;
+var gl = 8078007;
+var ml = 8078008;
+var yl = 8078009;
+var Al = 8078010;
+var pl = 8078011;
+var Aa = 8078012;
+var SH = 8078013;
+var RH = 8078014;
+var IH = 8078015;
+var hH = 8078016;
+var Pl = 8078017;
+var bl = 8078018;
+var DH = 8078019;
+var TH = 8078020;
+var wH = 8078021;
+var Mt = 8078022;
+var VH = 8078023;
+var WH = 8078024;
+var EH = 8078025;
+var MH = 809e4;
+var _H = 8090001;
+var xH = 8090002;
+var OH = 8090003;
+var NH = 8090004;
+var kH = 8090005;
+var LH = 8090006;
+var FH = 8090007;
+var UH = 8090008;
+var BH = 8090009;
+var zH = 8090010;
+var HH = 8090011;
+var GH = 8090012;
+var jH = 81e5;
+var YH = 8100001;
+var XH = 8100002;
+var $H = 8100003;
+var KH = 819e4;
+var JH = 8190001;
+var qH = 8190002;
+var ZH = 8190003;
+var QH = 8190004;
 var V = 85e5;
-var Uc = 8500001;
-var Bc = 8500002;
-var mU = 8500003;
-var zc = 8500004;
-var yU = 8500005;
-var Hc = 8500006;
-var AU = 89e5;
-var pU = 8900001;
-var PU = 8900002;
-var bU = 99e5;
-var CU = 9900001;
-var vU = 9900002;
-var SU = 9900003;
-var RU = 9900004;
-var IU = 9900005;
-var hU = 9900006;
-function Gc(e8) {
-  return Array.isArray(e8) ? "%5B" + e8.map(Gc).join(
+var Cl = 8500001;
+var vl = 8500002;
+var eG = 8500003;
+var Sl = 8500004;
+var rG = 8500005;
+var Rl = 8500006;
+var aG = 89e5;
+var tG = 8900001;
+var nG = 8900002;
+var oG = 99e5;
+var iG = 9900001;
+var cG = 9900002;
+var lG = 9900003;
+var sG = 9900004;
+var uG = 9900005;
+var dG = 9900006;
+function Il(e5) {
+  return Array.isArray(e5) ? "%5B" + e5.map(Il).join(
     "%2C%20"
     /* ", " */
   ) + /* "]" */
-  "%5D" : typeof e8 == "bigint" ? `${e8}n` : encodeURIComponent(
+  "%5D" : typeof e5 == "bigint" ? `${e5}n` : encodeURIComponent(
     String(
-      e8 != null && Object.getPrototypeOf(e8) === null ? (
+      e5 != null && Object.getPrototypeOf(e5) === null ? (
         // Plain objects with no prototype don't have a `toString` method.
         // Convert them before stringifying them.
-        { ...e8 }
-      ) : e8
+        { ...e5 }
+      ) : e5
     )
   );
 }
-function DU([e8, t]) {
-  return `${e8}=${Gc(t)}`;
+function fG([e5, t]) {
+  return `${e5}=${Il(t)}`;
 }
-function TU(e8) {
-  const t = Object.entries(e8).map(DU).join("&");
+function gG(e5) {
+  const t = Object.entries(e5).map(fG).join("&");
   return btoa(t);
 }
-var wU = {
-  [Cc]: "Account not found at address: $address",
-  [f7]: "Not all accounts were decoded. Encoded accounts found at addresses: $addresses.",
-  [d7]: "Expected decoded account at address: $address",
-  [Sc]: "Failed to decode account data at address: $address",
-  [vc]: "Accounts not found at addresses: $addresses",
-  [bc]: "Unable to find a viable program address bump seed.",
-  [o7]: "$putativeAddress is not a base58-encoded address.",
-  [yc]: "Expected base58 encoded address to decode to a byte array of length 32. Actual length: $actualLength.",
-  [i7]: "The `CryptoKey` must be an `Ed25519` public key.",
-  [u7]: "$putativeOffCurveAddress is not a base58-encoded off-curve address.",
-  [Ct]: "Invalid seeds; point must fall off the Ed25519 curve.",
-  [c7]: "Expected given program derived address to have the following format: [Address, ProgramDerivedAddressBump].",
-  [pc]: "A maximum of $maxSeeds seeds, including the bump seed, may be supplied when creating an address. Received: $actual.",
-  [Pc]: "The seed at index $index with length $actual exceeds the maximum length of $maxSeedLength bytes.",
-  [l7]: "Expected program derived address bump to be in the range [0, 255], got: $bump.",
-  [s7]: "Program address cannot end with PDA marker.",
-  [Ac]: "Expected base58-encoded address string of length in the range [32, 44]. Actual length: $actualLength.",
-  [D6]: "Expected base58-encoded blockhash string of length in the range [32, 44]. Actual length: $actualLength.",
-  [R6]: "The network has progressed past the last block for which this transaction could have been committed.",
-  [Tc]: "Codec [$codecDescription] cannot decode empty byte arrays.",
-  [vt]: "Enum codec cannot use lexical values [$stringValues] as discriminators. Either remove all lexical values or set `useValuesAsDiscriminators` to `false`.",
-  [B5]: "Sentinel [$hexSentinel] must not be present in encoded bytes [$hexEncodedBytes].",
-  [Ec]: "Encoder and decoder must have the same fixed size, got [$encoderFixedSize] and [$decoderFixedSize].",
-  [_c]: "Encoder and decoder must have the same max size, got [$encoderMaxSize] and [$decoderMaxSize].",
-  [Wc]: "Encoder and decoder must either both be fixed-size or variable-size.",
-  [xc]: "Enum discriminator out of range. Expected a number in [$formattedValidDiscriminators], got $discriminator.",
-  [Vc]: "Expected a fixed-size codec, got a variable-size one.",
-  [N5]: "Codec [$codecDescription] expected a positive byte length, got $bytesLength.",
-  [O5]: "Expected a variable-size codec, got a fixed-size one.",
-  [U5]: "Codec [$codecDescription] expected zero-value [$hexZeroValue] to have the same size as the provided fixed-size item [$expectedSize bytes].",
-  [wc]: "Codec [$codecDescription] expected $expected bytes, got $bytesLength.",
-  [Fc]: "Expected byte array constant [$hexConstant] to be present in data [$hexData] at offset [$offset].",
-  [Oc]: "Invalid discriminated union variant. Expected one of [$variants], got $value.",
-  [Nc]: "Invalid enum variant. Expected one of [$stringValues] or a number in [$formattedNumericalValues], got $variant.",
-  [L5]: "Invalid literal union variant. Expected one of [$variants], got $value.",
-  [Mc]: "Expected [$codecDescription] to have $expected items, got $actual.",
-  [ia]: "Invalid value $value for base $base with alphabet $alphabet.",
-  [F5]: "Literal union discriminator out of range. Expected a number between $minRange and $maxRange, got $discriminator.",
-  [kc]: "Codec [$codecDescription] expected number to be in the range [$min, $max], got $value.",
-  [k5]: "Codec [$codecDescription] expected offset to be in the range [0, $bytesLength], got $offset.",
-  [z5]: "Expected sentinel [$hexSentinel] to be present in decoded bytes [$hexDecodedBytes].",
-  [Lc]: "Union variant out of range. Expected an index between $minRange and $maxRange, got $variant.",
-  [H5]: "This decoder expected a byte array of exactly $expectedLength bytes, but $numExcessBytes unexpected excess bytes remained after decoding. Are you sure that you have chosen the correct decoder for this data?",
-  [G5]: "Invalid pattern match value. The provided value does not match any of the specified patterns.",
-  [j5]: "Invalid pattern match bytes. The provided byte array does not match any of the specified patterns.",
-  [b7]: "No random values implementation could be found.",
-  [M6]: "Failed to send transaction$causeMessage",
-  [x6]: "Failed to send transactions$causeMessages",
-  [Q5]: "Fixed-point operation `$operation` of kind `$kind` overflowed. Expected a raw bigint in [$min, $max], got $result.",
-  [rU]: "Fixed-point division by zero for value of kind `$kind` ($signedness, $totalBits bits).",
-  [K5]: "`fractionalBits` ($fractionalBits) must not exceed `totalBits` ($totalBits).",
-  [$5]: "Invalid `decimals`. Expected a non-negative integer, got $decimals.",
-  [X5]: "Invalid `fractionalBits`. Expected a non-negative integer, got $fractionalBits.",
-  [q5]: "Invalid string `$input` for fixed-point value of kind `$kind`.",
-  [Y5]: "Invalid `totalBits`. Expected a positive integer, got $totalBits.",
-  [Z5]: "Invalid ratio $numerator/$denominator for fixed-point value of kind `$kind`. Denominator must be non-zero.",
-  [tU]: "Fixed-point value of kind `$kind` has a malformed `raw` field. Expected a bigint, got `$raw`.",
-  [eU]: "Fixed-point `$operation` operation expected $expectedKind ($expectedSignedness, $expectedTotalBits bits, $expectedScale $expectedScaleLabel); got $actualKind ($actualSignedness, $actualTotalBits bits, $actualScale $actualScaleLabel).",
-  [aU]: "Fixed-point operation `$operation` of kind `$kind` cannot be performed exactly; pass a rounding mode other than `strict` to allow a rounded result.",
-  [nU]: "Fixed-point codec of kind `$kind` requires `totalBits` to be a multiple of 8; got $totalBits.",
-  [J5]: "Fixed-point value of kind `$kind` is out of range for $signedness $totalBits-bit storage. Expected a raw bigint in [$min, $max], got $raw.",
-  [T7]: "Filesystem operation `$operation` is not supported in this environment.",
-  [L7]: "Instruction requires an uninitialized account",
-  [Z7]: "Instruction tries to borrow reference for an account which is already borrowed",
-  [Q7]: "Instruction left account with an outstanding borrowed reference",
-  [J7]: "Program other than the account's owner changed the size of the account data",
-  [x7]: "Account data too small for instruction",
-  [q7]: "Instruction expected an executable account",
-  [CL]: "An account does not have enough lamports to be rent-exempt",
-  [SL]: "Program arithmetic overflowed",
-  [bL]: "Failed to serialize or deserialize account data",
-  [wL]: "Builtin programs must consume compute units",
-  [iL]: "Cross-program invocation call depth too deep",
-  [fL]: "Computational budget exceeded",
-  [Dc]: "Custom program error: #$code",
-  [Y7]: "Instruction contains duplicate accounts",
-  [eL]: "Instruction modifications of multiply-passed account differ",
-  [nL]: "Executable accounts must be rent exempt",
-  [aL]: "Instruction changed executable accounts data",
-  [tL]: "Instruction changed the balance of an executable account",
-  [X7]: "Instruction changed executable bit of an account",
-  [H7]: "Instruction modified data of an account it does not own",
-  [z7]: "Instruction spent from the balance of an account it does not own",
-  [W7]: "Generic instruction error",
-  [IL]: "Provided owner is not allowed",
-  [pL]: "Account is immutable",
-  [PL]: "Incorrect authority provided",
-  [N7]: "Incorrect program id for instruction",
-  [O7]: "Insufficient funds for instruction",
-  [M7]: "Invalid account data for instruction",
-  [vL]: "Invalid account owner",
-  [E7]: "Invalid program argument",
-  [rL]: "Program returned invalid error code",
-  [_7]: "Invalid instruction data",
-  [dL]: "Failed to reallocate account data",
-  [uL]: "Provided seeds do not result in a valid address",
-  [hL]: "Accounts data allocations exceeded the maximum allowed per transaction",
-  [DL]: "Max accounts exceeded",
-  [TL]: "Max instruction trace length exceeded",
-  [sL]: "Length of the seed is too long for address generation",
-  [cL]: "An account required by the instruction is missing",
-  [k7]: "Missing required signature for instruction",
-  [B7]: "Instruction illegally modified the program id of an account",
-  [K7]: "Insufficient account keys for instruction",
-  [gL]: "Cross-program invocation with unauthorized signer or writable account",
-  [mL]: "Failed to create program execution environment",
-  [AL]: "Program failed to compile",
-  [yL]: "Program failed to complete",
-  [j7]: "Instruction modified data of a read-only account",
-  [G7]: "Instruction changed the balance of a read-only account",
-  [lL]: "Cross-program invocation reentrancy not allowed for this instruction",
-  [$7]: "Instruction modified rent epoch of an account",
-  [U7]: "Sum of account balances before and after instruction do not match",
-  [F7]: "Instruction requires an initialized account",
-  [Za]: "The instruction failed with the error: $errorName",
-  [oL]: "Unsupported program id",
-  [RL]: "Unsupported sysvar",
-  [IU]: "Invalid instruction plan kind: $kind.",
-  [T5]: "The provided instruction plan is empty.",
-  [W5]: "No failed transaction plan result was found in the provided transaction plan result.",
-  [V5]: "This transaction plan executor does not support non-divisible sequential plans. To support them, you may create your own executor such that multi-transaction atomicity is preserved \u2014 e.g. by targetting RPCs that support transaction bundles.",
-  [w5]: "The provided transaction plan failed to execute. See the `transactionPlanResult` attribute for more details. Note that the `cause` property is deprecated, and a future version will not set it.",
-  [h5]: "The provided message has insufficient capacity to accommodate the next instruction(s) in this plan. Expected at least $numBytesRequired free byte(s), got $numFreeBytes byte(s).",
-  [hU]: "Invalid transaction plan kind: $kind.",
-  [D5]: "No more instructions to pack; the message packer has completed the instruction plan.",
-  [E5]: "Unexpected instruction plan. Expected $expectedKind plan, got $actualKind plan.",
-  [_5]: "Unexpected transaction plan. Expected $expectedKind plan, got $actualKind plan.",
-  [M5]: "Unexpected transaction plan result. Expected $expectedKind plan, got $actualKind plan.",
-  [x5]: "Expected a successful transaction plan result. I.e. there is at least one failed or cancelled transaction in the plan.",
-  [hc]: "The instruction does not have any accounts.",
-  [w7]: "The instruction does not have any data.",
-  [V7]: "Expected instruction to have progress address $expectedProgramAddress, got $actualProgramAddress.",
-  [T6]: "Expected base58 encoded blockhash to decode to a byte array of length 32. Actual length: $actualLength.",
-  [I6]: "The nonce `$expectedNonceValue` is no longer valid. It has advanced to `$actualNonceValue`",
-  [vU]: "Invariant violation: Found no abortable iterable cache entry for key `$cacheKey`. It should be impossible to hit this error; please file an issue at https://sola.na/web3invariant",
-  [RU]: "Invariant violation: This data publisher does not publish to the channel named `$channelName`. Supported channels include $supportedChannelNames.",
-  [CU]: "Invariant violation: WebSocket message iterator state is corrupt; iterated without first resolving existing message promise. It should be impossible to hit this error; please file an issue at https://sola.na/web3invariant",
-  [bU]: "Invariant violation: WebSocket message iterator is missing state storage. It should be impossible to hit this error; please file an issue at https://sola.na/web3invariant",
-  [SU]: "Invariant violation: Switch statement non-exhaustive. Received unexpected value `$unexpectedValue`. It should be impossible to hit this error; please file an issue at https://sola.na/web3invariant",
-  [N6]: "JSON-RPC error: Internal JSON-RPC error ($__serverMessage)",
-  [k6]: "JSON-RPC error: Invalid method parameter(s) ($__serverMessage)",
-  [F6]: "JSON-RPC error: The JSON sent is not a valid `Request` object ($__serverMessage)",
-  [L6]: "JSON-RPC error: The method does not exist / is not available ($__serverMessage)",
-  [O6]: "JSON-RPC error: An error occurred on the server while parsing the JSON text ($__serverMessage)",
-  [X6]: "$__serverMessage",
-  [n7]: "$__serverMessage",
-  [r7]: "$__serverMessage",
-  [j6]: "$__serverMessage",
-  [z6]: "Epoch rewards period still active at slot $slot",
-  [K6]: "$__serverMessage",
-  [J6]: "$__serverMessage",
-  [U6]: "Failed to query long-term storage; please try again",
-  [H6]: "Minimum context slot has not been reached",
-  [e7]: "Node is unhealthy; behind by $numSlotsBehind slots",
-  [q6]: "No snapshot",
-  [t7]: "Transaction simulation failed",
-  [B6]: "Rewards cannot be found because slot $slot is not the epoch boundary. This may be due to gap in the queried node's local ledger or long-term storage",
-  [Z6]: "$__serverMessage",
-  [$6]: "Transaction history is not available from this node",
-  [Q6]: "$__serverMessage",
-  [Y6]: "Transaction signature length mismatch",
-  [a7]: "Transaction signature verification failure",
-  [G6]: "$__serverMessage",
-  [h7]: "The grind regex `/$source/` contains the character `$character`, which is not in the base58 alphabet and can never match a Solana address.",
-  [C7]: "Key pair bytes must be of length 64, got $byteLength.",
-  [v7]: "Expected private key bytes with length 32. Actual length: $actualLength.",
-  [S7]: "Expected base58-encoded signature to decode to a byte array of length 64. Actual length: $actualLength.",
-  [I7]: "The provided private key does not match the provided public key.",
-  [R7]: "Expected base58-encoded signature string of length in the range [64, 88]. Actual length: $actualLength.",
-  [D7]: "Writing a key pair to disk is not supported in this environment.",
-  [w6]: "Lamports value must be in the range [0, 2e64-1]",
-  [V6]: "`$value` cannot be parsed as a `BigInt`",
-  [_6]: "$message",
-  [W6]: "`$value` cannot be parsed as a `Number`",
-  [h6]: "No nonce account could be found at address `$nonceAccountAddress`",
-  [jL]: "Expected base58 encoded application domain to decode to a byte array of length 32. Actual length: $actualLength.",
-  [rF]: "Attempted to sign an offchain message with an address that is not a signer for it",
-  [GL]: "Expected base58-encoded application domain string of length in the range [32, 44]. Actual length: $actualLength.",
-  [eF]: "The signer addresses in this offchain message envelope do not match the list of required signers in the message preamble. These unexpected signers were present in the envelope: `[$unexpectedSigners]`. These required signers were missing from the envelope `[$missingSigners]`.",
-  [zL]: "The message body provided has a byte-length of $actualBytes. The maximum allowable byte-length is $maxBytes",
-  [KL]: "Expected message format $expectedMessageFormat, got $actualMessageFormat",
-  [JL]: "The message length specified in the message preamble is $specifiedLength bytes. The actual length of the message is $actualLength bytes.",
-  [qL]: "Offchain message content must be non-empty",
-  [XL]: "Offchain message must specify the address of at least one required signer",
-  [ZL]: "Offchain message envelope must reserve space for at least one signature",
-  [YL]: "The offchain message preamble specifies $numRequiredSignatures required signature(s), got $signaturesLength.",
-  [tF]: "The signatories of this offchain message must be listed in lexicographical order",
-  [nF]: "An address must be listed no more than once among the signatories of an offchain message",
-  [QL]: "Offchain message is missing signatures for addresses: $addresses.",
-  [oF]: "Offchain message signature verification failed. Signature mismatch for required signatories [$signatoriesWithInvalidSignatures]. Missing signatures for signatories [$signatoriesWithMissingSignatures]",
-  [HL]: "The message body provided contains characters whose codes fall outside the allowed range. In order to ensure clear-signing compatiblity with hardware wallets, the message may only contain line feeds and characters in the range [\\x20-\\x7e].",
-  [aF]: "Expected offchain message version $expectedVersion. Got $actualVersion.",
-  [$L]: "This version of Kit does not support decoding offchain messages with version $unsupportedVersion. The current max supported version is 0.",
-  [Hc]: "The provided account could not be identified as an account from the $programName program.",
-  [Bc]: "The provided instruction could not be identified as an instruction from the $programName program.",
+var mG = {
+  [el]: "Account not found at address: $address",
+  [Z5]: "Not all accounts were decoded. Encoded accounts found at addresses: $addresses.",
+  [q5]: "Expected decoded account at address: $address",
+  [al]: "Failed to decode account data at address: $address",
+  [rl]: "Accounts not found at addresses: $addresses",
+  [Qc]: "Unable to find a viable program address bump seed.",
+  [j5]: "$putativeAddress is not a base58-encoded address.",
+  [Kc]: "Expected base58 encoded address to decode to a byte array of length 32. Actual length: $actualLength.",
+  [Y5]: "The `CryptoKey` must be an `Ed25519` public key.",
+  [J5]: "$putativeOffCurveAddress is not a base58-encoded off-curve address.",
+  [Et]: "Invalid seeds; point must fall off the Ed25519 curve.",
+  [X5]: "Expected given program derived address to have the following format: [Address, ProgramDerivedAddressBump].",
+  [qc]: "A maximum of $maxSeeds seeds, including the bump seed, may be supplied when creating an address. Received: $actual.",
+  [Zc]: "The seed at index $index with length $actual exceeds the maximum length of $maxSeedLength bytes.",
+  [$5]: "Expected program derived address bump to be in the range [0, 255], got: $bump.",
+  [K5]: "Program address cannot end with PDA marker.",
+  [Jc]: "Expected base58-encoded address string of length in the range [32, 44]. Actual length: $actualLength.",
+  [f5]: "Expected base58-encoded blockhash string of length in the range [32, 44]. Actual length: $actualLength.",
+  [s5]: "The network has progressed past the last block for which this transaction could have been committed.",
+  [cl]: "Codec [$codecDescription] cannot decode empty byte arrays.",
+  [Mt]: "Enum codec cannot use lexical values [$stringValues] as discriminators. Either remove all lexical values or set `useValuesAsDiscriminators` to `false`.",
+  [TH]: "Sentinel [$hexSentinel] must not be present in encoded bytes [$hexEncodedBytes].",
+  [dl]: "Encoder and decoder must have the same fixed size, got [$encoderFixedSize] and [$decoderFixedSize].",
+  [fl]: "Encoder and decoder must have the same max size, got [$encoderMaxSize] and [$decoderMaxSize].",
+  [ul]: "Encoder and decoder must either both be fixed-size or variable-size.",
+  [ml]: "Enum discriminator out of range. Expected a number in [$formattedValidDiscriminators], got $discriminator.",
+  [sl]: "Expected a fixed-size codec, got a variable-size one.",
+  [SH]: "Codec [$codecDescription] expected a positive byte length, got $bytesLength.",
+  [vH]: "Expected a variable-size codec, got a fixed-size one.",
+  [DH]: "Codec [$codecDescription] expected zero-value [$hexZeroValue] to have the same size as the provided fixed-size item [$expectedSize bytes].",
+  [ll]: "Codec [$codecDescription] expected $expected bytes, got $bytesLength.",
+  [bl]: "Expected byte array constant [$hexConstant] to be present in data [$hexData] at offset [$offset].",
+  [yl]: "Invalid discriminated union variant. Expected one of [$variants], got $value.",
+  [Al]: "Invalid enum variant. Expected one of [$stringValues] or a number in [$formattedNumericalValues], got $variant.",
+  [IH]: "Invalid literal union variant. Expected one of [$variants], got $value.",
+  [gl]: "Expected [$codecDescription] to have $expected items, got $actual.",
+  [Aa]: "Invalid value $value for base $base with alphabet $alphabet.",
+  [hH]: "Literal union discriminator out of range. Expected a number between $minRange and $maxRange, got $discriminator.",
+  [pl]: "Codec [$codecDescription] expected number to be in the range [$min, $max], got $value.",
+  [RH]: "Codec [$codecDescription] expected offset to be in the range [0, $bytesLength], got $offset.",
+  [wH]: "Expected sentinel [$hexSentinel] to be present in decoded bytes [$hexDecodedBytes].",
+  [Pl]: "Union variant out of range. Expected an index between $minRange and $maxRange, got $variant.",
+  [VH]: "This decoder expected a byte array of exactly $expectedLength bytes, but $numExcessBytes unexpected excess bytes remained after decoding. Are you sure that you have chosen the correct decoder for this data?",
+  [WH]: "Invalid pattern match value. The provided value does not match any of the specified patterns.",
+  [EH]: "Invalid pattern match bytes. The provided byte array does not match any of the specified patterns.",
+  [oU]: "No random values implementation could be found.",
+  [b5]: "Failed to send transaction$causeMessage",
+  [C5]: "Failed to send transactions$causeMessages",
+  [FH]: "Fixed-point operation `$operation` of kind `$kind` overflowed. Expected a raw bigint in [$min, $max], got $result.",
+  [BH]: "Fixed-point division by zero for value of kind `$kind` ($signedness, $totalBits bits).",
+  [OH]: "`fractionalBits` ($fractionalBits) must not exceed `totalBits` ($totalBits).",
+  [xH]: "Invalid `decimals`. Expected a non-negative integer, got $decimals.",
+  [_H]: "Invalid `fractionalBits`. Expected a non-negative integer, got $fractionalBits.",
+  [kH]: "Invalid string `$input` for fixed-point value of kind `$kind`.",
+  [MH]: "Invalid `totalBits`. Expected a positive integer, got $totalBits.",
+  [LH]: "Invalid ratio $numerator/$denominator for fixed-point value of kind `$kind`. Denominator must be non-zero.",
+  [HH]: "Fixed-point value of kind `$kind` has a malformed `raw` field. Expected a bigint, got `$raw`.",
+  [UH]: "Fixed-point `$operation` operation expected $expectedKind ($expectedSignedness, $expectedTotalBits bits, $expectedScale $expectedScaleLabel); got $actualKind ($actualSignedness, $actualTotalBits bits, $actualScale $actualScaleLabel).",
+  [zH]: "Fixed-point operation `$operation` of kind `$kind` cannot be performed exactly; pass a rounding mode other than `strict` to allow a rounded result.",
+  [GH]: "Fixed-point codec of kind `$kind` requires `totalBits` to be a multiple of 8; got $totalBits.",
+  [NH]: "Fixed-point value of kind `$kind` is out of range for $signedness $totalBits-bit storage. Expected a raw bigint in [$min, $max], got $raw.",
+  [gU]: "Filesystem operation `$operation` is not supported in this environment.",
+  [IU]: "Instruction requires an uninitialized account",
+  [LU]: "Instruction tries to borrow reference for an account which is already borrowed",
+  [FU]: "Instruction left account with an outstanding borrowed reference",
+  [NU]: "Program other than the account's owner changed the size of the account data",
+  [CU]: "Account data too small for instruction",
+  [kU]: "Instruction expected an executable account",
+  [iB]: "An account does not have enough lamports to be rent-exempt",
+  [lB]: "Program arithmetic overflowed",
+  [oB]: "Failed to serialize or deserialize account data",
+  [mB]: "Builtin programs must consume compute units",
+  [YU]: "Cross-program invocation call depth too deep",
+  [ZU]: "Computational budget exceeded",
+  [il]: "Custom program error: #$code",
+  [MU]: "Instruction contains duplicate accounts",
+  [UU]: "Instruction modifications of multiply-passed account differ",
+  [GU]: "Executable accounts must be rent exempt",
+  [zU]: "Instruction changed executable accounts data",
+  [HU]: "Instruction changed the balance of an executable account",
+  [_U]: "Instruction changed executable bit of an account",
+  [VU]: "Instruction modified data of an account it does not own",
+  [wU]: "Instruction spent from the balance of an account it does not own",
+  [AU]: "Generic instruction error",
+  [uB]: "Provided owner is not allowed",
+  [tB]: "Account is immutable",
+  [nB]: "Incorrect authority provided",
+  [SU]: "Incorrect program id for instruction",
+  [vU]: "Insufficient funds for instruction",
+  [bU]: "Invalid account data for instruction",
+  [cB]: "Invalid account owner",
+  [pU]: "Invalid program argument",
+  [BU]: "Program returned invalid error code",
+  [PU]: "Invalid instruction data",
+  [qU]: "Failed to reallocate account data",
+  [JU]: "Provided seeds do not result in a valid address",
+  [dB]: "Accounts data allocations exceeded the maximum allowed per transaction",
+  [fB]: "Max accounts exceeded",
+  [gB]: "Max instruction trace length exceeded",
+  [KU]: "Length of the seed is too long for address generation",
+  [XU]: "An account required by the instruction is missing",
+  [RU]: "Missing required signature for instruction",
+  [TU]: "Instruction illegally modified the program id of an account",
+  [OU]: "Insufficient account keys for instruction",
+  [QU]: "Cross-program invocation with unauthorized signer or writable account",
+  [eB]: "Failed to create program execution environment",
+  [aB]: "Program failed to compile",
+  [rB]: "Program failed to complete",
+  [EU]: "Instruction modified data of a read-only account",
+  [WU]: "Instruction changed the balance of a read-only account",
+  [$U]: "Cross-program invocation reentrancy not allowed for this instruction",
+  [xU]: "Instruction modified rent epoch of an account",
+  [DU]: "Sum of account balances before and after instruction do not match",
+  [hU]: "Instruction requires an initialized account",
+  [lt]: "The instruction failed with the error: $errorName",
+  [jU]: "Unsupported program id",
+  [sB]: "Unsupported sysvar",
+  [uG]: "Invalid instruction plan kind: $kind.",
+  [gH]: "The provided instruction plan is empty.",
+  [AH]: "No failed transaction plan result was found in the provided transaction plan result.",
+  [yH]: "This transaction plan executor does not support non-divisible sequential plans. To support them, you may create your own executor such that multi-transaction atomicity is preserved \u2014 e.g. by targetting RPCs that support transaction bundles.",
+  [mH]: "The provided transaction plan failed to execute. See the `transactionPlanResult` attribute for more details. Note that the `cause` property is deprecated, and a future version will not set it.",
+  [dH]: "The provided message has insufficient capacity to accommodate the next instruction(s) in this plan. Expected at least $numBytesRequired free byte(s), got $numFreeBytes byte(s).",
+  [dG]: "Invalid transaction plan kind: $kind.",
+  [fH]: "No more instructions to pack; the message packer has completed the instruction plan.",
+  [pH]: "Unexpected instruction plan. Expected $expectedKind plan, got $actualKind plan.",
+  [PH]: "Unexpected transaction plan. Expected $expectedKind plan, got $actualKind plan.",
+  [bH]: "Unexpected transaction plan result. Expected $expectedKind plan, got $actualKind plan.",
+  [CH]: "Expected a successful transaction plan result. I.e. there is at least one failed or cancelled transaction in the plan.",
+  [ol]: "The instruction does not have any accounts.",
+  [mU]: "The instruction does not have any data.",
+  [yU]: "Expected instruction to have progress address $expectedProgramAddress, got $actualProgramAddress.",
+  [g5]: "Expected base58 encoded blockhash to decode to a byte array of length 32. Actual length: $actualLength.",
+  [u5]: "The nonce `$expectedNonceValue` is no longer valid. It has advanced to `$actualNonceValue`",
+  [cG]: "Invariant violation: Found no abortable iterable cache entry for key `$cacheKey`. It should be impossible to hit this error; please file an issue at https://sola.na/web3invariant",
+  [sG]: "Invariant violation: This data publisher does not publish to the channel named `$channelName`. Supported channels include $supportedChannelNames.",
+  [iG]: "Invariant violation: WebSocket message iterator state is corrupt; iterated without first resolving existing message promise. It should be impossible to hit this error; please file an issue at https://sola.na/web3invariant",
+  [oG]: "Invariant violation: WebSocket message iterator is missing state storage. It should be impossible to hit this error; please file an issue at https://sola.na/web3invariant",
+  [lG]: "Invariant violation: Switch statement non-exhaustive. Received unexpected value `$unexpectedValue`. It should be impossible to hit this error; please file an issue at https://sola.na/web3invariant",
+  [S5]: "JSON-RPC error: Internal JSON-RPC error ($__serverMessage)",
+  [R5]: "JSON-RPC error: Invalid method parameter(s) ($__serverMessage)",
+  [h5]: "JSON-RPC error: The JSON sent is not a valid `Request` object ($__serverMessage)",
+  [I5]: "JSON-RPC error: The method does not exist / is not available ($__serverMessage)",
+  [v5]: "JSON-RPC error: An error occurred on the server while parsing the JSON text ($__serverMessage)",
+  [_5]: "$__serverMessage",
+  [G5]: "$__serverMessage",
+  [B5]: "$__serverMessage",
+  [E5]: "$__serverMessage",
+  [w5]: "Epoch rewards period still active at slot $slot",
+  [O5]: "$__serverMessage",
+  [N5]: "$__serverMessage",
+  [D5]: "Failed to query long-term storage; please try again",
+  [V5]: "Minimum context slot has not been reached",
+  [U5]: "Node is unhealthy; behind by $numSlotsBehind slots",
+  [k5]: "No snapshot",
+  [H5]: "Transaction simulation failed",
+  [T5]: "Rewards cannot be found because slot $slot is not the epoch boundary. This may be due to gap in the queried node's local ledger or long-term storage",
+  [L5]: "$__serverMessage",
+  [x5]: "Transaction history is not available from this node",
+  [F5]: "$__serverMessage",
+  [M5]: "Transaction signature length mismatch",
+  [z5]: "Transaction signature verification failure",
+  [W5]: "$__serverMessage",
+  [dU]: "The grind regex `/$source/` contains the character `$character`, which is not in the base58 alphabet and can never match a Solana address.",
+  [iU]: "Key pair bytes must be of length 64, got $byteLength.",
+  [cU]: "Expected private key bytes with length 32. Actual length: $actualLength.",
+  [lU]: "Expected base58-encoded signature to decode to a byte array of length 64. Actual length: $actualLength.",
+  [uU]: "The provided private key does not match the provided public key.",
+  [sU]: "Expected base58-encoded signature string of length in the range [64, 88]. Actual length: $actualLength.",
+  [fU]: "Writing a key pair to disk is not supported in this environment.",
+  [m5]: "Lamports value must be in the range [0, 2e64-1]",
+  [y5]: "`$value` cannot be parsed as a `BigInt`",
+  [P5]: "$message",
+  [A5]: "`$value` cannot be parsed as a `Number`",
+  [d5]: "No nonce account could be found at address `$nonceAccountAddress`",
+  [EB]: "Expected base58 encoded application domain to decode to a byte array of length 32. Actual length: $actualLength.",
+  [BB]: "Attempted to sign an offchain message with an address that is not a signer for it",
+  [WB]: "Expected base58-encoded application domain string of length in the range [32, 44]. Actual length: $actualLength.",
+  [UB]: "The signer addresses in this offchain message envelope do not match the list of required signers in the message preamble. These unexpected signers were present in the envelope: `[$unexpectedSigners]`. These required signers were missing from the envelope `[$missingSigners]`.",
+  [wB]: "The message body provided has a byte-length of $actualBytes. The maximum allowable byte-length is $maxBytes",
+  [OB]: "Expected message format $expectedMessageFormat, got $actualMessageFormat",
+  [NB]: "The message length specified in the message preamble is $specifiedLength bytes. The actual length of the message is $actualLength bytes.",
+  [kB]: "Offchain message content must be non-empty",
+  [_B]: "Offchain message must specify the address of at least one required signer",
+  [LB]: "Offchain message envelope must reserve space for at least one signature",
+  [MB]: "The offchain message preamble specifies $numRequiredSignatures required signature(s), got $signaturesLength.",
+  [HB]: "The signatories of this offchain message must be listed in lexicographical order",
+  [GB]: "An address must be listed no more than once among the signatories of an offchain message",
+  [FB]: "Offchain message is missing signatures for addresses: $addresses.",
+  [jB]: "Offchain message signature verification failed. Signature mismatch for required signatories [$signatoriesWithInvalidSignatures]. Missing signatures for signatories [$signatoriesWithMissingSignatures]",
+  [VB]: "The message body provided contains characters whose codes fall outside the allowed range. In order to ensure clear-signing compatiblity with hardware wallets, the message may only contain line feeds and characters in the range [\\x20-\\x7e].",
+  [zB]: "Expected offchain message version $expectedVersion. Got $actualVersion.",
+  [xB]: "This version of Kit does not support decoding offchain messages with version $unsupportedVersion. The current max supported version is 0.",
+  [Rl]: "The provided account could not be identified as an account from the $programName program.",
+  [vl]: "The provided instruction could not be identified as an instruction from the $programName program.",
   [V]: "The provided instruction is missing some accounts. Expected at least $expectedAccountMetas account(s), got $actualAccountMetas.",
-  [zc]: "Expected resolved instruction input '$inputName' to be non-null.",
-  [mU]: "Expected resolved instruction input '$inputName' to be of type `$expectedType`.",
-  [yU]: "Unrecognized account type '$accountType' for the $programName program.",
-  [Uc]: "Unrecognized instruction type '$instructionType' for the $programName program.",
-  [sU]: "The notification name must end in 'Notifications' and the API must supply a subscription plan creator function for the notification '$notificationName'.",
-  [dU]: "WebSocket was closed before payload could be added to the send buffer",
-  [fU]: "WebSocket connection closed",
-  [gU]: "WebSocket failed to connect",
-  [uU]: "Failed to obtain a subscription id from the server",
-  [lU]: "Could not find an API plan for RPC method: `$method`",
-  [oU]: "The $argumentLabel argument to the `$methodName` RPC method$optionalPathLabel was `$value`. This number is unsafe for use with the Solana JSON-RPC because it exceeds `Number.MAX_SAFE_INTEGER`.",
-  [cU]: "HTTP error ($statusCode): $message",
-  [iU]: "HTTP header(s) forbidden: $headers. Learn more at https://developer.mozilla.org/en-US/docs/Glossary/Forbidden_header_name.",
-  [VL]: "Multiple distinct signers were identified for address `$address`. Please ensure that you are using the same signer instance for each address.",
-  [WL]: "The provided value does not implement the `KeyPairSigner` interface",
-  [_L]: "The provided value does not implement the `MessageModifyingSigner` interface",
-  [ML]: "The provided value does not implement the `MessagePartialSigner` interface",
-  [EL]: "The provided value does not implement any of the `MessageSigner` interfaces",
-  [OL]: "The provided value does not implement the `TransactionModifyingSigner` interface",
-  [NL]: "The provided value does not implement the `TransactionPartialSigner` interface",
-  [kL]: "The provided value does not implement the `TransactionSendingSigner` interface",
-  [xL]: "The provided value does not implement any of the `TransactionSigner` interfaces",
-  [LL]: "More than one `TransactionSendingSigner` was identified.",
-  [FL]: "No `TransactionSendingSigner` was identified. Please provide a valid `TransactionWithSingleSendingSigner` transaction.",
-  [BL]: "The wallet account $address cannot be used to create a transaction signer because it does not implement either the `solana:signTransaction` or `solana:signAndSendTransaction` feature. At least one of these features is required. The account supports the following features: $supportedFeatures.",
-  [UL]: "Wallet account signers do not support signing multiple messages/transactions in a single operation",
-  [P7]: "Cannot export a non-extractable key.",
-  [Ic]: "No digest implementation could be found.",
-  [Rc]: "Cryptographic operations are only allowed in secure browser contexts. Read more here: https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts.",
-  [g7]: `This runtime does not support the generation of Ed25519 key pairs.
+  [Sl]: "Expected resolved instruction input '$inputName' to be non-null.",
+  [eG]: "Expected resolved instruction input '$inputName' to be of type `$expectedType`.",
+  [rG]: "Unrecognized account type '$accountType' for the $programName program.",
+  [Cl]: "Unrecognized instruction type '$instructionType' for the $programName program.",
+  [KH]: "The notification name must end in 'Notifications' and the API must supply a subscription plan creator function for the notification '$notificationName'.",
+  [qH]: "WebSocket was closed before payload could be added to the send buffer",
+  [ZH]: "WebSocket connection closed",
+  [QH]: "WebSocket failed to connect",
+  [JH]: "Failed to obtain a subscription id from the server",
+  [$H]: "Could not find an API plan for RPC method: `$method`",
+  [jH]: "The $argumentLabel argument to the `$methodName` RPC method$optionalPathLabel was `$value`. This number is unsafe for use with the Solana JSON-RPC because it exceeds `Number.MAX_SAFE_INTEGER`.",
+  [XH]: "HTTP error ($statusCode): $message",
+  [YH]: "HTTP header(s) forbidden: $headers. Learn more at https://developer.mozilla.org/en-US/docs/Glossary/Forbidden_header_name.",
+  [yB]: "Multiple distinct signers were identified for address `$address`. Please ensure that you are using the same signer instance for each address.",
+  [AB]: "The provided value does not implement the `KeyPairSigner` interface",
+  [PB]: "The provided value does not implement the `MessageModifyingSigner` interface",
+  [bB]: "The provided value does not implement the `MessagePartialSigner` interface",
+  [pB]: "The provided value does not implement any of the `MessageSigner` interfaces",
+  [vB]: "The provided value does not implement the `TransactionModifyingSigner` interface",
+  [SB]: "The provided value does not implement the `TransactionPartialSigner` interface",
+  [RB]: "The provided value does not implement the `TransactionSendingSigner` interface",
+  [CB]: "The provided value does not implement any of the `TransactionSigner` interfaces",
+  [IB]: "More than one `TransactionSendingSigner` was identified.",
+  [hB]: "No `TransactionSendingSigner` was identified. Please provide a valid `TransactionWithSingleSendingSigner` transaction.",
+  [TB]: "The wallet account $address cannot be used to create a transaction signer because it does not implement either the `solana:signTransaction` or `solana:signAndSendTransaction` feature. At least one of these features is required. The account supports the following features: $supportedFeatures.",
+  [DB]: "Wallet account signers do not support signing multiple messages/transactions in a single operation",
+  [nU]: "Cannot export a non-extractable key.",
+  [nl]: "No digest implementation could be found.",
+  [tl]: "Cryptographic operations are only allowed in secure browser contexts. Read more here: https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts.",
+  [Q5]: `This runtime does not support the generation of Ed25519 key pairs.
 
 Install @solana/webcrypto-ed25519-polyfill and call its \`install\` function before generating keys in environments that do not support Ed25519.
 
 For a list of runtimes that currently support Ed25519 operations, visit https://github.com/WICG/webcrypto-secure-curves/issues/20.`,
-  [m7]: "No key export implementation could be found.",
-  [y7]: "No key generation implementation could be found.",
-  [A7]: "No signing implementation could be found.",
-  [p7]: "No signature verification implementation could be found.",
-  [E6]: "Timestamp value must be in the range [-(2n ** 63n), (2n ** 63n) - 1]. `$value` given",
-  [n5]: "Transaction processing left an account with an outstanding borrowed reference",
-  [HF]: "Account in use",
-  [GF]: "Account loaded twice",
-  [jF]: "Attempt to debit an account but found no record of a prior credit.",
-  [d5]: "Transaction loads an address table account that doesn't exist",
-  [KF]: "This transaction has already been processed",
-  [JF]: "Blockhash not found",
-  [qF]: "Loader call chain is too deep",
-  [t5]: "Transactions are currently disabled due to cluster maintenance",
-  [P5]: "Transaction contains a duplicate instruction ($index) that is not allowed",
-  [XF]: "Insufficient funds for fee",
-  [b5]: "Transaction results in an account ($accountIndex) with insufficient funds for rent",
-  [$F]: "This account may not be used to pay transaction fees",
-  [QF]: "Transaction contains an invalid account reference",
-  [g5]: "Transaction loads an address table account with invalid data",
-  [m5]: "Transaction address table lookup uses an invalid index",
-  [f5]: "Transaction loads an address table account with an invalid owner",
-  [v5]: "LoadedAccountsDataSizeLimit set for transaction must be greater than 0.",
-  [r5]: "This program may not be used for executing instructions",
-  [y5]: "Transaction leaves an account with a lower balance than rent-exempt minimum",
-  [c5]: "Transaction loads a writable account that cannot be written",
-  [C5]: "Transaction exceeded max loaded accounts data size cap",
-  [ZF]: "Transaction requires a fee but has no signature present",
-  [YF]: "Attempt to load a program that does not exist",
-  [R5]: "Execution of the program referenced by account at index $accountIndex is temporarily restricted.",
-  [S5]: "ResanitizationNeeded",
-  [a5]: "Transaction failed to sanitize accounts offsets correctly",
-  [e5]: "Transaction did not pass signature verification",
-  [u5]: "Transaction locked too many accounts",
-  [I5]: "Sum of account balances before and after transaction do not match",
-  [zF]: "The transaction failed with the error `$errorName`",
-  [i5]: "Transaction version is unsupported",
-  [s5]: "Transaction would exceed account data limit within the block",
-  [p5]: "Transaction would exceed total account data limit",
-  [l5]: "Transaction would exceed max account limit within the block",
-  [o5]: "Transaction would exceed max Block Cost Limit",
-  [A5]: "Transaction would exceed max Vote Cost Limit",
-  [vF]: "Attempted to sign a transaction with an address that is not a signer for it",
-  [AF]: "Transaction is missing an address at index: $index.",
-  [SF]: "Transaction has no expected signers therefore it cannot be encoded",
-  [DF]: "Transaction size $transactionSize exceeds limit of $transactionSizeLimit bytes",
-  [lF]: "Transaction does not have a blockhash lifetime",
-  [sF]: "Transaction is not a durable nonce transaction",
-  [dF]: "Contents of these address lookup tables unknown: $lookupTableAddresses",
-  [fF]: "Lookup of address at index $highestRequestedIndex failed for lookup table `$lookupTableAddress`. Highest known index is $highestKnownIndex. The lookup table may have been extended since its contents were retrieved",
-  [mF]: "No fee payer set in CompiledTransaction",
-  [gF]: "Could not find program address at index $index",
-  [IF]: "Failed to estimate the compute unit consumption for this transaction message. This is likely because simulating the transaction failed. Inspect the `cause` property of this error to learn more",
-  [hF]: "Transaction failed when it was simulated in order to estimate the compute unit consumption. The compute unit estimate provided is for a transaction that failed when simulated and may not be representative of the compute units this transaction would consume if successful. Inspect the `cause` property of this error to learn more",
-  [pF]: "Transaction is missing a fee payer.",
-  [PF]: "Could not determine this transaction's signature. Make sure that the transaction has been signed by its fee payer.",
-  [CF]: "Transaction first instruction is not advance nonce account instruction.",
-  [bF]: "Transaction with no instructions cannot be durable nonce transaction.",
-  [iF]: "This transaction includes an address (`$programAddress`) which is both invoked and set as the fee payer. Program addresses may not pay fees",
-  [cF]: "This transaction includes an address (`$programAddress`) which is both invoked and marked writable. Program addresses may not be writable",
-  [RF]: "The transaction message expected the transaction to have $numRequiredSignatures signatures, got $signaturesLength.",
-  [yF]: "Transaction is missing signatures for addresses: $addresses.",
-  [uF]: "Transaction version must be in the range [0, 127]. `$actualVersion` given",
-  [TF]: "This version of Kit does not support decoding transactions with version $unsupportedVersion. The current max supported version is 1.",
-  [wF]: "The transaction has a durable nonce lifetime (with nonce `$nonce`), but the nonce account address is in a lookup table. The lifetime constraint cannot be constructed without fetching the lookup tables for the transaction.",
-  [xF]: "Invalid transaction config mask: $mask. Bits 0 and 1 must match (both set or both unset)",
-  [VF]: "Transaction message bytes are malformed: $messageBytes",
-  [WF]: "Transaction message bytes are empty, so the transaction cannot be encoded",
-  [EF]: "Transaction bytes are empty, so no transaction can be decoded",
-  [_F]: "Transaction version 0 must be encoded with signatures first. This transaction was encoded with first byte $firstByte, which is expected to be a signature count for v0 transactions.",
-  [MF]: "The provided transaction bytes expect that there should be $numExpectedSignatures signatures, but the bytes are not long enough to contain a transaction message with this many signatures. The provided bytes are $transactionBytesLength bytes long.",
-  [OF]: "The transaction has a durable nonce lifetime, but the nonce account index is invalid. Expected a nonce account index less than $numberOfStaticAccounts, got $nonceAccountIndex.",
-  [NF]: "The transaction config value for $configName has the incorrect kind. Expected $expectedKind, got $actualKind.",
-  [kF]: "The transaction does not have the same number of instruction headers and instruction payloads. Got $numInstructionHeaders instruction headers, and $numInstructionPayloads instruction payloads.",
-  [LF]: "Transaction has $actualCount unique signer addresses but the maximum allowed is $maxAllowed",
-  [FF]: "Transaction has $actualCount unique account addresses but the maximum allowed is $maxAllowed",
-  [UF]: "Transaction has $actualCount instructions but the maximum allowed is $maxAllowed",
-  [BF]: "The instruction at index $instructionIndex has $actualCount account references but the maximum allowed is $maxAllowed",
-  [AU]: "Cannot $operation: no wallet connected",
-  [pU]: "No signing wallet connected (status: $status)",
-  [PU]: "Connected wallet does not support signing"
+  [eU]: "No key export implementation could be found.",
+  [rU]: "No key generation implementation could be found.",
+  [aU]: "No signing implementation could be found.",
+  [tU]: "No signature verification implementation could be found.",
+  [p5]: "Timestamp value must be in the range [-(2n ** 63n), (2n ** 63n) - 1]. `$value` given",
+  [Gz]: "Transaction processing left an account with an outstanding borrowed reference",
+  [Vz]: "Account in use",
+  [Wz]: "Account loaded twice",
+  [Ez]: "Attempt to debit an account but found no record of a prior credit.",
+  [qz]: "Transaction loads an address table account that doesn't exist",
+  [Oz]: "This transaction has already been processed",
+  [Nz]: "Blockhash not found",
+  [kz]: "Loader call chain is too deep",
+  [Hz]: "Transactions are currently disabled due to cluster maintenance",
+  [nH]: "Transaction contains a duplicate instruction ($index) that is not allowed",
+  [_z]: "Insufficient funds for fee",
+  [oH]: "Transaction results in an account ($accountIndex) with insufficient funds for rent",
+  [xz]: "This account may not be used to pay transaction fees",
+  [Fz]: "Transaction contains an invalid account reference",
+  [Qz]: "Transaction loads an address table account with invalid data",
+  [eH]: "Transaction address table lookup uses an invalid index",
+  [Zz]: "Transaction loads an address table account with an invalid owner",
+  [cH]: "LoadedAccountsDataSizeLimit set for transaction must be greater than 0.",
+  [Bz]: "This program may not be used for executing instructions",
+  [rH]: "Transaction leaves an account with a lower balance than rent-exempt minimum",
+  [Xz]: "Transaction loads a writable account that cannot be written",
+  [iH]: "Transaction exceeded max loaded accounts data size cap",
+  [Lz]: "Transaction requires a fee but has no signature present",
+  [Mz]: "Attempt to load a program that does not exist",
+  [sH]: "Execution of the program referenced by account at index $accountIndex is temporarily restricted.",
+  [lH]: "ResanitizationNeeded",
+  [zz]: "Transaction failed to sanitize accounts offsets correctly",
+  [Uz]: "Transaction did not pass signature verification",
+  [Jz]: "Transaction locked too many accounts",
+  [uH]: "Sum of account balances before and after transaction do not match",
+  [wz]: "The transaction failed with the error `$errorName`",
+  [Yz]: "Transaction version is unsupported",
+  [Kz]: "Transaction would exceed account data limit within the block",
+  [tH]: "Transaction would exceed total account data limit",
+  [$z]: "Transaction would exceed max account limit within the block",
+  [jz]: "Transaction would exceed max Block Cost Limit",
+  [aH]: "Transaction would exceed max Vote Cost Limit",
+  [cz]: "Attempted to sign a transaction with an address that is not a signer for it",
+  [az]: "Transaction is missing an address at index: $index.",
+  [lz]: "Transaction has no expected signers therefore it cannot be encoded",
+  [fz]: "Transaction size $transactionSize exceeds limit of $transactionSizeLimit bytes",
+  [$B]: "Transaction does not have a blockhash lifetime",
+  [KB]: "Transaction is not a durable nonce transaction",
+  [qB]: "Contents of these address lookup tables unknown: $lookupTableAddresses",
+  [ZB]: "Lookup of address at index $highestRequestedIndex failed for lookup table `$lookupTableAddress`. Highest known index is $highestKnownIndex. The lookup table may have been extended since its contents were retrieved",
+  [ez]: "No fee payer set in CompiledTransaction",
+  [QB]: "Could not find program address at index $index",
+  [uz]: "Failed to estimate the compute unit consumption for this transaction message. This is likely because simulating the transaction failed. Inspect the `cause` property of this error to learn more",
+  [dz]: "Transaction failed when it was simulated in order to estimate the compute unit consumption. The compute unit estimate provided is for a transaction that failed when simulated and may not be representative of the compute units this transaction would consume if successful. Inspect the `cause` property of this error to learn more",
+  [tz]: "Transaction is missing a fee payer.",
+  [nz]: "Could not determine this transaction's signature. Make sure that the transaction has been signed by its fee payer.",
+  [iz]: "Transaction first instruction is not advance nonce account instruction.",
+  [oz]: "Transaction with no instructions cannot be durable nonce transaction.",
+  [YB]: "This transaction includes an address (`$programAddress`) which is both invoked and set as the fee payer. Program addresses may not pay fees",
+  [XB]: "This transaction includes an address (`$programAddress`) which is both invoked and marked writable. Program addresses may not be writable",
+  [sz]: "The transaction message expected the transaction to have $numRequiredSignatures signatures, got $signaturesLength.",
+  [rz]: "Transaction is missing signatures for addresses: $addresses.",
+  [JB]: "Transaction version must be in the range [0, 127]. `$actualVersion` given",
+  [gz]: "This version of Kit does not support decoding transactions with version $unsupportedVersion. The current max supported version is 1.",
+  [mz]: "The transaction has a durable nonce lifetime (with nonce `$nonce`), but the nonce account address is in a lookup table. The lifetime constraint cannot be constructed without fetching the lookup tables for the transaction.",
+  [Cz]: "Invalid transaction config mask: $mask. Bits 0 and 1 must match (both set or both unset)",
+  [yz]: "Transaction message bytes are malformed: $messageBytes",
+  [Az]: "Transaction message bytes are empty, so the transaction cannot be encoded",
+  [pz]: "Transaction bytes are empty, so no transaction can be decoded",
+  [Pz]: "Transaction version 0 must be encoded with signatures first. This transaction was encoded with first byte $firstByte, which is expected to be a signature count for v0 transactions.",
+  [bz]: "The provided transaction bytes expect that there should be $numExpectedSignatures signatures, but the bytes are not long enough to contain a transaction message with this many signatures. The provided bytes are $transactionBytesLength bytes long.",
+  [vz]: "The transaction has a durable nonce lifetime, but the nonce account index is invalid. Expected a nonce account index less than $numberOfStaticAccounts, got $nonceAccountIndex.",
+  [Sz]: "The transaction config value for $configName has the incorrect kind. Expected $expectedKind, got $actualKind.",
+  [Rz]: "The transaction does not have the same number of instruction headers and instruction payloads. Got $numInstructionHeaders instruction headers, and $numInstructionPayloads instruction payloads.",
+  [Iz]: "Transaction has $actualCount unique signer addresses but the maximum allowed is $maxAllowed",
+  [hz]: "Transaction has $actualCount unique account addresses but the maximum allowed is $maxAllowed",
+  [Dz]: "Transaction has $actualCount instructions but the maximum allowed is $maxAllowed",
+  [Tz]: "The instruction at index $instructionIndex has $actualCount account references but the maximum allowed is $maxAllowed",
+  [aG]: "Cannot $operation: no wallet connected",
+  [tG]: "No signing wallet connected (status: $status)",
+  [nG]: "Connected wallet does not support signing"
 };
-var VU = 1e3;
-var yr = "i";
-var sr = "t";
-function WU(e8, t = {}) {
-  const a = wU[e8];
+var yG = 1e3;
+var br = "i";
+var gr = "t";
+function AG(e5, t = {}) {
+  const a = mG[e5];
   if (a.length === 0)
     return "";
-  let o6;
-  function r(g6) {
-    if (o6[sr] === 2) {
-      const U8 = a.slice(o6[yr] + 1, g6);
+  let o3;
+  function r(g2) {
+    if (o3[gr] === 2) {
+      const L = a.slice(o3[br] + 1, g2);
       c.push(
-        U8 in t ? (
+        L in t ? (
           // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-          `${t[U8]}`
-        ) : `$${U8}`
+          `${t[L]}`
+        ) : `$${L}`
       );
-    } else o6[sr] === 1 && c.push(a.slice(o6[yr], g6));
+    } else o3[gr] === 1 && c.push(a.slice(o3[br], g2));
   }
   const c = [];
-  a.split("").forEach((g6, U8) => {
-    if (U8 === 0) {
-      o6 = {
-        [yr]: 0,
-        [sr]: a[0] === "\\" ? 0 : a[0] === "$" ? 2 : 1
+  a.split("").forEach((g2, L) => {
+    if (L === 0) {
+      o3 = {
+        [br]: 0,
+        [gr]: a[0] === "\\" ? 0 : a[0] === "$" ? 2 : 1
         /* Text */
       };
       return;
     }
-    let Z;
-    switch (o6[sr]) {
+    let J;
+    switch (o3[gr]) {
       case 0:
-        Z = {
-          [yr]: U8,
-          [sr]: 1
+        J = {
+          [br]: L,
+          [gr]: 1
           /* Text */
         };
         break;
       case 1:
-        g6 === "\\" ? Z = {
-          [yr]: U8,
-          [sr]: 0
+        g2 === "\\" ? J = {
+          [br]: L,
+          [gr]: 0
           /* EscapeSequence */
-        } : g6 === "$" && (Z = {
-          [yr]: U8,
-          [sr]: 2
+        } : g2 === "$" && (J = {
+          [br]: L,
+          [gr]: 2
           /* Variable */
         });
         break;
       case 2:
-        g6 === "\\" ? Z = {
-          [yr]: U8,
-          [sr]: 0
+        g2 === "\\" ? J = {
+          [br]: L,
+          [gr]: 0
           /* EscapeSequence */
-        } : g6 === "$" ? Z = {
-          [yr]: U8,
-          [sr]: 2
+        } : g2 === "$" ? J = {
+          [br]: L,
+          [gr]: 2
           /* Variable */
-        } : g6.match(/\w/) || (Z = {
-          [yr]: U8,
-          [sr]: 1
+        } : g2.match(/\w/) || (J = {
+          [br]: L,
+          [gr]: 1
           /* Text */
         });
         break;
     }
-    Z && (o6 !== Z && r(U8), o6 = Z);
+    J && (o3 !== J && r(L), o3 = J);
   }), r();
   let n = c.join("");
-  return e8 >= Za && e8 < Za + VU && "index" in t && (n += ` (instruction #${t.index + 1})`), n;
+  return e5 >= lt && e5 < lt + yG && "index" in t && (n += ` (instruction #${t.index + 1})`), n;
 }
-function EU(e8, t = {}) {
+function pG(e5, t = {}) {
   if (process.env.NODE_ENV !== "production")
-    return WU(e8, t);
+    return AG(e5, t);
   {
-    let a = `Solana error #${e8}; Decode this error by running \`npx @solana/errors decode -- ${e8}`;
-    return Object.keys(t).length && (a += ` '${TU(t)}'`), `${a}\``;
+    let a = `Solana error #${e5}; Decode this error by running \`npx @solana/errors decode -- ${e5}`;
+    return Object.keys(t).length && (a += ` '${gG(t)}'`), `${a}\``;
   }
 }
 var w = class extends Error {
@@ -39982,557 +39967,595 @@ var w = class extends Error {
    * Contains context that can assist in understanding or recovering from a {@link SolanaError}.
    */
   context;
-  constructor(...[e8, t]) {
-    let a, o6;
+  constructor(...[e5, t]) {
+    let a, o3;
     t && Object.entries(Object.getOwnPropertyDescriptors(t)).forEach(([c, n]) => {
-      c === "cause" ? o6 = { cause: n.value } : (a === void 0 && (a = {
-        __code: e8
+      c === "cause" ? o3 = { cause: n.value } : (a === void 0 && (a = {
+        __code: e5
       }), Object.defineProperty(a, c, n));
     });
-    const r = EU(e8, a);
-    super(r, o6), this.context = Object.freeze(
+    const r = pG(e5, a);
+    super(r, o3), this.context = Object.freeze(
       a === void 0 ? {
-        __code: e8
+        __code: e5
       } : a
     ), this.name = "SolanaError";
   }
 };
-function _U(e8, t) {
-  if (e8.length >= t) return e8;
+function PG(e5, t) {
+  if (e5.length >= t) return e5;
   const a = new Uint8Array(t).fill(0);
-  return a.set(e8), a;
+  return a.set(e5), a;
 }
-var MU = (e8, t) => _U(e8.length <= t ? e8 : e8.slice(0, t), t);
-function R(e8, t, a) {
-  const o6 = (a === 0 || a <= -e8.byteLength) && e8.length === t.length ? e8 : e8.slice(a, a + t.length);
-  return xU(o6, t);
+var bG = (e5, t) => PG(e5.length <= t ? e5 : e5.slice(0, t), t);
+function R(e5, t, a) {
+  const o3 = (a === 0 || a <= -e5.byteLength) && e5.length === t.length ? e5 : e5.slice(a, a + t.length);
+  return CG(o3, t);
 }
-function xU(e8, t) {
-  return e8.length === t.length && e8.every((a, o6) => a === t[o6]);
+function CG(e5, t) {
+  return e5.length === t.length && e5.every((a, o3) => a === t[o3]);
 }
-function Nr(e8, t) {
-  return "fixedSize" in t ? t.fixedSize : t.getSizeFromValue(e8);
+function zr(e5, t) {
+  return "fixedSize" in t ? t.fixedSize : t.getSizeFromValue(e5);
 }
-function Ge(e8) {
+function qe(e5) {
   return Object.freeze({
-    ...e8,
+    ...e5,
     encode: (t) => {
-      const a = new Uint8Array(Nr(t, e8));
-      return e8.write(t, a, 0), a;
+      const a = new Uint8Array(zr(t, e5));
+      return e5.write(t, a, 0), a;
     }
   });
 }
-function je(e8) {
+function Ze(e5) {
   return Object.freeze({
-    ...e8,
-    decode: (t, a = 0) => e8.read(t, a)[0]
+    ...e5,
+    decode: (t, a = 0) => e5.read(t, a)[0]
   });
 }
-function OU(e8) {
+function vG(e5) {
   return Object.freeze({
-    ...e8,
-    decode: (t, a = 0) => e8.read(t, a)[0],
+    ...e5,
+    decode: (t, a = 0) => e5.read(t, a)[0],
     encode: (t) => {
-      const a = new Uint8Array(Nr(t, e8));
-      return e8.write(t, a, 0), a;
+      const a = new Uint8Array(zr(t, e5));
+      return e5.write(t, a, 0), a;
     }
   });
 }
-function Ye(e8) {
-  return "fixedSize" in e8 && typeof e8.fixedSize == "number";
+function rr(e5) {
+  return "fixedSize" in e5 && typeof e5.fixedSize == "number";
 }
-function Yc(e8) {
-  if (!Ye(e8))
-    throw new w(Vc);
+function Dl(e5) {
+  if (!rr(e5))
+    throw new w(sl);
 }
-function NU(e8) {
-  return !Ye(e8);
+function SG(e5) {
+  return !rr(e5);
 }
-function u(e8, t) {
-  if (Ye(e8) !== Ye(t))
-    throw new w(Wc);
-  if (Ye(e8) && Ye(t) && e8.fixedSize !== t.fixedSize)
-    throw new w(Ec, {
+function u(e5, t) {
+  if (rr(e5) !== rr(t))
+    throw new w(ul);
+  if (rr(e5) && rr(t) && e5.fixedSize !== t.fixedSize)
+    throw new w(dl, {
       decoderFixedSize: t.fixedSize,
-      encoderFixedSize: e8.fixedSize
+      encoderFixedSize: e5.fixedSize
     });
-  if (!Ye(e8) && !Ye(t) && e8.maxSize !== t.maxSize)
-    throw new w(_c, {
+  if (!rr(e5) && !rr(t) && e5.maxSize !== t.maxSize)
+    throw new w(fl, {
       decoderMaxSize: t.maxSize,
-      encoderMaxSize: e8.maxSize
+      encoderMaxSize: e5.maxSize
     });
   return {
     ...t,
-    ...e8,
+    ...e5,
     decode: t.decode,
-    encode: e8.encode,
+    encode: e5.encode,
     read: t.read,
-    write: e8.write
+    write: e5.write
   };
 }
-function kU(e8, t, a = 0) {
+function RG(e5, t, a = 0) {
   if (t.length - a <= 0)
-    throw new w(Tc, {
-      codecDescription: e8
+    throw new w(cl, {
+      codecDescription: e5
     });
 }
-function Xc(e8, t, a, o6 = 0) {
-  const r = a.length - o6;
+function Tl(e5, t, a, o3 = 0) {
+  const r = a.length - o3;
   if (r < t)
-    throw new w(wc, {
+    throw new w(ll, {
       bytesLength: r,
-      codecDescription: e8,
+      codecDescription: e5,
       expected: t
     });
 }
-function LU(e8, t, a) {
-  const o6 = e8.byteOffset + (t ?? 0), r = a ?? e8.byteLength;
+function IG(e5, t, a) {
+  const o3 = e5.byteOffset + (t ?? 0), r = a ?? e5.byteLength;
   let c;
-  return typeof SharedArrayBuffer > "u" ? c = e8.buffer : e8.buffer instanceof SharedArrayBuffer ? (c = new ArrayBuffer(e8.length), new Uint8Array(c).set(new Uint8Array(e8))) : c = e8.buffer, (o6 === 0 || o6 === -e8.byteLength) && r === e8.byteLength ? c : c.slice(o6, o6 + r);
+  return typeof SharedArrayBuffer > "u" ? c = e5.buffer : e5.buffer instanceof SharedArrayBuffer ? (c = new ArrayBuffer(e5.length), new Uint8Array(c).set(new Uint8Array(e5))) : c = e5.buffer, (o3 === 0 || o3 === -e5.byteLength) && r === e5.byteLength ? c : c.slice(o3, o3 + r);
 }
-function S(e8, t) {
-  return je({
+function S(e5, t) {
+  return Ze({
     fixedSize: t,
-    read: (a, o6) => {
-      Xc("fixCodecSize", t, a, o6), (o6 > 0 || a.length > t) && (a = a.slice(o6, o6 + t)), Ye(e8) && (a = MU(a, e8.fixedSize));
-      const [r] = e8.read(a, 0);
-      return [r, o6 + t];
+    read: (a, o3) => {
+      Tl("fixCodecSize", t, a, o3), (o3 > 0 || a.length > t) && (a = a.slice(o3, o3 + t)), rr(e5) && (a = bG(a, e5.fixedSize));
+      const [r] = e5.read(a, 0);
+      return [r, o3 + t];
     }
   });
 }
-function v(e8, t) {
-  return Ge({
-    ...NU(e8) ? { ...e8, getSizeFromValue: (a) => e8.getSizeFromValue(t(a)) } : e8,
-    write: (a, o6, r) => e8.write(t(a), o6, r)
+function v(e5, t) {
+  return qe({
+    ...SG(e5) ? { ...e5, getSizeFromValue: (a) => e5.getSizeFromValue(t(a)) } : e5,
+    write: (a, o3, r) => e5.write(t(a), o3, r)
   });
 }
-function br(e8, t) {
-  return je({
-    ...e8,
-    read: (a, o6) => {
-      const [r, c] = e8.read(a, o6);
-      return [t(r, a, o6), c];
+function Je(e5, t) {
+  return Ze({
+    ...e5,
+    read: (a, o3) => {
+      const [r, c] = e5.read(a, o3);
+      return [t(r, a, o3), c];
     }
   });
 }
-function FU(e8, t, a) {
-  return OU({
-    ...v(e8, t),
-    read: a ? br(e8, a).read : e8.read
+function hG(e5, t, a) {
+  return vG({
+    ...v(e5, t),
+    read: a ? Je(e5, a).read : e5.read
   });
 }
-var zU = (e8) => je({
+var wG = (e5) => Ze({
   read(t, a) {
-    const o6 = a === 0 || a <= -t.byteLength ? t : t.slice(a);
-    if (o6.length === 0) return ["", 0];
-    let r = o6.findIndex((U8) => U8 !== 0);
-    r = r === -1 ? o6.length : r;
-    const c = e8[0].repeat(r);
-    if (r === o6.length) return [c, t.length];
-    const n = o6.slice(r).reduce((U8, Z) => U8 * 256n + BigInt(Z), 0n), g6 = HU(n, e8);
-    return [c + g6, t.length];
+    const o3 = a === 0 || a <= -t.byteLength ? t : t.slice(a);
+    if (o3.length === 0) return ["", 0];
+    let r = o3.findIndex((L) => L !== 0);
+    r = r === -1 ? o3.length : r;
+    const c = e5[0].repeat(r);
+    if (r === o3.length) return [c, t.length];
+    const n = o3.slice(r).reduce((L, J) => L * 256n + BigInt(J), 0n), g2 = VG(n, e5);
+    return [c + g2, t.length];
   }
 });
-function HU(e8, t) {
-  const a = BigInt(t.length), o6 = [];
-  for (; e8 > 0n; )
-    o6.unshift(t[Number(e8 % a)]), e8 /= a;
-  return o6.join("");
+function VG(e5, t) {
+  const a = BigInt(t.length), o3 = [];
+  for (; e5 > 0n; )
+    o3.unshift(t[Number(e5 % a)]), e5 /= a;
+  return o3.join("");
 }
-var $c = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
-var jU = () => zU($c);
-var XU = (e8) => (
+var wl = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+var EG = () => wG(wl);
+var _G = (e5) => (
   // eslint-disable-next-line no-control-regex
-  e8.replace(/\u0000/g, "")
+  e5.replace(/\u0000/g, "")
 );
-var $U = globalThis.TextDecoder;
-var qi = globalThis.TextEncoder;
-var JU = () => {
-  let e8;
-  return je({
+var xG = globalThis.TextDecoder;
+var Vc = globalThis.TextEncoder;
+var NG = () => {
+  let e5;
+  return Ze({
     read(t, a) {
-      const o6 = (e8 ||= new $U()).decode(t.slice(a));
-      return [XU(o6), t.length];
+      const o3 = (e5 ||= new xG()).decode(t.slice(a));
+      return [_G(o3), t.length];
     }
   });
 };
-var $a;
-function eB() {
-  return $a || ($a = jU()), $a;
+var tt;
+function UG() {
+  return tt || (tt = EG()), tt;
 }
 function x() {
-  return S(eB(), 32);
+  return S(UG(), 32);
 }
-function gB(e8, t, a, o6) {
-  if (o6 < t || o6 > a)
-    throw new w(kc, {
-      codecDescription: e8,
+function QG(e5, t, a, o3) {
+  if (o3 < t || o3 > a)
+    throw new w(pl, {
+      codecDescription: e5,
       max: a,
       min: t,
-      value: o6
+      value: o3
     });
 }
-function qc(e8) {
-  return e8?.endian !== 1;
+function El(e5) {
+  return e5?.endian !== 1;
 }
-function dr(e8) {
-  return Ge({
-    fixedSize: e8.size,
-    write(t, a, o6) {
-      e8.range && gB(e8.name, e8.range[0], e8.range[1], t);
-      const r = new ArrayBuffer(e8.size);
-      return e8.set(new DataView(r), t, qc(e8.config)), a.set(new Uint8Array(r), o6), o6 + e8.size;
+function yr(e5) {
+  return qe({
+    fixedSize: e5.size,
+    write(t, a, o3) {
+      e5.range && QG(e5.name, e5.range[0], e5.range[1], t);
+      const r = new ArrayBuffer(e5.size);
+      return e5.set(new DataView(r), t, El(e5.config)), a.set(new Uint8Array(r), o3), o3 + e5.size;
     }
   });
 }
-function fr(e8) {
-  return je({
-    fixedSize: e8.size,
+function Ar(e5) {
+  return Ze({
+    fixedSize: e5.size,
     read(t, a = 0) {
-      kU(e8.name, t, a), Xc(e8.name, e8.size, t, a);
-      const o6 = new DataView(LU(t, a, e8.size));
-      return [e8.get(o6, qc(e8.config)), a + e8.size];
+      RG(e5.name, t, a), Tl(e5.name, e5.size, t, a);
+      const o3 = new DataView(IG(t, a, e5.size));
+      return [e5.get(o3, El(e5.config)), a + e5.size];
     }
   });
 }
-var Zc = (e8 = {}) => dr({
-  config: e8,
+var Ml = (e5 = {}) => yr({
+  config: e5,
   name: "i128",
   range: [-BigInt("0x7fffffffffffffffffffffffffffffff") - 1n, BigInt("0x7fffffffffffffffffffffffffffffff")],
-  set: (t, a, o6) => {
-    const r = o6 ? 8 : 0, c = o6 ? 0 : 8, n = 0xffffffffffffffffn;
-    t.setBigInt64(r, BigInt(a) >> 64n, o6), t.setBigUint64(c, BigInt(a) & n, o6);
+  set: (t, a, o3) => {
+    const r = o3 ? 8 : 0, c = o3 ? 0 : 8, n = 0xffffffffffffffffn;
+    t.setBigInt64(r, BigInt(a) >> 64n, o3), t.setBigUint64(c, BigInt(a) & n, o3);
   },
   size: 16
 });
-var Qc = (e8 = {}) => fr({
-  config: e8,
+var _l = (e5 = {}) => Ar({
+  config: e5,
   get: (t, a) => {
-    const o6 = a ? 8 : 0, r = a ? 0 : 8, c = t.getBigInt64(o6, a), n = t.getBigUint64(r, a);
+    const o3 = a ? 8 : 0, r = a ? 0 : 8, c = t.getBigInt64(o3, a), n = t.getBigUint64(r, a);
     return (c << 64n) + n;
   },
   name: "i128",
   size: 16
 });
-var he = (e8 = {}) => fr({
-  config: e8,
+var De = (e5 = {}) => Ar({
+  config: e5,
   get: (t, a) => t.getInt16(0, a),
   name: "i16",
   size: 2
 });
-var Ur = (e8 = {}) => fr({
-  config: e8,
+var Yr = (e5 = {}) => Ar({
+  config: e5,
   get: (t, a) => t.getInt32(0, a),
   name: "i32",
   size: 4
 });
-var L = (e8 = {}) => dr({
-  config: e8,
+var F = (e5 = {}) => yr({
+  config: e5,
   name: "i64",
   range: [-BigInt("0x7fffffffffffffff") - 1n, BigInt("0x7fffffffffffffff")],
-  set: (t, a, o6) => t.setBigInt64(0, BigInt(a), o6),
+  set: (t, a, o3) => t.setBigInt64(0, BigInt(a), o3),
   size: 8
 });
-var F = (e8 = {}) => fr({
-  config: e8,
+var U = (e5 = {}) => Ar({
+  config: e5,
   get: (t, a) => t.getBigInt64(0, a),
   name: "i64",
   size: 8
 });
-var b = (e8 = {}) => dr({
-  config: e8,
+var b = (e5 = {}) => yr({
+  config: e5,
   name: "u16",
   range: [0, +"0xffff"],
-  set: (t, a, o6) => t.setUint16(0, Number(a), o6),
+  set: (t, a, o3) => t.setUint16(0, Number(a), o3),
   size: 2
 });
-var C = (e8 = {}) => fr({
-  config: e8,
+var C = (e5 = {}) => Ar({
+  config: e5,
   get: (t, a) => t.getUint16(0, a),
   name: "u16",
   size: 2
 });
-var _ = (e8 = {}) => dr({
-  config: e8,
+var M = (e5 = {}) => yr({
+  config: e5,
   name: "u32",
   range: [0, +"0xffffffff"],
-  set: (t, a, o6) => t.setUint32(0, Number(a), o6),
+  set: (t, a, o3) => t.setUint32(0, Number(a), o3),
   size: 4
 });
-var M = (e8 = {}) => fr({
-  config: e8,
+var _ = (e5 = {}) => Ar({
+  config: e5,
   get: (t, a) => t.getUint32(0, a),
   name: "u32",
   size: 4
 });
-var y = (e8 = {}) => dr({
-  config: e8,
+var y = (e5 = {}) => yr({
+  config: e5,
   name: "u64",
   range: [0n, BigInt("0xffffffffffffffff")],
-  set: (t, a, o6) => t.setBigUint64(0, BigInt(a), o6),
+  set: (t, a, o3) => t.setBigUint64(0, BigInt(a), o3),
   size: 8
 });
-var A = (e8 = {}) => fr({
-  config: e8,
+var p = (e5 = {}) => Ar({
+  config: e5,
   get: (t, a) => t.getBigUint64(0, a),
   name: "u64",
   size: 8
 });
-var P6 = () => fr({
-  get: (e8) => e8.getUint8(0),
+var A = () => yr({
+  name: "u8",
+  range: [0, +"0xff"],
+  set: (e5, t) => e5.setUint8(0, Number(t)),
+  size: 1
+});
+var P2 = () => Ar({
+  get: (e5) => e5.getUint8(0),
   name: "u8",
   size: 1
 });
-function mB(e8) {
-  return e8.reduce(
+function xl(e5, t, a) {
+  if (t !== a)
+    throw new w(gl, {
+      actual: a,
+      codecDescription: e5,
+      expected: t
+    });
+}
+function ej(e5) {
+  return e5.reduce(
     (t, a) => t === null || a === null ? null : Math.max(t, a),
     0
   );
 }
-function wr(e8) {
-  return e8.reduce((t, a) => t === null || a === null ? null : t + a, 0);
+function _r(e5) {
+  return e5.reduce((t, a) => t === null || a === null ? null : t + a, 0);
 }
-function Yr(e8) {
-  return Ye(e8) ? e8.fixedSize : null;
+function Zr(e5) {
+  return rr(e5) ? e5.fixedSize : null;
 }
-function Br(e8) {
-  return Ye(e8) ? e8.fixedSize : e8.maxSize ?? null;
+function Xr(e5) {
+  return rr(e5) ? e5.fixedSize : e5.maxSize ?? null;
 }
-function T(e8, t = {}) {
-  const a = t.size ?? M(), o6 = Yr(e8), r = ca(a, o6), c = ca(a, Br(e8)) ?? void 0;
-  return je({
+function D2(e5, t = {}) {
+  const a = t.size ?? M(), o3 = pa(a, Zr(e5)), r = pa(a, Xr(e5)) ?? void 0;
+  return qe({
+    ...o3 !== null ? { fixedSize: o3 } : {
+      getSizeFromValue: (c) => (typeof a == "object" ? zr(c.length, a) : 0) + [...c].reduce((g2, L) => g2 + zr(L, e5), 0),
+      maxSize: r
+    },
+    write: (c, n, g2) => (typeof a == "number" && xl(t.description ?? "array", a, c.length), typeof a == "object" && (g2 = a.write(c.length, n, g2)), c.forEach((L) => {
+      g2 = e5.write(L, n, g2);
+    }), g2)
+  });
+}
+function T(e5, t = {}) {
+  const a = t.size ?? _(), o3 = Zr(e5), r = pa(a, o3), c = pa(a, Xr(e5)) ?? void 0;
+  return Ze({
     ...r !== null ? { fixedSize: r } : { maxSize: c },
-    read: (n, g6) => {
-      const U8 = [];
-      if (typeof a == "object" && g6 >= n.length)
-        return [U8, g6];
+    read: (n, g2) => {
+      const L = [];
+      if (typeof a == "object" && g2 >= n.length)
+        return [L, g2];
       if (a === "remainder") {
-        for (; g6 < n.length; ) {
-          const [ar2, oa2] = e8.read(n, g6);
-          g6 = oa2, U8.push(ar2);
+        for (; g2 < n.length; ) {
+          const [Ve2, Oe2] = e5.read(n, g2);
+          g2 = Oe2, L.push(Ve2);
         }
-        return [U8, g6];
+        return [L, g2];
       }
-      const [Z, Ve2] = typeof a == "number" ? [a, g6] : a.read(n, g6);
-      g6 = Ve2;
-      for (let ar2 = 0; ar2 < Z; ar2 += 1) {
-        const [oa2, SN] = e8.read(n, g6);
-        g6 = SN, U8.push(oa2);
+      const [J, le] = typeof a == "number" ? [a, g2] : a.read(n, g2);
+      g2 = le;
+      for (let Ve2 = 0; Ve2 < J; Ve2 += 1) {
+        const [Oe2, Ur2] = e5.read(n, g2);
+        g2 = Ur2, L.push(Oe2);
       }
-      return [U8, g6];
+      return [L, g2];
     }
   });
 }
-function ca(e8, t) {
-  return typeof e8 != "number" ? null : e8 === 0 ? 0 : t === null ? null : t * e8;
+function pa(e5, t) {
+  return typeof e5 != "number" ? null : e5 === 0 ? 0 : t === null ? null : t * e5;
 }
-function ge(e8 = {}) {
-  return br(e8.size ?? P6(), (t) => Number(t) === 1);
+function fe(e5 = {}) {
+  return Je(e5.size ?? P2(), (t) => Number(t) === 1);
 }
 function I() {
-  return je({
-    read: (e8, t) => {
-      const a = e8.slice(t);
+  return Ze({
+    read: (e5, t) => {
+      const a = e5.slice(t);
       return [a, t + a.length];
     }
   });
 }
-var yB = () => je({
-  read(e8, t) {
-    return [e8.slice(t).reduce((o6, r) => o6 + r.toString(16).padStart(2, "0"), ""), e8.length];
+var rj = () => Ze({
+  read(e5, t) {
+    return [e5.slice(t).reduce((o3, r) => o3 + r.toString(16).padStart(2, "0"), ""), e5.length];
   }
 });
-function pB(e8) {
-  return je({
-    fixedSize: e8.length,
+function tj(e5) {
+  return Ze({
+    fixedSize: e5.length,
     read: (t, a) => {
-      const o6 = yB();
-      if (!R(t, e8, a))
-        throw new w(Fc, {
-          constant: e8,
+      const o3 = rj();
+      if (!R(t, e5, a))
+        throw new w(bl, {
+          constant: e5,
           data: t,
-          hexConstant: o6.decode(e8),
-          hexData: o6.decode(t),
+          hexConstant: o3.decode(e5),
+          hexData: o3.decode(t),
           offset: a
         });
-      return [void 0, a + e8.length];
+      return [void 0, a + e5.length];
     }
   });
 }
-function q(e8) {
-  const t = wr(e8.map(Yr)), a = wr(e8.map(Br)) ?? void 0;
-  return je({
+function Z(e5) {
+  const t = _r(e5.map(Zr)), a = _r(e5.map(Xr)) ?? void 0;
+  return Ze({
     ...t === null ? { maxSize: a } : { fixedSize: t },
-    read: (o6, r) => {
+    read: (o3, r) => {
       const c = [];
-      return e8.forEach((n) => {
-        const [g6, U8] = n.read(o6, r);
-        c.push(g6), r = U8;
+      return e5.forEach((n) => {
+        const [g2, L] = n.read(o3, r);
+        c.push(g2), r = L;
       }), [c, r];
     }
   });
 }
-function al(e8, t) {
-  const a = tl(e8), o6 = (c, n) => {
-    const g6 = t(c, n);
-    return rt(e8, g6), e8[g6].read(c, n);
+function Nl(e5, t) {
+  const a = kl(e5), o3 = (c, n) => {
+    const g2 = t(c, n);
+    return dt(e5, g2), e5[g2].read(c, n);
   };
   if (a !== null)
-    return je({ fixedSize: a, read: o6 });
-  const r = nl(e8);
-  return je({ ...r !== null ? { maxSize: r } : {}, read: o6 });
+    return Ze({ fixedSize: a, read: o3 });
+  const r = Ll(e5);
+  return Ze({ ...r !== null ? { maxSize: r } : {}, read: o3 });
 }
-function rt(e8, t) {
-  if (typeof e8[t] > "u")
-    throw new w(Lc, {
-      maxRange: e8.length - 1,
+function dt(e5, t) {
+  if (typeof e5[t] > "u")
+    throw new w(Pl, {
+      maxRange: e5.length - 1,
       minRange: 0,
       variant: t
     });
 }
-function tl(e8) {
-  if (e8.length === 0) return 0;
-  if (!Ye(e8[0])) return null;
-  const t = e8[0].fixedSize;
-  return e8.every((o6) => Ye(o6) && o6.fixedSize === t) ? t : null;
+function kl(e5) {
+  if (e5.length === 0) return 0;
+  if (!rr(e5[0])) return null;
+  const t = e5[0].fixedSize;
+  return e5.every((o3) => rr(o3) && o3.fixedSize === t) ? t : null;
 }
-function nl(e8) {
-  return mB(e8.map((t) => Br(t)));
+function Ll(e5) {
+  return ej(e5.map((t) => Xr(t)));
 }
-function _r(e8, t = {}) {
-  const a = t.discriminator ?? "__kind", o6 = t.size ?? P6();
-  return al(
-    e8.map(
-      ([r, c]) => br(q([o6, c]), ([, n]) => ({
+function kr(e5, t = {}) {
+  const a = t.discriminator ?? "__kind", o3 = t.size ?? P2();
+  return Nl(
+    e5.map(
+      ([r, c]) => Je(Z([o3, c]), ([, n]) => ({
         [a]: r,
         ...n
       }))
     ),
-    (r, c) => Number(o6.read(r, c)[0])
+    (r, c) => Number(o3.read(r, c)[0])
   );
 }
-function ol(e8) {
-  const t = [...new Set(Object.values(e8).filter((n) => typeof n == "number"))].sort(), a = Object.fromEntries(Object.entries(e8).slice(t.length)), o6 = Object.keys(a), r = Object.values(a), c = [
-    .../* @__PURE__ */ new Set([...o6, ...r.filter((n) => typeof n == "string")])
+function Fl(e5) {
+  const t = [...new Set(Object.values(e5).filter((n) => typeof n == "number"))].sort(), a = Object.fromEntries(Object.entries(e5).slice(t.length)), o3 = Object.keys(a), r = Object.values(a), c = [
+    .../* @__PURE__ */ new Set([...o3, ...r.filter((n) => typeof n == "string")])
   ];
-  return { enumKeys: o6, enumRecord: a, enumValues: r, numericalValues: t, stringValues: c };
+  return { enumKeys: o3, enumRecord: a, enumValues: r, numericalValues: t, stringValues: c };
 }
-function CB({
-  discriminator: e8,
+function ij({
+  discriminator: e5,
   enumKeys: t,
   enumValues: a,
-  useValuesAsDiscriminators: o6
+  useValuesAsDiscriminators: o3
 }) {
-  return o6 ? il(a, (r) => r === e8) : e8 >= 0 && e8 < t.length ? e8 : -1;
+  return o3 ? Ul(a, (r) => r === e5) : e5 >= 0 && e5 < t.length ? e5 : -1;
 }
-function il(e8, t) {
-  let a = e8.length;
+function Ul(e5, t) {
+  let a = e5.length;
   for (; a--; )
-    if (t(e8[a], a, e8)) return a;
+    if (t(e5[a], a, e5)) return a;
   return -1;
 }
-function cl(e8) {
-  if (e8.length === 0) return "";
-  let t = [e8[0], e8[0]];
+function Bl(e5) {
+  if (e5.length === 0) return "";
+  let t = [e5[0], e5[0]];
   const a = [];
-  for (let o6 = 1; o6 < e8.length; o6++) {
-    const r = e8[o6];
+  for (let o3 = 1; o3 < e5.length; o3++) {
+    const r = e5[o3];
     t[1] + 1 === r ? t[1] = r : (a.push(t[0] === t[1] ? `${t[0]}` : `${t[0]}-${t[1]}`), t = [r, r]);
   }
   return a.push(t[0] === t[1] ? `${t[0]}` : `${t[0]}-${t[1]}`), a.join(", ");
 }
-function ve(e8, t = {}) {
-  const a = t.size ?? P6(), o6 = t.useValuesAsDiscriminators ?? false, { enumKeys: r, enumValues: c, numericalValues: n } = ol(e8);
-  if (o6 && c.some((g6) => typeof g6 == "string"))
-    throw new w(vt, {
-      stringValues: c.filter((g6) => typeof g6 == "string")
+function Se(e5, t = {}) {
+  const a = t.size ?? P2(), o3 = t.useValuesAsDiscriminators ?? false, { enumKeys: r, enumValues: c, numericalValues: n } = Fl(e5);
+  if (o3 && c.some((g2) => typeof g2 == "string"))
+    throw new w(Mt, {
+      stringValues: c.filter((g2) => typeof g2 == "string")
     });
-  return br(a, (g6) => {
-    const U8 = Number(g6), Z = CB({
-      discriminator: U8,
+  return Je(a, (g2) => {
+    const L = Number(g2), J = ij({
+      discriminator: L,
       enumKeys: r,
       enumValues: c,
-      useValuesAsDiscriminators: o6
+      useValuesAsDiscriminators: o3
     });
-    if (Z < 0) {
-      const Ve2 = o6 ? n : [...Array(r.length).keys()];
-      throw new w(xc, {
-        discriminator: U8,
-        formattedValidDiscriminators: cl(Ve2),
-        validDiscriminators: Ve2
+    if (J < 0) {
+      const le = o3 ? n : [...Array(r.length).keys()];
+      throw new w(ml, {
+        discriminator: L,
+        formattedValidDiscriminators: Bl(le),
+        validDiscriminators: le
       });
     }
-    return c[Z];
+    return c[J];
   });
 }
-function re(e8, t, a = {}) {
-  return br(
-    T(q([e8, t]), a),
-    (o6) => new Map(o6)
+function ee(e5, t, a = {}) {
+  return Je(
+    T(Z([e5, t]), a),
+    (o3) => new Map(o3)
   );
 }
-function Tr() {
-  return je({
+function Mr() {
+  return Ze({
     fixedSize: 0,
-    read: (e8, t) => [void 0, t]
+    read: (e5, t) => [void 0, t]
   });
 }
-function de(e8, t = {}) {
-  return br(T(e8, t), (a) => new Set(a));
+function Pe(e5, t = {}) {
+  return Je(T(e5, t), (a) => new Set(a));
 }
-function f(e8) {
-  const t = e8.map(([, r]) => r), a = wr(t.map(Yr)), o6 = wr(t.map(Br)) ?? void 0;
-  return je({
-    ...a === null ? { maxSize: o6 } : { fixedSize: a },
+function d(e5) {
+  const t = e5.map(([, r]) => r), a = _r(t.map(Zr)), o3 = _r(t.map(Xr)) ?? void 0;
+  return qe({
+    ...a === null ? {
+      getSizeFromValue: (r) => e5.map(([c, n]) => zr(r[c], n)).reduce((c, n) => c + n, 0),
+      maxSize: o3
+    } : { fixedSize: a },
+    write: (r, c, n) => (e5.forEach(([g2, L]) => {
+      n = L.write(r[g2], c, n);
+    }), n)
+  });
+}
+function f(e5) {
+  const t = e5.map(([, r]) => r), a = _r(t.map(Zr)), o3 = _r(t.map(Xr)) ?? void 0;
+  return Ze({
+    ...a === null ? { maxSize: o3 } : { fixedSize: a },
     read: (r, c) => {
       const n = {};
-      return e8.forEach(([g6, U8]) => {
-        const [Z, Ve2] = U8.read(r, c);
-        c = Ve2, n[g6] = Z;
+      return e5.forEach(([g2, L]) => {
+        const [J, le] = L.read(r, c);
+        c = le, n[g2] = J;
       }), [n, c];
     }
   });
 }
-var ll = (e8) => ({ __option: "Some", value: e8 });
-var sl = () => ({ __option: "None" });
-function z(e8, t = {}) {
-  const a = t.prefix === null ? br(Tr(), () => false) : ge({ size: t.prefix ?? P6() }), o6 = t.noneValue === "zeroes" ? (Yc(e8), S(Tr(), e8.fixedSize)) : t.noneValue ? pB(t.noneValue) : Tr();
-  return al(
+var zl = (e5) => ({ __option: "Some", value: e5 });
+var Hl = () => ({ __option: "None" });
+function z(e5, t = {}) {
+  const a = t.prefix === null ? Je(Mr(), () => false) : fe({ size: t.prefix ?? P2() }), o3 = t.noneValue === "zeroes" ? (Dl(e5), S(Mr(), e5.fixedSize)) : t.noneValue ? tj(t.noneValue) : Mr();
+  return Nl(
     [
-      br(q([a, o6]), () => sl()),
-      br(q([a, e8]), ([, r]) => ll(r))
+      Je(Z([a, o3]), () => Hl()),
+      Je(Z([a, e5]), ([, r]) => zl(r))
     ],
     (r, c) => {
       if (t.prefix === null && !t.noneValue)
         return +(c < r.length);
       if (t.prefix === null && t.noneValue != null) {
-        const n = t.noneValue === "zeroes" ? new Uint8Array(o6.fixedSize).fill(0) : t.noneValue;
+        const n = t.noneValue === "zeroes" ? new Uint8Array(o3.fixedSize).fill(0) : t.noneValue;
         return R(r, n, c) ? 0 : 1;
       }
       return Number(a.read(r, c)[0]);
     }
   );
 }
-function dl() {
+function Kl() {
   return f([
-    ["stat", ba()],
-    ["deltaBps", M()],
-    ["chargesRemaining", P6()]
+    ["stat", Ma()],
+    ["deltaBps", _()],
+    ["chargesRemaining", P2()]
   ]);
 }
-var St = /* @__PURE__ */ ((e8) => (e8[e8.None = 0] = "None", e8[e8.Light = 1] = "Light", e8[e8.Heavy = 2] = "Heavy", e8))(St || {});
-function yl() {
-  return ve(St);
+var Ot = /* @__PURE__ */ ((e5) => (e5[e5.None = 0] = "None", e5[e5.Light = 1] = "Light", e5[e5.Heavy = 2] = "Heavy", e5))(Ot || {});
+function ql() {
+  return Se(Ot);
 }
-function bl() {
+function rs() {
   return f([
     [
       "resources",
-      re(K(), Ll())
+      ee(K(), Ss())
     ]
   ]);
 }
-var Pr = class _Pr {
+var Sr = class _Sr {
   constructor(t, a) {
     this.raw = t, this.fractionalBits = a;
   }
@@ -40552,38 +40575,72 @@ var Pr = class _Pr {
     return this.toNumber();
   }
   static fromRaw(t, a) {
-    return new _Pr(t, a);
+    return new _Sr(t, a);
   }
-  static fromNumber(t, { fractionalBits: a, totalBits: o6, signed: r }) {
+  static fromNumber(t, { fractionalBits: a, totalBits: o3, signed: r }) {
     if (!Number.isFinite(t))
       throw new RangeError("FixedPoint.fromNumber requires a finite number");
-    const c = 1n << BigInt(a), n = BigInt(Math.round(t * Number(c))), [g6, U8] = _Pr.bounds(o6, r), Z = _Pr.clamp(n, g6, U8);
-    return new _Pr(Z, a);
+    const c = 1n << BigInt(a), n = BigInt(Math.round(t * Number(c))), [g2, L] = _Sr.bounds(o3, r), J = _Sr.clamp(n, g2, L);
+    return new _Sr(J, a);
   }
   static bounds(t, a) {
     if (t <= 0)
       throw new RangeError("totalBits must be positive");
     if (a) {
-      const o6 = 1n << BigInt(t - 1);
-      return [-o6, o6 - 1n];
+      const o3 = 1n << BigInt(t - 1);
+      return [-o3, o3 - 1n];
     }
     return [0n, (1n << BigInt(t)) - 1n];
   }
-  static clamp(t, a, o6) {
-    return t < a ? a : t > o6 ? o6 : t;
+  static clamp(t, a, o3) {
+    return t < a ? a : t > o3 ? o3 : t;
   }
 };
-var NB = () => u(b(), C());
-var ga = () => u(_(), M());
-var ma = () => u(y(), A());
-var Rt = () => u(L(), F());
-var kB = () => u(Zc(), Qc());
-var Ze = (e8, t) => FU(
-  e8,
-  (a) => a instanceof Pr ? a.raw : typeof a == "bigint" ? Pr.fromRaw(a, t.fractionalBits).raw : Pr.fromNumber(a, t).raw,
-  (a) => Pr.fromRaw(BigInt(a), t.fractionalBits)
+var Dj = () => u(b(), C());
+var oa = () => u(M(), _());
+var Ta = () => u(y(), p());
+var Nt = () => u(F(), U());
+var Tj = () => u(Ml(), _l());
+var Qe = (e5, t, a = {}) => hG(
+  e5,
+  (o3) => o3 instanceof Sr ? (a.strict && wj(o3, t, a.typeName), o3.raw) : typeof o3 == "bigint" ? (a.strict && kt(o3, t, a.typeName), Sr.fromRaw(o3, t.fractionalBits).raw) : a.strict ? Vj(o3, t, a.typeName) : Sr.fromNumber(o3, t).raw,
+  (o3) => Sr.fromRaw(BigInt(o3), t.fractionalBits)
 );
-var Qe = {
+function as({ totalBits: e5, signed: t }) {
+  if (e5 <= 0)
+    throw new RangeError("totalBits must be positive");
+  if (t) {
+    const a = 1n << BigInt(e5 - 1);
+    return [-a, a - 1n];
+  }
+  return [0n, (1n << BigInt(e5)) - 1n];
+}
+function kt(e5, t, a = "fixed-point") {
+  const [o3, r] = as(t);
+  if (e5 < o3 || e5 > r)
+    throw new RangeError(
+      `${a} raw value ${e5} is outside [${o3}, ${r}]`
+    );
+}
+function wj(e5, t, a = "fixed-point") {
+  if (e5.fractionalBits !== t.fractionalBits)
+    throw new RangeError(
+      `${a} requires ${t.fractionalBits} fractional bits; got ${e5.fractionalBits}`
+    );
+  kt(e5.raw, t, a);
+}
+function Vj(e5, t, a = "fixed-point") {
+  if (!Number.isFinite(e5))
+    throw new RangeError(`${a} requires a finite number`);
+  const [o3, r] = as(t), c = 1n << BigInt(t.fractionalBits), n = Number(c), g2 = Number(o3) / n, L = Number(r) / n;
+  if (e5 < g2 || e5 > L)
+    throw new RangeError(
+      `${a} value ${e5} is outside [${g2}, ${L}]`
+    );
+  const J = e5 * n, le = Math.floor(J), Ve2 = J - le, Oe2 = Ve2 < 0.5 ? le : Ve2 > 0.5 ? le + 1 : le % 2 === 0 ? le : le + 1, Ur2 = BigInt(Oe2);
+  return kt(Ur2, t, a), Ur2;
+}
+var er = {
   U8F8: { fractionalBits: 8, totalBits: 16, signed: false },
   U16F16: {
     fractionalBits: 16,
@@ -40646,822 +40703,897 @@ var Qe = {
     signed: true
   }
 };
-var Cl = () => Ze(NB(), Qe.U8F8);
-var vl = () => Ze(ga(), Qe.U16F16);
-var Sl = () => Ze(ga(), Qe.U18F14);
-var Rl = () => Ze(ga(), Qe.U26F6);
-var Il = () => Ze(ma(), Qe.U32F32);
-var hl = () => Ze(ma(), Qe.U16F48);
-var Dl = () => Ze(ma(), Qe.U8F56);
-var Tl = () => Ze(ga(), Qe.U0F32);
-var wl = () => Ze(ma(), Qe.U54F10);
-var Vl = () => Ze(Rt(), Qe.I32F32);
-var Wl = () => Ze(Rt(), Qe.I8F56);
-var El = () => Ze(Rt(), Qe.I54F10);
-var _l = () => Ze(kB(), Qe.I72F56);
-var Wr = Il;
-var ht = hl;
-var sa = Dl;
-var se = vl;
-var Re = Rl;
-var Ee = Vl;
-var ye = Wl;
-var xl = Tl;
-var Ja = Sl;
-var FB = Cl;
-var Nl = wl;
-var Zr = El;
-var tt = _l;
-function Ll() {
+var ts = () => Qe(Dj(), er.U8F8);
+var ns = () => Qe(oa(), er.U16F16);
+var os = () => Qe(oa(), er.U18F14);
+var is = () => Qe(oa(), er.U26F6);
+var cs = () => Qe(oa(), er.U26F6, {
+  strict: true,
+  typeName: "CombatU26F6"
+});
+var ls = () => Qe(Ta(), er.U32F32);
+var ss = () => Qe(Ta(), er.U16F48);
+var us = () => Qe(Ta(), er.U8F56);
+var ds = () => Qe(oa(), er.U0F32);
+var fs = () => Qe(Ta(), er.U54F10);
+var gs = () => Qe(Nt(), er.I32F32);
+var ms = () => Qe(Nt(), er.I8F56);
+var ys = () => Qe(Nt(), er.I54F10);
+var As = () => Qe(Tj(), er.I72F56);
+var Or = ls;
+var Ft = ss;
+var va = us;
+var ue = ns;
+var Ie = is;
+var ke = cs;
+var Me = gs;
+var Ce = ms;
+var Ps = ds;
+var ot = os;
+var Ej = ts;
+var Cs = fs;
+var ca = ys;
+var gt = As;
+function Ss() {
   return f([
-    ["richness", ht()],
-    ["amountMined", A()],
-    ["miners", A()]
+    ["richness", Ft()],
+    ["amountMined", p()],
+    ["miners", p()]
   ]);
 }
-function Yl() {
+function Ws() {
   return f([
-    ["buildingId", rr()],
+    ["buildingId", ir()],
     ["name", ce()],
-    ["slots", M()],
-    ["crewSlots", he()],
+    ["slots", _()],
+    ["crewSlots", De()],
     ["neededCrew", C()],
-    ["constructionTime", F()],
-    ["power", he()],
-    ["resourceStorage", A()],
+    ["constructionTime", U()],
+    ["power", De()],
+    ["resourceStorage", p()],
     ["hubValue", C()],
-    ["minimumTier", hr()],
-    ["xpValue", se()],
-    ["refunds", re(K(), A())],
-    ["constructionCost", re(K(), A())],
-    ["researchRequirements", de(pe())],
+    ["minimumTier", Wr()],
+    ["xpValue", ue()],
+    ["refunds", ee(K(), p())],
+    ["constructionCost", ee(K(), p())],
+    ["researchRequirements", Pe(me())],
     [
       "netResourceProduction",
-      re(K(), Zr())
+      ee(K(), ca())
     ],
     [
       "resourceExtraction",
-      re(K(), Nl())
+      ee(K(), Cs())
     ],
-    ["requiredTags", de(Te())],
-    ["providedTags", de(Te())]
+    ["requiredTags", Pe(we())],
+    ["providedTags", Pe(we())]
   ]);
 }
-function $l() {
+function Ms() {
   return f([
-    ["seqId", M()],
+    ["seqId", _()],
     [
       "buildings",
       f([
-        ["unsizedLen", M()],
+        ["unsizedLen", _()],
         [
           "offsetList",
           T(
             f([
-              ["offset", M()],
-              ["key", rr()]
+              ["offset", _()],
+              ["key", ir()]
             ])
           )
         ],
-        ["unsizedList", T(Yl())]
+        ["unsizedList", T(Ws())]
       ])
     ]
   ]);
 }
-function rr() {
+function ir() {
   return C();
 }
-function Te() {
+function we() {
   return C();
 }
-function Hr() {
+function Fs() {
+  return d([
+    ["xp", y()],
+    ["pending", y()],
+    ["basis", y()],
+    ["earned", M()],
+    ["spent", M()],
+    ["rank", M()],
+    ["unlockedVersion", M()],
+    ["focus", A()]
+  ]);
+}
+function Us() {
+  return f([
+    ["xp", p()],
+    ["pending", p()],
+    ["basis", p()],
+    ["earned", _()],
+    ["spent", _()],
+    ["rank", _()],
+    ["unlockedVersion", _()],
+    ["focus", P2()]
+  ]);
+}
+function Kr() {
   return C();
 }
-function as() {
+function zs() {
   return f([
     ["seqId", C()],
     ["cache", x()],
-    ["cargoTypes", re(K(), Tt())],
-    ["mintToId", re(x(), K())],
+    ["cargoTypes", ee(K(), Bt())],
+    ["mintToId", ee(x(), K())],
     [
       "cargoCategoryIds",
-      re(Hr(), ce())
+      ee(Kr(), ce())
     ]
   ]);
 }
-function ns() {
-  return q([M()]);
+function Gs() {
+  return Z([_()]);
 }
 function K() {
   return C();
 }
-function vr() {
+function Ir() {
   return f([
     ["seqId", C()],
-    ["storageCost", A()],
-    ["amounts", re(K(), A())]
+    ["storageCost", p()],
+    ["amounts", ee(K(), p())]
   ]);
 }
-function is() {
+function Ys() {
   return f([
-    ["cargoCapacity", A()],
-    ["fuelCapacity", A()],
-    ["ammoCapacity", A()],
-    ["ammoConsumptionRate", Ja()],
-    ["foodConsumptionRate", Ja()],
-    ["miningRate", Ja()],
-    ["loadRate", Re()]
+    ["cargoCapacity", p()],
+    ["fuelCapacity", p()],
+    ["ammoCapacity", p()],
+    ["ammoConsumptionRate", ot()],
+    ["foodConsumptionRate", ot()],
+    ["miningRate", ot()],
+    ["loadRate", Ie()]
   ]);
 }
-function Tt() {
+function Bt() {
   return f([
     ["id", K()],
     ["name", ce()],
     ["mint", x()],
-    ["storageCost", M()],
-    ["category", Hr()],
-    ["withdrawEpochDuration", M()],
-    ["circuitBreaker", A()],
-    ["xpModifier", M()],
-    ["flags", ns()]
+    ["storageCost", _()],
+    ["category", Kr()],
+    ["withdrawEpochDuration", _()],
+    ["circuitBreaker", p()],
+    ["xpModifier", _()],
+    ["flags", Gs()]
   ]);
 }
-function pr() {
-  return f([
-    ["spent", A()],
-    ["earned", A()],
+function Cr() {
+  return d([
+    ["spent", y()],
+    ["earned", y()],
     ["level", M()]
   ]);
 }
-function wt() {
+function vr() {
+  return f([
+    ["spent", p()],
+    ["earned", p()],
+    ["level", _()]
+  ]);
+}
+function zt() {
   return C();
 }
-function fs() {
-  return _r([
+function Zs() {
+  return kr([
     [
       "Planet",
-      f([["fields", q([ef()])]])
+      f([["fields", Z([Hf()])]])
     ],
     [
       "Asteroid",
-      f([["fields", q([bl()])]])
+      f([["fields", Z([rs()])]])
     ]
   ]);
 }
-function ms() {
-  return f([
+function Qs() {
+  return d([
     ["claimStakes", M()],
     ["craftingHabs", M()],
     ["fleets", M()]
   ]);
 }
-function pa() {
+function eu() {
   return f([
-    ["fleetSize", M()],
-    ["fleetConcurrency", M()],
-    ["respawnTimeModifier", Ee()],
-    ["warpLaneFeeModifier", Ee()],
-    ["warpSpeedModifier", Ee()],
-    ["subwarpSpeedModifier", Ee()],
-    ["warpCooldownModifier", Ee()],
-    ["craftingEfficiencyModifier", Ee()],
-    ["craftingTimeModifier", Ee()],
+    ["claimStakes", _()],
+    ["craftingHabs", _()],
+    ["fleets", _()]
+  ]);
+}
+function Wa() {
+  return f([
+    ["fleetSize", _()],
+    ["fleetConcurrency", _()],
+    ["respawnTimeModifier", Me()],
+    ["warpLaneFeeModifier", Me()],
+    ["warpSpeedModifier", Me()],
+    ["subwarpSpeedModifier", Me()],
+    ["warpCooldownModifier", Me()],
+    ["craftingEfficiencyModifier", Me()],
+    ["craftingTimeModifier", Me()],
     ["craftingJobConcurrencyBonus", C()],
-    ["maxResidentialPlotTier", Jr()],
-    ["maxResidentialPlots", M()],
-    ["maxProductivePlotTier", Jr()],
-    ["maxProductivePlots", M()],
-    ["securityZoneAccess", Pn()],
-    ["enemyFactionZoneAccess", ge()],
-    ["maxDailyStreakLength", M()],
-    ["maxShipSize", na()],
-    ["scanPowerModifier", Ee()],
-    ["scanCoolDownModifier", Ee()],
-    ["researchTags", de(pe())],
-    ["cargoCategories", de(Hr())],
+    ["maxResidentialPlotTier", na()],
+    ["maxResidentialPlots", _()],
+    ["maxProductivePlotTier", na()],
+    ["maxProductivePlots", _()],
+    ["securityZoneAccess", Nn()],
+    ["enemyFactionZoneAccess", fe()],
+    ["maxDailyStreakLength", _()],
+    ["maxShipSize", ya()],
+    ["scanPowerModifier", Me()],
+    ["scanCoolDownModifier", Me()],
+    ["researchTags", Pe(me())],
+    ["cargoCategories", Pe(Kr())],
     [
       "rareMineralDiscovery",
-      re(K(), ht())
+      ee(K(), Ft())
     ]
   ]);
 }
-function Ps() {
+function nu() {
   return f([
-    ["seqId", M()],
+    ["seqId", _()],
     ["unupdatedCount", C()],
-    ["unlockedNodes", de(Lr())],
-    ["nodeLevels", re(Lr(), M())],
-    ["modifiers", pa()]
+    ["unlockedNodes", Pe(Gr())],
+    ["nodeLevels", ee(Gr(), _())],
+    ["modifiers", Wa()]
   ]);
 }
-function Ss() {
-  return f([
+function cu() {
+  return d([
     ["lastCheckInTime", F()],
     ["checkInStreak", M()]
   ]);
 }
-function Is() {
+function lu() {
+  return f([
+    ["lastCheckInTime", U()],
+    ["checkInStreak", _()]
+  ]);
+}
+function uu() {
   return f([
     ["name", ce()],
     ["cargoId", K()],
-    ["tier", hr()],
-    ["slots", M()],
-    ["rentMultiplier", sa()],
-    ["placementFeeMultiplier", sa()],
+    ["tier", Wr()],
+    ["slots", _()],
+    ["rentMultiplier", va()],
+    ["placementFeeMultiplier", va()],
     ["hubValue", C()],
-    ["requiredTags", de(Te())],
-    ["providedTags", de(Te())]
+    ["requiredTags", Pe(we())],
+    ["providedTags", Pe(we())]
   ]);
 }
-function Rr() {
+function wr() {
   return C();
 }
-function Ds() {
+function fu() {
   return f([
-    ["seqId", M()],
-    ["evictionGracePeriod", F()],
-    ["respawnTime", F()],
+    ["seqId", _()],
+    ["evictionGracePeriod", U()],
+    ["respawnTime", U()],
     [
       "claimStakes",
       f([
-        ["unsizedLen", M()],
+        ["unsizedLen", _()],
         [
           "offsetList",
           T(
             f([
-              ["offset", M()],
-              ["key", Rr()]
+              ["offset", _()],
+              ["key", wr()]
             ])
           )
         ],
-        ["unsizedList", T(Is())]
+        ["unsizedList", T(uu())]
       ])
     ]
   ]);
 }
-function ws() {
+function mu() {
   return f([
     ["chronoList", T(x())],
     [
       "stakeMap",
-      re(x(), Ga())
+      ee(x(), rt())
     ]
-  ]);
-}
-function Ws() {
-  return f([
-    ["planet", x()],
-    ["claimStake", x()],
-    ["end", F()],
-    ["load", re(K(), A())],
-    ["unload", re(K(), A())]
-  ]);
-}
-function _s() {
-  return f([
-    ["globalCeasefire", ge()],
-    ["interactionRange", ye()],
-    ["lootExclusivityTime", F()],
-    ["maxLootRate", Re()],
-    ["starbaseUpgradeProgressContinuation", xl()],
-    ["crewRespawnTime", F()],
-    ["cargoRespawnTime", F()],
-    ["rawShipsRespawnTime", F()],
-    ["maxFleetSize", M()]
-  ]);
-}
-function ba() {
-  return q([P6()]);
-}
-function Ls() {
-  return f([
-    ["ap", M()],
-    ["hp", M()],
-    ["sp", M()],
-    ["ammoConsumptionRate", Re()],
-    ["apRegenRate", Re()],
-    ["shieldRechargeRate", Re()],
-    ["repairRate", Re()],
-    ["repairAbility", Re()],
-    ["repairEfficiency", Re()],
-    ["repairCost", Re()],
-    ["lootRate", Re()],
-    ["shieldBreakDelay", C()],
-    ["warpSpoolTime", C()],
-    ["damageKinetic", M()],
-    ["damageKineticVariance", M()],
-    ["damageEnergy", M()],
-    ["damageEnergyVariance", M()],
-    ["damageEmp", M()],
-    ["damageEmpVariance", M()],
-    ["damageSuperchill", M()],
-    ["damageSuperchillVariance", M()],
-    ["damageShockwave", M()],
-    ["damageShockwaveVariance", M()],
-    ["damageGraygoo", M()],
-    ["damageGraygooVariance", M()],
-    ["damageHeat", M()],
-    ["damageHeatVariance", M()],
-    ["damageBomb", M()],
-    ["damageBombVariance", M()],
-    ["counterDecoy", M()],
-    ["counterEnergyCapacitor", M()],
-    ["counterFireSuppressor", M()],
-    ["counterFlare", M()],
-    ["counterHealingNanobots", M()],
-    ["counterMine", M()],
-    ["counterNegativeRemPlating", M()],
-    ["counterWarmingPlates", M()],
-    ["counterFaradayShielding", M()],
-    ["stealthPower", M()],
-    ["hitChance", M()],
-    ["aimAbility", M()],
-    ["critChance", M()],
-    ["critMultiplier", M()],
-    ["fuelConsumptionRate", M()],
-    ["missileDamage", M()],
-    ["missileFireRate", M()]
-  ]);
-}
-function va() {
-  return f([
-    ["level1", A()],
-    ["level2", A()],
-    ["level3", A()],
-    ["level4", A()],
-    ["level5", A()],
-    ["css", A()]
-  ]);
-}
-function zs() {
-  return f([
-    ["name", ce()],
-    ["cargoId", K()],
-    ["tier", hr()],
-    ["slots", M()],
-    ["rentMultiplier", sa()],
-    ["placementFeeMultiplier", sa()],
-    ["hubValue", C()],
-    ["requiredTags", de(Te())],
-    ["providedTags", de(Te())]
-  ]);
-}
-function jr() {
-  return C();
-}
-function Gs() {
-  return f([
-    ["seqId", M()],
-    ["evictionGracePeriod", F()],
-    ["respawnTime", F()],
-    [
-      "craftingHabs",
-      f([
-        ["unsizedLen", M()],
-        [
-          "offsetList",
-          T(
-            f([
-              ["offset", M()],
-              ["key", jr()]
-            ])
-          )
-        ],
-        ["unsizedList", T(zs())]
-      ])
-    ]
-  ]);
-}
-function Js() {
-  return f([
-    ["chronoList", T(x())],
-    ["habMap", re(x(), Ga())]
-  ]);
-}
-function Ra() {
-  return f([
-    ["craftingEfficiencyModifier", Re()],
-    ["craftingSpeedModifier", Re()],
-    ["crewCountModifier", Re()],
-    ["craftingFeeModifier", Re()]
   ]);
 }
 function Au() {
   return f([
-    ["atlas", ct()],
-    ["polis", ct()]
+    ["planet", x()],
+    ["claimStake", x()],
+    ["end", U()],
+    ["load", ee(K(), p())],
+    ["unload", ee(K(), p())]
   ]);
 }
-function ct() {
+function Pu() {
+  return f([
+    ["globalCeasefire", fe()],
+    ["interactionRange", Ce()],
+    ["lootExclusivityTime", U()],
+    ["maxLootRate", Ie()],
+    ["starbaseUpgradeProgressContinuation", Ps()],
+    ["crewRespawnTime", U()],
+    ["cargoRespawnTime", U()],
+    ["rawShipsRespawnTime", U()],
+    ["maxFleetSize", _()]
+  ]);
+}
+function Ma() {
+  return Z([P2()]);
+}
+function Iu() {
+  return f([
+    ["ap", _()],
+    ["hp", _()],
+    ["sp", _()],
+    ["ammoConsumptionRate", Ie()],
+    ["apRegenRate", Ie()],
+    ["shieldRechargeRate", Ie()],
+    ["repairRate", Ie()],
+    ["repairAbility", Ie()],
+    ["repairEfficiency", Ie()],
+    ["repairCost", Ie()],
+    ["lootRate", Ie()],
+    ["shieldBreakDelay", C()],
+    ["warpSpoolTime", C()],
+    ["damageKinetic", ke()],
+    ["damageKineticVariance", _()],
+    ["damageEnergy", ke()],
+    ["damageEnergyVariance", _()],
+    ["damageEmp", ke()],
+    ["damageEmpVariance", _()],
+    ["damageSuperchill", ke()],
+    ["damageSuperchillVariance", _()],
+    ["damageShockwave", ke()],
+    ["damageShockwaveVariance", _()],
+    ["damageGraygoo", ke()],
+    ["damageGraygooVariance", _()],
+    ["damageHeat", ke()],
+    ["damageHeatVariance", _()],
+    ["damageBomb", ke()],
+    ["damageBombVariance", _()],
+    ["counterDecoy", ke()],
+    ["counterEnergyCapacitor", ke()],
+    ["counterFireSuppressor", ke()],
+    ["counterFlare", ke()],
+    ["counterHealingNanobots", ke()],
+    ["counterMine", ke()],
+    ["counterNegativeRemPlating", ke()],
+    ["counterWarmingPlates", ke()],
+    ["counterFaradayShielding", ke()],
+    ["stealthPower", _()],
+    ["hitChance", _()],
+    ["aimAbility", _()],
+    ["critChance", _()],
+    ["critMultiplier", _()],
+    ["fuelConsumptionRate", _()],
+    ["missileDamage", _()],
+    ["missileFireRate", _()]
+  ]);
+}
+function xa() {
+  return f([
+    ["level1", p()],
+    ["level2", p()],
+    ["level3", p()],
+    ["level4", p()],
+    ["level5", p()],
+    ["css", p()]
+  ]);
+}
+function wu() {
+  return f([
+    ["fundedQuantity", p()],
+    ["collectedQuantity", p()],
+    ["fundedFee", p()]
+  ]);
+}
+function Wu() {
+  return f([
+    ["name", ce()],
+    ["cargoId", K()],
+    ["tier", Wr()],
+    ["slots", _()],
+    ["rentMultiplier", va()],
+    ["placementFeeMultiplier", va()],
+    ["hubValue", C()],
+    ["requiredTags", Pe(we())],
+    ["providedTags", Pe(we())]
+  ]);
+}
+function qr() {
+  return C();
+}
+function Mu() {
+  return f([
+    ["seqId", _()],
+    ["evictionGracePeriod", U()],
+    ["respawnTime", U()],
+    [
+      "craftingHabs",
+      f([
+        ["unsizedLen", _()],
+        [
+          "offsetList",
+          T(
+            f([
+              ["offset", _()],
+              ["key", qr()]
+            ])
+          )
+        ],
+        ["unsizedList", T(Wu())]
+      ])
+    ]
+  ]);
+}
+function Lu() {
+  return f([
+    ["chronoList", T(x())],
+    ["habMap", ee(x(), rt())]
+  ]);
+}
+function Na() {
+  return f([
+    ["craftingEfficiencyModifier", Ie()],
+    ["craftingSpeedModifier", Ie()],
+    ["crewCountModifier", Ie()],
+    ["craftingFeeModifier", Ie()]
+  ]);
+}
+function nd() {
+  return f([
+    ["atlas", pt()],
+    ["polis", pt()]
+  ]);
+}
+function pt() {
   return f([
     ["mint", x()],
     ["vault", x()],
     ["daoVault", x()],
-    ["withdrawEpochDuration", M()],
-    ["circuitBreaker", A()]
+    ["withdrawEpochDuration", _()],
+    ["circuitBreaker", p()]
   ]);
 }
-function Ut() {
+function an() {
   return f([
-    ["xpBase", A()],
-    ["streakBonus", A()],
-    ["lpBonusStreakReq", A()],
-    ["streakBuyBackCost", A()],
-    ["streakBuyBackMaxDays", M()],
-    ["minCheckInTimeDiff", M()],
-    ["epochStartTime", F()]
+    ["xpBase", p()],
+    ["streakBonus", p()],
+    ["lpBonusStreakReq", p()],
+    ["streakBuyBackCost", p()],
+    ["streakBuyBackMaxDays", _()],
+    ["minCheckInTimeDiff", _()],
+    ["epochStartTime", U()]
   ]);
 }
-function Cu() {
-  return q([]);
+function ld() {
+  return f([["recoverySpeedPpb", _()]]);
 }
-function Su() {
+function ud() {
   return f([
     ["system", x()],
-    ["systemSeqId", A()]
+    ["systemSeqId", p()]
   ]);
 }
-function ha() {
-  return f([["ammoUsage", yl()]]);
+function La() {
+  return f([["ammoUsage", ql()]]);
 }
-function Wu() {
-  return _r([
+function Pd() {
+  return kr([
     [
       "Idle",
-      f([["fields", q([Gu()])]])
+      f([["fields", Z([Md()])]])
     ],
     [
       "ClaimStakeTransfer",
       f([
-        ["fields", q([Ws()])]
+        ["fields", Z([Au()])]
       ])
     ],
     [
       "Destroyed",
-      f([["fields", q([Cu()])]])
+      f([["fields", Z([ld()])]])
     ],
     [
       "Docked",
-      f([["fields", q([Su()])]])
+      f([["fields", Z([ud()])]])
     ],
     [
       "MineAsteroid",
       f([
-        ["fields", q([Id()])]
+        ["fields", Z([gf()])]
       ])
     ],
     [
       "MoveWarp",
-      f([["fields", q([_d()])]])
+      f([["fields", Z([vf()])]])
     ],
     [
       "MoveSubwarp",
       f([
-        ["fields", q([Wd()])]
+        ["fields", Z([bf()])]
       ])
     ],
     [
       "Respawn",
-      f([["fields", q([Tf()])]])
+      f([["fields", Z([yg()])]])
     ]
   ]);
 }
-function xu() {
+function Sd() {
   return f([
     ["craftingFeeBps", C()],
     ["localMarketFeeBps", C()],
     ["localTreasuryShareBps", C()]
   ]);
 }
-function Nu() {
+function Id() {
   return f([
-    ["buildingId", rr()],
+    ["buildingId", ir()],
     ["name", ce()],
-    ["slots", M()],
-    ["crewSlots", he()],
+    ["slots", _()],
+    ["crewSlots", De()],
     ["neededCrew", C()],
-    ["constructionTime", F()],
-    ["resourceStorage", A()],
+    ["constructionTime", U()],
+    ["resourceStorage", p()],
     ["hubValue", C()],
-    ["minimumTier", hr()],
-    ["craftingModifiers", Ra()],
+    ["minimumTier", Wr()],
+    ["craftingModifiers", Na()],
     ["craftingJobConcurrency", C()],
-    ["xpValue", se()],
-    ["refunds", re(K(), A())],
-    ["constructionCost", re(K(), A())],
-    ["researchRequirements", de(pe())],
-    ["requiredTags", de(Te())],
-    ["providedTags", de(Te())],
+    ["xpValue", ue()],
+    ["refunds", ee(K(), p())],
+    ["constructionCost", ee(K(), p())],
+    ["researchRequirements", Pe(me())],
+    ["requiredTags", Pe(we())],
+    ["providedTags", Pe(we())],
     [
       "netResourceProduction",
-      re(K(), Zr())
+      ee(K(), ca())
     ],
-    ["recipesUnlocked", de(gr())]
+    ["recipesUnlocked", Pe(pr())]
   ]);
 }
-function Lu() {
+function Dd() {
   return f([
-    ["seqId", M()],
+    ["seqId", _()],
     [
       "habBuildingDefinitions",
       f([
-        ["unsizedLen", M()],
+        ["unsizedLen", _()],
         [
           "offsetList",
           T(
             f([
-              ["offset", M()],
-              ["key", rr()]
+              ["offset", _()],
+              ["key", ir()]
             ])
           )
         ],
-        ["unsizedList", T(Nu())]
+        ["unsizedList", T(Id())]
       ])
     ]
   ]);
 }
-function Gu() {
-  return q([]);
+function Md() {
+  return Z([]);
 }
-function $u() {
+function Nd() {
   return f([
     ["sequenceId", C()],
-    ["buildings", re(rr(), Ur())]
+    ["buildings", ee(ir(), Yr())]
   ]);
 }
-function Ju() {
+function Ld() {
   return f([
-    ["from", T(ye(), { size: 2 })],
-    ["to", T(ye(), { size: 2 })],
-    ["departureTime", F()],
-    ["duration", tt()]
+    ["from", T(Ce(), { size: 2 })],
+    ["to", T(Ce(), { size: 2 })],
+    ["departureTime", U()],
+    ["duration", gt()]
   ]);
 }
-function ea() {
+function da() {
   return f([
     ["cargoId", K()],
-    ["sideFlags", P6()],
-    ["price", A()],
-    ["remainingQty", A()]
+    ["sideFlags", P2()],
+    ["price", p()],
+    ["remainingQty", p()]
   ]);
 }
-function Va() {
+function Ua() {
   return C();
 }
-function ad() {
+function Gd() {
   return f([
-    ["totals", zd()],
+    ["totals", Ef()],
     ["orderCount", C()],
-    ["rentBytesOwned", A()]
+    ["rentBytesOwned", p()]
   ]);
 }
-function nd() {
+function Yd() {
   return f([
-    ["level1", ke()],
-    ["level0", Fe()]
+    ["level1", Be()],
+    ["level0", He()]
   ]);
 }
-function ld() {
+function Jd() {
   return f([
-    ["level2", ke()],
-    ["level0", Fe()],
-    ["level1", Fe()]
+    ["level2", Be()],
+    ["level0", He()],
+    ["level1", He()]
   ]);
 }
-function fd() {
+function ef() {
   return f([
-    ["level3", ke()],
-    ["level0", Fe()],
-    ["level1", Fe()],
-    ["level2", Fe()]
+    ["level3", Be()],
+    ["level0", He()],
+    ["level1", He()],
+    ["level2", He()]
   ]);
 }
-function Ad() {
+function nf() {
   return f([
-    ["level4", ke()],
-    ["level0", Fe()],
-    ["level1", Fe()],
-    ["level2", Fe()],
-    ["level3", Fe()]
+    ["level4", Be()],
+    ["level0", He()],
+    ["level1", He()],
+    ["level2", He()],
+    ["level3", He()]
   ]);
 }
-function Cd() {
+function sf() {
   return f([
-    ["level5", ke()],
-    ["level0", Fe()],
-    ["level1", Fe()],
-    ["level2", Fe()],
-    ["level3", Fe()],
-    ["level4", Fe()]
+    ["level5", Be()],
+    ["level0", He()],
+    ["level1", He()],
+    ["level2", He()],
+    ["level3", He()],
+    ["level4", He()]
   ]);
 }
-function Id() {
+function gf() {
   return f([
     ["asteroid", x()],
-    ["regionXpModifier", se()],
+    ["regionXpModifier", ue()],
+    ["minedStorageUnits", p()],
+    ["exitFuelCeiling", p()],
+    ["cargoCapacity", p()],
+    ["progressionGainPpb", _()],
     ["resources", T(K())]
   ]);
 }
-function $e() {
+function tr() {
   return f([
-    ["min", Wr()],
-    ["max", Wr()]
+    ["min", Or()],
+    ["max", Or()]
   ]);
 }
 function ne() {
   return C();
 }
-function Dd() {
+function yf() {
   return f([
     ["requiredCrew", C()],
     ["passengerCapacity", C()],
     ["respawnTimeWithoutFee", C()],
     ["respawnTimeWithFee", C()],
-    ["recoveryFee", A()],
-    ["scanCoolDown", M()],
-    ["scanPower", M()],
-    ["scanCost", M()],
-    ["scanBonus", Ur()],
-    ["lpValue", M()],
-    ["medallionValue", M()],
-    ["xpValue", M()]
+    ["recoveryFee", p()],
+    ["scanCoolDown", _()],
+    ["scanPower", _()],
+    ["scanCost", _()],
+    ["scanBonus", Yr()],
+    ["lpValue", _()],
+    ["medallionValue", _()],
+    ["xpValue", _()]
   ]);
 }
-function wd() {
+function pf() {
   return f([
-    ["subwarpSpeed", se()],
-    ["warpSpeed", se()],
-    ["warpLaneSpeed", se()],
-    ["maxWarpDistance", FB()],
+    ["subwarpSpeed", ue()],
+    ["warpSpeed", ue()],
+    ["warpLaneSpeed", ue()],
+    ["maxWarpDistance", Ej()],
     ["warpCoolDown", C()],
-    ["subwarpFuelConsumptionRate", Re()],
-    ["warpFuelConsumptionRate", Re()],
-    ["planetExitFuelAmount", M()],
-    ["warpXpRate", se()],
-    ["subwarpXpRate", se()]
+    ["subwarpFuelConsumptionRate", Ie()],
+    ["warpFuelConsumptionRate", Ie()],
+    ["planetExitFuelAmount", _()],
+    ["warpXpRate", ue()],
+    ["subwarpXpRate", ue()]
   ]);
 }
-function Wd() {
+function bf() {
   return f([
-    ["journey", Ju()],
-    ["totalFuelExpenditure", tt()],
-    ["totalXpToAward", tt()]
+    ["journey", Ld()],
+    ["totalFuelExpenditure", gt()],
+    ["totalXpToAward", gt()]
   ]);
 }
-function _d() {
+function vf() {
   return f([
-    ["to", T(ye(), { size: 2 })],
-    ["warpStart", F()],
-    ["warpFinish", F()]
+    ["to", T(Ce(), { size: 2 })],
+    ["warpStart", U()],
+    ["warpFinish", U()],
+    ["isLane", P2()]
   ]);
 }
 function ce() {
-  return S(JU(), 64);
+  return S(NG(), 64);
 }
-var en = /* @__PURE__ */ ((e8) => (e8[e8.None = 0] = "None", e8[e8.One = 1] = "One", e8[e8.Two = 2] = "Two", e8[e8.Three = 3] = "Three", e8[e8.Four = 4] = "Four", e8[e8.Five = 5] = "Five", e8))(en || {});
-function Jr() {
-  return ve(en);
-}
-function dt() {
+function Pn() {
   return f([
-    ["idCounter", A()],
-    ["makers", re(x(), ad())],
-    ["orders", T(Ld())]
+    ["through", U()],
+    ["nanoSixthsPerSecond", p()],
+    ["work", p()]
   ]);
 }
-function Ld() {
+var bn = /* @__PURE__ */ ((e5) => (e5[e5.None = 0] = "None", e5[e5.One = 1] = "One", e5[e5.Two = 2] = "Two", e5[e5.Three = 3] = "Three", e5[e5.Four = 4] = "Four", e5[e5.Five = 5] = "Five", e5))(bn || {});
+function na() {
+  return Se(bn);
+}
+function vt() {
   return f([
-    ["price", A()],
-    ["quantity", A()],
-    ["orderId", A()],
+    ["idCounter", p()],
+    ["makers", ee(x(), Gd())],
+    ["orders", T(Tf())]
+  ]);
+}
+function Tf() {
+  return f([
+    ["price", p()],
+    ["quantity", p()],
+    ["orderId", p()],
     ["maker", x()]
   ]);
 }
-function zd() {
+function Ef() {
   return f([
-    ["atlas", A()],
-    ["cargo", A()]
+    ["atlas", p()],
+    ["cargo", p()]
   ]);
 }
-function Zd() {
-  return f([
+function Uf() {
+  return d([
     ["lastAccrualTime", F()],
-    ["available", C()],
-    ["fractionalCarry", T(P6(), { size: 6 })]
+    ["available", b()],
+    ["fractionalCarry", D2(A(), { size: 6 })]
   ]);
 }
-function ef() {
+function Bf() {
+  return f([
+    ["lastAccrualTime", U()],
+    ["available", C()],
+    ["fractionalCarry", T(P2(), { size: 6 })]
+  ]);
+}
+function Hf() {
   return f([
     [
       "claimStakePlots",
-      T(T(M(), { size: 5 }), {
+      T(T(_(), { size: 5 }), {
         size: 7
       })
     ],
     [
       "baseClaimStakeRentRate",
-      T(T(Wr(), { size: 5 }), {
+      T(T(Or(), { size: 5 }), {
         size: 7
       })
     ],
     [
       "baseClaimStakePlacementFee",
-      T(T(Wr(), { size: 5 }), {
+      T(T(Or(), { size: 5 }), {
         size: 7
       })
     ],
-    ["resources", re(K(), ht())],
-    ["providedTags", de(Te())],
+    ["resources", ee(K(), Ft())],
+    ["providedTags", Pe(we())],
     [
       "claimedPlots",
       f([
-        ["unsizedLen", M()],
+        ["unsizedLen", _()],
         [
           "offsetList",
           T(
             f([
-              ["offset", M()],
-              ["key", P6()]
+              ["offset", _()],
+              ["key", P2()]
             ])
           )
         ],
-        ["unsizedList", T(ws())]
+        ["unsizedList", T(mu())]
       ])
     ]
   ]);
 }
-function on() {
+function In() {
   return f([
-    ["lastTickTimestamp", F()],
-    ["resourceStorage", A()],
+    ["lastTickTimestamp", U()],
+    ["resourceStorage", p()],
     [
       "netResourceProduction",
-      re(K(), Zr())
+      ee(K(), ca())
     ],
-    ["cargoPod", vr()]
+    ["cargoPod", Ir()]
   ]);
 }
-var cn = /* @__PURE__ */ ((e8) => (e8[e8.Atlas = 0] = "Atlas", e8[e8.Daoatlas = 1] = "Daoatlas", e8))(cn || {});
-function aa() {
-  return ve(cn);
+var hn = /* @__PURE__ */ ((e5) => (e5[e5.Atlas = 0] = "Atlas", e5[e5.Daoatlas = 1] = "Daoatlas", e5))(hn || {});
+function ga() {
+  return Se(hn);
 }
-function gr() {
+function pr() {
   return C();
 }
-var ln = /* @__PURE__ */ ((e8) => (e8[e8.Active = 0] = "Active", e8[e8.Deactivated = 1] = "Deactivated", e8))(ln || {});
-function nf() {
-  return ve(ln);
+var Dn = /* @__PURE__ */ ((e5) => (e5[e5.Active = 0] = "Active", e5[e5.Deactivated = 1] = "Deactivated", e5))(Dn || {});
+function Xf() {
+  return Se(Dn);
 }
 function te() {
   return C();
 }
-function gn() {
+function En() {
   return f([
-    ["divisor", M()],
+    ["divisor", _()],
     ["feederCategories", C()]
   ]);
 }
-function bf() {
+function cg() {
   return f([
-    ["id", Lr()],
+    ["id", Gr()],
     ["name", ce()],
-    ["atlasCost", A()],
-    ["maxLevel", M()],
-    ["costGrowthBps", M()],
-    ["cargoCost", re(K(), A())],
-    ["requiredTags", de(pe())],
-    ["xpCost", re(Ya(), Zn())],
-    ["modifier", pa()]
+    ["atlasCost", p()],
+    ["maxLevel", _()],
+    ["costGrowthBps", _()],
+    ["cargoCost", ee(K(), p())],
+    ["requiredTags", Pe(me())],
+    ["xpCost", ee(ea(), bo())],
+    ["modifier", Wa()]
   ]);
 }
-function Lr() {
+function Gr() {
   return C();
 }
-function pe() {
+function me() {
   return C();
 }
-function vf() {
+function sg() {
   return f([
-    ["seqId", M()],
+    ["seqId", _()],
     [
       "nodes",
       f([
-        ["unsizedLen", M()],
+        ["unsizedLen", _()],
         [
           "offsetList",
           T(
             f([
-              ["offset", M()],
-              ["key", Lr()]
+              ["offset", _()],
+              ["key", Gr()]
             ])
           )
         ],
-        ["unsizedList", T(bf())]
+        ["unsizedList", T(cg())]
       ])
     ]
   ]);
 }
-function Rf() {
+function dg() {
   return f([
     ["ammo", K()],
     ["food", K()],
@@ -41469,44 +41601,44 @@ function Rf() {
     ["repairKit", K()]
   ]);
 }
-function Tf() {
+function yg() {
   return f([
-    ["start", F()],
-    ["end", F()],
-    ["wasInLowRiskZone", ge()]
+    ["start", U()],
+    ["end", U()],
+    ["wasInLowRiskZone", fe()]
   ]);
 }
-function $r() {
+function aa() {
   return f([
-    ["quantity", A()],
-    ["completeAt", F()]
+    ["quantity", p()],
+    ["completeAt", U()]
   ]);
 }
-var An = /* @__PURE__ */ ((e8) => (e8[e8.LowRiskZone = 0] = "LowRiskZone", e8[e8.MediumRiskZone = 1] = "MediumRiskZone", e8[e8.HighRiskZone = 2] = "HighRiskZone", e8))(An || {});
-function Pn() {
-  return ve(An);
+var xn = /* @__PURE__ */ ((e5) => (e5[e5.LowRiskZone = 0] = "LowRiskZone", e5[e5.MediumRiskZone = 1] = "MediumRiskZone", e5[e5.HighRiskZone = 2] = "HighRiskZone", e5))(xn || {});
+function Nn() {
+  return Se(xn);
 }
-var wn = /* @__PURE__ */ ((e8) => (e8[e8.Draft = 0] = "Draft", e8[e8.Active = 1] = "Active", e8[e8.Removed = 2] = "Removed", e8))(wn || {});
-function xr() {
-  return ve(wn);
+var Yn = /* @__PURE__ */ ((e5) => (e5[e5.Draft = 0] = "Draft", e5[e5.Active = 1] = "Active", e5[e5.Removed = 2] = "Removed", e5))(Yn || {});
+function Fr() {
+  return Se(Yn);
 }
-function Kf() {
+function kg() {
   return f([
     ["id", _e()],
     ["name", ce()],
     ["mint", x()],
-    ["sizeClass", na()],
-    ["stats", za()],
-    ["researchRequirements", T(pe())],
+    ["sizeClass", ya()],
+    ["stats", Qa()],
+    ["researchRequirements", T(me())],
     [
       "componentRequirements",
-      re(K(), A())
+      ee(K(), p())
     ]
   ]);
 }
-function qf() {
+function Fg() {
   return f([
-    ["total", M()],
+    ["total", _()],
     ["xxSmall", C()],
     ["xSmall", C()],
     ["small", C()],
@@ -41517,40 +41649,40 @@ function qf() {
     ["titan", C()]
   ]);
 }
-function Qf() {
+function Bg() {
   return f([
-    ["seqId", M()],
-    ["maxFleetSize", M()],
+    ["seqId", _()],
+    ["maxFleetSize", _()],
     [
       "mintToId",
       f([
-        ["unsizedLen", M()],
+        ["unsizedLen", _()],
         [
           "offsetList",
           T(
             f([
-              ["offset", M()],
+              ["offset", _()],
               ["key", x()]
             ])
           )
         ],
-        ["unsizedList", T(de(_e()))]
+        ["unsizedList", T(Pe(_e()))]
       ])
     ],
     [
       "ships",
       f([
-        ["unsizedLen", M()],
+        ["unsizedLen", _()],
         [
           "offsetList",
           T(
             f([
-              ["offset", M()],
+              ["offset", _()],
               ["key", _e()]
             ])
           )
         ],
-        ["unsizedList", T(Kf())]
+        ["unsizedList", T(kg())]
       ])
     ]
   ]);
@@ -41558,246 +41690,317 @@ function Qf() {
 function _e() {
   return C();
 }
-function za() {
+function Qa() {
   return f([
-    ["movementStats", wd()],
-    ["cargoStats", is()],
-    ["combatStats", Ls()],
-    ["miscStats", Dd()]
+    ["movementStats", pf()],
+    ["cargoStats", Ys()],
+    ["combatStats", Iu()],
+    ["miscStats", yf()]
   ]);
 }
-function da() {
+function Yg() {
+  return d([
+    ["careers", D2(Fs(), { size: 6 })],
+    ["legacyEarned", y()],
+    ["legacySpent", y()],
+    ["legacyPending", y()],
+    ["legacyRanks", D2(M(), { size: 6 })],
+    ["legacyUnlockedVersion", M()],
+    ["legacyFocus", A()]
+  ]);
+}
+function Xg() {
+  return f([
+    ["careers", T(Us(), { size: 6 })],
+    ["legacyEarned", p()],
+    ["legacySpent", p()],
+    ["legacyPending", p()],
+    ["legacyRanks", T(_(), { size: 6 })],
+    ["legacyUnlockedVersion", _()],
+    ["legacyFocus", P2()]
+  ]);
+}
+function Qn() {
+  return f([
+    ["version", _()],
+    ["finiteCaps", T(_(), { size: 6 })],
+    ["councilCap", _()]
+  ]);
+}
+function Ra() {
   return f([
     ["cargoId", K()],
-    ["amount", A()]
+    ["amount", p()]
   ]);
 }
-var xn = /* @__PURE__ */ ((e8) => (e8[e8.XxSmall = 0] = "XxSmall", e8[e8.Xsmall = 1] = "Xsmall", e8[e8.Small = 2] = "Small", e8[e8.Medium = 3] = "Medium", e8[e8.Large = 4] = "Large", e8[e8.Capital = 5] = "Capital", e8[e8.Commander = 6] = "Commander", e8[e8.Titan = 7] = "Titan", e8))(xn || {});
-function na() {
-  return ve(xn);
+var eo = /* @__PURE__ */ ((e5) => (e5[e5.XxSmall = 0] = "XxSmall", e5[e5.Xsmall = 1] = "Xsmall", e5[e5.Small = 2] = "Small", e5[e5.Medium = 3] = "Medium", e5[e5.Large = 4] = "Large", e5[e5.Capital = 5] = "Capital", e5[e5.Commander = 6] = "Commander", e5[e5.Titan = 7] = "Titan", e5))(eo || {});
+function ya() {
+  return Se(eo);
 }
-function og() {
-  return q([P6()]);
+function Kg() {
+  return Z([P2()]);
 }
-function cg() {
+function qg() {
   return f([
-    ["owner", ir()],
-    ["level", Oe()],
-    ["localMarketEnableLevel", Oe()],
-    ["repairEnableLevel", Oe()],
-    ["hp", M()],
-    ["pendingHp", M()],
-    ["sp", M()],
-    ["shieldBreakDelayExpiresAt", F()],
-    ["lastCombatUpdate", F()],
-    ["builtDestroyedTimestamp", F()],
+    ["owner", ur()],
+    ["level", Fe()],
+    ["localMarketEnableLevel", Fe()],
+    ["repairEnableLevel", Fe()],
+    ["hp", _()],
+    ["pendingHp", _()],
+    ["sp", _()],
+    ["shieldBreakDelayExpiresAt", U()],
+    ["lastCombatUpdate", U()],
+    ["builtDestroyedTimestamp", U()],
     [
       "craftingHabPlots",
-      T(T(M(), { size: 5 }), {
+      T(T(_(), { size: 5 }), {
         size: 7
       })
     ],
     [
       "baseCraftingHabRentRate",
-      T(T(Wr(), { size: 5 }), {
+      T(T(Or(), { size: 5 }), {
         size: 7
       })
     ],
     [
       "baseCraftingHabPlacementFee",
-      T(T(Wr(), { size: 5 }), {
+      T(T(Or(), { size: 5 }), {
         size: 7
       })
     ],
-    ["starbaseMaxLevel", sg()],
-    ["locationTags", de(Va())],
-    ["buildingTags", de(Te())],
-    ["validRecipes", de(gr())],
+    ["starbaseMaxLevel", Qg()],
+    ["locationTags", Pe(Ua())],
+    ["buildingTags", Pe(we())],
+    ["validRecipes", Pe(pr())],
     [
       "craftingHabs",
       f([
-        ["unsizedLen", M()],
+        ["unsizedLen", _()],
         [
           "offsetList",
           T(
             f([
-              ["offset", M()],
-              ["key", P6()]
+              ["offset", _()],
+              ["key", P2()]
             ])
           )
         ],
-        ["unsizedList", T(Js())]
+        ["unsizedList", T(Lu())]
       ])
     ]
   ]);
 }
-function Fe() {
+function He() {
   return f([
-    ["info", ke()],
+    ["info", Be()],
     [
       "upgradeState",
-      re(K(), Og())
+      ee(K(), hm())
     ]
   ]);
 }
-var On = /* @__PURE__ */ ((e8) => (e8[e8.Level0 = 0] = "Level0", e8[e8.Level1 = 1] = "Level1", e8[e8.Level2 = 2] = "Level2", e8[e8.Level3 = 3] = "Level3", e8[e8.Level4 = 4] = "Level4", e8[e8.Level5 = 5] = "Level5", e8[e8.Css = 6] = "Css", e8))(On || {});
-function Oe() {
-  return ve(On);
+var ro = /* @__PURE__ */ ((e5) => (e5[e5.Level0 = 0] = "Level0", e5[e5.Level1 = 1] = "Level1", e5[e5.Level2 = 2] = "Level2", e5[e5.Level3 = 3] = "Level3", e5[e5.Level4 = 4] = "Level4", e5[e5.Level5 = 5] = "Level5", e5[e5.Css = 6] = "Css", e5))(ro || {});
+function Fe() {
+  return Se(ro);
 }
-function ke() {
+function Be() {
   return f([
-    ["hp", M()],
-    ["sp", M()],
-    ["xpValue", se()],
+    ["hp", _()],
+    ["sp", _()],
+    ["xpValue", ue()],
     ["shieldBreakDelay", C()],
-    ["shieldRechargeRate", Re()],
-    ["repairRate", Re()],
-    ["repairAbility", Re()],
-    ["repairEfficiency", Re()],
-    ["repairCost", Re()],
-    ["repairFee", A()],
-    ["damagePerRound", M()]
+    ["shieldRechargeRate", Ie()],
+    ["repairRate", Ie()],
+    ["repairAbility", Ie()],
+    ["repairEfficiency", Ie()],
+    ["repairCost", Ie()],
+    ["repairFee", p()],
+    ["damagePerRound", _()]
   ]);
 }
-function sg() {
-  return _r([
+function Qg() {
+  return kr([
     [
       "Level0",
       f([
-        ["fields", q([ke()])]
+        ["fields", Z([Be()])]
       ])
     ],
     [
       "Level1",
-      f([["fields", q([nd()])]])
+      f([["fields", Z([Yd()])]])
     ],
     [
       "Level2",
-      f([["fields", q([ld()])]])
+      f([["fields", Z([Jd()])]])
     ],
     [
       "Level3",
-      f([["fields", q([fd()])]])
+      f([["fields", Z([ef()])]])
     ],
     [
       "Level4",
-      f([["fields", q([Ad()])]])
+      f([["fields", Z([nf()])]])
     ],
     [
       "Level5",
-      f([["fields", q([Cd()])]])
+      f([["fields", Z([sf()])]])
     ],
     [
       "Css",
       f([
-        ["fields", q([ke()])]
+        ["fields", Z([Be()])]
       ])
     ]
   ]);
 }
-function Fn() {
+function oo() {
   return f([
-    ["stat", ba()],
-    ["deltaBps", M()],
-    ["charges", P6()],
-    ["stackRule", og()]
+    ["stat", Ma()],
+    ["deltaBps", _()],
+    ["charges", P2()],
+    ["stackRule", Kg()]
   ]);
 }
-function dg() {
+function rm() {
   return f([
-    ["effectCount", P6()],
-    ["effects", T(Fn(), { size: 3 })]
+    ["effectCount", P2()],
+    ["effects", T(oo(), { size: 3 })]
   ]);
 }
-function gg() {
+function tm() {
   return f([
-    ["seqId", M()],
+    ["seqId", _()],
     [
       "definitions",
-      re(K(), dg())
+      ee(K(), rm())
     ]
   ]);
 }
-function Bn() {
-  return _r([
-    ["Active", Tr()],
+function co() {
+  return kr([
+    ["Active", Mr()],
     [
       "Design",
       f([
-        ["fields", q([$u()])]
+        ["fields", Z([Nd()])]
       ])
     ],
     [
       "Deactivated",
       f([
-        ["fields", q([Ga()])]
+        ["fields", Z([rt()])]
       ])
     ]
   ]);
 }
-function Ga() {
-  return f([["deactivationTime", F()]]);
+function rt() {
+  return f([["deactivationTime", U()]]);
 }
-function nr() {
+function lr() {
   return C();
 }
-var zn = /* @__PURE__ */ ((e8) => (e8[e8.One = 0] = "One", e8[e8.Two = 1] = "Two", e8[e8.Three = 2] = "Three", e8[e8.Four = 3] = "Four", e8[e8.Five = 4] = "Five", e8))(zn || {});
-function hr() {
-  return ve(zn);
+var lo = /* @__PURE__ */ ((e5) => (e5[e5.One = 0] = "One", e5[e5.Two = 1] = "Two", e5[e5.Three = 2] = "Three", e5[e5.Four = 3] = "Four", e5[e5.Five = 4] = "Five", e5))(lo || {});
+function Wr() {
+  return Se(lo);
 }
-function Og() {
+function hm() {
   return f([
-    ["needed", A()],
-    ["deposited", A()],
+    ["needed", p()],
+    ["deposited", p()],
     ["crew", C()],
     ["duration", C()]
   ]);
 }
-var Jn = /* @__PURE__ */ ((e8) => (e8[e8.CouncilRank = 0] = "CouncilRank", e8[e8.DailyXp = 1] = "DailyXp", e8[e8.Pilot = 2] = "Pilot", e8[e8.DataRunner = 3] = "DataRunner", e8[e8.Mining = 4] = "Mining", e8[e8.Building = 5] = "Building", e8[e8.Crafting = 6] = "Crafting", e8[e8.Combat = 7] = "Combat", e8))(Jn || {});
-function Ya() {
-  return ve(Jn);
+var po = /* @__PURE__ */ ((e5) => (e5[e5.CouncilRank = 0] = "CouncilRank", e5[e5.DailyXp = 1] = "DailyXp", e5[e5.Pilot = 2] = "Pilot", e5[e5.DataRunner = 3] = "DataRunner", e5[e5.Mining = 4] = "Mining", e5[e5.Building = 5] = "Building", e5[e5.Crafting = 6] = "Crafting", e5[e5.Combat = 7] = "Combat", e5))(po || {});
+function ea() {
+  return Se(po);
 }
-function Zn() {
+function bo() {
   return f([
-    ["minimumLevel", M()],
-    ["cost", A()]
+    ["minimumLevel", _()],
+    ["cost", p()]
   ]);
 }
-function Bg() {
+function Em() {
   return f([
+    ["seqId", _()],
+    ["dailyCheckInConfig", an()],
+    ["renownConfig", En()],
+    ["progression", Qn()],
+    ["levelThresholds", T(Ro())],
+    [
+      "combatComponentPointsQ6",
+      ee(K(), p())
+    ],
+    ["starbasePointsQ6", T(p(), { size: 6 })]
+  ]);
+}
+function Mm() {
+  return d([
     ["seqId", M()],
-    ["dailyCheckInConfig", Ut()],
-    ["renownConfig", gn()],
-    ["levelThresholds", T(ao())]
+    ["councilRank", Cr()],
+    ["dailyXp", Cr()],
+    ["pilot", Cr()],
+    ["dataRunner", Cr()],
+    ["mining", Cr()],
+    ["building", Cr()],
+    ["crafting", Cr()],
+    ["combat", Cr()],
+    ["councilRankLevelCarry", M()],
+    ["progression", Yg()]
   ]);
 }
-function Hg() {
+function _m() {
   return f([
-    ["seqId", M()],
-    ["councilRank", pr()],
-    ["dailyXp", pr()],
-    ["pilot", pr()],
-    ["dataRunner", pr()],
-    ["mining", pr()],
-    ["building", pr()],
-    ["crafting", pr()],
-    ["combat", pr()],
-    ["councilRankLevelCarry", M()]
+    ["seqId", _()],
+    ["councilRank", vr()],
+    ["dailyXp", vr()],
+    ["pilot", vr()],
+    ["dataRunner", vr()],
+    ["mining", vr()],
+    ["building", vr()],
+    ["crafting", vr()],
+    ["combat", vr()],
+    ["councilRankLevelCarry", _()],
+    ["progression", Xg()]
   ]);
 }
-function ao() {
+function Ro() {
   return f([
-    ["building", A()],
-    ["combat", A()],
-    ["councilRank", A()],
-    ["crafting", A()],
-    ["dailyXp", A()],
-    ["dataRunner", A()],
-    ["mining", A()],
-    ["pilot", A()]
+    ["building", p()],
+    ["combat", p()],
+    ["councilRank", p()],
+    ["crafting", p()],
+    ["dailyXp", p()],
+    ["dataRunner", p()],
+    ["mining", p()],
+    ["pilot", p()]
   ]);
 }
-var Gg = new Uint8Array([
+var xm = new Uint8Array([
+  6,
+  84,
+  68,
+  189,
+  240,
+  238,
+  54,
+  46
+]);
+var Lm = new Uint8Array([
+  142,
+  98,
+  134,
+  68,
+  74,
+  251,
+  106,
+  147
+]);
+var zm = new Uint8Array([
   133,
   168,
   11,
@@ -41807,7 +42010,7 @@ var Gg = new Uint8Array([
   253,
   162
 ]);
-var $g = new Uint8Array([
+var Ym = new Uint8Array([
   202,
   183,
   49,
@@ -41817,7 +42020,7 @@ var $g = new Uint8Array([
   28,
   31
 ]);
-var Zg = new Uint8Array([
+var Jm = new Uint8Array([
   182,
   164,
   35,
@@ -41827,7 +42030,27 @@ var Zg = new Uint8Array([
   234,
   214
 ]);
-var am = new Uint8Array([
+var e1 = new Uint8Array([
+  215,
+  221,
+  58,
+  193,
+  182,
+  136,
+  233,
+  135
+]);
+var n1 = new Uint8Array([
+  32,
+  132,
+  80,
+  155,
+  22,
+  227,
+  153,
+  91
+]);
+var l1 = new Uint8Array([
   57,
   155,
   254,
@@ -41837,7 +42060,7 @@ var am = new Uint8Array([
   21,
   28
 ]);
-var im = new Uint8Array([
+var f1 = new Uint8Array([
   91,
   194,
   154,
@@ -41847,7 +42070,7 @@ var im = new Uint8Array([
   55,
   172
 ]);
-var um = new Uint8Array([
+var A1 = new Uint8Array([
   32,
   26,
   247,
@@ -41857,7 +42080,7 @@ var um = new Uint8Array([
   108,
   248
 ]);
-var mm = new Uint8Array([
+var C1 = new Uint8Array([
   248,
   247,
   117,
@@ -41867,7 +42090,7 @@ var mm = new Uint8Array([
   31,
   146
 ]);
-var Pm = new Uint8Array([
+var I1 = new Uint8Array([
   185,
   37,
   29,
@@ -41877,45 +42100,56 @@ var Pm = new Uint8Array([
   142,
   109
 ]);
-function bm() {
+function h1() {
   return f([
     ["discriminator", S(I(), 8)],
-    ["version", P6()],
-    ["id", wt()],
+    ["version", P2()],
+    ["id", zt()],
     ["name", ce()],
     ["game", x()],
     ["system", x()],
-    ["systemSeqId", A()],
-    ["lastSyncTimestamp", F()],
-    ["celestialBodyType", fs()]
+    ["systemSeqId", p()],
+    ["lastSyncTimestamp", U()],
+    ["celestialBodyType", Zs()]
   ]);
 }
-var Sm = new Uint8Array([
-  140,
-  115,
-  165,
-  36,
-  241,
-  153,
-  102,
-  84
+var Io = new Uint8Array([
+  75,
+  17,
+  216,
+  95,
+  4,
+  168,
+  107,
+  219
 ]);
-function Rm() {
+function w1() {
   return f([
-    ["discriminator", S(I(), 8)],
-    ["version", P6()],
+    [
+      "discriminator",
+      Je(S(I(), 8), (e5) => {
+        if (!e5.every(
+          (t, a) => t === Io[a]
+        ))
+          throw new RangeError(
+            "Incompatible character account layout discriminator"
+          );
+        return e5;
+      })
+    ],
+    ["version", P2()],
     ["playerProfile", x()],
     ["gameId", x()],
-    ["bump", P6()],
-    ["checkInInfo", Ss()],
-    ["xpInfo", Hg()],
-    ["atlas", A()],
-    ["counts", ms()],
-    ["pilotXpBudget", Zd()],
-    ["characterModifiers", Ps()]
+    ["bump", P2()],
+    ["checkInInfo", lu()],
+    ["xpInfo", _m()],
+    ["atlas", p()],
+    ["counts", eu()],
+    ["pilotXpBudget", Bf()],
+    ["characterModifiers", nu()]
   ]);
 }
-var Dm = new Uint8Array([
+var E1 = new Uint8Array([
   246,
   5,
   165,
@@ -41925,7 +42159,7 @@ var Dm = new Uint8Array([
   101,
   6
 ]);
-var Wm = new Uint8Array([
+var O1 = new Uint8Array([
   200,
   38,
   62,
@@ -41935,28 +42169,39 @@ var Wm = new Uint8Array([
   40,
   163
 ]);
-function Em() {
+function N1() {
   return f([
     ["discriminator", S(I(), 8)],
-    ["version", P6()],
+    ["version", P2()],
     ["owner", x()],
     ["gameId", x()],
     ["celestialBodyId", x()],
-    ["claimStakeDefinitionId", Rr()],
-    ["claimStakeDefinitionSeqId", M()],
-    ["buildingDefinitionSeqId", M()],
-    ["systemSeqId", A()],
-    ["lastRentClockTimestamp", F()],
-    ["constructionRemaining", F()],
-    ["constructionProgressTimestamp", F()],
-    ["rentBalance", A()],
+    ["claimStakeDefinitionId", wr()],
+    ["claimStakeDefinitionSeqId", _()],
+    ["buildingDefinitionSeqId", _()],
+    ["systemSeqId", p()],
+    ["lastRentClockTimestamp", U()],
+    ["constructionRemaining", U()],
+    ["operationalXp", Pn()],
+    ["constructionProgressTimestamp", U()],
+    ["rentBalance", p()],
     ["neededCrew", C()],
-    ["buildings", re(rr(), M())],
-    ["state", Bn()],
-    ["productionCore", on()]
+    ["buildings", ee(ir(), _())],
+    ["state", co()],
+    ["productionCore", In()]
   ]);
 }
-var Mm = new Uint8Array([
+var L1 = new Uint8Array([
+  66,
+  191,
+  15,
+  29,
+  24,
+  59,
+  190,
+  173
+]);
+var z1 = new Uint8Array([
   71,
   73,
   19,
@@ -41966,7 +42211,7 @@ var Mm = new Uint8Array([
   242,
   53
 ]);
-var km = new Uint8Array([
+var Y1 = new Uint8Array([
   26,
   127,
   237,
@@ -41976,32 +42221,33 @@ var km = new Uint8Array([
   51,
   31
 ]);
-function Lm() {
+function X1() {
   return f([
     ["discriminator", S(I(), 8)],
-    ["version", P6()],
+    ["version", P2()],
     ["owner", x()],
     ["gameId", x()],
     ["system", x()],
-    ["craftingHabDefinitionId", jr()],
-    ["craftingHabDefinitionSeqId", M()],
-    ["buildingDefinitionSeqId", M()],
-    ["systemSeqId", A()],
-    ["lastRentClockTimestamp", F()],
-    ["constructionRemaining", F()],
-    ["constructionProgressTimestamp", F()],
-    ["rentBalance", A()],
+    ["craftingHabDefinitionId", qr()],
+    ["craftingHabDefinitionSeqId", _()],
+    ["buildingDefinitionSeqId", _()],
+    ["systemSeqId", p()],
+    ["lastRentClockTimestamp", U()],
+    ["constructionRemaining", U()],
+    ["operationalXp", Pn()],
+    ["constructionProgressTimestamp", U()],
+    ["rentBalance", p()],
     ["neededCrew", C()],
     ["craftingJobConcurrency", C()],
     ["craftingJobs", C()],
-    ["craftingModifiers", Ra()],
-    ["habBuildings", re(rr(), M())],
-    ["recipesUnlocked", de(gr())],
-    ["state", Bn()],
-    ["productionCore", on()]
+    ["craftingModifiers", Na()],
+    ["habBuildings", ee(ir(), _())],
+    ["recipesUnlocked", Pe(pr())],
+    ["state", co()],
+    ["productionCore", In()]
   ]);
 }
-var Um = new Uint8Array([
+var K1 = new Uint8Array([
   105,
   184,
   5,
@@ -42011,28 +42257,29 @@ var Um = new Uint8Array([
   13,
   169
 ]);
-function Bm() {
+function J1() {
   return f([
     ["discriminator", S(I(), 8)],
-    ["version", P6()],
+    ["version", P2()],
     ["recipe", x()],
     ["profile", x()],
     ["system", x()],
     ["starbasePlayer", x()],
-    ["starbaseSeqId", A()],
+    ["starbaseSeqId", p()],
     ["craftingHab", x()],
-    ["quantity", A()],
-    ["numCrew", M()],
-    ["startTime", F()],
-    ["endTime", F()],
-    ["feeEscrow", A()],
-    ["feeRecipient", aa()],
+    ["quantity", p()],
+    ["numCrew", _()],
+    ["startTime", U()],
+    ["endTime", U()],
+    ["feeEscrow", p()],
+    ["feeRecipient", ga()],
     ["feeGovernance", x()],
-    ["feeSnapshot", xu()],
-    ["inputs", vr()]
+    ["feeSnapshot", Sd()],
+    ["inputs", Ir()],
+    ["completion", wu()]
   ]);
 }
-var Hm = new Uint8Array([
+var Z1 = new Uint8Array([
   55,
   198,
   43,
@@ -42042,7 +42289,7 @@ var Hm = new Uint8Array([
   241,
   90
 ]);
-var Xm = new Uint8Array([
+var ay = new Uint8Array([
   231,
   203,
   142,
@@ -42052,7 +42299,7 @@ var Xm = new Uint8Array([
   7,
   191
 ]);
-var qm = new Uint8Array([
+var iy = new Uint8Array([
   204,
   180,
   192,
@@ -42062,7 +42309,7 @@ var qm = new Uint8Array([
   98,
   38
 ]);
-var r1 = new Uint8Array([
+var uy = new Uint8Array([
   23,
   85,
   6,
@@ -42072,7 +42319,7 @@ var r1 = new Uint8Array([
   45,
   47
 ]);
-var o1 = new Uint8Array([
+var my = new Uint8Array([
   123,
   17,
   116,
@@ -42082,7 +42329,7 @@ var o1 = new Uint8Array([
   80,
   12
 ]);
-var s1 = new Uint8Array([
+var Py = new Uint8Array([
   18,
   165,
   241,
@@ -42092,7 +42339,7 @@ var s1 = new Uint8Array([
   254,
   248
 ]);
-var g1 = new Uint8Array([
+var Sy = new Uint8Array([
   105,
   137,
   7,
@@ -42102,7 +42349,7 @@ var g1 = new Uint8Array([
   30,
   33
 ]);
-var p1 = new Uint8Array([
+var Dy = new Uint8Array([
   77,
   163,
   59,
@@ -42112,7 +42359,7 @@ var p1 = new Uint8Array([
   123,
   79
 ]);
-var v1 = new Uint8Array([
+var Wy = new Uint8Array([
   187,
   146,
   239,
@@ -42122,7 +42369,17 @@ var v1 = new Uint8Array([
   173,
   26
 ]);
-var h1 = new Uint8Array([
+var xy = new Uint8Array([
+  70,
+  250,
+  91,
+  244,
+  119,
+  155,
+  102,
+  180
+]);
+var Ly = new Uint8Array([
   122,
   143,
   85,
@@ -42132,7 +42389,7 @@ var h1 = new Uint8Array([
   117,
   239
 ]);
-var V1 = new Uint8Array([
+var zy = new Uint8Array([
   218,
   116,
   183,
@@ -42142,7 +42399,7 @@ var V1 = new Uint8Array([
   56,
   14
 ]);
-var M1 = new Uint8Array([
+var Yy = new Uint8Array([
   156,
   40,
   135,
@@ -42152,7 +42409,7 @@ var M1 = new Uint8Array([
   178,
   62
 ]);
-var k1 = new Uint8Array([
+var Jy = new Uint8Array([
   144,
   26,
   143,
@@ -42162,7 +42419,7 @@ var k1 = new Uint8Array([
   135,
   133
 ]);
-var B1 = new Uint8Array([
+var eA = new Uint8Array([
   71,
   225,
   34,
@@ -42172,7 +42429,7 @@ var B1 = new Uint8Array([
   172,
   184
 ]);
-var j1 = new Uint8Array([
+var nA = new Uint8Array([
   81,
   104,
   128,
@@ -42182,7 +42439,7 @@ var j1 = new Uint8Array([
   98,
   171
 ]);
-var K1 = new Uint8Array([
+var lA = new Uint8Array([
   140,
   39,
   208,
@@ -42192,7 +42449,7 @@ var K1 = new Uint8Array([
   14,
   227
 ]);
-var Q1 = new Uint8Array([
+var fA = new Uint8Array([
   198,
   204,
   233,
@@ -42202,7 +42459,7 @@ var Q1 = new Uint8Array([
   149,
   234
 ]);
-var ty = new Uint8Array([
+var AA = new Uint8Array([
   48,
   66,
   68,
@@ -42212,7 +42469,7 @@ var ty = new Uint8Array([
   156,
   249
 ]);
-var cy = new Uint8Array([
+var CA = new Uint8Array([
   10,
   86,
   25,
@@ -42222,7 +42479,7 @@ var cy = new Uint8Array([
   119,
   112
 ]);
-var dy = new Uint8Array([
+var IA = new Uint8Array([
   205,
   145,
   134,
@@ -42232,7 +42489,7 @@ var dy = new Uint8Array([
   236,
   68
 ]);
-var yy = new Uint8Array([
+var wA = new Uint8Array([
   84,
   187,
   171,
@@ -42242,7 +42499,7 @@ var yy = new Uint8Array([
   229,
   251
 ]);
-var by = new Uint8Array([
+var MA = new Uint8Array([
   60,
   22,
   221,
@@ -42252,7 +42509,7 @@ var by = new Uint8Array([
   182,
   148
 ]);
-var Ry = new Uint8Array([
+var NA = new Uint8Array([
   168,
   67,
   28,
@@ -42262,7 +42519,7 @@ var Ry = new Uint8Array([
   131,
   114
 ]);
-var Ty = new Uint8Array([
+var UA = new Uint8Array([
   6,
   199,
   201,
@@ -42272,7 +42529,7 @@ var Ty = new Uint8Array([
   12,
   98
 ]);
-var Ey = new Uint8Array([
+var GA = new Uint8Array([
   4,
   107,
   245,
@@ -42282,7 +42539,7 @@ var Ey = new Uint8Array([
   255,
   159
 ]);
-var Oy = new Uint8Array([
+var $A = new Uint8Array([
   36,
   73,
   142,
@@ -42292,7 +42549,7 @@ var Oy = new Uint8Array([
   34,
   61
 ]);
-var Fy = new Uint8Array([
+var ZA = new Uint8Array([
   191,
   120,
   121,
@@ -42302,7 +42559,7 @@ var Fy = new Uint8Array([
   27,
   219
 ]);
-var Hy = new Uint8Array([
+var ap = new Uint8Array([
   217,
   200,
   82,
@@ -42312,7 +42569,7 @@ var Hy = new Uint8Array([
   145,
   199
 ]);
-var Xy = new Uint8Array([
+var ip = new Uint8Array([
   18,
   114,
   75,
@@ -42322,7 +42579,7 @@ var Xy = new Uint8Array([
   197,
   111
 ]);
-var qy = new Uint8Array([
+var up = new Uint8Array([
   83,
   108,
   137,
@@ -42332,7 +42589,7 @@ var qy = new Uint8Array([
   168,
   166
 ]);
-var rA = new Uint8Array([
+var mp = new Uint8Array([
   24,
   3,
   230,
@@ -42342,7 +42599,7 @@ var rA = new Uint8Array([
   213,
   78
 ]);
-var oA = new Uint8Array([
+var Pp = new Uint8Array([
   204,
   101,
   0,
@@ -42352,7 +42609,7 @@ var oA = new Uint8Array([
   171,
   104
 ]);
-var sA = new Uint8Array([
+var Sp = new Uint8Array([
   15,
   192,
   165,
@@ -42362,7 +42619,7 @@ var sA = new Uint8Array([
   213,
   180
 ]);
-var gA = new Uint8Array([
+var Dp = new Uint8Array([
   110,
   61,
   87,
@@ -42372,7 +42629,37 @@ var gA = new Uint8Array([
   243,
   91
 ]);
-var pA = new Uint8Array([
+var Wp = new Uint8Array([
+  163,
+  11,
+  19,
+  187,
+  226,
+  16,
+  165,
+  213
+]);
+var xp = new Uint8Array([
+  50,
+  203,
+  177,
+  219,
+  42,
+  182,
+  49,
+  121
+]);
+var Lp = new Uint8Array([
+  193,
+  212,
+  9,
+  107,
+  127,
+  37,
+  40,
+  160
+]);
+var zp = new Uint8Array([
   241,
   110,
   50,
@@ -42382,7 +42669,7 @@ var pA = new Uint8Array([
   0,
   218
 ]);
-var vA = new Uint8Array([
+var Yp = new Uint8Array([
   33,
   94,
   192,
@@ -42392,7 +42679,7 @@ var vA = new Uint8Array([
   243,
   113
 ]);
-var hA = new Uint8Array([
+var Jp = new Uint8Array([
   81,
   161,
   197,
@@ -42402,7 +42689,7 @@ var hA = new Uint8Array([
   146,
   194
 ]);
-var VA = new Uint8Array([
+var eP = new Uint8Array([
   187,
   168,
   40,
@@ -42412,7 +42699,7 @@ var VA = new Uint8Array([
   217,
   193
 ]);
-var MA = new Uint8Array([
+var nP = new Uint8Array([
   206,
   35,
   249,
@@ -42422,7 +42709,7 @@ var MA = new Uint8Array([
   97,
   143
 ]);
-var kA = new Uint8Array([
+var lP = new Uint8Array([
   94,
   145,
   95,
@@ -42432,7 +42719,7 @@ var kA = new Uint8Array([
   184,
   7
 ]);
-var BA = new Uint8Array([
+var fP = new Uint8Array([
   52,
   12,
   254,
@@ -42442,7 +42729,7 @@ var BA = new Uint8Array([
   124,
   55
 ]);
-var jA = new Uint8Array([
+var AP = new Uint8Array([
   234,
   110,
   66,
@@ -42452,7 +42739,7 @@ var jA = new Uint8Array([
   136,
   227
 ]);
-var KA = new Uint8Array([
+var CP = new Uint8Array([
   92,
   103,
   248,
@@ -42462,7 +42749,7 @@ var KA = new Uint8Array([
   83,
   32
 ]);
-var QA = new Uint8Array([
+var IP = new Uint8Array([
   161,
   70,
   46,
@@ -42472,30 +42759,30 @@ var QA = new Uint8Array([
   238,
   2
 ]);
-function ep() {
+function hP() {
   return f([
     ["discriminator", S(I(), 8)],
-    ["version", P6()],
-    ["bump", P6()],
+    ["version", P2()],
+    ["bump", P2()],
     ["gameId", x()],
     ["factionId", ne()],
     ["system", x()],
-    ["starbaseSeqId", A()],
-    ["status", xr()],
-    ["minStandingBuy", he()],
-    ["minStandingSell", he()],
+    ["starbaseSeqId", p()],
+    ["status", Fr()],
+    ["minStandingBuy", De()],
+    ["minStandingSell", De()],
     ["priceTierBps", T(C(), { size: 4 })],
-    ["authoredTargetQty", A()],
-    ["restockPeriodSecs", M()],
-    ["lastRestockAt", F()],
+    ["authoredTargetQty", p()],
+    ["restockPeriodSecs", _()],
+    ["lastRestockAt", U()],
     ["atlasBurnBps", C()],
-    ["standingBps", M()],
-    ["faucetEnabled", P6()],
-    ["pad", T(P6(), { size: 4 })],
-    ["offers", T(ea())]
+    ["standingBps", _()],
+    ["faucetEnabled", P2()],
+    ["pad", T(P2(), { size: 4 })],
+    ["offers", T(da())]
   ]);
 }
-var tp = new Uint8Array([
+var wP = new Uint8Array([
   80,
   199,
   51,
@@ -42505,7 +42792,7 @@ var tp = new Uint8Array([
   99,
   227
 ]);
-var cp = new Uint8Array([
+var MP = new Uint8Array([
   7,
   233,
   28,
@@ -42515,7 +42802,7 @@ var cp = new Uint8Array([
   130,
   252
 ]);
-var dp = new Uint8Array([
+var NP = new Uint8Array([
   81,
   79,
   162,
@@ -42525,7 +42812,7 @@ var dp = new Uint8Array([
   119,
   133
 ]);
-var yp = new Uint8Array([
+var UP = new Uint8Array([
   65,
   117,
   44,
@@ -42535,59 +42822,72 @@ var yp = new Uint8Array([
   91,
   49
 ]);
-var bp = new Uint8Array([
-  109,
-  207,
-  251,
-  48,
-  106,
-  2,
-  136,
-  163
+var ho = new Uint8Array([
+  74,
+  178,
+  149,
+  158,
+  182,
+  52,
+  120,
+  94
 ]);
-function Cp() {
-  return f([
-    ["discriminator", S(I(), 8)],
-    ["version", P6()],
-    ["bump", P6()],
-    ["gameId", x()],
-    ["ownerProfile", x()],
-    ["subProfile", x()],
-    ["subProfileInvalidator", x()],
-    ["faction", ir()],
-    ["npcFactionId", ne()],
-    ["fleetLabel", ce()],
-    ["shipCounts", qf()],
-    ["warpCooldownExpiresAt", F()],
-    ["scanCooldownExpiresAt", F()],
-    ["stats", za()],
-    ["fuelTank", da()],
-    ["ammoBank", da()],
-    ["crewCount", C()],
-    ["rentedCrew", C()],
-    ["shipDefinitionsSeqId", M()],
-    ["ap", M()],
-    ["sp", M()],
-    ["hp", M()],
-    ["pendingHp", M()],
-    ["stance", ha()],
-    ["apReloadExpiresAt", F()],
-    ["shieldBreakDelayExpiresAt", F()],
-    ["lastCombatUpdate", F()],
-    ["location", T(ye(), { size: 2 })],
-    ["lastUpdateAt", F()],
-    ["fleetShips", re(_e(), A())],
-    ["respawningCargo", vr()],
-    ["components", vr()],
-    ["cargoHold", vr()],
-    [
-      "activeStimulants",
-      re(ba(), dl())
-    ],
-    ["state", Wu()]
-  ]);
+function GP() {
+  return Je(
+    f([
+      [
+        "discriminator",
+        Je(S(I(), 8), (e5) => {
+          if (!e5.every((t, a) => t === ho[a]))
+            throw new RangeError(
+              "Incompatible fleet account layout discriminator"
+            );
+          return e5;
+        })
+      ],
+      ["version", P2()],
+      ["bump", P2()],
+      ["gameId", x()],
+      ["ownerProfile", x()],
+      ["subProfile", x()],
+      ["subProfileInvalidator", x()],
+      ["faction", ur()],
+      ["npcFactionId", ne()],
+      ["fleetLabel", ce()],
+      ["shipCounts", Fg()],
+      ["warpCooldownExpiresAt", U()],
+      ["scanCooldownExpiresAt", U()],
+      ["stats", Qa()],
+      ["fuelTank", Ra()],
+      ["ammoBank", Ra()],
+      ["crewCount", C()],
+      ["rentedCrew", C()],
+      ["shipDefinitionsSeqId", _()],
+      ["ap", _()],
+      ["sp", _()],
+      ["hp", _()],
+      ["pendingHp", _()],
+      ["stance", La()],
+      ["apReloadExpiresAt", U()],
+      ["shieldBreakDelayExpiresAt", U()],
+      ["lastCombatUpdate", U()],
+      ["location", T(Ce(), { size: 2 })],
+      ["lastUpdateAt", U()],
+      ["fleetShips", ee(_e(), p())],
+      ["respawningCargo", Ir()],
+      ["components", Ir()],
+      ["cargoHold", Ir()],
+      [
+        "activeStimulants",
+        ee(Ma(), Kl())
+      ],
+      ["fundedNpcXp", P2()],
+      ["state", Pd()]
+    ]),
+    (e5) => (l6(e5.version), e5)
+  );
 }
-var Rp = new Uint8Array([
+var XP = new Uint8Array([
   203,
   64,
   149,
@@ -42597,37 +42897,49 @@ var Rp = new Uint8Array([
   184,
   181
 ]);
-var Tp = new Uint8Array([
-  27,
-  90,
-  166,
-  125,
-  74,
-  100,
-  121,
-  18
+var Do = new Uint8Array([
+  182,
+  167,
+  78,
+  72,
+  87,
+  124,
+  131,
+  71
 ]);
-function wp() {
-  return f([
-    ["discriminator", S(I(), 8)],
-    ["version", P6()],
-    ["profile", x()],
-    ["resources", Rf()],
-    ["currencies", Au()],
-    ["combat", _s()],
-    ["crewConfig", x()],
-    ["shipDefinitions", Qf()],
-    ["cargoDefinitions", as()],
-    ["claimStakeDefinitions", Ds()],
-    ["buildingDefinitions", $l()],
-    ["craftingHabDefinitions", Gs()],
-    ["habBuildingDefinitions", Lu()],
-    ["xpDefinitions", Bg()],
-    ["researchTreeDefinitions", vf()],
-    ["stimulantDefinitions", gg()]
-  ]);
+function qP() {
+  return Je(
+    f([
+      [
+        "discriminator",
+        Je(S(I(), 8), (e5) => {
+          if (!e5.every((t, a) => t === Do[a]))
+            throw new RangeError(
+              "Incompatible game account layout discriminator"
+            );
+          return e5;
+        })
+      ],
+      ["version", P2()],
+      ["profile", x()],
+      ["resources", dg()],
+      ["currencies", nd()],
+      ["combat", Pu()],
+      ["crewConfig", x()],
+      ["shipDefinitions", Bg()],
+      ["cargoDefinitions", zs()],
+      ["claimStakeDefinitions", fu()],
+      ["buildingDefinitions", Ms()],
+      ["craftingHabDefinitions", Mu()],
+      ["habBuildingDefinitions", Dd()],
+      ["xpDefinitions", Em()],
+      ["researchTreeDefinitions", sg()],
+      ["stimulantDefinitions", tm()]
+    ]),
+    (e5) => (c6(e5.version), e5)
+  );
 }
-var Wp = new Uint8Array([
+var QP = new Uint8Array([
   80,
   237,
   110,
@@ -42637,7 +42949,47 @@ var Wp = new Uint8Array([
   137,
   44
 ]);
-var xp = new Uint8Array([
+var tb = new Uint8Array([
+  37,
+  188,
+  206,
+  50,
+  0,
+  184,
+  52,
+  244
+]);
+var cb = new Uint8Array([
+  112,
+  149,
+  16,
+  244,
+  218,
+  235,
+  85,
+  241
+]);
+var db = new Uint8Array([
+  71,
+  179,
+  161,
+  250,
+  81,
+  30,
+  49,
+  216
+]);
+var yb = new Uint8Array([
+  244,
+  250,
+  107,
+  0,
+  109,
+  225,
+  178,
+  39
+]);
+var bb = new Uint8Array([
   106,
   127,
   42,
@@ -42647,7 +42999,7 @@ var xp = new Uint8Array([
   246,
   254
 ]);
-var Lp = new Uint8Array([
+var Rb = new Uint8Array([
   28,
   242,
   214,
@@ -42657,21 +43009,21 @@ var Lp = new Uint8Array([
   167,
   153
 ]);
-function Fp() {
+function Ib() {
   return f([
     ["discriminator", S(I(), 8)],
-    ["version", P6()],
+    ["version", P2()],
     ["system", x()],
-    ["starbaseSeqId", A()],
-    ["bump", P6()],
+    ["starbaseSeqId", p()],
+    ["bump", P2()],
     ["marketInitializer", x()],
-    ["cargo", da()],
-    ["vault", A()],
-    ["bids", dt()],
-    ["asks", dt()]
+    ["cargo", Ra()],
+    ["vault", p()],
+    ["bids", vt()],
+    ["asks", vt()]
   ]);
 }
-var zp = new Uint8Array([
+var Tb = new Uint8Array([
   151,
   225,
   207,
@@ -42681,7 +43033,7 @@ var zp = new Uint8Array([
   64,
   159
 ]);
-var jp = new Uint8Array([
+var Wb = new Uint8Array([
   239,
   214,
   43,
@@ -42691,7 +43043,7 @@ var jp = new Uint8Array([
   3,
   115
 ]);
-var Kp = new Uint8Array([
+var xb = new Uint8Array([
   128,
   198,
   30,
@@ -42701,7 +43053,7 @@ var Kp = new Uint8Array([
   148,
   162
 ]);
-var Qp = new Uint8Array([
+var Lb = new Uint8Array([
   17,
   80,
   238,
@@ -42711,7 +43063,7 @@ var Qp = new Uint8Array([
   171,
   115
 ]);
-var tP = new Uint8Array([
+var zb = new Uint8Array([
   81,
   38,
   83,
@@ -42721,7 +43073,7 @@ var tP = new Uint8Array([
   161,
   137
 ]);
-var iP = new Uint8Array([
+var jb = new Uint8Array([
   86,
   39,
   130,
@@ -42731,7 +43083,7 @@ var iP = new Uint8Array([
   18,
   251
 ]);
-var uP = new Uint8Array([
+var Kb = new Uint8Array([
   230,
   116,
   138,
@@ -42741,7 +43093,7 @@ var uP = new Uint8Array([
   77,
   120
 ]);
-var mP = new Uint8Array([
+var Qb = new Uint8Array([
   19,
   104,
   160,
@@ -42751,7 +43103,17 @@ var mP = new Uint8Array([
   253,
   173
 ]);
-var PP = new Uint8Array([
+var tC = new Uint8Array([
+  163,
+  145,
+  77,
+  225,
+  145,
+  123,
+  132,
+  218
+]);
+var cC = new Uint8Array([
   204,
   80,
   96,
@@ -42761,7 +43123,7 @@ var PP = new Uint8Array([
   161,
   47
 ]);
-var vP = new Uint8Array([
+var uC = new Uint8Array([
   10,
   162,
   156,
@@ -42771,33 +43133,33 @@ var vP = new Uint8Array([
   205,
   77
 ]);
-function SP() {
+function dC() {
   return f([
     ["discriminator", S(I(), 8)],
-    ["version", P6()],
-    ["recipeId", gr()],
+    ["version", P2()],
+    ["recipeId", pr()],
     ["gameId", x()],
-    ["craftingDuration", A()],
-    ["minDuration", A()],
+    ["craftingDuration", p()],
+    ["minDuration", p()],
     ["name", ce()],
-    ["status", nf()],
-    ["feeAmount", A()],
-    ["feeRecipient", aa()],
-    ["habRequired", ge()],
-    ["usageCount", A()],
-    ["usageLimit", A()],
-    ["value", A()],
-    ["minStarbaseLevel", Oe()],
-    ["craftingEfficiencyMinmax", $e()],
-    ["craftingSpeedMinmax", $e()],
-    ["craftingCrewCountMinmax", $e()],
-    ["craftingFeeMinmax", $e()],
-    ["researchRequirements", de(pe())],
-    ["inputs", re(K(), A())],
-    ["outputs", re(K(), A())]
+    ["status", Xf()],
+    ["feeAmount", p()],
+    ["feeRecipient", ga()],
+    ["habRequired", fe()],
+    ["usageCount", p()],
+    ["usageLimit", p()],
+    ["value", p()],
+    ["minStarbaseLevel", Fe()],
+    ["craftingEfficiencyMinmax", tr()],
+    ["craftingSpeedMinmax", tr()],
+    ["craftingCrewCountMinmax", tr()],
+    ["craftingFeeMinmax", tr()],
+    ["researchRequirements", Pe(me())],
+    ["inputs", ee(K(), p())],
+    ["outputs", ee(K(), p())]
   ]);
 }
-var hP = new Uint8Array([
+var mC = new Uint8Array([
   100,
   219,
   235,
@@ -42807,7 +43169,17 @@ var hP = new Uint8Array([
   106,
   205
 ]);
-var VP = new Uint8Array([
+var PC = new Uint8Array([
+  122,
+  64,
+  130,
+  27,
+  23,
+  195,
+  235,
+  69
+]);
+var SC = new Uint8Array([
   179,
   52,
   120,
@@ -42817,7 +43189,7 @@ var VP = new Uint8Array([
   91,
   62
 ]);
-var MP = new Uint8Array([
+var DC = new Uint8Array([
   23,
   29,
   27,
@@ -42827,7 +43199,7 @@ var MP = new Uint8Array([
   0,
   225
 ]);
-var kP = new Uint8Array([
+var WC = new Uint8Array([
   81,
   246,
   163,
@@ -42837,7 +43209,7 @@ var kP = new Uint8Array([
   92,
   112
 ]);
-var BP = new Uint8Array([
+var xC = new Uint8Array([
   70,
   65,
   49,
@@ -42847,7 +43219,7 @@ var BP = new Uint8Array([
   118,
   97
 ]);
-var jP = new Uint8Array([
+var LC = new Uint8Array([
   147,
   22,
   229,
@@ -42857,7 +43229,7 @@ var jP = new Uint8Array([
   184,
   21
 ]);
-var KP = new Uint8Array([
+var zC = new Uint8Array([
   23,
   215,
   250,
@@ -42867,7 +43239,7 @@ var KP = new Uint8Array([
   59,
   91
 ]);
-var QP = new Uint8Array([
+var YC = new Uint8Array([
   228,
   169,
   139,
@@ -42877,7 +43249,7 @@ var QP = new Uint8Array([
   130,
   246
 ]);
-var tb = new Uint8Array([
+var JC = new Uint8Array([
   65,
   34,
   7,
@@ -42887,7 +43259,7 @@ var tb = new Uint8Array([
   137,
   238
 ]);
-var cb = new Uint8Array([
+var ev = new Uint8Array([
   124,
   46,
   212,
@@ -42897,7 +43269,7 @@ var cb = new Uint8Array([
   99,
   188
 ]);
-var db = new Uint8Array([
+var nv = new Uint8Array([
   53,
   211,
   97,
@@ -42907,7 +43279,7 @@ var db = new Uint8Array([
   46,
   55
 ]);
-var yb = new Uint8Array([
+var lv = new Uint8Array([
   114,
   219,
   30,
@@ -42917,7 +43289,7 @@ var yb = new Uint8Array([
   58,
   70
 ]);
-var bb = new Uint8Array([
+var fv = new Uint8Array([
   73,
   104,
   134,
@@ -42927,7 +43299,7 @@ var bb = new Uint8Array([
   153,
   184
 ]);
-var Rb = new Uint8Array([
+var Av = new Uint8Array([
   152,
   164,
   77,
@@ -42937,7 +43309,7 @@ var Rb = new Uint8Array([
   20,
   187
 ]);
-var Tb = new Uint8Array([
+var Cv = new Uint8Array([
   140,
   185,
   128,
@@ -42947,7 +43319,7 @@ var Tb = new Uint8Array([
   144,
   176
 ]);
-var Eb = new Uint8Array([
+var Iv = new Uint8Array([
   117,
   109,
   179,
@@ -42957,7 +43329,7 @@ var Eb = new Uint8Array([
   65,
   56
 ]);
-var Ob = new Uint8Array([
+var wv = new Uint8Array([
   72,
   237,
   20,
@@ -42967,7 +43339,7 @@ var Ob = new Uint8Array([
   191,
   151
 ]);
-var Fb = new Uint8Array([
+var Mv = new Uint8Array([
   17,
   195,
   13,
@@ -42977,7 +43349,7 @@ var Fb = new Uint8Array([
   22,
   180
 ]);
-var Hb = new Uint8Array([
+var Nv = new Uint8Array([
   192,
   234,
   144,
@@ -42987,44 +43359,44 @@ var Hb = new Uint8Array([
   5,
   99
 ]);
-function Gb() {
+function kv() {
   return f([
     ["discriminator", S(I(), 8)],
-    ["version", P6()],
+    ["version", P2()],
     ["playerProfile", x()],
-    ["faction", ir()],
+    ["faction", ur()],
     ["system", x()],
     ["character", x()],
-    ["totalCrew", M()],
-    ["busyCrew", M()],
-    ["respawningCrew", $r()],
-    ["seqId", A()],
-    ["cargoRespawnEndsAt", F()],
-    ["bump", P6()],
+    ["totalCrew", _()],
+    ["busyCrew", _()],
+    ["respawningCrew", aa()],
+    ["seqId", p()],
+    ["cargoRespawnEndsAt", U()],
+    ["bump", P2()],
     [
       "respawningShips",
-      re(_e(), $r())
+      ee(_e(), aa())
     ],
     [
       "respawningClaimStakes",
-      re(
-        Rr(),
-        $r()
+      ee(
+        wr(),
+        aa()
       )
     ],
     [
       "respawningCraftingHabs",
-      re(
-        jr(),
-        $r()
+      ee(
+        qr(),
+        aa()
       )
     ],
-    ["respawningCargo", vr()],
-    ["shipsInEscrow", re(_e(), A())],
-    ["cargoPod", vr()]
+    ["respawningCargo", Ir()],
+    ["shipsInEscrow", ee(_e(), p())],
+    ["cargoPod", Ir()]
   ]);
 }
-var Xb = new Uint8Array([
+var Uv = new Uint8Array([
   3,
   184,
   34,
@@ -43034,7 +43406,7 @@ var Xb = new Uint8Array([
   187,
   141
 ]);
-var qb = new Uint8Array([
+var Gv = new Uint8Array([
   243,
   137,
   76,
@@ -43044,22 +43416,22 @@ var qb = new Uint8Array([
   175,
   134
 ]);
-function Zb() {
+function jv() {
   return f([
     ["discriminator", S(I(), 8)],
-    ["version", P6()],
+    ["version", P2()],
     ["profile", x()],
     ["system", x()],
     ["starbasePlayer", x()],
-    ["starbaseSeqId", A()],
+    ["starbaseSeqId", p()],
     ["resourceId", K()],
-    ["quantity", A()],
+    ["quantity", p()],
     ["numCrew", C()],
-    ["startTime", F()],
-    ["endTime", F()]
+    ["startTime", U()],
+    ["endTime", U()]
   ]);
 }
-var eC = new Uint8Array([
+var Xv = new Uint8Array([
   207,
   32,
   123,
@@ -43069,25 +43441,25 @@ var eC = new Uint8Array([
   221,
   169
 ]);
-function rC() {
+function $v() {
   return f([
     ["discriminator", S(I(), 8)],
-    ["version", P6()],
+    ["version", P2()],
     ["gameId", x()],
-    ["systemId", nr()],
+    ["systemId", lr()],
     ["name", ce()],
     ["region", z(te(), { noneValue: "zeroes" })],
-    ["coordinates", T(ye(), { size: 2 })],
-    ["seqId", A()],
+    ["coordinates", T(Ce(), { size: 2 })],
+    ["seqId", p()],
     [
       "connections",
-      re(nr(), va())
+      ee(lr(), xa())
     ],
-    ["celestialBodies", de(x())],
-    ["starbase", z(cg())]
+    ["celestialBodies", Pe(x())],
+    ["starbase", z(qg())]
   ]);
 }
-var nC = new Uint8Array([
+var qv = new Uint8Array([
   124,
   165,
   4,
@@ -43097,7 +43469,7 @@ var nC = new Uint8Array([
   39,
   72
 ]);
-var lC = new Uint8Array([
+var rS = new Uint8Array([
   220,
   136,
   40,
@@ -43107,7 +43479,7 @@ var lC = new Uint8Array([
   87,
   133
 ]);
-var fC = new Uint8Array([
+var oS = new Uint8Array([
   183,
   189,
   211,
@@ -43117,7 +43489,7 @@ var fC = new Uint8Array([
   168,
   250
 ]);
-var AC = new Uint8Array([
+var sS = new Uint8Array([
   59,
   182,
   211,
@@ -43127,7 +43499,7 @@ var AC = new Uint8Array([
   43,
   65
 ]);
-var bC = new Uint8Array([
+var fS = new Uint8Array([
   155,
   59,
   204,
@@ -43137,7 +43509,7 @@ var bC = new Uint8Array([
   60,
   140
 ]);
-var SC = new Uint8Array([
+var yS = new Uint8Array([
   181,
   104,
   135,
@@ -43147,7 +43519,7 @@ var SC = new Uint8Array([
   30,
   29
 ]);
-var hC = new Uint8Array([
+var PS = new Uint8Array([
   155,
   238,
   4,
@@ -43157,7 +43529,7 @@ var hC = new Uint8Array([
   150,
   242
 ]);
-var wC = new Uint8Array([
+var vS = new Uint8Array([
   33,
   250,
   139,
@@ -43167,7 +43539,37 @@ var wC = new Uint8Array([
   52,
   246
 ]);
-var EC = new Uint8Array([
+var IS = new Uint8Array([
+  205,
+  215,
+  154,
+  155,
+  157,
+  213,
+  231,
+  35
+]);
+var TS = new Uint8Array([
+  81,
+  113,
+  62,
+  217,
+  165,
+  93,
+  91,
+  194
+]);
+var WS = new Uint8Array([
+  214,
+  68,
+  178,
+  121,
+  213,
+  201,
+  154,
+  152
+]);
+var _S = new Uint8Array([
   208,
   131,
   166,
@@ -43177,7 +43579,7 @@ var EC = new Uint8Array([
   145,
   168
 ]);
-var xC = new Uint8Array([
+var NS = new Uint8Array([
   193,
   235,
   246,
@@ -43187,8 +43589,8 @@ var xC = new Uint8Array([
   16,
   187
 ]);
-var kC = new Uint8Array([82, 121, 246, 47, 26, 103, 236, 117]);
-var UC = new Uint8Array([
+var FS = new Uint8Array([82, 121, 246, 47, 26, 103, 236, 117]);
+var zS = new Uint8Array([
   39,
   179,
   114,
@@ -43198,7 +43600,7 @@ var UC = new Uint8Array([
   82,
   142
 ]);
-var zC = new Uint8Array([
+var GS = new Uint8Array([
   213,
   113,
   170,
@@ -43208,7 +43610,7 @@ var zC = new Uint8Array([
   28,
   115
 ]);
-var jC = new Uint8Array([
+var XS = new Uint8Array([
   186,
   19,
   218,
@@ -43218,7 +43620,7 @@ var jC = new Uint8Array([
   212,
   89
 ]);
-var XC = new Uint8Array([
+var KS = new Uint8Array([
   237,
   166,
   153,
@@ -43228,7 +43630,7 @@ var XC = new Uint8Array([
   220,
   78
 ]);
-var KC = new Uint8Array([
+var qS = new Uint8Array([
   208,
   222,
   135,
@@ -43238,7 +43640,7 @@ var KC = new Uint8Array([
   244,
   247
 ]);
-var ZC = new Uint8Array([
+var eR = new Uint8Array([
   24,
   127,
   77,
@@ -43248,7 +43650,7 @@ var ZC = new Uint8Array([
   215,
   89
 ]);
-var rv = new Uint8Array([
+var tR = new Uint8Array([
   209,
   163,
   62,
@@ -43258,7 +43660,7 @@ var rv = new Uint8Array([
   237,
   41
 ]);
-var nv = new Uint8Array([
+var iR = new Uint8Array([
   229,
   157,
   64,
@@ -43268,7 +43670,7 @@ var nv = new Uint8Array([
   121,
   79
 ]);
-var cv = new Uint8Array([
+var sR = new Uint8Array([
   80,
   211,
   97,
@@ -43278,7 +43680,7 @@ var cv = new Uint8Array([
   141,
   38
 ]);
-var sv = new Uint8Array([
+var dR = new Uint8Array([
   86,
   172,
   211,
@@ -43288,7 +43690,7 @@ var sv = new Uint8Array([
   59,
   178
 ]);
-var fv = new Uint8Array([
+var mR = new Uint8Array([
   34,
   168,
   44,
@@ -43298,7 +43700,7 @@ var fv = new Uint8Array([
   33,
   109
 ]);
-var yv = new Uint8Array([
+var pR = new Uint8Array([
   166,
   190,
   92,
@@ -43308,8 +43710,18 @@ var yv = new Uint8Array([
   242,
   153
 ]);
-var Pv = new Uint8Array([141, 84, 251, 137, 175, 171, 141, 169]);
-var vv = new Uint8Array([
+var CR = new Uint8Array([141, 84, 251, 137, 175, 171, 141, 169]);
+var RR = new Uint8Array([
+  65,
+  160,
+  77,
+  226,
+  32,
+  28,
+  238,
+  249
+]);
+var hR = new Uint8Array([
   242,
   181,
   58,
@@ -43319,8 +43731,8 @@ var vv = new Uint8Array([
   209,
   58
 ]);
-var Iv = new Uint8Array([237, 91, 204, 189, 199, 69, 224, 219]);
-var Tv = new Uint8Array([
+var wR = new Uint8Array([237, 91, 204, 189, 199, 69, 224, 219]);
+var ER = new Uint8Array([
   210,
   137,
   148,
@@ -43330,8 +43742,8 @@ var Tv = new Uint8Array([
   5,
   191
 ]);
-var Wv = new Uint8Array([234, 136, 179, 50, 80, 14, 168, 171]);
-var Mv = new Uint8Array([
+var xR = new Uint8Array([234, 136, 179, 50, 80, 14, 168, 171]);
+var kR = new Uint8Array([
   251,
   57,
   86,
@@ -43341,11 +43753,11 @@ var Mv = new Uint8Array([
   111,
   17
 ]);
-var Nv = new Uint8Array([132, 240, 80, 235, 147, 147, 201, 0]);
-var Fv = new Uint8Array(
+var UR = new Uint8Array([132, 240, 80, 235, 147, 147, 201, 0]);
+var HR = new Uint8Array(
   [7, 123, 136, 144, 159, 223, 167, 198]
 );
-var zv = new Uint8Array([
+var YR = new Uint8Array([
   150,
   161,
   105,
@@ -43355,7 +43767,7 @@ var zv = new Uint8Array([
   164,
   89
 ]);
-var jv = new Uint8Array([
+var KR = new Uint8Array([
   171,
   89,
   149,
@@ -43365,7 +43777,7 @@ var jv = new Uint8Array([
   249,
   122
 ]);
-var $v = new Uint8Array([
+var ZR = new Uint8Array([
   89,
   173,
   5,
@@ -43375,7 +43787,7 @@ var $v = new Uint8Array([
   236,
   217
 ]);
-var Jv = new Uint8Array([
+var eI = new Uint8Array([
   82,
   235,
   15,
@@ -43385,7 +43797,7 @@ var Jv = new Uint8Array([
   129,
   161
 ]);
-var Zv = new Uint8Array([
+var aI = new Uint8Array([
   6,
   211,
   254,
@@ -43395,7 +43807,7 @@ var Zv = new Uint8Array([
   67,
   222
 ]);
-var eS = new Uint8Array([
+var nI = new Uint8Array([
   71,
   101,
   188,
@@ -43405,7 +43817,7 @@ var eS = new Uint8Array([
   128,
   209
 ]);
-var tS = new Uint8Array([
+var cI = new Uint8Array([
   36,
   178,
   60,
@@ -43415,7 +43827,7 @@ var tS = new Uint8Array([
   100,
   170
 ]);
-var iS = new Uint8Array([
+var uI = new Uint8Array([
   183,
   4,
   87,
@@ -43425,7 +43837,7 @@ var iS = new Uint8Array([
   182,
   214
 ]);
-var sS = new Uint8Array([
+var gI = new Uint8Array([
   17,
   232,
   125,
@@ -43435,10 +43847,10 @@ var sS = new Uint8Array([
   130,
   42
 ]);
-var fS = new Uint8Array(
+var AI = new Uint8Array(
   [130, 27, 238, 182, 238, 145, 109, 52]
 );
-var yS = new Uint8Array([
+var bI = new Uint8Array([
   234,
   158,
   152,
@@ -43448,8 +43860,8 @@ var yS = new Uint8Array([
   185,
   104
 ]);
-var PS = new Uint8Array([165, 216, 224, 47, 224, 236, 170, 104]);
-var vS = new Uint8Array([
+var SI = new Uint8Array([165, 216, 224, 47, 224, 236, 170, 104]);
+var hI = new Uint8Array([
   126,
   92,
   230,
@@ -43459,7 +43871,17 @@ var vS = new Uint8Array([
   78,
   205
 ]);
-var IS = new Uint8Array([
+var wI = new Uint8Array([
+  70,
+  198,
+  218,
+  209,
+  129,
+  99,
+  124,
+  224
+]);
+var EI = new Uint8Array([
   184,
   3,
   35,
@@ -43469,7 +43891,7 @@ var IS = new Uint8Array([
   31,
   218
 ]);
-var TS = new Uint8Array([
+var xI = new Uint8Array([
   105,
   229,
   103,
@@ -43479,7 +43901,7 @@ var TS = new Uint8Array([
   45,
   65
 ]);
-var WS = new Uint8Array([
+var kI = new Uint8Array([
   53,
   52,
   99,
@@ -43489,7 +43911,7 @@ var WS = new Uint8Array([
   90,
   247
 ]);
-var MS = new Uint8Array([
+var UI = new Uint8Array([
   198,
   108,
   146,
@@ -43499,7 +43921,7 @@ var MS = new Uint8Array([
   72,
   203
 ]);
-var NS = new Uint8Array([
+var HI = new Uint8Array([
   181,
   171,
   118,
@@ -43509,7 +43931,7 @@ var NS = new Uint8Array([
   160,
   13
 ]);
-var LS = new Uint8Array([
+var jI = new Uint8Array([
   135,
   96,
   234,
@@ -43519,7 +43941,7 @@ var LS = new Uint8Array([
   231,
   191
 ]);
-var US = new Uint8Array([
+var XI = new Uint8Array([
   215,
   30,
   129,
@@ -43529,7 +43951,7 @@ var US = new Uint8Array([
   249,
   78
 ]);
-var zS = new Uint8Array([
+var KI = new Uint8Array([
   201,
   61,
   68,
@@ -43539,7 +43961,7 @@ var zS = new Uint8Array([
   147,
   241
 ]);
-var jS = new Uint8Array([
+var ZI = new Uint8Array([
   107,
   145,
   194,
@@ -43549,7 +43971,7 @@ var jS = new Uint8Array([
   1,
   129
 ]);
-var XS = new Uint8Array([
+var eh = new Uint8Array([
   71,
   232,
   14,
@@ -43559,7 +43981,7 @@ var XS = new Uint8Array([
   216,
   221
 ]);
-var KS = new Uint8Array([
+var ah = new Uint8Array([
   204,
   232,
   50,
@@ -43569,7 +43991,7 @@ var KS = new Uint8Array([
   110,
   198
 ]);
-var ZS = new Uint8Array([
+var oh = new Uint8Array([
   10,
   175,
   96,
@@ -43579,7 +44001,7 @@ var ZS = new Uint8Array([
   195,
   51
 ]);
-var rR = new Uint8Array([
+var lh = new Uint8Array([
   9,
   186,
   34,
@@ -43589,7 +44011,7 @@ var rR = new Uint8Array([
   162,
   50
 ]);
-var nR = new Uint8Array([
+var dh = new Uint8Array([
   195,
   241,
   238,
@@ -43599,8 +44021,8 @@ var nR = new Uint8Array([
   109,
   176
 ]);
-var cR = new Uint8Array([73, 206, 46, 230, 144, 225, 238, 49]);
-var uR = new Uint8Array([
+var mh = new Uint8Array([73, 206, 46, 230, 144, 225, 238, 49]);
+var ph = new Uint8Array([
   50,
   230,
   189,
@@ -43610,8 +44032,8 @@ var uR = new Uint8Array([
   154,
   117
 ]);
-var gR = new Uint8Array([212, 79, 231, 252, 241, 240, 209, 178]);
-var AR = new Uint8Array([
+var Ch = new Uint8Array([212, 79, 231, 252, 241, 240, 209, 178]);
+var Rh = new Uint8Array([
   107,
   122,
   221,
@@ -43621,7 +44043,17 @@ var AR = new Uint8Array([
   70,
   193
 ]);
-var bR = new Uint8Array([
+var Dh = new Uint8Array([
+  107,
+  181,
+  102,
+  247,
+  207,
+  212,
+  251,
+  24
+]);
+var wh = new Uint8Array([
   212,
   201,
   149,
@@ -43631,7 +44063,7 @@ var bR = new Uint8Array([
   201,
   129
 ]);
-var vR = new Uint8Array([
+var Wh = new Uint8Array([
   115,
   103,
   140,
@@ -43641,7 +44073,7 @@ var vR = new Uint8Array([
   142,
   96
 ]);
-var RR = new Uint8Array([
+var Mh = new Uint8Array([
   183,
   105,
   78,
@@ -43651,7 +44083,7 @@ var RR = new Uint8Array([
   58,
   6
 ]);
-var hR = new Uint8Array([
+var xh = new Uint8Array([
   34,
   119,
   185,
@@ -43661,7 +44093,7 @@ var hR = new Uint8Array([
   184,
   154
 ]);
-var TR = new Uint8Array([
+var Nh = new Uint8Array([
   71,
   61,
   100,
@@ -43671,7 +44103,7 @@ var TR = new Uint8Array([
   139,
   177
 ]);
-var VR = new Uint8Array([
+var Lh = new Uint8Array([
   174,
   247,
   149,
@@ -43681,7 +44113,7 @@ var VR = new Uint8Array([
   20,
   102
 ]);
-var ER = new Uint8Array([
+var Uh = new Uint8Array([
   87,
   18,
   111,
@@ -43691,7 +44123,7 @@ var ER = new Uint8Array([
   71,
   46
 ]);
-var xR = new Uint8Array([
+var Hh = new Uint8Array([
   236,
   131,
   187,
@@ -43701,7 +44133,7 @@ var xR = new Uint8Array([
   125,
   108
 ]);
-var NR = new Uint8Array([
+var jh = new Uint8Array([
   148,
   247,
   250,
@@ -43711,7 +44143,7 @@ var NR = new Uint8Array([
   252,
   124
 ]);
-var FR = new Uint8Array([
+var $h = new Uint8Array([
   18,
   216,
   248,
@@ -43721,7 +44153,7 @@ var FR = new Uint8Array([
   197,
   102
 ]);
-var zR = new Uint8Array([
+var qh = new Uint8Array([
   220,
   146,
   128,
@@ -43731,7 +44163,8 @@ var zR = new Uint8Array([
   210,
   137
 ]);
-var jR = new Uint8Array([
+var Qh = new Uint8Array([7, 40, 157, 248, 127, 105, 145, 198]);
+var aD = new Uint8Array([
   116,
   128,
   134,
@@ -43741,7 +44174,7 @@ var jR = new Uint8Array([
   4,
   202
 ]);
-var $R = new Uint8Array([
+var oD = new Uint8Array([
   249,
   111,
   52,
@@ -43751,8 +44184,8 @@ var $R = new Uint8Array([
   231,
   4
 ]);
-var qR = new Uint8Array([229, 109, 179, 179, 35, 149, 88, 151]);
-var eI = new Uint8Array([
+var lD = new Uint8Array([229, 109, 179, 179, 35, 149, 88, 151]);
+var dD = new Uint8Array([
   174,
   32,
   119,
@@ -43762,7 +44195,7 @@ var eI = new Uint8Array([
   181,
   83
 ]);
-var aI = new Uint8Array([
+var gD = new Uint8Array([
   13,
   150,
   20,
@@ -43772,7 +44205,7 @@ var aI = new Uint8Array([
   37,
   212
 ]);
-var oI = new Uint8Array([
+var AD = new Uint8Array([
   9,
   68,
   127,
@@ -43782,8 +44215,8 @@ var oI = new Uint8Array([
   172,
   212
 ]);
-var cI = new Uint8Array([208, 220, 157, 95, 213, 20, 90, 56]);
-var uI = new Uint8Array([
+var PD = new Uint8Array([208, 220, 157, 95, 213, 20, 90, 56]);
+var vD = new Uint8Array([
   114,
   110,
   173,
@@ -43793,7 +44226,7 @@ var uI = new Uint8Array([
   94,
   59
 ]);
-var gI = new Uint8Array([
+var ID = new Uint8Array([
   34,
   45,
   223,
@@ -43803,7 +44236,7 @@ var gI = new Uint8Array([
   112,
   3
 ]);
-var AI = new Uint8Array([
+var TD = new Uint8Array([
   85,
   76,
   118,
@@ -43813,7 +44246,7 @@ var AI = new Uint8Array([
   70,
   172
 ]);
-var bI = new Uint8Array([
+var WD = new Uint8Array([
   118,
   40,
   4,
@@ -43823,7 +44256,7 @@ var bI = new Uint8Array([
   196,
   103
 ]);
-var SI = new Uint8Array([
+var _D = new Uint8Array([
   234,
   180,
   216,
@@ -43833,7 +44266,7 @@ var SI = new Uint8Array([
   81,
   29
 ]);
-var hI = new Uint8Array([
+var ND = new Uint8Array([
   31,
   156,
   74,
@@ -43843,7 +44276,7 @@ var hI = new Uint8Array([
   87,
   203
 ]);
-var TI = new Uint8Array([
+var LD = new Uint8Array([
   59,
   1,
   100,
@@ -43853,11 +44286,11 @@ var TI = new Uint8Array([
   216,
   192
 ]);
-var WI = new Uint8Array([143, 175, 10, 148, 97, 30, 16, 109]);
-var MI = new Uint8Array(
+var BD = new Uint8Array([143, 175, 10, 148, 97, 30, 16, 109]);
+var GD = new Uint8Array(
   [88, 15, 115, 9, 46, 117, 125, 64]
 );
-var NI = new Uint8Array([
+var XD = new Uint8Array([
   97,
   222,
   149,
@@ -43867,7 +44300,7 @@ var NI = new Uint8Array([
   197,
   26
 ]);
-var FI = new Uint8Array([
+var JD = new Uint8Array([
   96,
   34,
   101,
@@ -43877,7 +44310,7 @@ var FI = new Uint8Array([
   150,
   61
 ]);
-var zI = new Uint8Array([
+var QD = new Uint8Array([
   37,
   221,
   40,
@@ -43887,7 +44320,7 @@ var zI = new Uint8Array([
   74,
   59
 ]);
-var jI = new Uint8Array([
+var aT = new Uint8Array([
   156,
   50,
   202,
@@ -43897,7 +44330,17 @@ var jI = new Uint8Array([
   99,
   62
 ]);
-var $I = new Uint8Array([
+var oT = new Uint8Array([
+  174,
+  79,
+  251,
+  16,
+  140,
+  135,
+  203,
+  56
+]);
+var cT = new Uint8Array([
   137,
   37,
   41,
@@ -43907,7 +44350,7 @@ var $I = new Uint8Array([
   199,
   239
 ]);
-var JI = new Uint8Array([
+var sT = new Uint8Array([
   253,
   172,
   172,
@@ -43917,7 +44360,7 @@ var JI = new Uint8Array([
   228,
   49
 ]);
-var QI = new Uint8Array([
+var fT = new Uint8Array([
   125,
   135,
   52,
@@ -43927,7 +44370,7 @@ var QI = new Uint8Array([
   222,
   140
 ]);
-var ah = new Uint8Array([
+var yT = new Uint8Array([
   74,
   50,
   244,
@@ -43937,7 +44380,7 @@ var ah = new Uint8Array([
   19,
   67
 ]);
-var nh = new Uint8Array([
+var pT = new Uint8Array([
   211,
   123,
   143,
@@ -43947,7 +44390,7 @@ var nh = new Uint8Array([
   214,
   21
 ]);
-var ih = new Uint8Array([
+var bT = new Uint8Array([
   234,
   64,
   158,
@@ -43957,7 +44400,7 @@ var ih = new Uint8Array([
   0,
   182
 ]);
-var lh = new Uint8Array([
+var vT = new Uint8Array([
   188,
   83,
   195,
@@ -43967,7 +44410,7 @@ var lh = new Uint8Array([
   238,
   177
 ]);
-var dh = new Uint8Array([
+var IT = new Uint8Array([
   175,
   36,
   166,
@@ -43977,7 +44420,7 @@ var dh = new Uint8Array([
   110,
   60
 ]);
-var mh = new Uint8Array([
+var TT = new Uint8Array([
   192,
   162,
   214,
@@ -43987,7 +44430,7 @@ var mh = new Uint8Array([
   255,
   210
 ]);
-var ph = new Uint8Array([
+var WT = new Uint8Array([
   14,
   153,
   186,
@@ -43997,7 +44440,7 @@ var ph = new Uint8Array([
   165,
   56
 ]);
-var Ch = new Uint8Array([
+var _T = new Uint8Array([
   214,
   154,
   80,
@@ -44007,7 +44450,7 @@ var Ch = new Uint8Array([
   46,
   221
 ]);
-var Rh = new Uint8Array([
+var NT = new Uint8Array([
   243,
   165,
   188,
@@ -44017,7 +44460,7 @@ var Rh = new Uint8Array([
   251,
   14
 ]);
-var Dh = new Uint8Array([
+var FT = new Uint8Array([
   72,
   130,
   61,
@@ -44027,7 +44470,7 @@ var Dh = new Uint8Array([
   223,
   240
 ]);
-var Vh = new Uint8Array([
+var zT = new Uint8Array([
   180,
   118,
   200,
@@ -44037,7 +44480,7 @@ var Vh = new Uint8Array([
   27,
   69
 ]);
-var _h = new Uint8Array([
+var jT = new Uint8Array([
   76,
   123,
   81,
@@ -44047,7 +44490,7 @@ var _h = new Uint8Array([
   156,
   203
 ]);
-var xh = new Uint8Array([
+var XT = new Uint8Array([
   19,
   246,
   183,
@@ -44057,7 +44500,7 @@ var xh = new Uint8Array([
   73,
   19
 ]);
-var kh = new Uint8Array([
+var JT = new Uint8Array([
   109,
   129,
   151,
@@ -44067,7 +44510,7 @@ var kh = new Uint8Array([
   157,
   210
 ]);
-var Uh = new Uint8Array([
+var QT = new Uint8Array([
   172,
   211,
   4,
@@ -44077,7 +44520,7 @@ var Uh = new Uint8Array([
   116,
   157
 ]);
-var Hh = new Uint8Array([
+var aw = new Uint8Array([
   64,
   139,
   143,
@@ -44087,7 +44530,7 @@ var Hh = new Uint8Array([
   15,
   56
 ]);
-var Yh = new Uint8Array([
+var ow = new Uint8Array([
   108,
   252,
   183,
@@ -44097,7 +44540,7 @@ var Yh = new Uint8Array([
   84,
   66
 ]);
-var Kh = new Uint8Array([
+var lw = new Uint8Array([
   164,
   135,
   15,
@@ -44107,7 +44550,7 @@ var Kh = new Uint8Array([
   2,
   7
 ]);
-var Zh = new Uint8Array([
+var dw = new Uint8Array([
   1,
   106,
   196,
@@ -44117,7 +44560,7 @@ var Zh = new Uint8Array([
   118,
   39
 ]);
-var rD = new Uint8Array([
+var mw = new Uint8Array([
   146,
   87,
   139,
@@ -44127,7 +44570,7 @@ var rD = new Uint8Array([
   247,
   7
 ]);
-var nD = new Uint8Array([
+var pw = new Uint8Array([
   7,
   227,
   227,
@@ -44137,7 +44580,7 @@ var nD = new Uint8Array([
   33,
   253
 ]);
-var cD = new Uint8Array([
+var Cw = new Uint8Array([
   59,
   209,
   220,
@@ -44147,7 +44590,7 @@ var cD = new Uint8Array([
   251,
   82
 ]);
-var uD = new Uint8Array([
+var Rw = new Uint8Array([
   233,
   216,
   204,
@@ -44157,7 +44600,7 @@ var uD = new Uint8Array([
   27,
   158
 ]);
-var gD = new Uint8Array([
+var Dw = new Uint8Array([
   7,
   249,
   90,
@@ -44167,7 +44610,7 @@ var gD = new Uint8Array([
   254,
   197
 ]);
-var AD = new Uint8Array([
+var Vw = new Uint8Array([
   6,
   165,
   180,
@@ -44177,7 +44620,7 @@ var AD = new Uint8Array([
   78,
   206
 ]);
-var bD = new Uint8Array([
+var Mw = new Uint8Array([
   90,
   4,
   68,
@@ -44187,7 +44630,7 @@ var bD = new Uint8Array([
   145,
   192
 ]);
-var SD = new Uint8Array([
+var Ow = new Uint8Array([
   98,
   111,
   198,
@@ -44197,7 +44640,7 @@ var SD = new Uint8Array([
   67,
   98
 ]);
-var ID = new Uint8Array([
+var kw = new Uint8Array([
   174,
   24,
   1,
@@ -44207,7 +44650,7 @@ var ID = new Uint8Array([
   186,
   153
 ]);
-var TD = new Uint8Array([
+var Uw = new Uint8Array([
   158,
   237,
   215,
@@ -44217,7 +44660,7 @@ var TD = new Uint8Array([
   248,
   221
 ]);
-var WD = new Uint8Array([
+var Hw = new Uint8Array([
   42,
   98,
   221,
@@ -44227,7 +44670,7 @@ var WD = new Uint8Array([
   77,
   39
 ]);
-var MD = new Uint8Array([
+var Yw = new Uint8Array([
   178,
   113,
   183,
@@ -44237,7 +44680,7 @@ var MD = new Uint8Array([
   45,
   3
 ]);
-var OD = new Uint8Array([
+var $w = new Uint8Array([
   94,
   22,
   156,
@@ -44247,7 +44690,7 @@ var OD = new Uint8Array([
   228,
   36
 ]);
-var kD = new Uint8Array([
+var Jw = new Uint8Array([
   93,
   61,
   229,
@@ -44257,7 +44700,7 @@ var kD = new Uint8Array([
   199,
   102
 ]);
-var UD = new Uint8Array([
+var Qw = new Uint8Array([
   87,
   78,
   51,
@@ -44267,7 +44710,7 @@ var UD = new Uint8Array([
   68,
   222
 ]);
-var zD = new Uint8Array([
+var r0 = new Uint8Array([
   87,
   49,
   117,
@@ -44277,7 +44720,7 @@ var zD = new Uint8Array([
   176,
   18
 ]);
-var GD = new Uint8Array([
+var t0 = new Uint8Array([
   26,
   194,
   137,
@@ -44287,7 +44730,7 @@ var GD = new Uint8Array([
   93,
   98
 ]);
-var XD = new Uint8Array([
+var i0 = new Uint8Array([
   145,
   86,
   239,
@@ -44297,7 +44740,7 @@ var XD = new Uint8Array([
   226,
   250
 ]);
-var KD = new Uint8Array([
+var l0 = new Uint8Array([
   5,
   143,
   194,
@@ -44307,7 +44750,7 @@ var KD = new Uint8Array([
   137,
   46
 ]);
-var qD = new Uint8Array([
+var u0 = new Uint8Array([
   250,
   78,
   36,
@@ -44317,8 +44760,8 @@ var qD = new Uint8Array([
   9,
   144
 ]);
-var eT = new Uint8Array([77, 155, 47, 127, 235, 61, 7, 65]);
-var tT = new Uint8Array([
+var g0 = new Uint8Array([77, 155, 47, 127, 235, 61, 7, 65]);
+var A0 = new Uint8Array([
   174,
   184,
   35,
@@ -44328,7 +44771,7 @@ var tT = new Uint8Array([
   189,
   164
 ]);
-var oT = new Uint8Array([
+var P0 = new Uint8Array([
   80,
   244,
   41,
@@ -44338,7 +44781,7 @@ var oT = new Uint8Array([
   26,
   207
 ]);
-var lT = new Uint8Array([
+var v0 = new Uint8Array([
   103,
   13,
   77,
@@ -44348,7 +44791,7 @@ var lT = new Uint8Array([
   142,
   69
 ]);
-var dT = new Uint8Array([
+var I0 = new Uint8Array([
   19,
   23,
   175,
@@ -44358,7 +44801,7 @@ var dT = new Uint8Array([
   90,
   209
 ]);
-var mT = new Uint8Array([
+var T0 = new Uint8Array([
   173,
   151,
   101,
@@ -44368,7 +44811,7 @@ var mT = new Uint8Array([
   255,
   120
 ]);
-var pT = new Uint8Array([
+var W0 = new Uint8Array([
   30,
   102,
   130,
@@ -44378,7 +44821,7 @@ var pT = new Uint8Array([
   76,
   145
 ]);
-var bT = new Uint8Array([
+var M0 = new Uint8Array([
   39,
   139,
   14,
@@ -44388,7 +44831,7 @@ var bT = new Uint8Array([
   215,
   152
 ]);
-var vT = new Uint8Array([
+var x0 = new Uint8Array([
   20,
   5,
   193,
@@ -44398,7 +44841,7 @@ var vT = new Uint8Array([
   81,
   188
 ]);
-var IT = new Uint8Array([
+var k0 = new Uint8Array([
   123,
   42,
   204,
@@ -44408,7 +44851,7 @@ var IT = new Uint8Array([
   248,
   123
 ]);
-var DT = new Uint8Array([
+var F0 = new Uint8Array([
   121,
   28,
   22,
@@ -44418,7 +44861,7 @@ var DT = new Uint8Array([
   3,
   143
 ]);
-var VT = new Uint8Array([
+var z0 = new Uint8Array([
   29,
   132,
   59,
@@ -44428,7 +44871,7 @@ var VT = new Uint8Array([
   167,
   111
 ]);
-var ET = new Uint8Array([
+var G0 = new Uint8Array([
   214,
   113,
   185,
@@ -44438,7 +44881,7 @@ var ET = new Uint8Array([
   13,
   152
 ]);
-var MT = new Uint8Array([
+var Y0 = new Uint8Array([
   115,
   121,
   17,
@@ -44448,7 +44891,7 @@ var MT = new Uint8Array([
   250,
   11
 ]);
-var OT = new Uint8Array([
+var $0 = new Uint8Array([
   145,
   12,
   245,
@@ -44458,7 +44901,7 @@ var OT = new Uint8Array([
   68,
   188
 ]);
-var kT = new Uint8Array([
+var J0 = new Uint8Array([
   14,
   229,
   95,
@@ -44468,7 +44911,7 @@ var kT = new Uint8Array([
   175,
   76
 ]);
-var UT = new Uint8Array([
+var Q0 = new Uint8Array([
   134,
   221,
   22,
@@ -44478,7 +44921,7 @@ var UT = new Uint8Array([
   169,
   103
 ]);
-var zT = new Uint8Array([
+var r8 = new Uint8Array([
   252,
   70,
   147,
@@ -44488,7 +44931,7 @@ var zT = new Uint8Array([
   85,
   145
 ]);
-var jT = new Uint8Array([
+var n8 = new Uint8Array([
   124,
   106,
   163,
@@ -44498,7 +44941,7 @@ var jT = new Uint8Array([
   160,
   157
 ]);
-var XT = new Uint8Array([
+var i8 = new Uint8Array([
   159,
   217,
   112,
@@ -44508,7 +44951,7 @@ var XT = new Uint8Array([
   1,
   223
 ]);
-var JT = new Uint8Array([
+var s8 = new Uint8Array([
   18,
   245,
   53,
@@ -44518,8 +44961,8 @@ var JT = new Uint8Array([
   1,
   78
 ]);
-var ZT = new Uint8Array([249, 214, 127, 208, 159, 31, 179, 240]);
-var rw = new Uint8Array([
+var d8 = new Uint8Array([249, 214, 127, 208, 159, 31, 179, 240]);
+var m8 = new Uint8Array([
   252,
   181,
   51,
@@ -44529,7 +44972,7 @@ var rw = new Uint8Array([
   146,
   41
 ]);
-var nw = new Uint8Array([
+var p8 = new Uint8Array([
   69,
   106,
   188,
@@ -44539,7 +44982,7 @@ var nw = new Uint8Array([
   240,
   48
 ]);
-var cw = new Uint8Array([
+var C8 = new Uint8Array([
   248,
   196,
   44,
@@ -44549,7 +44992,7 @@ var cw = new Uint8Array([
   93,
   140
 ]);
-var uw = new Uint8Array([
+var R8 = new Uint8Array([
   51,
   86,
   56,
@@ -44559,7 +45002,7 @@ var uw = new Uint8Array([
   132,
   129
 ]);
-var gw = new Uint8Array([
+var D8 = new Uint8Array([
   111,
   118,
   36,
@@ -44569,7 +45012,7 @@ var gw = new Uint8Array([
   103,
   231
 ]);
-var Aw = new Uint8Array([
+var V8 = new Uint8Array([
   6,
   48,
   172,
@@ -44579,7 +45022,7 @@ var Aw = new Uint8Array([
   200,
   160
 ]);
-var Pw = new Uint8Array([
+var E8 = new Uint8Array([
   213,
   96,
   169,
@@ -44589,7 +45032,7 @@ var Pw = new Uint8Array([
   175,
   28
 ]);
-var Cw = new Uint8Array([
+var _8 = new Uint8Array([
   203,
   116,
   164,
@@ -44599,7 +45042,7 @@ var Cw = new Uint8Array([
   145,
   68
 ]);
-var Rw = new Uint8Array([
+var N8 = new Uint8Array([
   90,
   155,
   85,
@@ -44609,7 +45052,7 @@ var Rw = new Uint8Array([
   44,
   232
 ]);
-var Dw = new Uint8Array([
+var F8 = new Uint8Array([
   223,
   147,
   25,
@@ -44619,7 +45062,7 @@ var Dw = new Uint8Array([
   124,
   213
 ]);
-var ww = new Uint8Array([
+var B8 = new Uint8Array([
   80,
   240,
   6,
@@ -44629,7 +45072,7 @@ var ww = new Uint8Array([
   37,
   147
 ]);
-var Ew = new Uint8Array([
+var G8 = new Uint8Array([
   235,
   207,
   200,
@@ -44639,8 +45082,18 @@ var Ew = new Uint8Array([
   91,
   168
 ]);
-var Mw = new Uint8Array([66, 225, 181, 120, 200, 49, 182, 232]);
-var Nw = new Uint8Array([
+var Y8 = new Uint8Array([66, 225, 181, 120, 200, 49, 182, 232]);
+var K8 = new Uint8Array([
+  227,
+  142,
+  60,
+  11,
+  25,
+  139,
+  37,
+  246
+]);
+var q8 = new Uint8Array([
   46,
   58,
   56,
@@ -44650,7 +45103,7 @@ var Nw = new Uint8Array([
   244,
   158
 ]);
-var Fw = new Uint8Array([
+var eV = new Uint8Array([
   126,
   41,
   19,
@@ -44660,7 +45113,7 @@ var Fw = new Uint8Array([
   149,
   238
 ]);
-var zw = new Uint8Array([
+var tV = new Uint8Array([
   138,
   96,
   207,
@@ -44670,7 +45123,27 @@ var zw = new Uint8Array([
   128,
   193
 ]);
-var jw = new Uint8Array([
+var iV = new Uint8Array([
+  134,
+  201,
+  175,
+  168,
+  254,
+  127,
+  216,
+  206
+]);
+var sV = new Uint8Array([
+  63,
+  22,
+  141,
+  170,
+  86,
+  13,
+  237,
+  25
+]);
+var fV = new Uint8Array([
   165,
   78,
   165,
@@ -44680,7 +45153,7 @@ var jw = new Uint8Array([
   219,
   187
 ]);
-var $w = new Uint8Array([
+var yV = new Uint8Array([
   161,
   109,
   53,
@@ -44690,7 +45163,7 @@ var $w = new Uint8Array([
   45,
   2
 ]);
-var qw = new Uint8Array([
+var PV = new Uint8Array([
   115,
   138,
   168,
@@ -44700,7 +45173,17 @@ var qw = new Uint8Array([
   75,
   181
 ]);
-var e0 = new Uint8Array([
+var vV = new Uint8Array([
+  143,
+  113,
+  41,
+  192,
+  195,
+  64,
+  54,
+  214
+]);
+var IV = new Uint8Array([
   37,
   193,
   134,
@@ -44710,7 +45193,7 @@ var e0 = new Uint8Array([
   211,
   239
 ]);
-var t0 = new Uint8Array([
+var TV = new Uint8Array([
   72,
   115,
   98,
@@ -44720,7 +45203,7 @@ var t0 = new Uint8Array([
   116,
   14
 ]);
-var i0 = new Uint8Array([
+var WV = new Uint8Array([
   3,
   176,
   217,
@@ -44730,7 +45213,17 @@ var i0 = new Uint8Array([
   80,
   234
 ]);
-var s0 = new Uint8Array([
+var _V = new Uint8Array([
+  174,
+  115,
+  82,
+  181,
+  121,
+  244,
+  234,
+  92
+]);
+var NV = new Uint8Array([
   134,
   75,
   32,
@@ -44740,7 +45233,7 @@ var s0 = new Uint8Array([
   168,
   108
 ]);
-var f0 = new Uint8Array([
+var FV = new Uint8Array([
   186,
   31,
   152,
@@ -44750,8 +45243,8 @@ var f0 = new Uint8Array([
   87,
   84
 ]);
-var y0 = new Uint8Array([83, 93, 121, 200, 169, 255, 17, 119]);
-var P0 = new Uint8Array([
+var zV = new Uint8Array([83, 93, 121, 200, 169, 255, 17, 119]);
+var jV = new Uint8Array([
   249,
   149,
   165,
@@ -44761,7 +45254,7 @@ var P0 = new Uint8Array([
   109,
   173
 ]);
-var v0 = new Uint8Array([
+var $V = new Uint8Array([
   245,
   5,
   20,
@@ -44771,7 +45264,7 @@ var v0 = new Uint8Array([
   67,
   57
 ]);
-var I0 = new Uint8Array([
+var qV = new Uint8Array([
   61,
   242,
   207,
@@ -44781,7 +45274,7 @@ var I0 = new Uint8Array([
   93,
   63
 ]);
-var T0 = new Uint8Array([
+var eW = new Uint8Array([
   230,
   27,
   72,
@@ -44791,7 +45284,7 @@ var T0 = new Uint8Array([
   3,
   75
 ]);
-var W0 = new Uint8Array([
+var tW = new Uint8Array([
   191,
   16,
   25,
@@ -44801,7 +45294,7 @@ var W0 = new Uint8Array([
   122,
   233
 ]);
-var M0 = new Uint8Array([
+var iW = new Uint8Array([
   133,
   3,
   187,
@@ -44811,7 +45304,17 @@ var M0 = new Uint8Array([
   85,
   197
 ]);
-var N0 = new Uint8Array([
+var sW = new Uint8Array([
+  59,
+  234,
+  59,
+  113,
+  90,
+  201,
+  149,
+  155
+]);
+var fW = new Uint8Array([
   251,
   46,
   12,
@@ -44821,7 +45324,27 @@ var N0 = new Uint8Array([
   157,
   73
 ]);
-var F0 = new Uint8Array([
+var yW = new Uint8Array([
+  139,
+  144,
+  151,
+  160,
+  43,
+  126,
+  121,
+  193
+]);
+var PW = new Uint8Array([
+  53,
+  182,
+  243,
+  86,
+  125,
+  121,
+  137,
+  216
+]);
+var vW = new Uint8Array([
   79,
   53,
   82,
@@ -44831,7 +45354,7 @@ var F0 = new Uint8Array([
   164,
   79
 ]);
-var z0 = new Uint8Array([
+var IW = new Uint8Array([
   112,
   99,
   251,
@@ -44841,7 +45364,7 @@ var z0 = new Uint8Array([
   222,
   183
 ]);
-var j0 = new Uint8Array([
+var TW = new Uint8Array([
   193,
   238,
   98,
@@ -44851,7 +45374,7 @@ var j0 = new Uint8Array([
   242,
   8
 ]);
-var $0 = new Uint8Array([
+var WW = new Uint8Array([
   119,
   252,
   142,
@@ -44861,7 +45384,17 @@ var $0 = new Uint8Array([
   229,
   35
 ]);
-var q0 = new Uint8Array([
+var _W = new Uint8Array([
+  226,
+  216,
+  159,
+  173,
+  192,
+  12,
+  124,
+  218
+]);
+var NW = new Uint8Array([
   141,
   37,
   254,
@@ -44871,7 +45404,7 @@ var q0 = new Uint8Array([
   210,
   199
 ]);
-var Q0 = new Uint8Array([
+var LW = new Uint8Array([
   68,
   101,
   73,
@@ -44881,7 +45414,7 @@ var Q0 = new Uint8Array([
   98,
   26
 ]);
-var r8 = new Uint8Array([
+var UW = new Uint8Array([
   23,
   195,
   44,
@@ -44891,7 +45424,10 @@ var r8 = new Uint8Array([
   250,
   87
 ]);
-var n8 = new Uint8Array([
+var HW = new Uint8Array(
+  [209, 82, 217, 174, 114, 6, 186, 204]
+);
+var YW = new Uint8Array([
   152,
   176,
   99,
@@ -44901,7 +45437,7 @@ var n8 = new Uint8Array([
   163,
   111
 ]);
-var c8 = new Uint8Array([
+var KW = new Uint8Array([
   180,
   183,
   106,
@@ -44911,7 +45447,17 @@ var c8 = new Uint8Array([
   232,
   178
 ]);
-var u8 = new Uint8Array([
+var ZW = new Uint8Array([
+  77,
+  244,
+  14,
+  199,
+  207,
+  191,
+  85,
+  214
+]);
+var rE = new Uint8Array([
   61,
   115,
   30,
@@ -44921,7 +45467,7 @@ var u8 = new Uint8Array([
   27,
   254
 ]);
-var f8 = new Uint8Array([
+var tE = new Uint8Array([
   122,
   148,
   216,
@@ -44931,7 +45477,7 @@ var f8 = new Uint8Array([
   238,
   126
 ]);
-var y8 = new Uint8Array([
+var iE = new Uint8Array([
   39,
   9,
   212,
@@ -44941,7 +45487,7 @@ var y8 = new Uint8Array([
   137,
   208
 ]);
-var P8 = new Uint8Array([
+var sE = new Uint8Array([
   226,
   64,
   151,
@@ -44951,7 +45497,7 @@ var P8 = new Uint8Array([
   221,
   205
 ]);
-var C8 = new Uint8Array([
+var dE = new Uint8Array([
   47,
   127,
   19,
@@ -44961,7 +45507,7 @@ var C8 = new Uint8Array([
   235,
   218
 ]);
-var R8 = new Uint8Array([
+var mE = new Uint8Array([
   118,
   172,
   60,
@@ -44971,7 +45517,7 @@ var R8 = new Uint8Array([
   142,
   207
 ]);
-var D8 = new Uint8Array([
+var pE = new Uint8Array([
   107,
   249,
   4,
@@ -44981,7 +45527,17 @@ var D8 = new Uint8Array([
   204,
   154
 ]);
-var w8 = new Uint8Array([
+var bE = new Uint8Array([
+  248,
+  13,
+  173,
+  186,
+  220,
+  242,
+  184,
+  219
+]);
+var SE = new Uint8Array([
   208,
   63,
   135,
@@ -44991,7 +45547,7 @@ var w8 = new Uint8Array([
   36,
   0
 ]);
-var W8 = new Uint8Array([
+var IE = new Uint8Array([
   36,
   59,
   8,
@@ -45001,7 +45557,7 @@ var W8 = new Uint8Array([
   98,
   205
 ]);
-var M8 = new Uint8Array([
+var TE = new Uint8Array([
   70,
   84,
   99,
@@ -45011,7 +45567,7 @@ var M8 = new Uint8Array([
   69,
   66
 ]);
-var O8 = new Uint8Array([
+var VE = new Uint8Array([
   38,
   28,
   79,
@@ -45021,7 +45577,7 @@ var O8 = new Uint8Array([
   116,
   161
 ]);
-var k8 = new Uint8Array([
+var EE = new Uint8Array([
   120,
   237,
   170,
@@ -45031,7 +45587,7 @@ var k8 = new Uint8Array([
   137,
   161
 ]);
-var F8 = new Uint8Array([
+var _E2 = new Uint8Array([
   98,
   205,
   72,
@@ -45041,7 +45597,7 @@ var F8 = new Uint8Array([
   221,
   12
 ]);
-var B8 = new Uint8Array([
+var OE = new Uint8Array([
   217,
   164,
   25,
@@ -45051,7 +45607,7 @@ var B8 = new Uint8Array([
   253,
   237
 ]);
-var H8 = new Uint8Array([
+var kE = new Uint8Array([
   196,
   236,
   61,
@@ -45061,7 +45617,7 @@ var H8 = new Uint8Array([
   234,
   30
 ]);
-var j8 = new Uint8Array([
+var FE = new Uint8Array([
   8,
   184,
   146,
@@ -45071,10 +45627,10 @@ var j8 = new Uint8Array([
   138,
   67
 ]);
-var X8 = new Uint8Array(
+var BE = new Uint8Array(
   [163, 133, 121, 104, 144, 226, 60, 199]
 );
-var K8 = new Uint8Array([
+var HE = new Uint8Array([
   62,
   161,
   15,
@@ -45084,7 +45640,7 @@ var K8 = new Uint8Array([
   3,
   26
 ]);
-var q8 = new Uint8Array([
+var jE = new Uint8Array([
   227,
   220,
   186,
@@ -45094,7 +45650,7 @@ var q8 = new Uint8Array([
   35,
   58
 ]);
-var Q8 = new Uint8Array([
+var XE = new Uint8Array([
   227,
   92,
   109,
@@ -45104,7 +45660,7 @@ var Q8 = new Uint8Array([
   203,
   218
 ]);
-var rV = new Uint8Array([
+var KE = new Uint8Array([
   111,
   207,
   42,
@@ -45114,7 +45670,7 @@ var rV = new Uint8Array([
   201,
   174
 ]);
-var nV = new Uint8Array([
+var ZE = new Uint8Array([
   163,
   96,
   34,
@@ -45124,7 +45680,7 @@ var nV = new Uint8Array([
   210,
   17
 ]);
-var cV = new Uint8Array([
+var rM = new Uint8Array([
   62,
   158,
   50,
@@ -45134,7 +45690,7 @@ var cV = new Uint8Array([
   127,
   5
 ]);
-var uV = new Uint8Array([
+var nM = new Uint8Array([
   186,
   120,
   54,
@@ -45144,7 +45700,7 @@ var uV = new Uint8Array([
   80,
   86
 ]);
-var gV = new Uint8Array([
+var cM = new Uint8Array([
   146,
   232,
   95,
@@ -45154,7 +45710,7 @@ var gV = new Uint8Array([
   228,
   135
 ]);
-var AV = new Uint8Array([
+var uM = new Uint8Array([
   197,
   117,
   98,
@@ -45164,7 +45720,17 @@ var AV = new Uint8Array([
   127,
   70
 ]);
-var bV = new Uint8Array([
+var gM = new Uint8Array([
+  78,
+  95,
+  242,
+  43,
+  187,
+  189,
+  64,
+  14
+]);
+var yM = new Uint8Array([
   131,
   57,
   245,
@@ -45174,10 +45740,20 @@ var bV = new Uint8Array([
   137,
   19
 ]);
-var SV = new Uint8Array(
+var PM = new Uint8Array([
+  80,
+  122,
+  130,
+  171,
+  32,
+  40,
+  93,
+  115
+]);
+var vM = new Uint8Array(
   [151, 50, 217, 219, 211, 103, 227, 104]
 );
-var hV = new Uint8Array([
+var IM = new Uint8Array([
   228,
   26,
   75,
@@ -45187,7 +45763,7 @@ var hV = new Uint8Array([
   74,
   177
 ]);
-var wV = new Uint8Array([
+var TM = new Uint8Array([
   130,
   65,
   225,
@@ -45197,7 +45773,7 @@ var wV = new Uint8Array([
   114,
   233
 ]);
-var WV = new Uint8Array([
+var VM = new Uint8Array([
   49,
   244,
   80,
@@ -45207,7 +45783,8 @@ var WV = new Uint8Array([
   154,
   100
 ]);
-var _V = new Uint8Array([
+var EM = new Uint8Array([161, 116, 108, 91, 239, 30, 92, 42]);
+var _M = new Uint8Array([
   247,
   231,
   146,
@@ -45217,7 +45794,7 @@ var _V = new Uint8Array([
   111,
   212
 ]);
-var OV = new Uint8Array([
+var NM = new Uint8Array([
   191,
   18,
   66,
@@ -45227,7 +45804,7 @@ var OV = new Uint8Array([
   124,
   213
 ]);
-var LV = new Uint8Array([
+var FM = new Uint8Array([
   208,
   244,
   202,
@@ -45237,7 +45814,7 @@ var LV = new Uint8Array([
   250,
   26
 ]);
-var BV = new Uint8Array([
+var zM = new Uint8Array([
   105,
   33,
   36,
@@ -45247,7 +45824,7 @@ var BV = new Uint8Array([
   51,
   57
 ]);
-var GV = new Uint8Array([
+var jM = new Uint8Array([
   60,
   18,
   158,
@@ -45257,7 +45834,7 @@ var GV = new Uint8Array([
   83,
   226
 ]);
-var XV = new Uint8Array([
+var $M = new Uint8Array([
   211,
   211,
   1,
@@ -45267,9 +45844,9 @@ var XV = new Uint8Array([
   59,
   93
 ]);
-var JV = new Uint8Array([241, 204, 113, 241, 12, 125, 94, 34]);
-var QV = new Uint8Array([71, 34, 120, 2, 228, 105, 209, 34]);
-var aW = new Uint8Array([
+var qM = new Uint8Array([241, 204, 113, 241, 12, 125, 94, 34]);
+var e_ = new Uint8Array([71, 34, 120, 2, 228, 105, 209, 34]);
+var t_ = new Uint8Array([
   118,
   238,
   153,
@@ -45279,7 +45856,7 @@ var aW = new Uint8Array([
   34,
   69
 ]);
-var oW = new Uint8Array([
+var i_ = new Uint8Array([
   242,
   139,
   76,
@@ -45289,7 +45866,7 @@ var oW = new Uint8Array([
   100,
   117
 ]);
-var cW = new Uint8Array([
+var l_ = new Uint8Array([
   166,
   246,
   124,
@@ -45299,7 +45876,7 @@ var cW = new Uint8Array([
   70,
   33
 ]);
-var uW = new Uint8Array([
+var d_ = new Uint8Array([
   232,
   237,
   196,
@@ -45309,7 +45886,7 @@ var uW = new Uint8Array([
   148,
   27
 ]);
-var gW = new Uint8Array([
+var m_ = new Uint8Array([
   213,
   18,
   200,
@@ -45319,7 +45896,7 @@ var gW = new Uint8Array([
   54,
   99
 ]);
-var AW = new Uint8Array([
+var p_ = new Uint8Array([
   149,
   133,
   23,
@@ -45329,7 +45906,7 @@ var AW = new Uint8Array([
   44,
   16
 ]);
-var bW = new Uint8Array([
+var C_ = new Uint8Array([
   228,
   186,
   177,
@@ -45339,7 +45916,7 @@ var bW = new Uint8Array([
   202,
   48
 ]);
-var SW = new Uint8Array([
+var R_ = new Uint8Array([
   67,
   4,
   108,
@@ -45349,7 +45926,7 @@ var SW = new Uint8Array([
   125,
   52
 ]);
-var IW = new Uint8Array([
+var h_ = new Uint8Array([
   10,
   109,
   218,
@@ -45359,7 +45936,7 @@ var IW = new Uint8Array([
   85,
   203
 ]);
-var TW = new Uint8Array([
+var w_ = new Uint8Array([
   219,
   159,
   171,
@@ -45369,7 +45946,7 @@ var TW = new Uint8Array([
   61,
   189
 ]);
-var WW = new Uint8Array([
+var E_ = new Uint8Array([
   139,
   96,
   58,
@@ -45379,7 +45956,7 @@ var WW = new Uint8Array([
   163,
   78
 ]);
-var MW = new Uint8Array([
+var x_ = new Uint8Array([
   127,
   229,
   233,
@@ -45389,7 +45966,7 @@ var MW = new Uint8Array([
   229,
   236
 ]);
-var NW = new Uint8Array([
+var k_ = new Uint8Array([
   124,
   74,
   59,
@@ -45399,7 +45976,7 @@ var NW = new Uint8Array([
   84,
   239
 ]);
-var FW = new Uint8Array([
+var U_ = new Uint8Array([
   96,
   45,
   125,
@@ -45409,7 +45986,7 @@ var FW = new Uint8Array([
   76,
   14
 ]);
-var zW = new Uint8Array([
+var H_ = new Uint8Array([
   43,
   173,
   10,
@@ -45419,7 +45996,7 @@ var zW = new Uint8Array([
   19,
   96
 ]);
-var GW = new Uint8Array([
+var j_ = new Uint8Array([
   70,
   1,
   43,
@@ -45429,7 +46006,7 @@ var GW = new Uint8Array([
   67,
   58
 ]);
-var YW = new Uint8Array([
+var X_ = new Uint8Array([
   99,
   69,
   237,
@@ -45439,7 +46016,7 @@ var YW = new Uint8Array([
   239,
   190
 ]);
-var KW = new Uint8Array([
+var J_ = new Uint8Array([
   152,
   78,
   72,
@@ -45449,7 +46026,7 @@ var KW = new Uint8Array([
   117,
   2
 ]);
-var qW = new Uint8Array([
+var Z_ = new Uint8Array([
   4,
   181,
   224,
@@ -45459,7 +46036,7 @@ var qW = new Uint8Array([
   195,
   197
 ]);
-var eE = new Uint8Array([
+var rx = new Uint8Array([
   76,
   48,
   128,
@@ -45469,7 +46046,7 @@ var eE = new Uint8Array([
   130,
   139
 ]);
-var tE = new Uint8Array([
+var nx = new Uint8Array([
   79,
   36,
   179,
@@ -45479,7 +46056,7 @@ var tE = new Uint8Array([
   92,
   176
 ]);
-var iE = new Uint8Array([
+var cx = new Uint8Array([
   76,
   150,
   185,
@@ -45489,7 +46066,7 @@ var iE = new Uint8Array([
   252,
   35
 ]);
-var sE = new Uint8Array([
+var ux = new Uint8Array([
   206,
   223,
   93,
@@ -45499,7 +46076,7 @@ var sE = new Uint8Array([
   253,
   149
 ]);
-var fE = new Uint8Array([
+var gx = new Uint8Array([
   233,
   160,
   123,
@@ -45509,7 +46086,7 @@ var fE = new Uint8Array([
   214,
   45
 ]);
-var yE = new Uint8Array([
+var Ax = new Uint8Array([
   4,
   67,
   180,
@@ -45519,7 +46096,7 @@ var yE = new Uint8Array([
   96,
   101
 ]);
-var pE = new Uint8Array([
+var Px = new Uint8Array([
   42,
   60,
   240,
@@ -45529,7 +46106,7 @@ var pE = new Uint8Array([
   155,
   53
 ]);
-var CE = new Uint8Array([
+var vx = new Uint8Array([
   133,
   46,
   125,
@@ -45539,7 +46116,7 @@ var CE = new Uint8Array([
   164,
   72
 ]);
-var SE = new Uint8Array([
+var Rx = new Uint8Array([
   128,
   119,
   227,
@@ -45549,8 +46126,8 @@ var SE = new Uint8Array([
   4,
   160
 ]);
-var hE = new Uint8Array([22, 160, 154, 153, 145, 180, 218, 27]);
-var wE = new Uint8Array([
+var Dx = new Uint8Array([22, 160, 154, 153, 145, 180, 218, 27]);
+var Vx = new Uint8Array([
   175,
   57,
   245,
@@ -45560,7 +46137,7 @@ var wE = new Uint8Array([
   108,
   237
 ]);
-var EE = new Uint8Array([
+var Mx = new Uint8Array([
   163,
   174,
   57,
@@ -45570,7 +46147,17 @@ var EE = new Uint8Array([
   28,
   48
 ]);
-var xE = new Uint8Array([
+var Ox = new Uint8Array([
+  177,
+  199,
+  174,
+  172,
+  140,
+  35,
+  220,
+  72
+]);
+var kx = new Uint8Array([
   228,
   204,
   46,
@@ -45580,7 +46167,7 @@ var xE = new Uint8Array([
   60,
   22
 ]);
-var kE = new Uint8Array([
+var Ux = new Uint8Array([
   22,
   105,
   28,
@@ -45590,7 +46177,17 @@ var kE = new Uint8Array([
   121,
   194
 ]);
-var UE = new Uint8Array([
+var Hx = new Uint8Array([
+  142,
+  59,
+  122,
+  143,
+  175,
+  36,
+  141,
+  102
+]);
+var Yx = new Uint8Array([
   254,
   218,
   254,
@@ -45600,7 +46197,7 @@ var UE = new Uint8Array([
   228,
   159
 ]);
-var HE = new Uint8Array([
+var Kx = new Uint8Array([
   86,
   213,
   70,
@@ -45610,7 +46207,7 @@ var HE = new Uint8Array([
   84,
   68
 ]);
-var YE = new Uint8Array([
+var Zx = new Uint8Array([
   43,
   128,
   255,
@@ -45620,7 +46217,7 @@ var YE = new Uint8Array([
   37,
   246
 ]);
-var KE = new Uint8Array([
+var rO = new Uint8Array([
   177,
   226,
   22,
@@ -45630,7 +46227,7 @@ var KE = new Uint8Array([
   132,
   129
 ]);
-var ZE = new Uint8Array([
+var nO = new Uint8Array([
   129,
   64,
   124,
@@ -45640,7 +46237,7 @@ var ZE = new Uint8Array([
   228,
   29
 ]);
-var r_ = new Uint8Array([
+var cO = new Uint8Array([
   172,
   197,
   157,
@@ -45650,7 +46247,7 @@ var r_ = new Uint8Array([
   8,
   191
 ]);
-var n_ = new Uint8Array([
+var uO = new Uint8Array([
   241,
   164,
   121,
@@ -45660,7 +46257,7 @@ var n_ = new Uint8Array([
   17,
   157
 ]);
-var c_ = new Uint8Array([
+var gO = new Uint8Array([
   158,
   153,
   82,
@@ -45670,7 +46267,7 @@ var c_ = new Uint8Array([
   76,
   237
 ]);
-var u_ = new Uint8Array([
+var AO = new Uint8Array([
   71,
   66,
   11,
@@ -45680,7 +46277,7 @@ var u_ = new Uint8Array([
   29,
   81
 ]);
-var g_ = new Uint8Array([
+var bO = new Uint8Array([
   130,
   224,
   92,
@@ -45690,7 +46287,7 @@ var g_ = new Uint8Array([
   59,
   145
 ]);
-var A_ = new Uint8Array([
+var SO = new Uint8Array([
   233,
   61,
   200,
@@ -45700,7 +46297,7 @@ var A_ = new Uint8Array([
   169,
   148
 ]);
-var b_ = new Uint8Array([
+var hO = new Uint8Array([
   171,
   88,
   84,
@@ -45710,7 +46307,7 @@ var b_ = new Uint8Array([
   18,
   19
 ]);
-var S_ = new Uint8Array([
+var wO = new Uint8Array([
   12,
   169,
   4,
@@ -45720,7 +46317,7 @@ var S_ = new Uint8Array([
   173,
   254
 ]);
-var h_ = new Uint8Array([
+var EO = new Uint8Array([
   85,
   235,
   157,
@@ -45730,7 +46327,27 @@ var h_ = new Uint8Array([
   230,
   97
 ]);
-var w_ = new Uint8Array([
+var xO = new Uint8Array([
+  60,
+  67,
+  192,
+  10,
+  222,
+  55,
+  31,
+  89
+]);
+var NO = new Uint8Array([
+  19,
+  246,
+  24,
+  156,
+  132,
+  10,
+  35,
+  237
+]);
+var FO = new Uint8Array([
   134,
   25,
   92,
@@ -45740,7 +46357,7 @@ var w_ = new Uint8Array([
   110,
   77
 ]);
-var W_ = new Uint8Array([
+var BO = new Uint8Array([
   235,
   104,
   190,
@@ -45750,7 +46367,7 @@ var W_ = new Uint8Array([
   107,
   241
 ]);
-var M_ = new Uint8Array([
+var GO = new Uint8Array([
   22,
   214,
   151,
@@ -45760,7 +46377,7 @@ var M_ = new Uint8Array([
   125,
   29
 ]);
-var O_ = new Uint8Array([
+var YO = new Uint8Array([
   42,
   160,
   190,
@@ -45770,7 +46387,7 @@ var O_ = new Uint8Array([
   98,
   14
 ]);
-var L_ = new Uint8Array([
+var KO = new Uint8Array([
   211,
   246,
   217,
@@ -45780,7 +46397,7 @@ var L_ = new Uint8Array([
   128,
   35
 ]);
-var B_ = new Uint8Array([
+var ZO = new Uint8Array([
   30,
   200,
   4,
@@ -45790,11 +46407,11 @@ var B_ = new Uint8Array([
   212,
   59
 ]);
-var G_ = new Uint8Array([99, 8, 227, 218, 113, 152, 51, 141]);
-var X_ = new Uint8Array(
+var rN = new Uint8Array([99, 8, 227, 218, 113, 152, 51, 141]);
+var nN = new Uint8Array(
   [215, 171, 15, 195, 34, 152, 237, 225]
 );
-var J_ = new Uint8Array([
+var cN = new Uint8Array([
   138,
   2,
   241,
@@ -45804,7 +46421,7 @@ var J_ = new Uint8Array([
   25,
   109
 ]);
-var Q_ = new Uint8Array([
+var uN = new Uint8Array([
   173,
   117,
   234,
@@ -45814,7 +46431,7 @@ var Q_ = new Uint8Array([
   114,
   20
 ]);
-var aM = new Uint8Array([
+var gN = new Uint8Array([
   117,
   130,
   21,
@@ -45824,7 +46441,7 @@ var aM = new Uint8Array([
   185,
   33
 ]);
-var oM = new Uint8Array([
+var AN = new Uint8Array([
   218,
   245,
   159,
@@ -45834,7 +46451,7 @@ var oM = new Uint8Array([
   76,
   164
 ]);
-var lM = new Uint8Array([
+var bN = new Uint8Array([
   226,
   10,
   120,
@@ -45844,7 +46461,7 @@ var lM = new Uint8Array([
   160,
   69
 ]);
-var uM = new Uint8Array([
+var vN = new Uint8Array([
   64,
   108,
   109,
@@ -45854,7 +46471,7 @@ var uM = new Uint8Array([
   138,
   246
 ]);
-var fM = new Uint8Array([
+var RN = new Uint8Array([
   186,
   215,
   80,
@@ -45864,7 +46481,7 @@ var fM = new Uint8Array([
   211,
   33
 ]);
-var mM = new Uint8Array([
+var hN = new Uint8Array([
   220,
   224,
   41,
@@ -45874,7 +46491,7 @@ var mM = new Uint8Array([
   254,
   157
 ]);
-var AM = new Uint8Array([
+var TN = new Uint8Array([
   212,
   181,
   79,
@@ -45884,7 +46501,7 @@ var AM = new Uint8Array([
   13,
   105
 ]);
-var bM = new Uint8Array([
+var WN = new Uint8Array([
   20,
   218,
   211,
@@ -45894,10 +46511,10 @@ var bM = new Uint8Array([
   20,
   87
 ]);
-var SM = new Uint8Array(
+var _N = new Uint8Array(
   [5, 166, 187, 117, 1, 178, 185, 90]
 );
-var hM = new Uint8Array([
+var NN = new Uint8Array([
   253,
   36,
   109,
@@ -45907,7 +46524,7 @@ var hM = new Uint8Array([
   168,
   152
 ]);
-var wM = new Uint8Array([
+var FN = new Uint8Array([
   192,
   104,
   197,
@@ -45917,7 +46534,7 @@ var wM = new Uint8Array([
   155,
   48
 ]);
-var WM = new Uint8Array([
+var BN = new Uint8Array([
   78,
   174,
   172,
@@ -45927,7 +46544,7 @@ var WM = new Uint8Array([
   14,
   158
 ]);
-var MM = new Uint8Array([
+var GN = new Uint8Array([
   181,
   77,
   45,
@@ -45937,7 +46554,7 @@ var MM = new Uint8Array([
   211,
   81
 ]);
-var OM = new Uint8Array([
+var YN = new Uint8Array([
   150,
   58,
   3,
@@ -45947,7 +46564,7 @@ var OM = new Uint8Array([
   119,
   46
 ]);
-var kM = new Uint8Array([
+var $N = new Uint8Array([
   21,
   97,
   186,
@@ -45957,7 +46574,7 @@ var kM = new Uint8Array([
   249,
   248
 ]);
-var FM = new Uint8Array([
+var JN = new Uint8Array([
   128,
   207,
   120,
@@ -45967,7 +46584,7 @@ var FM = new Uint8Array([
   42,
   161
 ]);
-var zM = new Uint8Array([
+var QN = new Uint8Array([
   166,
   255,
   19,
@@ -45977,7 +46594,7 @@ var zM = new Uint8Array([
   180,
   31
 ]);
-var jM = new Uint8Array([
+var a2 = new Uint8Array([
   33,
   58,
   217,
@@ -45987,7 +46604,7 @@ var jM = new Uint8Array([
   183,
   126
 ]);
-var $M = new Uint8Array([
+var o2 = new Uint8Array([
   28,
   220,
   61,
@@ -45997,7 +46614,7 @@ var $M = new Uint8Array([
   212,
   67
 ]);
-var qM = new Uint8Array([
+var l2 = new Uint8Array([
   127,
   70,
   167,
@@ -46007,7 +46624,17 @@ var qM = new Uint8Array([
   47,
   15
 ]);
-var ex = new Uint8Array([
+var d2 = new Uint8Array([
+  142,
+  28,
+  28,
+  85,
+  213,
+  102,
+  130,
+  134
+]);
+var m2 = new Uint8Array([
   125,
   138,
   71,
@@ -46017,7 +46644,7 @@ var ex = new Uint8Array([
   239,
   228
 ]);
-var tx = new Uint8Array([
+var p2 = new Uint8Array([
   114,
   77,
   252,
@@ -46027,7 +46654,7 @@ var tx = new Uint8Array([
   2,
   156
 ]);
-var ix = new Uint8Array([
+var C2 = new Uint8Array([
   55,
   127,
   211,
@@ -46037,7 +46664,7 @@ var ix = new Uint8Array([
   101,
   140
 ]);
-var lx = new Uint8Array([
+var S2 = new Uint8Array([
   8,
   232,
   172,
@@ -46047,7 +46674,7 @@ var lx = new Uint8Array([
   150,
   30
 ]);
-var ux = new Uint8Array([
+var I2 = new Uint8Array([
   127,
   29,
   53,
@@ -46057,7 +46684,7 @@ var ux = new Uint8Array([
   99,
   14
 ]);
-var fx = new Uint8Array([
+var D22 = new Uint8Array([
   201,
   109,
   41,
@@ -46067,7 +46694,7 @@ var fx = new Uint8Array([
   180,
   23
 ]);
-var yx = new Uint8Array([
+var V2 = new Uint8Array([
   125,
   162,
   202,
@@ -46077,7 +46704,7 @@ var yx = new Uint8Array([
   210,
   206
 ]);
-var Px = new Uint8Array([
+var M2 = new Uint8Array([
   19,
   119,
   138,
@@ -46087,7 +46714,7 @@ var Px = new Uint8Array([
   92,
   146
 ]);
-var Cx = new Uint8Array([
+var x2 = new Uint8Array([
   58,
   33,
   246,
@@ -46097,7 +46724,7 @@ var Cx = new Uint8Array([
   61,
   226
 ]);
-var Sx = new Uint8Array([
+var N2 = new Uint8Array([
   103,
   95,
   42,
@@ -46107,7 +46734,7 @@ var Sx = new Uint8Array([
   71,
   32
 ]);
-var hx = new Uint8Array([
+var F2 = new Uint8Array([
   80,
   163,
   186,
@@ -46117,7 +46744,7 @@ var hx = new Uint8Array([
   131,
   75
 ]);
-var Tx = new Uint8Array([
+var B2 = new Uint8Array([
   227,
   136,
   205,
@@ -46127,7 +46754,7 @@ var Tx = new Uint8Array([
   52,
   49
 ]);
-var Vx = new Uint8Array([
+var H2 = new Uint8Array([
   244,
   47,
   131,
@@ -46137,7 +46764,17 @@ var Vx = new Uint8Array([
   94,
   38
 ]);
-var Ex = new Uint8Array([
+var j2 = new Uint8Array([
+  20,
+  84,
+  206,
+  185,
+  159,
+  246,
+  224,
+  195
+]);
+var $2 = new Uint8Array([
   85,
   214,
   190,
@@ -46147,7 +46784,7 @@ var Ex = new Uint8Array([
   217,
   206
 ]);
-var xx = new Uint8Array([
+var q2 = new Uint8Array([
   165,
   77,
   93,
@@ -46157,7 +46794,7 @@ var xx = new Uint8Array([
   5,
   52
 ]);
-var kx = new Uint8Array([
+var e32 = new Uint8Array([
   231,
   34,
   98,
@@ -46167,7 +46804,7 @@ var kx = new Uint8Array([
   81,
   170
 ]);
-var Ux = new Uint8Array([
+var t3 = new Uint8Array([
   36,
   32,
   46,
@@ -46177,7 +46814,7 @@ var Ux = new Uint8Array([
   254,
   144
 ]);
-var Hx = new Uint8Array([
+var i3 = new Uint8Array([
   64,
   69,
   26,
@@ -46187,7 +46824,7 @@ var Hx = new Uint8Array([
   10,
   111
 ]);
-var Yx = new Uint8Array([
+var s3 = new Uint8Array([
   105,
   232,
   50,
@@ -46197,7 +46834,8 @@ var Yx = new Uint8Array([
   144,
   204
 ]);
-var Kx = new Uint8Array([
+var f3 = new Uint8Array([236, 58, 20, 209, 45, 152, 92, 48]);
+var y3 = new Uint8Array([
   72,
   69,
   113,
@@ -46207,7 +46845,7 @@ var Kx = new Uint8Array([
   205,
   242
 ]);
-var Zx = new Uint8Array([
+var P3 = new Uint8Array([
   104,
   169,
   177,
@@ -46217,7 +46855,7 @@ var Zx = new Uint8Array([
   252,
   213
 ]);
-var rO = new Uint8Array([
+var v3 = new Uint8Array([
   81,
   255,
   211,
@@ -46227,7 +46865,8 @@ var rO = new Uint8Array([
   143,
   153
 ]);
-var nO = new Uint8Array([
+var I3 = new Uint8Array([107, 237, 169, 234, 251, 43, 134, 233]);
+var T3 = new Uint8Array([
   170,
   251,
   243,
@@ -46237,7 +46876,7 @@ var nO = new Uint8Array([
   55,
   20
 ]);
-var cO = new Uint8Array([
+var W3 = new Uint8Array([
   159,
   61,
   132,
@@ -46247,7 +46886,7 @@ var cO = new Uint8Array([
   209,
   220
 ]);
-var uO = new Uint8Array([
+var _3 = new Uint8Array([
   194,
   72,
   231,
@@ -46257,7 +46896,7 @@ var uO = new Uint8Array([
   170,
   30
 ]);
-var gO = new Uint8Array([
+var N3 = new Uint8Array([
   253,
   168,
   44,
@@ -46267,7 +46906,8 @@ var gO = new Uint8Array([
   222,
   84
 ]);
-var AO = new Uint8Array([
+var F3 = new Uint8Array([68, 20, 180, 149, 47, 25, 162, 54]);
+var z3 = new Uint8Array([
   79,
   118,
   143,
@@ -46277,7 +46917,7 @@ var AO = new Uint8Array([
   242,
   15
 ]);
-var bO = new Uint8Array([
+var j3 = new Uint8Array([
   50,
   154,
   61,
@@ -46287,7 +46927,17 @@ var bO = new Uint8Array([
   92,
   20
 ]);
-var SO = new Uint8Array([
+var $3 = new Uint8Array([
+  88,
+  74,
+  198,
+  120,
+  116,
+  60,
+  255,
+  89
+]);
+var q3 = new Uint8Array([
   227,
   165,
   202,
@@ -46297,7 +46947,7 @@ var SO = new Uint8Array([
   138,
   141
 ]);
-var hO = new Uint8Array([
+var e9 = new Uint8Array([
   184,
   234,
   165,
@@ -46307,7 +46957,7 @@ var hO = new Uint8Array([
   228,
   223
 ]);
-var wO = new Uint8Array([
+var t9 = new Uint8Array([
   66,
   153,
   145,
@@ -46317,7 +46967,7 @@ var wO = new Uint8Array([
   218,
   208
 ]);
-var EO = new Uint8Array([
+var i9 = new Uint8Array([
   42,
   218,
   132,
@@ -46327,7 +46977,7 @@ var EO = new Uint8Array([
   162,
   50
 ]);
-var xO = new Uint8Array([
+var s9 = new Uint8Array([
   226,
   75,
   190,
@@ -46337,7 +46987,7 @@ var xO = new Uint8Array([
   2,
   48
 ]);
-var kO = new Uint8Array([
+var f9 = new Uint8Array([
   63,
   230,
   234,
@@ -46347,7 +46997,17 @@ var kO = new Uint8Array([
   198,
   233
 ]);
-var UO = new Uint8Array([
+var y9 = new Uint8Array([
+  80,
+  192,
+  57,
+  162,
+  153,
+  10,
+  141,
+  192
+]);
+var P9 = new Uint8Array([
   78,
   146,
   104,
@@ -46357,7 +47017,7 @@ var UO = new Uint8Array([
   95,
   28
 ]);
-var HO = new Uint8Array([
+var v9 = new Uint8Array([
   70,
   7,
   75,
@@ -46367,7 +47027,7 @@ var HO = new Uint8Array([
   86,
   107
 ]);
-var jO = new Uint8Array([
+var R9 = new Uint8Array([
   101,
   242,
   87,
@@ -46377,7 +47037,7 @@ var jO = new Uint8Array([
   193,
   89
 ]);
-var $O = new Uint8Array([
+var D9 = new Uint8Array([
   152,
   218,
   134,
@@ -46387,7 +47047,7 @@ var $O = new Uint8Array([
   111,
   24
 ]);
-var qO = new Uint8Array([
+var V9 = new Uint8Array([
   103,
   117,
   88,
@@ -46397,7 +47057,7 @@ var qO = new Uint8Array([
   241,
   194
 ]);
-var eN = new Uint8Array([
+var M9 = new Uint8Array([
   51,
   236,
   56,
@@ -46407,7 +47067,7 @@ var eN = new Uint8Array([
   191,
   15
 ]);
-var tN = new Uint8Array([
+var O9 = new Uint8Array([
   159,
   129,
   136,
@@ -46417,7 +47077,7 @@ var tN = new Uint8Array([
   127,
   155
 ]);
-var iN = new Uint8Array([
+var L9 = new Uint8Array([
   175,
   104,
   6,
@@ -46427,7 +47087,7 @@ var iN = new Uint8Array([
   177,
   29
 ]);
-var sN = new Uint8Array([
+var B9 = new Uint8Array([
   49,
   42,
   134,
@@ -46437,7 +47097,17 @@ var sN = new Uint8Array([
   138,
   130
 ]);
-var fN = new Uint8Array([
+var G9 = new Uint8Array([
+  136,
+  218,
+  34,
+  52,
+  195,
+  238,
+  20,
+  237
+]);
+var $9 = new Uint8Array([
   232,
   188,
   195,
@@ -46447,7 +47117,7 @@ var fN = new Uint8Array([
   231,
   243
 ]);
-var mN = new Uint8Array([
+var J9 = new Uint8Array([
   87,
   60,
   50,
@@ -46457,7 +47127,7 @@ var mN = new Uint8Array([
   77,
   23
 ]);
-var AN = new Uint8Array([
+var Z9 = new Uint8Array([
   85,
   126,
   184,
@@ -46467,7 +47137,7 @@ var AN = new Uint8Array([
   89,
   89
 ]);
-var PN = new Uint8Array([
+var e6 = new Uint8Array([
   102,
   218,
   88,
@@ -46477,287 +47147,310 @@ var PN = new Uint8Array([
   24,
   62
 ]);
-var s8 = "C4SAgeKLgb3pTLWhVr6NRwWyYFuTR7ZeSXFrzoLwfMzF";
-var Cue = 1367932928;
-var vue = 1367932929;
-var Sue = 1367932930;
-var Rue = 1367932931;
-var Iue = 1367932932;
-var hue = 1367932933;
-var Due = 1367932934;
-var Tue = 1367932935;
-var wue = 1367932936;
-var Vue = 1367932937;
-var Wue = 1367932938;
-var Eue = 1367932939;
-var _ue = 1367932940;
-var Mue = 1367932941;
-var xue = 1367932942;
-var Oue = 1367932943;
-var Nue = 1367932944;
-var kue = 1367932945;
-var Lue = 1367932946;
-var Fue = 1367932947;
-var Uue = 1367932948;
-var Bue = 1367932949;
-var zue = 1367932950;
-var Hue = 1367932951;
-var Gue = 1367932952;
-var jue = 1367932953;
-var Yue = 1367932954;
-var Xue = 1367932955;
-var $ue = 1367932956;
-var Kue = 1367932957;
-var Jue = 1367932958;
-var que = 1367932959;
-var Zue = 1367932960;
-var Que = 1367932961;
-var ede = 1367932962;
-var rde = 1367932963;
-var ade = 1367932964;
-var tde = 1367932965;
-var nde = 1367932966;
-var ode = 1367932967;
-var ide = 1367932968;
-var cde = 1367932969;
-var lde = 1367932970;
-var sde = 1367932971;
-var ude = 1367932972;
-var dde = 1367932973;
-var fde = 1367932974;
-var gde = 1367932975;
-var mde = 1367932976;
-var yde = 1367932977;
-var Ade = 1367932978;
-var pde = 1367932979;
-var Pde = 1367932980;
-var bde = 1367932981;
-var Cde = 1367932982;
-var vde = 1367932983;
-var Sde = 1367932984;
-var Rde = 1367932985;
-var Ide = 1367932986;
-var hde = 1367932987;
-var Dde = 1367932988;
-var Tde = 1367932989;
-var wde = 1367932990;
-var Vde = 1367932991;
-var Wde = 1367932992;
-var Ede = 1367932993;
-var _de = 1367932994;
-var Mde = 1367932995;
-var xde = 1367932996;
-var Ode = 1367932997;
-var Nde = 1367932998;
-var kde = 1367932999;
-var Lde = 1367933e3;
-var Fde = 1367933001;
-var Ude = 1367933002;
-var Bde = 1367933003;
-var zde = 1367933004;
-var Hde = 1367933005;
-var Gde = 1367933006;
-var jde = 1367933007;
-var Yde = 1367933008;
-var Xde = 1367933009;
-var $de = 1367933010;
-var Kde = 1367933011;
-var Jde = 1367933012;
-var qde = 1367933013;
-var Zde = 1367933014;
-var Qde = 1367933015;
-var efe = 1367933016;
-var rfe = 1367933017;
-var afe = 1367933018;
-var tfe = 1367933019;
-var nfe = 1367933020;
-var ofe = 1367933021;
-var ife = 1367933022;
-var cfe = 1367933023;
-var lfe = 1367933024;
-var sfe = 1367933025;
-var ufe = 1367933026;
-var dfe = 1367933027;
-var ffe = 1367933028;
-var gfe = 1367933029;
-var mfe = 1367933030;
-var yfe = 1367933031;
-var Afe = 1367933032;
-var pfe = 1367933033;
-var Pfe = 1367933034;
-var bfe = 1367933035;
-var Cfe = 1367933036;
-var vfe = 1367933037;
-var Sfe = 1367933038;
-var Rfe = 1367933039;
-var Ife = 1367933040;
-var hfe = 1367933041;
-var Dfe = 1367933042;
-var Tfe = 1367933043;
-var wfe = 1367933044;
-var Vfe = 1367933045;
-var Wfe = 1367933046;
-var Efe = 1367933047;
-var _fe = 1367933048;
-var Mfe = 1367933049;
-var xfe = 1367933050;
-var Ofe = 1367933051;
-var Nfe = 1367933052;
-var vN;
-process.env.NODE_ENV !== "production" && (vN = {
-  [jue]: "Already exists",
-  [sde]: "Bounding box failed",
-  [Fue]: "Capacity exceeded",
-  [sfe]: "Career XP budget required",
-  [dfe]: "Career XP budget not reconciled",
-  [Zde]: "Ceasefire cooldown active",
-  [qde]: "Ceasefire too short",
-  [Due]: "Celestial body type mismatch",
-  [ife]: "Character research sync required",
-  [Nfe]: "Claim stake not operable",
-  [wde]: "Outlaw commitment window still active",
-  [Bue]: "Cooldown active",
-  [Vue]: "Crafting hab not evicted",
-  [Hue]: "Crafting job limit reached",
-  [vde]: "Crew already bound",
-  [mde]: "Crew asset mismatch",
-  [hde]: "Crew authority mismatch",
-  [pde]: "Crew bad status",
-  [Pde]: "Crew busy",
-  [yde]: "Crew feature disabled",
-  [Ade]: "Crew record not found",
-  [Ide]: "Crew roster owner mismatch",
-  [Sde]: "Crew XP award too large",
-  [Yue]: "Duplicate resource",
-  [nde]: "Epoch division error",
-  [ede]: "Escrow underflow",
-  [Wue]: "Eviction not delinquent",
-  [Gde]: "Faction is allied",
-  [Mde]: "Faction bridge inconsistent",
-  [ofe]: "Faction capture rate limited",
-  [jde]: "Faction ceasefire active",
-  [afe]: "Faction directive rate limited",
-  [Tde]: "Faction drain blocked: own-faction opposition requires an outlaw declaration",
-  [Ede]: "Faction flag not permitted",
-  [nfe]: "Faction fleet cap exceeded",
-  [Ofe]: "Faction market not draft",
-  [Ude]: "Faction market PDA mismatch",
-  [Bde]: "Faction market treasury mismatch",
-  [Oue]: "Faction mismatch",
-  [Hde]: "Faction market not active",
-  [Yde]: "Faction is not a combatant",
-  [Qde]: "Faction ownership mismatch",
-  [zde]: "Faction reserve floor",
-  [Dde]: "Fleet crew page conflict",
-  [tfe]: "Fleet not owned by faction",
-  [Mue]: "Game mismatch",
-  [Cde]: "Gear slot occupied",
-  [Kue]: "Global ceasefire active",
-  [Gue]: "Multiple hubs placed",
-  [_ue]: "Id mismatch",
-  [wue]: "Claim stake status mismatch",
-  [Zue]: "Instance deactivated",
-  [rde]: "Insufficient amount",
-  [$de]: "Invalid faction",
-  [Wde]: "Invalid faction flags",
-  [_de]: "Invalid faction status transition",
-  [rfe]: "Invalid fleet directive",
-  [Sue]: "Invalid fleet size",
-  [Iue]: "Invalid input",
-  [lde]: "Invalid path",
-  [Jde]: "Invalid relation argument",
-  [ode]: "Invalid timestamp",
-  [ude]: "Invariant violation",
-  [Kde]: "Max allies exceeded",
-  [vue]: "Must be only instruction",
-  [Xue]: "Not At Central Space Station",
-  [Rue]: "Not found",
-  [$ue]: "Not within range",
-  [Que]: "Numeric overflow",
-  [bde]: "Perk offer gate",
-  [xue]: "Profile mismatch",
-  [Cue]: "Program mismatch",
-  [cde]: "Region invalid",
-  [ide]: "Region not found",
-  [Tfe]: "Rent baseline inconsistent",
-  [Dfe]: "Rent budget stale",
-  [_fe]: "Rent cancel refused",
-  [Cfe]: "Rent catalog state mismatch",
-  [fde]: "Fleet is rented",
-  [Wfe]: "Rent evaluation conflict",
-  [hfe]: "Rent evaluation incomplete",
-  [Efe]: "Rent evaluation stale",
-  [bfe]: "Rent field retired: use SetPlanetRentGrid",
-  [Sfe]: "Rent hint invalid",
-  [pfe]: "Rent history invalid",
-  [vfe]: "Rent history missing",
-  [Vfe]: "Rent nothing to settle",
-  [Ife]: "Rent numeric domain",
-  [Rfe]: "Rent selector invalid",
-  [Mfe]: "Rent settlement required",
-  [wfe]: "Rent stake evictable",
-  [xfe]: "Rent stake not invalidated",
-  [Pfe]: "Rent write version mismatch",
-  [Uue]: "Requirements not met",
-  [Vde]: "Reserved faction id",
-  [gde]: "Crew roster page mismatch",
-  [Xde]: "Self relation",
-  [dde]: "Sequence ids do not match",
-  [Rde]: "Set perk definitions unsupported",
-  [Fde]: "Standing account required",
-  [kde]: "Standing epoch cap exceeded",
-  [Ode]: "Standing faction mismatch",
-  [Nde]: "Standing PDA mismatch",
-  [xde]: "Standing profile mismatch",
-  [Lde]: "Standing too low",
-  [efe]: "Starbase contested",
-  [kue]: "Starbase destroyed",
-  [Lue]: "Starbase not destroyed",
-  [Eue]: "State mismatch",
-  [Tue]: "Status mismatch",
-  [Afe]: "Structure XP accrual ledger required",
-  [Nue]: "System mismatch",
-  [hue]: "Type mismatch",
-  [Jue]: "Unauthorized",
-  [que]: "Under construction",
-  [zue]: "Usage limit exceeded",
-  [ade]: "Withdrawal limit exceeded",
-  [tde]: "Withdraw disabled",
-  [ufe]: "XP budget config required",
-  [ffe]: "XP budget not active for this game",
-  [gfe]: "XP migration digest mismatch",
-  [yfe]: "XP migration incomplete",
-  [cfe]: "XP migration in progress",
-  [mfe]: "XP migration manifest mismatch",
-  [lfe]: "XP migration phase mismatch"
+var Gye = 1367932928;
+var jye = 1367932929;
+var Yye = 1367932930;
+var Xye = 1367932931;
+var $ye = 1367932932;
+var Kye = 1367932933;
+var Jye = 1367932934;
+var qye = 1367932935;
+var Zye = 1367932936;
+var Qye = 1367932937;
+var eAe = 1367932938;
+var rAe = 1367932939;
+var aAe = 1367932940;
+var tAe = 1367932941;
+var nAe = 1367932942;
+var oAe = 1367932943;
+var iAe = 1367932944;
+var cAe = 1367932945;
+var lAe = 1367932946;
+var sAe = 1367932947;
+var uAe = 1367932948;
+var dAe = 1367932949;
+var fAe = 1367932950;
+var gAe = 1367932951;
+var mAe = 1367932952;
+var yAe = 1367932953;
+var AAe = 1367932954;
+var pAe = 1367932955;
+var PAe = 1367932956;
+var bAe = 1367932957;
+var CAe = 1367932958;
+var vAe = 1367932959;
+var SAe = 1367932960;
+var RAe = 1367932961;
+var IAe = 1367932962;
+var hAe = 1367932963;
+var DAe = 1367932964;
+var TAe = 1367932965;
+var wAe = 1367932966;
+var VAe = 1367932967;
+var WAe = 1367932968;
+var EAe = 1367932969;
+var MAe = 1367932970;
+var _Ae = 1367932971;
+var xAe = 1367932972;
+var OAe = 1367932973;
+var NAe = 1367932974;
+var kAe = 1367932975;
+var LAe = 1367932976;
+var FAe = 1367932977;
+var UAe = 1367932978;
+var BAe = 1367932979;
+var zAe = 1367932980;
+var HAe = 1367932981;
+var GAe = 1367932982;
+var jAe = 1367932983;
+var YAe = 1367932984;
+var XAe = 1367932985;
+var $Ae = 1367932986;
+var KAe = 1367932987;
+var JAe = 1367932988;
+var qAe = 1367932989;
+var ZAe = 1367932990;
+var QAe = 1367932991;
+var epe = 1367932992;
+var rpe = 1367932993;
+var ape = 1367932994;
+var tpe = 1367932995;
+var npe = 1367932996;
+var ope = 1367932997;
+var ipe = 1367932998;
+var cpe = 1367932999;
+var lpe = 1367933e3;
+var spe = 1367933001;
+var upe = 1367933002;
+var dpe = 1367933003;
+var fpe = 1367933004;
+var gpe = 1367933005;
+var mpe = 1367933006;
+var ype = 1367933007;
+var Ape = 1367933008;
+var ppe = 1367933009;
+var Ppe = 1367933010;
+var bpe = 1367933011;
+var Cpe = 1367933012;
+var vpe = 1367933013;
+var Spe = 1367933014;
+var Rpe = 1367933015;
+var Ipe = 1367933016;
+var hpe = 1367933017;
+var Dpe = 1367933018;
+var Tpe = 1367933019;
+var wpe = 1367933020;
+var Vpe = 1367933021;
+var Wpe = 1367933022;
+var Epe = 1367933023;
+var Mpe = 1367933024;
+var _pe = 1367933025;
+var xpe = 1367933026;
+var Ope = 1367933027;
+var Npe = 1367933028;
+var kpe = 1367933029;
+var Lpe = 1367933030;
+var Fpe = 1367933031;
+var Upe = 1367933032;
+var Bpe = 1367933033;
+var zpe = 1367933034;
+var Hpe = 1367933035;
+var Gpe = 1367933036;
+var jpe = 1367933037;
+var Ype = 1367933038;
+var Xpe = 1367933039;
+var $pe = 1367933040;
+var Kpe = 1367933041;
+var Jpe = 1367933042;
+var qpe = 1367933043;
+var Zpe = 1367933044;
+var Qpe = 1367933045;
+var ePe = 1367933046;
+var rPe = 1367933047;
+var aPe = 1367933048;
+var tPe = 1367933049;
+var nPe = 1367933050;
+var oPe = 1367933051;
+var iPe = 1367933052;
+var cPe = 1367933053;
+var lPe = 1367933054;
+var sPe = 1367933055;
+var uPe = 1367933056;
+var dPe = 1367933057;
+var fPe = 1367933058;
+var gPe = 1367933059;
+var mPe = 1367933060;
+var yPe = 1367933061;
+var APe = 1367933062;
+var pPe = 1367933063;
+var PPe = 1367933064;
+var t6;
+process.env.NODE_ENV !== "production" && (t6 = {
+  [fPe]: "Achievement already claimed",
+  [APe]: "Achievement definition invalid",
+  [uPe]: "Achievement disabled",
+  [yPe]: "Achievement metric unsupported",
+  [sPe]: "Achievement not found",
+  [gPe]: "Achievement prerequisite not met",
+  [mPe]: "Achievement requirement not met",
+  [pPe]: "Achievement revision mismatch",
+  [dPe]: "Achievement tier invalid",
+  [PPe]: "Achievement title unavailable",
+  [yAe]: "Already exists",
+  [_Ae]: "Bounding box failed",
+  [sAe]: "Capacity exceeded",
+  [_pe]: "Career XP budget required",
+  [Ope]: "Career XP budget not reconciled",
+  [Spe]: "Ceasefire cooldown active",
+  [vpe]: "Ceasefire too short",
+  [Jye]: "Celestial body type mismatch",
+  [Wpe]: "Character research sync required",
+  [iPe]: "Claim stake not operable",
+  [ZAe]: "Outlaw commitment window still active",
+  [dAe]: "Cooldown active",
+  [Qye]: "Crafting hab not evicted",
+  [gAe]: "Crafting job limit reached",
+  [jAe]: "Crew already bound",
+  [LAe]: "Crew asset mismatch",
+  [KAe]: "Crew authority mismatch",
+  [BAe]: "Crew bad status",
+  [zAe]: "Crew busy",
+  [FAe]: "Crew feature disabled",
+  [UAe]: "Crew record not found",
+  [$Ae]: "Crew roster owner mismatch",
+  [YAe]: "Crew XP award too large",
+  [cPe]: "Defender crew witness invalid",
+  [AAe]: "Duplicate resource",
+  [wAe]: "Epoch division error",
+  [IAe]: "Escrow underflow",
+  [eAe]: "Eviction not delinquent",
+  [mpe]: "Faction is allied",
+  [tpe]: "Faction bridge inconsistent",
+  [Vpe]: "Faction capture rate limited",
+  [ype]: "Faction ceasefire active",
+  [Dpe]: "Faction directive rate limited",
+  [qAe]: "Faction drain blocked: own-faction opposition requires an outlaw declaration",
+  [rpe]: "Faction flag not permitted",
+  [wpe]: "Faction fleet cap exceeded",
+  [oPe]: "Faction market not draft",
+  [upe]: "Faction market PDA mismatch",
+  [dpe]: "Faction market treasury mismatch",
+  [oAe]: "Faction mismatch",
+  [gpe]: "Faction market not active",
+  [Ape]: "Faction is not a combatant",
+  [Rpe]: "Faction ownership mismatch",
+  [fpe]: "Faction reserve floor",
+  [JAe]: "Fleet crew page conflict",
+  [Tpe]: "Fleet not owned by faction",
+  [tAe]: "Game mismatch",
+  [GAe]: "Gear slot occupied",
+  [bAe]: "Global ceasefire active",
+  [mAe]: "Multiple hubs placed",
+  [aAe]: "Id mismatch",
+  [Zye]: "Claim stake status mismatch",
+  [SAe]: "Instance deactivated",
+  [hAe]: "Insufficient amount",
+  [Ppe]: "Invalid faction",
+  [epe]: "Invalid faction flags",
+  [ape]: "Invalid faction status transition",
+  [hpe]: "Invalid fleet directive",
+  [Yye]: "Invalid fleet size",
+  [$ye]: "Invalid input",
+  [MAe]: "Invalid path",
+  [Cpe]: "Invalid relation argument",
+  [VAe]: "Invalid timestamp",
+  [xAe]: "Invariant violation",
+  [bpe]: "Max allies exceeded",
+  [jye]: "Must be only instruction",
+  [pAe]: "Not At Central Space Station",
+  [Xye]: "Not found",
+  [PAe]: "Not within range",
+  [RAe]: "Numeric overflow",
+  [HAe]: "Perk offer gate",
+  [nAe]: "Profile mismatch",
+  [Gye]: "Program mismatch",
+  [EAe]: "Region invalid",
+  [WAe]: "Region not found",
+  [qpe]: "Rent baseline inconsistent",
+  [Jpe]: "Rent budget stale",
+  [aPe]: "Rent cancel refused",
+  [Gpe]: "Rent catalog state mismatch",
+  [NAe]: "Fleet is rented",
+  [ePe]: "Rent evaluation conflict",
+  [Kpe]: "Rent evaluation incomplete",
+  [rPe]: "Rent evaluation stale",
+  [Hpe]: "Rent field retired: use SetPlanetRentGrid",
+  [Ype]: "Rent hint invalid",
+  [Bpe]: "Rent history invalid",
+  [jpe]: "Rent history missing",
+  [Qpe]: "Rent nothing to settle",
+  [$pe]: "Rent numeric domain",
+  [Xpe]: "Rent selector invalid",
+  [tPe]: "Rent settlement required",
+  [Zpe]: "Rent stake evictable",
+  [nPe]: "Rent stake not invalidated",
+  [zpe]: "Rent write version mismatch",
+  [uAe]: "Requirements not met",
+  [QAe]: "Reserved faction id",
+  [kAe]: "Crew roster page mismatch",
+  [ppe]: "Self relation",
+  [OAe]: "Sequence ids do not match",
+  [XAe]: "Set perk definitions unsupported",
+  [spe]: "Standing account required",
+  [cpe]: "Standing epoch cap exceeded",
+  [ope]: "Standing faction mismatch",
+  [ipe]: "Standing PDA mismatch",
+  [npe]: "Standing profile mismatch",
+  [lpe]: "Standing too low",
+  [Ipe]: "Starbase contested",
+  [cAe]: "Starbase destroyed",
+  [lAe]: "Starbase not destroyed",
+  [rAe]: "State mismatch",
+  [qye]: "Status mismatch",
+  [Upe]: "Structure XP accrual ledger required",
+  [iAe]: "System mismatch",
+  [Kye]: "Type mismatch",
+  [CAe]: "Unauthorized",
+  [vAe]: "Under construction",
+  [lPe]: "Unsupported claim stake plot row",
+  [fAe]: "Usage limit exceeded",
+  [DAe]: "Withdrawal limit exceeded",
+  [TAe]: "Withdraw disabled",
+  [xpe]: "XP budget config required",
+  [Npe]: "XP budget not active for this game",
+  [kpe]: "XP migration digest mismatch",
+  [Fpe]: "XP migration incomplete",
+  [Epe]: "XP migration in progress",
+  [Lpe]: "XP migration manifest mismatch",
+  [Mpe]: "XP migration phase mismatch"
 });
-var kfe = 1367932928;
-var Lfe = 1367932929;
-var Ffe = 1367932930;
-var Ufe = 1367932931;
-var Bfe = 1367932932;
-var zfe = 1367932933;
-var Hfe = 1367932934;
-var Gfe = 1367932935;
-var jfe = 1367932936;
-var Yfe = 1367932937;
-var Xfe = 1367932938;
-var $fe = 1367932939;
-var Kfe = 1367932940;
-var Jfe = 1367932941;
-var qfe = 1367932942;
-var Zfe = 1367932943;
-var Qfe = 1367932944;
-var ege = 1367932945;
-var rge = 1367932946;
-var age = 1367932947;
-var tge = 1367932948;
-var nge = 1367932949;
-var oge = 1367932950;
-var ige = 1367932951;
-var cge = 1367932952;
-process.env.NODE_ENV !== "production" && (jfe + "", Yfe + "", tge + "", age + "", ege + "", Xfe + "", cge + "", Qfe + "", oge + "", zfe + "", Lfe + "", kfe + "", Ufe + "", Hfe + "", nge + "", Gfe + "", Ffe + "", $fe + "", Zfe + "", qfe + "", Jfe + "", Kfe + "", Bfe + "", rge + "", ige + "");
-var lge = {
+var bPe = 1367932928;
+var CPe = 1367932929;
+var vPe = 1367932930;
+var SPe = 1367932931;
+var RPe = 1367932932;
+var IPe = 1367932933;
+var hPe = 1367932934;
+var DPe = 1367932935;
+var TPe = 1367932936;
+var wPe = 1367932937;
+var VPe = 1367932938;
+var WPe = 1367932939;
+var EPe = 1367932940;
+var MPe = 1367932941;
+var _Pe = 1367932942;
+var xPe = 1367932943;
+var OPe = 1367932944;
+var NPe = 1367932945;
+var kPe = 1367932946;
+var LPe = 1367932947;
+var FPe = 1367932948;
+var UPe = 1367932949;
+var BPe = 1367932950;
+var zPe = 1367932951;
+var HPe = 1367932952;
+process.env.NODE_ENV !== "production" && (TPe + "", wPe + "", FPe + "", LPe + "", NPe + "", VPe + "", HPe + "", OPe + "", BPe + "", IPe + "", CPe + "", bPe + "", SPe + "", hPe + "", UPe + "", DPe + "", vPe + "", WPe + "", xPe + "", _Pe + "", MPe + "", EPe + "", RPe + "", kPe + "", zPe + "");
+var GPe = {
   MANAGE_GAME: 1n << 0n,
   MANAGE_SYSTEM: 1n << 1n,
   MANAGE_STAR: 1n << 2n,
@@ -46801,9 +47494,18 @@ var lge = {
   DO_RESEARCH: 1n << 40n,
   DAILY_CHECK_IN: 1n << 41n,
   MANAGE_CURRENCY: 1n << 42n,
+  // SAGE-B3: bits 43–46 were absent from the SDK while the program already
+  // defined them (Rust `permissions.rs` is the source of truth).
+  MANAGE_NPC_ENCOUNTERS: 1n << 43n,
   MANAGE_MISSIONS: 1n << 44n,
+  MANAGE_FACTIONS: 1n << 45n,
+  MANAGE_DIPLOMACY: 1n << 46n,
   DO_GOVERNANCE: 1n << 47n,
-  MANAGE_MISSION_TREASURIES: 1n << 48n
+  // SAGE-B3: the PDA Crew / SDU-lottery admin tier added in this PR.
+  MANAGE_MISSION_TREASURIES: 1n << 48n,
+  DECODE_SDU: 1n << 49n,
+  ACTIVATE_SDU_MISSION: 1n << 50n,
+  CLAIM_ACHIEVEMENTS: 1n << 51n
 };
 
 // node_modules/@aephia/atlas-kit/dist/internal/c4/account-decoding.js
@@ -46823,10 +47525,11 @@ function accountValidator(rule) {
   return ruleValidator(rule, immutableBytes(rule.discriminator));
 }
 function ruleValidator(rule, discriminator) {
-  const { type, programAddress, length, exact, validateShape } = rule;
+  const { type, program, length, exact, validateShape } = rule;
   const label = rule.label ?? type;
-  return (account) => {
+  return (account, programs) => {
     const { address: address2, data } = account;
+    const programAddress = programs[program];
     if (account.owner !== programAddress)
       throw new InvalidAccountOwnerError(type, address2, programAddress, account.owner);
     if (data.length < discriminator.length || discriminator.some((byte, index) => data[index] !== byte))
@@ -46837,18 +47540,18 @@ function ruleValidator(rule, discriminator) {
   };
 }
 function defineAccount(rule, decoder, translate) {
-  const { type, programAddress, length } = rule;
+  const { type, program, length } = rule;
   const label = rule.label ?? type;
   const discriminator = immutableBytes(rule.discriminator);
   const validate2 = ruleValidator(rule, discriminator);
   return Object.freeze({
-    decode(account) {
-      validate2(account);
+    decode(account, programs) {
+      validate2(account, programs);
       try {
         const [decoded, offset] = decoder().read(account.data, 0);
         if (offset !== account.data.length)
           throw new RangeError(`Decoded ${offset} of ${account.data.length} ${label} account bytes; trailing bytes are not accepted.`);
-        return translate(decoded, account);
+        return translate(decoded, account, programs);
       } catch (cause) {
         if (cause instanceof AccountDecodeError)
           throw cause;
@@ -46857,7 +47560,7 @@ function defineAccount(rule, decoder, translate) {
     },
     discriminator,
     minimumDataLength: length,
-    programAddress,
+    program,
     type,
     validate: validate2
   });
@@ -46915,32 +47618,32 @@ function translateCombat(stats) {
     ammoConsumptionRate: fixedValue(stats.ammoConsumptionRate),
     ap: stats.ap,
     apRegenRate: fixedValue(stats.apRegenRate),
-    counterDecoy: stats.counterDecoy,
-    counterEnergyCapacitor: stats.counterEnergyCapacitor,
-    counterFaradayShielding: stats.counterFaradayShielding,
-    counterFireSuppressor: stats.counterFireSuppressor,
-    counterFlare: stats.counterFlare,
-    counterHealingNanobots: stats.counterHealingNanobots,
-    counterMine: stats.counterMine,
-    counterNegativeRemPlating: stats.counterNegativeRemPlating,
-    counterWarmingPlates: stats.counterWarmingPlates,
+    counterDecoy: fixedValue(stats.counterDecoy),
+    counterEnergyCapacitor: fixedValue(stats.counterEnergyCapacitor),
+    counterFaradayShielding: fixedValue(stats.counterFaradayShielding),
+    counterFireSuppressor: fixedValue(stats.counterFireSuppressor),
+    counterFlare: fixedValue(stats.counterFlare),
+    counterHealingNanobots: fixedValue(stats.counterHealingNanobots),
+    counterMine: fixedValue(stats.counterMine),
+    counterNegativeRemPlating: fixedValue(stats.counterNegativeRemPlating),
+    counterWarmingPlates: fixedValue(stats.counterWarmingPlates),
     critChance: packed(stats.critChance, 64),
     critMultiplier: packed(stats.critMultiplier, 64),
-    damageBomb: stats.damageBomb,
+    damageBomb: fixedValue(stats.damageBomb),
     damageBombVariance: packed(stats.damageBombVariance, 64),
-    damageEmp: stats.damageEmp,
+    damageEmp: fixedValue(stats.damageEmp),
     damageEmpVariance: packed(stats.damageEmpVariance, 64),
-    damageEnergy: stats.damageEnergy,
+    damageEnergy: fixedValue(stats.damageEnergy),
     damageEnergyVariance: packed(stats.damageEnergyVariance, 64),
-    damageGraygoo: stats.damageGraygoo,
+    damageGraygoo: fixedValue(stats.damageGraygoo),
     damageGraygooVariance: packed(stats.damageGraygooVariance, 64),
-    damageHeat: stats.damageHeat,
+    damageHeat: fixedValue(stats.damageHeat),
     damageHeatVariance: packed(stats.damageHeatVariance, 64),
-    damageKinetic: stats.damageKinetic,
+    damageKinetic: fixedValue(stats.damageKinetic),
     damageKineticVariance: packed(stats.damageKineticVariance, 64),
-    damageShockwave: stats.damageShockwave,
+    damageShockwave: fixedValue(stats.damageShockwave),
     damageShockwaveVariance: packed(stats.damageShockwaveVariance, 64),
-    damageSuperchill: stats.damageSuperchill,
+    damageSuperchill: fixedValue(stats.damageSuperchill),
     damageSuperchillVariance: packed(stats.damageSuperchillVariance, 64),
     fuelConsumptionRate: packed(stats.fuelConsumptionRate, 64),
     hitChance: packed(stats.hitChance, 64),
@@ -46998,30 +47701,56 @@ function cargoInventory(value) {
 }
 
 // node_modules/@aephia/atlas-kit/dist/internal/c4/discriminators.js
-var CELESTIAL_BODY_DISCRIMINATOR = /* @__PURE__ */ immutableBytes(Pm);
-var CHARACTER_DISCRIMINATOR = /* @__PURE__ */ immutableBytes(Sm);
-var CLAIM_STAKE_INSTANCE_DISCRIMINATOR = /* @__PURE__ */ immutableBytes(Wm);
-var CRAFTING_HAB_INSTANCE_DISCRIMINATOR = /* @__PURE__ */ immutableBytes(km);
-var CRAFTING_PROCESS_DISCRIMINATOR = /* @__PURE__ */ immutableBytes(Um);
-var FACTION_MARKET_DISCRIMINATOR = /* @__PURE__ */ immutableBytes(QA);
-var FLEET_DISCRIMINATOR2 = /* @__PURE__ */ immutableBytes(bp);
-var GAME_DISCRIMINATOR = /* @__PURE__ */ immutableBytes(Tp);
-var LOCAL_MARKET_DISCRIMINATOR = /* @__PURE__ */ immutableBytes(Lp);
-var RECIPE_DISCRIMINATOR = /* @__PURE__ */ immutableBytes(vP);
-var STARBASE_PLAYER_DISCRIMINATOR = /* @__PURE__ */ immutableBytes(Hb);
-var STARBASE_UPGRADE_PROCESS_DISCRIMINATOR = /* @__PURE__ */ immutableBytes(qb);
-var STAR_SYSTEM_DISCRIMINATOR = /* @__PURE__ */ immutableBytes(eC);
+var CELESTIAL_BODY_DISCRIMINATOR = /* @__PURE__ */ immutableBytes(I1);
+var CHARACTER_DISCRIMINATOR = /* @__PURE__ */ immutableBytes(Io);
+var CLAIM_STAKE_INSTANCE_DISCRIMINATOR = /* @__PURE__ */ immutableBytes(O1);
+var CRAFTING_HAB_INSTANCE_DISCRIMINATOR = /* @__PURE__ */ immutableBytes(Y1);
+var CRAFTING_PROCESS_DISCRIMINATOR = /* @__PURE__ */ immutableBytes(K1);
+var FACTION_MARKET_DISCRIMINATOR = /* @__PURE__ */ immutableBytes(IP);
+var FLEET_DISCRIMINATOR2 = /* @__PURE__ */ immutableBytes(ho);
+var GAME_DISCRIMINATOR = /* @__PURE__ */ immutableBytes(Do);
+var LOCAL_MARKET_DISCRIMINATOR = /* @__PURE__ */ immutableBytes(Rb);
+var RECIPE_DISCRIMINATOR = /* @__PURE__ */ immutableBytes(uC);
+var STARBASE_PLAYER_DISCRIMINATOR = /* @__PURE__ */ immutableBytes(Nv);
+var STARBASE_UPGRADE_PROCESS_DISCRIMINATOR = /* @__PURE__ */ immutableBytes(Gv);
+var STAR_SYSTEM_DISCRIMINATOR = /* @__PURE__ */ immutableBytes(Xv);
 
 // node_modules/@aephia/atlas-kit/dist/internal/c4/pda.js
 var textEncoder = /* @__PURE__ */ new TextEncoder();
-function deriveSagePda(literal2, ...seeds) {
+function deriveSagePda(programs, literal2, ...seeds) {
   return getProgramDerivedAddress({
-    programAddress: s8,
+    programAddress: programs.sage,
     seeds: [textEncoder.encode(literal2), ...seeds]
   });
 }
-async function deriveSageAddress(literal2, ...seeds) {
-  return (await deriveSagePda(literal2, ...seeds))[0];
+var MEMO_LIMIT = 4096;
+var DERIVED = /* @__PURE__ */ new WeakMap();
+function memoKey(literal2, seeds) {
+  return [textEncoder.encode(literal2), ...seeds].map((seed) => Array.from(seed, (byte) => byte.toString(16).padStart(2, "0")).join("")).join("/");
+}
+function deriveContextSagePda(context, literal2, ...seeds) {
+  let memo3 = DERIVED.get(context);
+  if (!memo3) {
+    memo3 = /* @__PURE__ */ new Map();
+    DERIVED.set(context, memo3);
+  }
+  const key = memoKey(literal2, seeds);
+  const known = memo3.get(key);
+  if (known) {
+    memo3.delete(key);
+    memo3.set(key, known);
+    return known;
+  }
+  const derived2 = deriveSagePda(context.programs, literal2, ...seeds);
+  memo3.set(key, derived2);
+  if (memo3.size > MEMO_LIMIT)
+    memo3.delete(memo3.keys().next().value);
+  const entries = memo3;
+  derived2.catch(() => entries.delete(key));
+  return derived2;
+}
+async function deriveSageAddress(programs, literal2, ...seeds) {
+  return (await deriveSagePda(programs, literal2, ...seeds))[0];
 }
 function addressSeed(address2) {
   return getAddressEncoder().encode(address2);
@@ -47034,7 +47763,7 @@ function validateUnsignedU16EntityId(entityType, id) {
 }
 
 // node_modules/@aephia/atlas-kit/dist/internal/c4/fleet.js
-var FLEET_MINIMUM_DATA_LENGTH = 685;
+var FLEET_MINIMUM_DATA_LENGTH = 686;
 var FLEET_LABEL_OFFSET2 = 141;
 var FLEET_LABEL_LENGTH = 64;
 var FLEET_LABEL_SEED_PART_LENGTH = 32;
@@ -47056,11 +47785,11 @@ function cargoPod(pod) {
 }
 function ammoUsage(value) {
   switch (value) {
-    case St.None:
+    case Ot.None:
       return "none";
-    case St.Light:
+    case Ot.Light:
       return "light";
-    case St.Heavy:
+    case Ot.Heavy:
       return "heavy";
     /* v8 ignore next -- generated enum decoding and compile-time exhaustiveness guard this branch. */
     default:
@@ -47192,29 +47921,34 @@ function translateFleet(fleet, fleetLabelSeed) {
   FLEET_LABEL_SEEDS.set(translated, fleetLabelSeed);
   return translated;
 }
-async function deriveFleetAddress(fleet) {
+function retainedFleetLabel(fleet) {
   const label = FLEET_LABEL_SEEDS.get(fleet);
   if (label === void 0) {
     throw new TypeError("The Fleet label seed bytes are unavailable for canonical address validation. Decode the Fleet through the pinned C4 adapter before retrying.");
   }
-  return deriveFleetLabelAddress(fleet.game, fleet.ownerProfile, label);
+  return label;
 }
-function deriveFleetLabelAddress(game, ownerProfile, label) {
+function fleetSeeds(game, ownerProfile, label) {
   const bytes = Uint8Array.from(label);
-  return deriveSageAddress("Fleet", addressSeed(game), addressSeed(ownerProfile), bytes.slice(0, FLEET_LABEL_SEED_PART_LENGTH), bytes.slice(FLEET_LABEL_SEED_PART_LENGTH));
+  return [
+    addressSeed(game),
+    addressSeed(ownerProfile),
+    bytes.slice(0, FLEET_LABEL_SEED_PART_LENGTH),
+    bytes.slice(FLEET_LABEL_SEED_PART_LENGTH)
+  ];
 }
-async function assertCanonicalFleetAddress(fleet) {
-  const expectedAddress = await deriveFleetAddress(fleet.data);
+async function assertCanonicalFleetAddress(context, fleet) {
+  const [expectedAddress] = await deriveContextSagePda(context, "Fleet", ...fleetSeeds(fleet.data.game, fleet.data.ownerProfile, retainedFleetLabel(fleet.data)));
   if (expectedAddress !== fleet.address) {
     throw new AccountDecodeError("fleet", fleet.address, new RangeError("The decoded Fleet contradicted its canonical PDA seeds."), `Fleet ${fleet.address} is not the canonical Fleet address for its decoded Game, owner Profile, and exact label seed bytes. Refresh Fleet discovery or verify the address, configured cluster, and pinned generated bindings before retrying.`);
   }
 }
 var fleetAccountDefinition = /* @__PURE__ */ defineAccount({
   type: "fleet",
-  programAddress: s8,
+  program: "sage",
   discriminator: FLEET_DISCRIMINATOR2,
   length: FLEET_MINIMUM_DATA_LENGTH
-}, Cp, (fleet, account) => translateFleet(fleet, immutableBytes(account.data.slice(FLEET_LABEL_OFFSET2, FLEET_LABEL_OFFSET2 + FLEET_LABEL_LENGTH))));
+}, GP, (fleet, account) => translateFleet(fleet, immutableBytes(account.data.slice(FLEET_LABEL_OFFSET2, FLEET_LABEL_OFFSET2 + FLEET_LABEL_LENGTH))));
 function buildFleetGameDiscoveryFilters(game) {
   return Object.freeze([
     {
@@ -47250,7 +47984,7 @@ async function discoverFleetAccountsWithFilters(context, ownerProfile, options =
       const requestedRelationship = ownerProfile === void 0 ? "requested Game" : "requested Game and owner Profile";
       throw new AccountDecodeError("fleet", fleet.address, new RangeError("The decoded Fleet fields contradicted its discovery filters."), `A discovered Fleet candidate did not match the ${requestedRelationship} after decoding. Verify the provider, configured cluster, and pinned Fleet filter offsets before retrying.`);
     }
-    await assertCanonicalFleetAddress(fleet);
+    await assertCanonicalFleetAddress(context, fleet);
   }
   return fleets;
 }
@@ -47527,31 +48261,31 @@ var rules = {
     lootRate: U26F62,
     shieldBreakDelaySeconds: U162,
     warpSpoolTimeSeconds: U162,
-    damageKinetic: U322,
+    damageKinetic: U26F62,
     damageKineticVariance: U26F62,
-    damageEnergy: U322,
+    damageEnergy: U26F62,
     damageEnergyVariance: U26F62,
-    damageEmp: U322,
+    damageEmp: U26F62,
     damageEmpVariance: U26F62,
-    damageSuperchill: U322,
+    damageSuperchill: U26F62,
     damageSuperchillVariance: U26F62,
-    damageShockwave: U322,
+    damageShockwave: U26F62,
     damageShockwaveVariance: U26F62,
-    damageGraygoo: U322,
+    damageGraygoo: U26F62,
     damageGraygooVariance: U26F62,
-    damageHeat: U322,
+    damageHeat: U26F62,
     damageHeatVariance: U26F62,
-    damageBomb: U322,
+    damageBomb: U26F62,
     damageBombVariance: U26F62,
-    counterDecoy: U322,
-    counterEnergyCapacitor: U322,
-    counterFireSuppressor: U322,
-    counterFlare: U322,
-    counterHealingNanobots: U322,
-    counterMine: U322,
-    counterNegativeRemPlating: U322,
-    counterWarmingPlates: U322,
-    counterFaradayShielding: U322,
+    counterDecoy: U26F62,
+    counterEnergyCapacitor: U26F62,
+    counterFireSuppressor: U26F62,
+    counterFlare: U26F62,
+    counterHealingNanobots: U26F62,
+    counterMine: U26F62,
+    counterNegativeRemPlating: U26F62,
+    counterWarmingPlates: U26F62,
+    counterFaradayShielding: U26F62,
     stealthPower: U26F62,
     hitChance: U26F62,
     aimAbility: U26F62,
@@ -47603,15 +48337,15 @@ function hydrateShipStats(value) {
 // node_modules/@aephia/atlas-kit/dist/internal/c4/claim-stake-definitions.js
 function tier2(value) {
   switch (value) {
-    case zn.One:
+    case lo.One:
       return "one";
-    case zn.Two:
+    case lo.Two:
       return "two";
-    case zn.Three:
+    case lo.Three:
       return "three";
-    case zn.Four:
+    case lo.Four:
       return "four";
-    case zn.Five:
+    case lo.Five:
       return "five";
     /* v8 ignore next -- the generated enum decoder rejects unknown values. */
     default:
@@ -47650,17 +48384,17 @@ function habBuildingDefinitionByteLength(row) {
 // node_modules/@aephia/atlas-kit/dist/internal/c4/character-modifier.js
 function optionalTier(tier3) {
   switch (tier3) {
-    case en.None:
+    case bn.None:
       return void 0;
-    case en.One:
+    case bn.One:
       return 1;
-    case en.Two:
+    case bn.Two:
       return 2;
-    case en.Three:
+    case bn.Three:
       return 3;
-    case en.Four:
+    case bn.Four:
       return 4;
-    case en.Five:
+    case bn.Five:
       return 5;
     /* v8 ignore next -- the generated enum decoder rejects unknown values. */
     default:
@@ -47669,11 +48403,11 @@ function optionalTier(tier3) {
 }
 function riskZone(zone) {
   switch (zone) {
-    case An.LowRiskZone:
+    case xn.LowRiskZone:
       return "low";
-    case An.MediumRiskZone:
+    case xn.MediumRiskZone:
       return "medium";
-    case An.HighRiskZone:
+    case xn.HighRiskZone:
       return "high";
     /* v8 ignore next -- the generated enum decoder rejects unknown values. */
     default:
@@ -47682,21 +48416,21 @@ function riskZone(zone) {
 }
 function shipSize(size) {
   switch (size) {
-    case xn.XxSmall:
+    case eo.XxSmall:
       return "xx-small";
-    case xn.Xsmall:
+    case eo.Xsmall:
       return "x-small";
-    case xn.Small:
+    case eo.Small:
       return "small";
-    case xn.Medium:
+    case eo.Medium:
       return "medium";
-    case xn.Large:
+    case eo.Large:
       return "large";
-    case xn.Capital:
+    case eo.Capital:
       return "capital";
-    case xn.Commander:
+    case eo.Commander:
       return "commander";
-    case xn.Titan:
+    case eo.Titan:
       return "titan";
     /* v8 ignore next -- the generated enum decoder rejects unknown values. */
     default:
@@ -47750,7 +48484,7 @@ function translateCharacterModifier(modifier) {
 var GAME_RULE = {
   type: "game",
   label: "Game",
-  programAddress: s8,
+  program: "sage",
   discriminator: GAME_DISCRIMINATOR,
   length: GAME_DISCRIMINATOR.length
 };
@@ -47760,33 +48494,36 @@ function decodeExactly(account, scope) {
   if (shared)
     return shared;
   try {
-    const [decoded, offset] = wp().read(account.data, 0);
+    const [decoded, offset] = qP().read(account.data, 0);
     if (offset !== account.data.length) {
       throw new RangeError(`Decoded ${offset} of ${account.data.length} Game account bytes; trailing bytes are not accepted.`);
     }
     scope?.set(account, decoded);
     return decoded;
   } catch (cause) {
-    throw new AccountDecodeError("game", account.address, cause);
+    throw new AccountDecodeError("game", account.address, cause, account.data[GAME_VERSION_OFFSET] === GAME_FRESH_PENDING_VERSION ? `Game ${account.address} is in its fresh pending phase (runtime ${GAME_FRESH_PENDING_VERSION}): its world is still being set up and gameplay has not opened. Retry once the Game moves to runtime ${SUPPORTED_GAME_RUNTIME_VERSIONS.join(" or ")}.` : void 0);
   }
 }
+var GAME_VERSION_OFFSET = 8;
+var GAME_FRESH_PENDING_VERSION = 7;
+var SUPPORTED_GAME_RUNTIME_VERSIONS = [5, 6];
 function shipSize2(sizeClass) {
   switch (sizeClass) {
-    case xn.XxSmall:
+    case eo.XxSmall:
       return "xx-small";
-    case xn.Xsmall:
+    case eo.Xsmall:
       return "x-small";
-    case xn.Small:
+    case eo.Small:
       return "small";
-    case xn.Medium:
+    case eo.Medium:
       return "medium";
-    case xn.Large:
+    case eo.Large:
       return "large";
-    case xn.Capital:
+    case eo.Capital:
       return "capital";
-    case xn.Commander:
+    case eo.Commander:
       return "commander";
-    case xn.Titan:
+    case eo.Titan:
       return "titan";
     /* v8 ignore next -- the generated enum decoder rejects unknown values. */
     default:
@@ -47904,17 +48641,17 @@ function translateHabBuildingsSection(game) {
   };
 }
 var XP_CATEGORIES = [
-  [Jn.CouncilRank, "council-rank"],
-  [Jn.DailyXp, "daily"],
-  [Jn.Pilot, "pilot"],
-  [Jn.DataRunner, "data-runner"],
-  [Jn.Mining, "mining"],
-  [Jn.Building, "building"],
-  [Jn.Crafting, "crafting"],
-  [Jn.Combat, "combat"]
+  [po.CouncilRank, "council-rank"],
+  [po.DailyXp, "daily"],
+  [po.Pilot, "pilot"],
+  [po.DataRunner, "data-runner"],
+  [po.Mining, "mining"],
+  [po.Building, "building"],
+  [po.Crafting, "crafting"],
+  [po.Combat, "combat"]
 ];
-function decodeRegistryGame(account) {
-  validateGameAccount(account);
+function decodeRegistryGame(programs, account) {
+  validateGameAccount(account, programs);
   return decodeExactly(account);
 }
 function gameCargoRegistrySection(account, game) {
@@ -48041,7 +48778,7 @@ var SHIPS = {
     return shipSection(ships.definitions, ships.sequenceId);
   },
   restore(snapshot, game) {
-    if (!isSnapshotEnvelope(snapshot, game, "ships", 3) || snapshot.sequenceId > 4294967295 || !snapshot.definitions.every(isShipDefinition) || !hasUniqueDefinitionIds(snapshot.definitions))
+    if (!isSnapshotEnvelope(snapshot, game, "ships", 4) || snapshot.sequenceId > 4294967295 || !snapshot.definitions.every(isShipDefinition) || !hasUniqueDefinitionIds(snapshot.definitions))
       return void 0;
     const rows = [];
     for (const definition of snapshot.definitions) {
@@ -48075,7 +48812,7 @@ var SHIPS = {
       researchRequirementTagIds: [...researchRequirementTagIds]
     })),
     game,
-    schemaVersion: 3,
+    schemaVersion: 4,
     section: "ships",
     sequenceId: loaded.sequenceId
   })
@@ -48155,7 +48892,7 @@ async function populateFromGame(context, game, drivers, state2) {
   assertContextActive(context);
   if (account === void 0)
     throw new AccountNotFoundError("game", game);
-  const decoded = decodeRegistryGame(account);
+  const decoded = decodeRegistryGame(context.programs, account);
   const populated = drivers.map((driver) => ({
     driver,
     loaded: {
@@ -48381,12 +49118,12 @@ async function getFleetCargoInventory(context, fleetAddress, options) {
   requireGameAddress(context);
   const envelope = await context.data.read(fleetAccountDefinition, fleetAddress, options);
   assertFleetGame(context, envelope);
-  await assertCanonicalFleetAddress(envelope);
+  await assertCanonicalFleetAddress(context, envelope);
   return toFleetInventory(context, envelope);
 }
 
 // node_modules/@aephia/atlas-kit/dist/internal/c4/claim-stake.js
-var CLAIM_STAKE_MINIMUM_DATA_LENGTH = 196;
+var CLAIM_STAKE_MINIMUM_DATA_LENGTH = 220;
 var CLAIM_STAKE_FILTER_OFFSETS = /* @__PURE__ */ Object.freeze({
   body: 73,
   discriminator: 0,
@@ -48459,10 +49196,10 @@ function translateClaimStake(value) {
 }
 var claimStakeAccountDefinition = /* @__PURE__ */ defineAccount({
   type: "claimStakeInstance",
-  programAddress: s8,
+  program: "sage",
   discriminator: CLAIM_STAKE_INSTANCE_DISCRIMINATOR,
   length: CLAIM_STAKE_MINIMUM_DATA_LENGTH
-}, Em, translateClaimStake);
+}, N1, translateClaimStake);
 function buildClaimStakeGameDiscoveryFilters(game) {
   return Object.freeze([
     {
@@ -48585,42 +49322,20 @@ async function getClaimStakesByBody(context, body, options) {
 var SYSTEM_PROGRAM = "11111111111111111111111111111111";
 
 // node_modules/@aephia/atlas-kit/dist/internal/c4/crafting-process-codec.js
-function getLegacyDecoder() {
-  return getStructDecoder([
-    ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
-    ["version", getU8Decoder()],
-    ["recipe", getAddressDecoder()],
-    ["profile", getAddressDecoder()],
-    ["system", getAddressDecoder()],
-    ["starbasePlayer", getAddressDecoder()],
-    ["starbaseSeqId", getU64Decoder()],
-    ["craftingHab", getAddressDecoder()],
-    ["quantity", getU64Decoder()],
-    ["numCrew", getU32Decoder()],
-    ["startTime", getI64Decoder()],
-    ["endTime", getI64Decoder()],
-    ["feeEscrow", getU64Decoder()],
-    ["inputs", vr()]
-  ]);
-}
+var CRAFTING_PROCESS_VERSIONS = [1, 2, 3];
 function readCompatibleCraftingProcess(bytes, offset) {
   const version2 = bytes[offset + 8];
-  if (version2 === 0) {
-    const [value, end] = getLegacyDecoder().read(bytes, offset);
-    return [{ ...value, version: 0 }, end];
-  }
-  if (version2 === 1) {
-    const [value, end] = Bm().read(bytes, offset);
-    return [{ ...value, version: 1 }, end];
-  }
-  throw new RangeError(`Unsupported CraftingProcess version ${String(version2)}. Verify the account and pinned binding version before retrying.`);
+  if (!CRAFTING_PROCESS_VERSIONS.includes(version2))
+    throw new RangeError(`Unsupported CraftingProcess version ${String(version2)}. Pre-governance processes must be migrated by the game before they can be read; verify the account and the pinned binding version before retrying.`);
+  const [value, end] = J1().read(bytes, offset);
+  return [value, end];
 }
 
 // node_modules/@aephia/atlas-kit/dist/internal/c4/crafting.js
 var FLOYDS_PER_ATLAS2 = 1e8;
 var RECIPE_MINIMUM_DATA_LENGTH = 235;
-var CRAFTING_HAB_MINIMUM_DATA_LENGTH = 220;
-var CRAFTING_PROCESS_MINIMUM_DATA_LENGTH = 227;
+var CRAFTING_HAB_MINIMUM_DATA_LENGTH = 244;
+var CRAFTING_PROCESS_MINIMUM_DATA_LENGTH = 290;
 var CRAFTING_HAB_FILTER_OFFSETS = /* @__PURE__ */ Object.freeze({
   discriminator: 0,
   game: 41,
@@ -48661,9 +49376,9 @@ function cargoPod3(value) {
 }
 function recipeStatus(value) {
   switch (value) {
-    case ln.Active:
+    case Dn.Active:
       return "active";
-    case ln.Deactivated:
+    case Dn.Deactivated:
       return "deactivated";
     /* v8 ignore next -- the generated enum decoder rejects unknown values. */
     default:
@@ -48672,9 +49387,9 @@ function recipeStatus(value) {
 }
 function feeRecipient(value) {
   switch (value) {
-    case cn.Atlas:
+    case hn.Atlas:
       return "atlas";
-    case cn.Daoatlas:
+    case hn.Daoatlas:
       return "dao-atlas";
     /* v8 ignore next -- the generated enum decoder rejects unknown values. */
     default:
@@ -48683,19 +49398,19 @@ function feeRecipient(value) {
 }
 function starbaseLevel(value) {
   switch (value) {
-    case On.Level0:
+    case ro.Level0:
       return "level-0";
-    case On.Level1:
+    case ro.Level1:
       return "level-1";
-    case On.Level2:
+    case ro.Level2:
       return "level-2";
-    case On.Level3:
+    case ro.Level3:
       return "level-3";
-    case On.Level4:
+    case ro.Level4:
       return "level-4";
-    case On.Level5:
+    case ro.Level5:
       return "level-5";
-    case On.Css:
+    case ro.Css:
       return "css";
     /* v8 ignore next -- the generated enum decoder rejects unknown values. */
     default:
@@ -48799,15 +49514,18 @@ function translateProcess(value) {
     ...value.craftingHab === SYSTEM_PROGRAM ? {} : { craftingHab: value.craftingHab },
     endsAtUnixSeconds: value.endTime,
     feeEscrowRaw: value.feeEscrow,
-    ...value.version === 1 ? {
-      feeRecipient: feeRecipient(value.feeRecipient),
-      ...value.feeGovernance === SYSTEM_PROGRAM ? {} : { feeGovernance: value.feeGovernance },
-      feeSnapshot: {
-        craftingFeeBasisPoints: value.feeSnapshot.craftingFeeBps,
-        localMarketFeeBasisPoints: value.feeSnapshot.localMarketFeeBps,
-        localTreasuryShareBasisPoints: value.feeSnapshot.localTreasuryShareBps
-      }
-    } : {},
+    feeRecipient: feeRecipient(value.feeRecipient),
+    ...value.feeGovernance === SYSTEM_PROGRAM ? {} : { feeGovernance: value.feeGovernance },
+    feeSnapshot: {
+      craftingFeeBasisPoints: value.feeSnapshot.craftingFeeBps,
+      localMarketFeeBasisPoints: value.feeSnapshot.localMarketFeeBps,
+      localTreasuryShareBasisPoints: value.feeSnapshot.localTreasuryShareBps
+    },
+    completion: {
+      collectedQuantity: value.completion.collectedQuantity,
+      fundedFeeRaw: value.completion.fundedFee,
+      fundedQuantity: value.completion.fundedQuantity
+    },
     inputs: cargoPod3(value.inputs),
     numCrew: value.numCrew,
     profile: value.profile,
@@ -48822,26 +49540,26 @@ function translateProcess(value) {
 }
 var RECIPE_RULE = {
   type: "recipe",
-  programAddress: s8,
+  program: "sage",
   discriminator: RECIPE_DISCRIMINATOR,
   length: RECIPE_MINIMUM_DATA_LENGTH
 };
-var recipeAccountDefinition = /* @__PURE__ */ defineAccount(RECIPE_RULE, SP, translateRecipe);
+var recipeAccountDefinition = /* @__PURE__ */ defineAccount(RECIPE_RULE, dC, translateRecipe);
 var craftingHabAccountDefinition = /* @__PURE__ */ defineAccount({
   type: "craftingHabInstance",
-  programAddress: s8,
+  program: "sage",
   discriminator: CRAFTING_HAB_INSTANCE_DISCRIMINATOR,
   length: CRAFTING_HAB_MINIMUM_DATA_LENGTH
-}, Lm, translateHab);
+}, X1, translateHab);
 var craftingProcessAccountDefinition = /* @__PURE__ */ defineAccount({
   type: "craftingProcess",
-  programAddress: s8,
+  program: "sage",
   discriminator: CRAFTING_PROCESS_DISCRIMINATOR,
   length: CRAFTING_PROCESS_MINIMUM_DATA_LENGTH
 }, () => ({ read: readCompatibleCraftingProcess }), translateProcess);
-async function deriveRecipeAddress(game, recipeId) {
+async function deriveRecipeAddress(programs, game, recipeId) {
   validateUnsignedU16EntityId("recipe", recipeId);
-  return deriveSageAddress("Recipe", addressSeed(game), getU16Encoder().encode(recipeId));
+  return deriveSageAddress(programs, "Recipe", addressSeed(game), getU16Encoder().encode(recipeId));
 }
 function filters(discriminator, entries) {
   return Object.freeze([
@@ -48910,7 +49628,14 @@ function discoverCraftingProcessesByStarbasePlayer(context, player, options) {
 
 // node_modules/@aephia/atlas-kit/dist/internal/c4/character.js
 var FLOYDS_PER_ATLAS3 = 1e8;
-var CHARACTER_MINIMUM_DATA_LENGTH = 415;
+var CHARACTER_IDENTITY_BYTES = 74;
+var CHARACTER_MODIFIERS_MINIMUM_BYTES = 125;
+var CHARACTER_MODIFIERS_OFFSET = /* @__PURE__ */ characterModifiersOffset();
+function characterModifiersOffset() {
+  return CHARACTER_IDENTITY_BYTES + cu().fixedSize + Mm().fixedSize + 8 + // ATLAS balance
+  Qs().fixedSize + Uf().fixedSize;
+}
+var CHARACTER_MINIMUM_DATA_LENGTH = CHARACTER_MODIFIERS_OFFSET + CHARACTER_MODIFIERS_MINIMUM_BYTES;
 function translateCharacter(character) {
   const carryRaw = littleEndianBytesToBigInt(character.pilotXpBudget.fractionalCarry);
   return {
@@ -48938,30 +49663,36 @@ function translateCharacter(character) {
     },
     playerProfile: character.playerProfile,
     version: character.version,
+    // Each field is mapped explicitly, so new generated fields (such as
+    // career mastery progression) never leak into the public XP shape.
     xp: {
-      ...character.xpInfo,
-      building: { ...character.xpInfo.building },
-      combat: { ...character.xpInfo.combat },
-      councilRank: { ...character.xpInfo.councilRank },
-      crafting: { ...character.xpInfo.crafting },
-      dailyXp: { ...character.xpInfo.dailyXp },
-      dataRunner: { ...character.xpInfo.dataRunner },
-      mining: { ...character.xpInfo.mining },
-      pilot: { ...character.xpInfo.pilot }
+      building: xpCategory(character.xpInfo.building),
+      combat: xpCategory(character.xpInfo.combat),
+      councilRank: xpCategory(character.xpInfo.councilRank),
+      councilRankLevelCarry: character.xpInfo.councilRankLevelCarry,
+      crafting: xpCategory(character.xpInfo.crafting),
+      dailyXp: xpCategory(character.xpInfo.dailyXp),
+      dataRunner: xpCategory(character.xpInfo.dataRunner),
+      mining: xpCategory(character.xpInfo.mining),
+      pilot: xpCategory(character.xpInfo.pilot),
+      seqId: character.xpInfo.seqId
     }
   };
 }
+function xpCategory(value) {
+  return { earned: value.earned, level: value.level, spent: value.spent };
+}
 var characterAccountDefinition = /* @__PURE__ */ defineAccount({
   type: "character",
-  programAddress: s8,
+  program: "sage",
   discriminator: CHARACTER_DISCRIMINATOR,
   length: CHARACTER_MINIMUM_DATA_LENGTH
-}, Rm, translateCharacter);
-function deriveCharacterPda(playerProfile, game) {
-  return deriveSagePda("Character", addressSeed(playerProfile), addressSeed(game));
+}, w1, translateCharacter);
+function deriveCharacterPda(programs, playerProfile, game) {
+  return deriveSagePda(programs, "Character", addressSeed(playerProfile), addressSeed(game));
 }
-async function findCharacterPda(playerProfile, game) {
-  return (await deriveCharacterPda(playerProfile, game))[0];
+async function findCharacterPda(programs, playerProfile, game) {
+  return (await deriveCharacterPda(programs, playerProfile, game))[0];
 }
 
 // node_modules/@aephia/atlas-kit/dist/internal/c4/starbase.js
@@ -49030,18 +49761,18 @@ function translateUpgrade(value) {
 }
 var starbasePlayerAccountDefinition = /* @__PURE__ */ defineAccount({
   type: "starbasePlayer",
-  programAddress: s8,
+  program: "sage",
   discriminator: STARBASE_PLAYER_DISCRIMINATOR,
   length: STARBASE_PLAYER_MINIMUM_DATA_LENGTH
-}, Gb, translatePlayer);
+}, kv, translatePlayer);
 var starbaseUpgradeProcessAccountDefinition = /* @__PURE__ */ defineAccount({
   type: "starbaseUpgradeProcess",
-  programAddress: s8,
+  program: "sage",
   discriminator: STARBASE_UPGRADE_PROCESS_DISCRIMINATOR,
   length: STARBASE_UPGRADE_MINIMUM_DATA_LENGTH
-}, Zb, translateUpgrade);
-async function deriveStarbasePlayerAddress(system, character) {
-  return deriveSageAddress("StarbasePlayer", addressSeed(system), addressSeed(character));
+}, jv, translateUpgrade);
+async function deriveStarbasePlayerAddress(programs, system, character) {
+  return deriveSageAddress(programs, "StarbasePlayer", addressSeed(system), addressSeed(character));
 }
 function filters2(discriminator, offset, address2) {
   return Object.freeze([
@@ -49114,7 +49845,7 @@ async function createRecipeSnapshot(context, envelope) {
   if (envelope.data.game !== game) {
     throw new AccountDecodeError("recipe", envelope.address, new RangeError("The decoded Recipe references a different Game."), `Recipe ${envelope.address} belongs to Game ${envelope.data.game}, not configured Game ${game}. Verify the Recipe address and configured cluster before retrying.`);
   }
-  const expectedAddress = await deriveRecipeAddress(game, envelope.data.id);
+  const expectedAddress = await deriveRecipeAddress(context.programs, game, envelope.data.id);
   if (expectedAddress !== envelope.address) {
     throw new AccountDecodeError("recipe", envelope.address, new RangeError("The decoded Recipe contradicted its Game and recipe-id PDA seeds."), `Recipe ${envelope.address} is not the derived account for Game ${game} and recipe id ${String(envelope.data.id)}. Use getRecipeById() or verify the address before retrying.`);
   }
@@ -49173,7 +49904,7 @@ async function createHabSnapshot(context, envelope) {
           ...rate
         }))),
         refunds: await Promise.all(refunds.map((amount2) => definitionCargo(context, amount2))),
-        unlockedRecipes: await Promise.all(unlockedRecipeIds.map(async (id) => entityRef("recipe", await deriveRecipeAddress(game, id))))
+        unlockedRecipes: await Promise.all(unlockedRecipeIds.map(async (id) => entityRef("recipe", await deriveRecipeAddress(context.programs, game, id))))
       },
       quantity
     };
@@ -49184,7 +49915,7 @@ async function createHabSnapshot(context, envelope) {
       ...await resolveCargo(context, cargoId2),
       ...rate
     }))),
-    Promise.all(envelope.data.unlockedRecipeIds.map(async (id) => entityRef("recipe", await deriveRecipeAddress(game, id))))
+    Promise.all(envelope.data.unlockedRecipeIds.map(async (id) => entityRef("recipe", await deriveRecipeAddress(context.programs, game, id))))
   ]);
   const { buildings: _buildings, game: _game, ownerProfile, production: production2, system, unlockedRecipeIds: _unlockedRecipeIds, ...data } = envelope.data;
   return freezeResolvedSnapshot(attachReadMeta(attachJsonSerialization({
@@ -49311,7 +50042,7 @@ async function getRecipeById(context, recipeId, options) {
   if (!Number.isInteger(recipeId) || recipeId < 0 || recipeId > 65535) {
     throw new InvalidEntityIdError("recipe", recipeId);
   }
-  const address2 = await deriveRecipeAddress(game, recipeId);
+  const address2 = await deriveRecipeAddress(context.programs, game, recipeId);
   return getRecipe(context, address2, options);
 }
 async function getCraftingHab(context, address2, options) {
@@ -49467,7 +50198,7 @@ async function createFleetSnapshot(context, envelope) {
   if (envelope.data.game !== game) {
     throw new AccountDecodeError("fleet", envelope.address, new RangeError(`The decoded Fleet references Game ${envelope.data.game}, but the configured Game is ${game}.`), `The Fleet at ${envelope.address} belongs to Game ${envelope.data.game}, not the configured Game ${game}. Verify the Fleet address, Game address, configured cluster, and installed binding version before retrying.`);
   }
-  await assertCanonicalFleetAddress(envelope);
+  await assertCanonicalFleetAddress(context, envelope);
   const { ownerProfile, ...resolved } = await resolveFleetAccount(context, envelope.data);
   return freezeResolvedSnapshot(attachReadMeta(attachJsonSerialization({
     ...resolved,
@@ -49514,15 +50245,15 @@ function validateWorldId(entityType, id) {
     throw new InvalidEntityIdError(entityType, id);
   }
 }
-async function deriveWorldAddress(entityType, seed, game, id) {
+async function deriveWorldAddress(programs, entityType, seed, game, id) {
   validateWorldId(entityType, id);
-  return deriveSageAddress(seed, addressSeed(game), getU16Encoder().encode(id));
+  return deriveSageAddress(programs, seed, addressSeed(game), getU16Encoder().encode(id));
 }
-function deriveStarSystemAddress(game, systemId) {
-  return deriveWorldAddress("starSystem", "StarSystem", game, systemId);
+function deriveStarSystemAddress(programs, game, systemId) {
+  return deriveWorldAddress(programs, "starSystem", "StarSystem", game, systemId);
 }
-function deriveCelestialBodyAddress(game, bodyId) {
-  return deriveWorldAddress("celestialBody", "CelestialBody", game, bodyId);
+function deriveCelestialBodyAddress(programs, game, bodyId) {
+  return deriveWorldAddress(programs, "celestialBody", "CelestialBody", game, bodyId);
 }
 var STAR_SYSTEM_FILTER_OFFSETS = /* @__PURE__ */ Object.freeze({
   discriminator: 0,
@@ -49535,19 +50266,19 @@ function fixedGrid(grid) {
 }
 function starbaseLevel2(value) {
   switch (value) {
-    case On.Level0:
+    case ro.Level0:
       return "level-0";
-    case On.Level1:
+    case ro.Level1:
       return "level-1";
-    case On.Level2:
+    case ro.Level2:
       return "level-2";
-    case On.Level3:
+    case ro.Level3:
       return "level-3";
-    case On.Level4:
+    case ro.Level4:
       return "level-4";
-    case On.Level5:
+    case ro.Level5:
       return "level-5";
-    case On.Css:
+    case ro.Css:
       return "css";
     /* v8 ignore next -- the generated enum decoder rejects unknown values. */
     default:
@@ -49847,16 +50578,25 @@ function translateCelestialBody(value) {
 }
 var starSystemAccountDefinition = /* @__PURE__ */ defineAccount({
   type: "starSystem",
-  programAddress: s8,
+  program: "sage",
   discriminator: STAR_SYSTEM_DISCRIMINATOR,
   length: STAR_SYSTEM_MINIMUM_DATA_LENGTH
-}, rC, translateStarSystem);
+}, $v, translateStarSystem);
+function celestialBodyWithOptionalTail() {
+  const decoder = h1();
+  return {
+    read(bytes, offset) {
+      const [value] = decoder.read(bytes, offset);
+      return [value, bytes.length];
+    }
+  };
+}
 var celestialBodyAccountDefinition = /* @__PURE__ */ defineAccount({
   type: "celestialBody",
-  programAddress: s8,
+  program: "sage",
   discriminator: CELESTIAL_BODY_DISCRIMINATOR,
   length: CELESTIAL_BODY_MINIMUM_DATA_LENGTH
-}, bm, translateCelestialBody);
+}, celestialBodyWithOptionalTail, translateCelestialBody);
 function assertStarSystemRegionId(regionId) {
   if (!Number.isInteger(regionId) || regionId < 0 || regionId > 65535) {
     throw new SageSdkError("INVALID_ENTITY_ID", "The StarSystem region id is invalid. Use a finite integer from 0 through 65535 before discovering Star Systems.", { accountType: "starSystem" });
@@ -49908,7 +50648,7 @@ async function createResourceDepositSnapshot(context, envelope) {
     throw new AccountDecodeError("celestialBody", envelope.address, new RangeError("The decoded CelestialBody is not an Asteroid."), `CelestialBody ${envelope.address} is not an Asteroid and has no Fleet-mining resource deposit. Supply an Asteroid address before retrying.`);
   }
   const asteroid = envelope.data;
-  const canonicalAddress3 = await deriveCelestialBodyAddress(asteroid.game, asteroid.id);
+  const canonicalAddress3 = await deriveCelestialBodyAddress(context.programs, asteroid.game, asteroid.id);
   if (envelope.address !== canonicalAddress3) {
     throw new AccountDecodeError("celestialBody", envelope.address, new RangeError("The decoded Asteroid is stored at a noncanonical CelestialBody address."), `CelestialBody ${envelope.address} decoded id ${asteroid.id}, whose canonical CelestialBody address is ${canonicalAddress3}. Refresh the Asteroid pointer and verify the configured cluster and pinned binding version before retrying.`);
   }
@@ -50030,7 +50770,7 @@ async function getFleetMiningState(context, fleet, options) {
   requireGameAddress(context);
   const envelope = await context.data.read(fleetAccountDefinition, fleet, options);
   assertConfiguredGame(context, "fleet", envelope);
-  await assertCanonicalFleetAddress(envelope);
+  await assertCanonicalFleetAddress(context, envelope);
   return toFleetMiningSnapshot(context, envelope, options);
 }
 async function getFleetMiningStatesByOwner(context, owner, options) {
@@ -50100,11 +50840,11 @@ function translateLocal(value) {
 }
 function status(value) {
   switch (value) {
-    case wn.Draft:
+    case Yn.Draft:
       return "draft";
-    case wn.Active:
+    case Yn.Active:
       return "active";
-    case wn.Removed:
+    case Yn.Removed:
       return "removed";
     /* v8 ignore next -- the generated enum decoder rejects unknown values. */
     default:
@@ -50142,25 +50882,25 @@ function translateFaction2(value) {
 var localMarketAccountDefinition = /* @__PURE__ */ defineAccount({
   type: "market",
   label: "Local Market",
-  programAddress: s8,
+  program: "sage",
   discriminator: LOCAL_MARKET_DISCRIMINATOR,
   length: LOCAL_MARKET_MINIMUM_DATA_LENGTH
-}, Fp, translateLocal);
+}, Ib, translateLocal);
 var factionMarketAccountDefinition = /* @__PURE__ */ defineAccount({
   type: "market",
   label: "Faction Market",
-  programAddress: s8,
+  program: "sage",
   discriminator: FACTION_MARKET_DISCRIMINATOR,
   length: FACTION_MARKET_MINIMUM_DATA_LENGTH
-}, ep, translateFaction2);
-async function deriveLocalMarketAddress(system, cargoId, starbaseSequenceId) {
+}, hP, translateFaction2);
+async function deriveLocalMarketAddress(programs, system, cargoId, starbaseSequenceId) {
   validateCargoId(cargoId);
   validateStarbaseSequenceId(starbaseSequenceId);
-  return deriveSageAddress("LocalMarket", addressSeed(system), getU16Encoder().encode(cargoId), getU64Encoder().encode(starbaseSequenceId));
+  return deriveSageAddress(programs, "LocalMarket", addressSeed(system), getU16Encoder().encode(cargoId), getU64Encoder().encode(starbaseSequenceId));
 }
-async function deriveFactionMarketAddress(game, system, starbaseSequenceId) {
+async function deriveFactionMarketAddress(programs, game, system, starbaseSequenceId) {
   validateStarbaseSequenceId(starbaseSequenceId);
-  return deriveSageAddress("FactionMarket", addressSeed(game), addressSeed(system), getU64Encoder().encode(starbaseSequenceId));
+  return deriveSageAddress(programs, "FactionMarket", addressSeed(game), addressSeed(system), getU64Encoder().encode(starbaseSequenceId));
 }
 function buildLocalMarketSystemDiscoveryFilters(system) {
   return Object.freeze([
@@ -50186,11 +50926,11 @@ async function discoverLocalMarketsBySystem(context, system, options = {}) {
 }
 
 // node_modules/@aephia/atlas-kit/dist/markets/index.js
-function deriveLocalMarketAddress2(system, cargoId, starbaseSequenceId) {
-  return deriveLocalMarketAddress(system, cargoId, starbaseSequenceId);
+function deriveLocalMarketAddress2(programs, system, cargoId, starbaseSequenceId) {
+  return deriveLocalMarketAddress(programs, system, cargoId, starbaseSequenceId);
 }
-function deriveFactionMarketAddress2(game, system, starbaseSequenceId) {
-  return deriveFactionMarketAddress(game, system, starbaseSequenceId);
+function deriveFactionMarketAddress2(programs, game, system, starbaseSequenceId) {
+  return deriveFactionMarketAddress(programs, game, system, starbaseSequenceId);
 }
 function order(value) {
   return { ...value, makerRef: entityRef("profile", value.maker) };
@@ -50208,7 +50948,7 @@ function book(value) {
 var LOCAL_SNAPSHOTS = /* @__PURE__ */ new WeakMap();
 var FACTION_SNAPSHOTS = /* @__PURE__ */ new WeakMap();
 async function createLocalSnapshot(context, envelope) {
-  const expected = await deriveLocalMarketAddress2(envelope.data.system, envelope.data.cargo.cargoId, envelope.data.starbaseSequenceId);
+  const expected = await deriveLocalMarketAddress2(context.programs, envelope.data.system, envelope.data.cargo.cargoId, envelope.data.starbaseSequenceId);
   if (expected !== envelope.address) {
     throw new AccountDecodeError("market", envelope.address, new RangeError("The decoded Local Market contradicted its PDA seeds."), `Local Market ${envelope.address} is not derived from its Star System, cargo id, and Starbase sequence. Verify the address and pinned generated source before retrying.`);
   }
@@ -50241,7 +50981,7 @@ async function createFactionSnapshot(context, envelope) {
   if (envelope.data.game !== game) {
     throw new AccountDecodeError("market", envelope.address, new RangeError("The decoded Faction Market references another Game."), `Faction Market ${envelope.address} belongs to Game ${envelope.data.game}, not configured Game ${game}. Verify the cluster and address before retrying.`);
   }
-  const expected = await deriveFactionMarketAddress2(game, envelope.data.system, envelope.data.starbaseSequenceId);
+  const expected = await deriveFactionMarketAddress2(context.programs, game, envelope.data.system, envelope.data.starbaseSequenceId);
   if (expected !== envelope.address) {
     throw new AccountDecodeError("market", envelope.address, new RangeError("The decoded Faction Market contradicted its PDA seeds."), `Faction Market ${envelope.address} is not derived from its configured Game, Star System, and Starbase sequence. Verify the address and pinned generated source before retrying.`);
   }
@@ -50276,7 +51016,7 @@ async function maybeGetLocalMarket(context, address2, options) {
   return envelope === void 0 ? void 0 : toLocalSnapshot(context, envelope);
 }
 async function getLocalMarketForCargo(context, system, cargoId, starbaseSequenceId, options) {
-  return getLocalMarket(context, await deriveLocalMarketAddress2(system, cargoId, starbaseSequenceId), options);
+  return getLocalMarket(context, await deriveLocalMarketAddress2(context.programs, system, cargoId, starbaseSequenceId), options);
 }
 async function getLocalMarketsBySystem(context, system, options) {
   const envelopes = await discoverLocalMarketsBySystem(context, system, options);
@@ -50311,183 +51051,183 @@ async function maybeGetFactionMarket(context, address2, options) {
 }
 async function getFactionMarketForSystem(context, system, starbaseSequenceId, options) {
   const game = requireGameAddress(context);
-  return getFactionMarket(context, await deriveFactionMarketAddress2(game, system, starbaseSequenceId), options);
+  return getFactionMarket(context, await deriveFactionMarketAddress2(context.programs, game, system, starbaseSequenceId), options);
 }
 
 // node_modules/@staratlas/dev-player-profile/dist/dist.es.js
 var Pn2 = 1;
 var Un = 2;
-var wn2 = 3;
+var wn = 3;
 var xn2 = 4;
-var Fn2 = 5;
+var Fn = 5;
 var $n = 6;
-var Bn2 = 7;
+var Bn = 7;
 var Gn = 8;
 var Vn = 9;
-var zn2 = 10;
-var Yn = 11;
+var zn = 10;
+var Yn2 = 11;
 var kn = 12;
 var Wn = -32700;
 var Hn = -32603;
 var Kn = -32602;
 var Xn = -32601;
 var jn = -32600;
-var Jn2 = -32019;
-var Zn2 = -32018;
+var Jn = -32019;
+var Zn = -32018;
 var qn = -32017;
-var Qn = -32016;
-var er = -32015;
-var tr = -32014;
-var nr2 = -32013;
+var Qn2 = -32016;
+var er2 = -32015;
+var tr2 = -32014;
+var nr = -32013;
 var rr2 = -32012;
 var ar = -32011;
 var or = -32010;
-var sr2 = -32009;
+var sr = -32009;
 var cr = -32008;
 var ir2 = -32007;
 var _r2 = -32006;
-var Rr2 = -32005;
-var Ar = -32004;
-var ur = -32003;
-var dr2 = -32002;
+var Rr = -32005;
+var Ar2 = -32004;
+var ur2 = -32003;
+var dr = -32002;
 var lr2 = -32001;
-var Pe = 28e5;
+var Pe2 = 28e5;
 var Ue = 2800001;
 var Er = 2800002;
 var Or2 = 2800003;
-var Nr2 = 2800004;
-var Sr = 2800005;
-var we = 2800006;
+var Nr = 2800004;
+var Sr2 = 2800005;
+var we2 = 2800006;
 var xe = 2800007;
-var Ee2 = 2800008;
+var Ee = 2800008;
 var Fe2 = 2800009;
-var mr2 = 2800010;
-var Ir = 2800011;
-var $e2 = 323e4;
-var Be = 32300001;
-var Ge2 = 3230002;
-var Tr2 = 3230003;
+var mr = 2800010;
+var Ir2 = 2800011;
+var $e = 323e4;
+var Be2 = 32300001;
+var Ge = 3230002;
+var Tr = 3230003;
 var fr2 = 3230004;
 var Ve = 361e4;
 var ze = 3610001;
 var gr2 = 3610002;
-var Lr2 = 3610003;
-var Cr = 3610004;
-var hr2 = 3610005;
+var Lr = 3610003;
+var Cr2 = 3610004;
+var hr = 3610005;
 var pr2 = 3610006;
 var vr2 = 3610007;
 var br2 = 3611e3;
 var Dr = 3704e3;
 var yr2 = 3704001;
-var Mr = 3704002;
+var Mr2 = 3704002;
 var Pr2 = 3704003;
-var Ur2 = 3704004;
+var Ur = 3704004;
 var wr2 = 3704005;
-var xr2 = 3704006;
-var Fr = 3712e3;
-var Ye2 = 4128e3;
-var $r2 = 4128001;
+var xr = 3704006;
+var Fr2 = 3712e3;
+var Ye = 4128e3;
+var $r = 4128001;
 var Br2 = 4128002;
-var ue = 4615e3;
-var Gr = 4615001;
+var ue2 = 4615e3;
+var Gr2 = 4615001;
 var Vr = 4615002;
-var zr = 4615003;
+var zr2 = 4615003;
 var Yr2 = 4615004;
-var kr = 4615005;
+var kr2 = 4615005;
 var Wr2 = 4615006;
-var Hr2 = 4615007;
-var Kr = 4615008;
-var Xr = 4615009;
-var jr2 = 4615010;
-var Jr2 = 4615011;
+var Hr = 4615007;
+var Kr2 = 4615008;
+var Xr2 = 4615009;
+var jr = 4615010;
+var Jr = 4615011;
 var Zr2 = 4615012;
-var qr = 4615013;
+var qr2 = 4615013;
 var Qr = 4615014;
 var ea2 = 4615015;
 var ta = 4615016;
 var na2 = 4615017;
 var ra = 4615018;
 var aa2 = 4615019;
-var oa = 4615020;
-var sa2 = 4615021;
+var oa2 = 4615020;
+var sa = 4615021;
 var ca2 = 4615022;
-var ia2 = 4615023;
+var ia = 4615023;
 var _a3 = 4615024;
 var Ra2 = 4615025;
 var ke2 = 4615026;
-var Aa = 4615027;
+var Aa2 = 4615027;
 var ua = 4615028;
 var da2 = 4615029;
 var la = 4615030;
 var Ea = 4615031;
 var Oa = 4615032;
-var Na = 4615033;
+var Na2 = 4615033;
 var Sa = 4615034;
-var ma2 = 4615035;
-var Ia = 4615036;
-var Ta = 4615037;
-var fa2 = 4615038;
+var ma = 4615035;
+var Ia2 = 4615036;
+var Ta2 = 4615037;
+var fa = 4615038;
 var ga2 = 4615039;
-var La = 4615040;
+var La2 = 4615040;
 var Ca = 4615041;
 var ha2 = 4615042;
 var pa2 = 4615043;
 var va2 = 4615044;
-var ba2 = 4615045;
-var Da = 4615046;
-var ya = 4615047;
-var Ma = 4615048;
+var ba = 4615045;
+var Da2 = 4615046;
+var ya2 = 4615047;
+var Ma2 = 4615048;
 var Pa = 4615049;
-var Ua = 4615050;
+var Ua2 = 4615050;
 var wa = 4615051;
-var xa = 4615052;
+var xa2 = 4615052;
 var Fa = 4615053;
-var $a2 = 4615054;
+var $a = 4615054;
 var Ba = 5508e3;
-var Ga2 = 5508001;
-var Va2 = 5508002;
-var za2 = 5508003;
-var Ya2 = 5508004;
+var Ga = 5508001;
+var Va = 5508002;
+var za = 5508003;
+var Ya = 5508004;
 var ka = 5508005;
-var Wa = 5508006;
+var Wa2 = 5508006;
 var Ha = 5508007;
 var Ka = 5508008;
 var Xa = 5508009;
 var ja = 5508010;
-var Ja2 = 5508011;
-var Za2 = 5508012;
-var qa2 = 5607e3;
-var Qa = 5607001;
-var eo = 5607002;
+var Ja = 5508011;
+var Za = 5508012;
+var qa = 5607e3;
+var Qa2 = 5607001;
+var eo2 = 5607002;
 var to = 5607003;
 var no = 5607004;
-var ro = 5607005;
-var ao2 = 5607006;
-var oo = 5607007;
+var ro2 = 5607005;
+var ao = 5607006;
+var oo2 = 5607007;
 var so = 5607008;
-var co = 5607009;
+var co2 = 5607009;
 var io = 5607010;
 var _o = 5607011;
-var Ro = 5607012;
+var Ro2 = 5607012;
 var Ao = 5607013;
 var uo = 5607014;
-var lo = 5607015;
+var lo2 = 5607015;
 var Eo = 5607016;
 var Oo = 5607017;
 var No = 5663e3;
 var So = 5663001;
 var mo = 5663002;
-var Io = 5663003;
+var Io2 = 5663003;
 var To = 5663004;
 var fo = 5663005;
 var go = 5663006;
 var Lo = 5663007;
 var Co = 5663008;
-var ho = 5663009;
-var po = 5663010;
+var ho2 = 5663009;
+var po2 = 5663010;
 var vo = 5663011;
-var bo = 5663012;
-var Do = 5663013;
+var bo2 = 5663012;
+var Do2 = 5663013;
 var yo = 5663014;
 var Mo = 5663015;
 var Po = 5663016;
@@ -50512,213 +51252,213 @@ var Zo = 5663034;
 var qo = 5663035;
 var Qo = 705e4;
 var es = 7050001;
-var ts = 7050002;
+var ts2 = 7050002;
 var ns2 = 7050003;
-var rs = 7050004;
+var rs2 = 7050004;
 var as2 = 7050005;
-var os = 7050006;
-var ss = 7050007;
-var cs = 7050008;
+var os2 = 7050006;
+var ss2 = 7050007;
+var cs2 = 7050008;
 var is2 = 7050009;
-var _s2 = 7050010;
+var _s = 7050010;
 var Rs = 7050011;
-var As = 7050012;
-var us = 7050013;
-var ds = 7050014;
-var ls = 7050015;
+var As2 = 7050012;
+var us2 = 7050013;
+var ds2 = 7050014;
+var ls2 = 7050015;
 var Es = 7050016;
 var Os = 7050017;
 var Ns = 7050018;
 var Ss2 = 7050019;
 var ms2 = 7050020;
-var Is2 = 7050021;
+var Is = 7050021;
 var Ts = 7050022;
 var fs2 = 7050023;
-var gs = 7050024;
-var Ls2 = 7050025;
-var Cs = 7050026;
+var gs2 = 7050024;
+var Ls = 7050025;
+var Cs2 = 7050026;
 var hs = 7050027;
-var ps2 = 7050028;
+var ps = 7050028;
 var vs = 7050029;
 var bs = 7050030;
-var Ds2 = 7050031;
-var ys = 7050032;
-var Ms = 7050033;
+var Ds = 7050031;
+var ys2 = 7050032;
+var Ms2 = 7050033;
 var Ps2 = 7050034;
-var Us = 7050035;
-var ws2 = 7050036;
+var Us2 = 7050035;
+var ws = 7050036;
 var xs = 7618e3;
-var Fs = 7618001;
+var Fs2 = 7618001;
 var $s = 7618002;
 var Bs = 7618003;
 var Gs2 = 7618004;
 var Vs = 7618005;
 var zs2 = 7618006;
-var Ys = 7618007;
+var Ys2 = 7618007;
 var ks = 7618008;
 var Ws2 = 7618009;
 var We = 8078e3;
-var He = 8078001;
+var He2 = 8078001;
 var Hs = 8078002;
 var Ks = 8078003;
 var Ke = 8078004;
 var Xe = 8078005;
-var je2 = 8078006;
-var Je = 8078007;
+var je = 8078006;
+var Je2 = 8078007;
 var Ze2 = 8078008;
 var Xs = 8078009;
-var qe = 8078010;
+var qe2 = 8078010;
 var Qe2 = 8078011;
 var te2 = 8078012;
 var js = 8078013;
-var Js2 = 8078014;
-var Zs = 8078015;
+var Js = 8078014;
+var Zs2 = 8078015;
 var qs = 8078016;
-var Qs = 8078017;
+var Qs2 = 8078017;
 var ec = 8078018;
-var tc2 = 8078019;
-var nc2 = 8078020;
+var tc = 8078019;
+var nc = 8078020;
 var rc = 8078021;
-var Oe2 = 8078022;
+var Oe = 8078022;
 var ac = 8078023;
-var oc2 = 8078024;
+var oc = 8078024;
 var sc = 8078025;
-var cc2 = 809e4;
-var ic2 = 8090001;
-var _c2 = 8090002;
-var Rc2 = 8090003;
-var Ac2 = 8090004;
-var uc2 = 8090005;
-var dc2 = 8090006;
-var lc2 = 8090007;
-var Ec2 = 8090008;
+var cc = 809e4;
+var ic = 8090001;
+var _c = 8090002;
+var Rc = 8090003;
+var Ac = 8090004;
+var uc = 8090005;
+var dc = 8090006;
+var lc = 8090007;
+var Ec = 8090008;
 var Oc2 = 8090009;
 var Nc2 = 8090010;
-var Sc2 = 8090011;
-var mc2 = 8090012;
-var Ic2 = 81e5;
-var Tc2 = 8100001;
-var fc2 = 8100002;
-var gc2 = 8100003;
+var Sc = 8090011;
+var mc = 8090012;
+var Ic = 81e5;
+var Tc = 8100001;
+var fc = 8100002;
+var gc = 8100003;
 var Lc2 = 819e4;
-var Cc2 = 8190001;
-var hc2 = 8190002;
-var pc2 = 8190003;
-var vc2 = 8190004;
+var Cc = 8190001;
+var hc = 8190002;
+var pc = 8190003;
+var vc = 8190004;
 var h = 85e5;
 var et = 8500001;
 var tt2 = 8500002;
-var bc2 = 8500003;
+var bc = 8500003;
 var nt = 8500004;
-var Dc2 = 8500005;
+var Dc = 8500005;
 var rt2 = 8500006;
-var yc2 = 89e5;
-var Mc2 = 8900001;
-var Pc2 = 8900002;
+var yc = 89e5;
+var Mc = 8900001;
+var Pc = 8900002;
 var Uc2 = 99e5;
-var wc2 = 9900001;
-var xc2 = 9900002;
+var wc = 9900001;
+var xc = 9900002;
 var Fc2 = 9900003;
 var $c2 = 9900004;
 var Bc2 = 9900005;
 var Gc2 = 9900006;
-function at(e8) {
-  return Array.isArray(e8) ? "%5B" + e8.map(at).join(
+function at(e5) {
+  return Array.isArray(e5) ? "%5B" + e5.map(at).join(
     "%2C%20"
     /* ", " */
   ) + /* "]" */
-  "%5D" : typeof e8 == "bigint" ? `${e8}n` : encodeURIComponent(
+  "%5D" : typeof e5 == "bigint" ? `${e5}n` : encodeURIComponent(
     String(
-      e8 != null && Object.getPrototypeOf(e8) === null ? (
+      e5 != null && Object.getPrototypeOf(e5) === null ? (
         // Plain objects with no prototype don't have a `toString` method.
         // Convert them before stringifying them.
-        { ...e8 }
-      ) : e8
+        { ...e5 }
+      ) : e5
     )
   );
 }
-function Vc2([e8, t]) {
-  return `${e8}=${at(t)}`;
+function Vc2([e5, t]) {
+  return `${e5}=${at(t)}`;
 }
-function zc2(e8) {
-  const t = Object.entries(e8).map(Vc2).join("&");
+function zc2(e5) {
+  const t = Object.entries(e5).map(Vc2).join("&");
   return btoa(t);
 }
 var Yc2 = {
-  [$e2]: "Account not found at address: $address",
+  [$e]: "Account not found at address: $address",
   [fr2]: "Not all accounts were decoded. Encoded accounts found at addresses: $addresses.",
-  [Tr2]: "Expected decoded account at address: $address",
-  [Ge2]: "Failed to decode account data at address: $address",
-  [Be]: "Accounts not found at addresses: $addresses",
+  [Tr]: "Expected decoded account at address: $address",
+  [Ge]: "Failed to decode account data at address: $address",
+  [Be2]: "Accounts not found at addresses: $addresses",
   [Fe2]: "Unable to find a viable program address bump seed.",
   [Er]: "$putativeAddress is not a base58-encoded address.",
-  [Pe]: "Expected base58 encoded address to decode to a byte array of length 32. Actual length: $actualLength.",
+  [Pe2]: "Expected base58 encoded address to decode to a byte array of length 32. Actual length: $actualLength.",
   [Or2]: "The `CryptoKey` must be an `Ed25519` public key.",
-  [Ir]: "$putativeOffCurveAddress is not a base58-encoded off-curve address.",
-  [Ee2]: "Invalid seeds; point must fall off the Ed25519 curve.",
-  [Nr2]: "Expected given program derived address to have the following format: [Address, ProgramDerivedAddressBump].",
-  [we]: "A maximum of $maxSeeds seeds, including the bump seed, may be supplied when creating an address. Received: $actual.",
+  [Ir2]: "$putativeOffCurveAddress is not a base58-encoded off-curve address.",
+  [Ee]: "Invalid seeds; point must fall off the Ed25519 curve.",
+  [Nr]: "Expected given program derived address to have the following format: [Address, ProgramDerivedAddressBump].",
+  [we2]: "A maximum of $maxSeeds seeds, including the bump seed, may be supplied when creating an address. Received: $actual.",
   [xe]: "The seed at index $index with length $actual exceeds the maximum length of $maxSeedLength bytes.",
-  [Sr]: "Expected program derived address bump to be in the range [0, 255], got: $bump.",
-  [mr2]: "Program address cannot end with PDA marker.",
+  [Sr2]: "Expected program derived address bump to be in the range [0, 255], got: $bump.",
+  [mr]: "Program address cannot end with PDA marker.",
   [Ue]: "Expected base58-encoded address string of length in the range [32, 44]. Actual length: $actualLength.",
   [xn2]: "Expected base58-encoded blockhash string of length in the range [32, 44]. Actual length: $actualLength.",
   [Pn2]: "The network has progressed past the last block for which this transaction could have been committed.",
   [We]: "Codec [$codecDescription] cannot decode empty byte arrays.",
-  [Oe2]: "Enum codec cannot use lexical values [$stringValues] as discriminators. Either remove all lexical values or set `useValuesAsDiscriminators` to `false`.",
-  [nc2]: "Sentinel [$hexSentinel] must not be present in encoded bytes [$hexEncodedBytes].",
+  [Oe]: "Enum codec cannot use lexical values [$stringValues] as discriminators. Either remove all lexical values or set `useValuesAsDiscriminators` to `false`.",
+  [nc]: "Sentinel [$hexSentinel] must not be present in encoded bytes [$hexEncodedBytes].",
   [Xe]: "Encoder and decoder must have the same fixed size, got [$encoderFixedSize] and [$decoderFixedSize].",
-  [je2]: "Encoder and decoder must have the same max size, got [$encoderMaxSize] and [$decoderMaxSize].",
+  [je]: "Encoder and decoder must have the same max size, got [$encoderMaxSize] and [$decoderMaxSize].",
   [Ke]: "Encoder and decoder must either both be fixed-size or variable-size.",
   [Ze2]: "Enum discriminator out of range. Expected a number in [$formattedValidDiscriminators], got $discriminator.",
   [Hs]: "Expected a fixed-size codec, got a variable-size one.",
   [js]: "Codec [$codecDescription] expected a positive byte length, got $bytesLength.",
   [Ks]: "Expected a variable-size codec, got a fixed-size one.",
-  [tc2]: "Codec [$codecDescription] expected zero-value [$hexZeroValue] to have the same size as the provided fixed-size item [$expectedSize bytes].",
-  [He]: "Codec [$codecDescription] expected $expected bytes, got $bytesLength.",
+  [tc]: "Codec [$codecDescription] expected zero-value [$hexZeroValue] to have the same size as the provided fixed-size item [$expectedSize bytes].",
+  [He2]: "Codec [$codecDescription] expected $expected bytes, got $bytesLength.",
   [ec]: "Expected byte array constant [$hexConstant] to be present in data [$hexData] at offset [$offset].",
   [Xs]: "Invalid discriminated union variant. Expected one of [$variants], got $value.",
-  [qe]: "Invalid enum variant. Expected one of [$stringValues] or a number in [$formattedNumericalValues], got $variant.",
-  [Zs]: "Invalid literal union variant. Expected one of [$variants], got $value.",
-  [Je]: "Expected [$codecDescription] to have $expected items, got $actual.",
+  [qe2]: "Invalid enum variant. Expected one of [$stringValues] or a number in [$formattedNumericalValues], got $variant.",
+  [Zs2]: "Invalid literal union variant. Expected one of [$variants], got $value.",
+  [Je2]: "Expected [$codecDescription] to have $expected items, got $actual.",
   [te2]: "Invalid value $value for base $base with alphabet $alphabet.",
   [qs]: "Literal union discriminator out of range. Expected a number between $minRange and $maxRange, got $discriminator.",
   [Qe2]: "Codec [$codecDescription] expected number to be in the range [$min, $max], got $value.",
-  [Js2]: "Codec [$codecDescription] expected offset to be in the range [0, $bytesLength], got $offset.",
+  [Js]: "Codec [$codecDescription] expected offset to be in the range [0, $bytesLength], got $offset.",
   [rc]: "Expected sentinel [$hexSentinel] to be present in decoded bytes [$hexDecodedBytes].",
-  [Qs]: "Union variant out of range. Expected an index between $minRange and $maxRange, got $variant.",
+  [Qs2]: "Union variant out of range. Expected an index between $minRange and $maxRange, got $variant.",
   [ac]: "This decoder expected a byte array of exactly $expectedLength bytes, but $numExcessBytes unexpected excess bytes remained after decoding. Are you sure that you have chosen the correct decoder for this data?",
-  [oc2]: "Invalid pattern match value. The provided value does not match any of the specified patterns.",
+  [oc]: "Invalid pattern match value. The provided value does not match any of the specified patterns.",
   [sc]: "Invalid pattern match bytes. The provided byte array does not match any of the specified patterns.",
   [br2]: "No random values implementation could be found.",
-  [Yn]: "Failed to send transaction$causeMessage",
+  [Yn2]: "Failed to send transaction$causeMessage",
   [kn]: "Failed to send transactions$causeMessages",
-  [lc2]: "Fixed-point operation `$operation` of kind `$kind` overflowed. Expected a raw bigint in [$min, $max], got $result.",
+  [lc]: "Fixed-point operation `$operation` of kind `$kind` overflowed. Expected a raw bigint in [$min, $max], got $result.",
   [Oc2]: "Fixed-point division by zero for value of kind `$kind` ($signedness, $totalBits bits).",
-  [Rc2]: "`fractionalBits` ($fractionalBits) must not exceed `totalBits` ($totalBits).",
-  [_c2]: "Invalid `decimals`. Expected a non-negative integer, got $decimals.",
-  [ic2]: "Invalid `fractionalBits`. Expected a non-negative integer, got $fractionalBits.",
-  [uc2]: "Invalid string `$input` for fixed-point value of kind `$kind`.",
-  [cc2]: "Invalid `totalBits`. Expected a positive integer, got $totalBits.",
-  [dc2]: "Invalid ratio $numerator/$denominator for fixed-point value of kind `$kind`. Denominator must be non-zero.",
-  [Sc2]: "Fixed-point value of kind `$kind` has a malformed `raw` field. Expected a bigint, got `$raw`.",
-  [Ec2]: "Fixed-point `$operation` operation expected $expectedKind ($expectedSignedness, $expectedTotalBits bits, $expectedScale $expectedScaleLabel); got $actualKind ($actualSignedness, $actualTotalBits bits, $actualScale $actualScaleLabel).",
+  [Rc]: "`fractionalBits` ($fractionalBits) must not exceed `totalBits` ($totalBits).",
+  [_c]: "Invalid `decimals`. Expected a non-negative integer, got $decimals.",
+  [ic]: "Invalid `fractionalBits`. Expected a non-negative integer, got $fractionalBits.",
+  [uc]: "Invalid string `$input` for fixed-point value of kind `$kind`.",
+  [cc]: "Invalid `totalBits`. Expected a positive integer, got $totalBits.",
+  [dc]: "Invalid ratio $numerator/$denominator for fixed-point value of kind `$kind`. Denominator must be non-zero.",
+  [Sc]: "Fixed-point value of kind `$kind` has a malformed `raw` field. Expected a bigint, got `$raw`.",
+  [Ec]: "Fixed-point `$operation` operation expected $expectedKind ($expectedSignedness, $expectedTotalBits bits, $expectedScale $expectedScaleLabel); got $actualKind ($actualSignedness, $actualTotalBits bits, $actualScale $actualScaleLabel).",
   [Nc2]: "Fixed-point operation `$operation` of kind `$kind` cannot be performed exactly; pass a rounding mode other than `strict` to allow a rounded result.",
-  [mc2]: "Fixed-point codec of kind `$kind` requires `totalBits` to be a multiple of 8; got $totalBits.",
-  [Ac2]: "Fixed-point value of kind `$kind` is out of range for $signedness $totalBits-bit storage. Expected a raw bigint in [$min, $max], got $raw.",
-  [Fr]: "Filesystem operation `$operation` is not supported in this environment.",
-  [Xr]: "Instruction requires an uninitialized account",
-  [ia2]: "Instruction tries to borrow reference for an account which is already borrowed",
+  [mc]: "Fixed-point codec of kind `$kind` requires `totalBits` to be a multiple of 8; got $totalBits.",
+  [Ac]: "Fixed-point value of kind `$kind` is out of range for $signedness $totalBits-bit storage. Expected a raw bigint in [$min, $max], got $raw.",
+  [Fr2]: "Filesystem operation `$operation` is not supported in this environment.",
+  [Xr2]: "Instruction requires an uninitialized account",
+  [ia]: "Instruction tries to borrow reference for an account which is already borrowed",
   [_a3]: "Instruction left account with an outstanding borrowed reference",
-  [sa2]: "Program other than the account's owner changed the size of the account data",
-  [kr]: "Account data too small for instruction",
+  [sa]: "Program other than the account's owner changed the size of the account data",
+  [kr2]: "Account data too small for instruction",
   [ca2]: "Instruction expected an executable account",
-  [Da]: "An account does not have enough lamports to be rent-exempt",
-  [Ma]: "Program arithmetic overflowed",
-  [ba2]: "Failed to serialize or deserialize account data",
-  [$a2]: "Builtin programs must consume compute units",
+  [Da2]: "An account does not have enough lamports to be rent-exempt",
+  [Ma2]: "Program arithmetic overflowed",
+  [ba]: "Failed to serialize or deserialize account data",
+  [$a]: "Builtin programs must consume compute units",
   [Oa]: "Cross-program invocation call depth too deep",
-  [fa2]: "Computational budget exceeded",
+  [fa]: "Computational budget exceeded",
   [ke2]: "Custom program error: #$code",
   [na2]: "Instruction contains duplicate accounts",
   [Ra2]: "Instruction modifications of multiply-passed account differ",
@@ -50727,39 +51467,39 @@ var Yc2 = {
   [da2]: "Instruction changed the balance of an executable account",
   [ra]: "Instruction changed executable bit of an account",
   [Qr]: "Instruction modified data of an account it does not own",
-  [qr]: "Instruction spent from the balance of an account it does not own",
-  [Gr]: "Generic instruction error",
-  [Ua]: "Provided owner is not allowed",
+  [qr2]: "Instruction spent from the balance of an account it does not own",
+  [Gr2]: "Generic instruction error",
+  [Ua2]: "Provided owner is not allowed",
   [pa2]: "Account is immutable",
   [va2]: "Incorrect authority provided",
-  [Hr2]: "Incorrect program id for instruction",
+  [Hr]: "Incorrect program id for instruction",
   [Wr2]: "Insufficient funds for instruction",
   [Yr2]: "Invalid account data for instruction",
-  [ya]: "Invalid account owner",
+  [ya2]: "Invalid account owner",
   [Vr]: "Invalid program argument",
-  [Aa]: "Program returned invalid error code",
-  [zr]: "Invalid instruction data",
-  [Ta]: "Failed to reallocate account data",
-  [Ia]: "Provided seeds do not result in a valid address",
+  [Aa2]: "Program returned invalid error code",
+  [zr2]: "Invalid instruction data",
+  [Ta2]: "Failed to reallocate account data",
+  [Ia2]: "Provided seeds do not result in a valid address",
   [wa]: "Accounts data allocations exceeded the maximum allowed per transaction",
-  [xa]: "Max accounts exceeded",
+  [xa2]: "Max accounts exceeded",
   [Fa]: "Max instruction trace length exceeded",
-  [ma2]: "Length of the seed is too long for address generation",
-  [Na]: "An account required by the instruction is missing",
-  [Kr]: "Missing required signature for instruction",
+  [ma]: "Length of the seed is too long for address generation",
+  [Na2]: "An account required by the instruction is missing",
+  [Kr2]: "Missing required signature for instruction",
   [Zr2]: "Instruction illegally modified the program id of an account",
-  [oa]: "Insufficient account keys for instruction",
+  [oa2]: "Insufficient account keys for instruction",
   [ga2]: "Cross-program invocation with unauthorized signer or writable account",
-  [La]: "Failed to create program execution environment",
+  [La2]: "Failed to create program execution environment",
   [ha2]: "Program failed to compile",
   [Ca]: "Program failed to complete",
   [ta]: "Instruction modified data of a read-only account",
   [ea2]: "Instruction changed the balance of a read-only account",
   [Sa]: "Cross-program invocation reentrancy not allowed for this instruction",
   [aa2]: "Instruction modified rent epoch of an account",
-  [Jr2]: "Sum of account balances before and after instruction do not match",
-  [jr2]: "Instruction requires an initialized account",
-  [ue]: "The instruction failed with the error: $errorName",
+  [Jr]: "Sum of account balances before and after instruction do not match",
+  [jr]: "Instruction requires an initialized account",
+  [ue2]: "The instruction failed with the error: $errorName",
   [Ea]: "Unsupported program id",
   [Pa]: "Unsupported sysvar",
   [Bc2]: "Invalid instruction plan kind: $kind.",
@@ -50769,19 +51509,19 @@ var Yc2 = {
   [Bs]: "The provided transaction plan failed to execute. See the `transactionPlanResult` attribute for more details. Note that the `cause` property is deprecated, and a future version will not set it.",
   [xs]: "The provided message has insufficient capacity to accommodate the next instruction(s) in this plan. Expected at least $numBytesRequired free byte(s), got $numFreeBytes byte(s).",
   [Gc2]: "Invalid transaction plan kind: $kind.",
-  [Fs]: "No more instructions to pack; the message packer has completed the instruction plan.",
+  [Fs2]: "No more instructions to pack; the message packer has completed the instruction plan.",
   [zs2]: "Unexpected instruction plan. Expected $expectedKind plan, got $actualKind plan.",
-  [Ys]: "Unexpected transaction plan. Expected $expectedKind plan, got $actualKind plan.",
+  [Ys2]: "Unexpected transaction plan. Expected $expectedKind plan, got $actualKind plan.",
   [ks]: "Unexpected transaction plan result. Expected $expectedKind plan, got $actualKind plan.",
   [Ws2]: "Expected a successful transaction plan result. I.e. there is at least one failed or cancelled transaction in the plan.",
-  [Ye2]: "The instruction does not have any accounts.",
-  [$r2]: "The instruction does not have any data.",
+  [Ye]: "The instruction does not have any accounts.",
+  [$r]: "The instruction does not have any data.",
   [Br2]: "Expected instruction to have progress address $expectedProgramAddress, got $actualProgramAddress.",
-  [Fn2]: "Expected base58 encoded blockhash to decode to a byte array of length 32. Actual length: $actualLength.",
+  [Fn]: "Expected base58 encoded blockhash to decode to a byte array of length 32. Actual length: $actualLength.",
   [Un]: "The nonce `$expectedNonceValue` is no longer valid. It has advanced to `$actualNonceValue`",
-  [xc2]: "Invariant violation: Found no abortable iterable cache entry for key `$cacheKey`. It should be impossible to hit this error; please file an issue at https://sola.na/web3invariant",
+  [xc]: "Invariant violation: Found no abortable iterable cache entry for key `$cacheKey`. It should be impossible to hit this error; please file an issue at https://sola.na/web3invariant",
   [$c2]: "Invariant violation: This data publisher does not publish to the channel named `$channelName`. Supported channels include $supportedChannelNames.",
-  [wc2]: "Invariant violation: WebSocket message iterator state is corrupt; iterated without first resolving existing message promise. It should be impossible to hit this error; please file an issue at https://sola.na/web3invariant",
+  [wc]: "Invariant violation: WebSocket message iterator state is corrupt; iterated without first resolving existing message promise. It should be impossible to hit this error; please file an issue at https://sola.na/web3invariant",
   [Uc2]: "Invariant violation: WebSocket message iterator is missing state storage. It should be impossible to hit this error; please file an issue at https://sola.na/web3invariant",
   [Fc2]: "Invariant violation: Switch statement non-exhaustive. Received unexpected value `$unexpectedValue`. It should be impossible to hit this error; please file an issue at https://sola.na/web3invariant",
   [Hn]: "JSON-RPC error: Internal JSON-RPC error ($__serverMessage)",
@@ -50791,82 +51531,82 @@ var Yc2 = {
   [Wn]: "JSON-RPC error: An error occurred on the server while parsing the JSON text ($__serverMessage)",
   [rr2]: "$__serverMessage",
   [lr2]: "$__serverMessage",
-  [Ar]: "$__serverMessage",
-  [tr]: "$__serverMessage",
+  [Ar2]: "$__serverMessage",
+  [tr2]: "$__serverMessage",
   [qn]: "Epoch rewards period still active at slot $slot",
   [or]: "$__serverMessage",
-  [sr2]: "$__serverMessage",
-  [Jn2]: "Failed to query long-term storage; please try again",
-  [Qn]: "Minimum context slot has not been reached",
-  [Rr2]: "Node is unhealthy; behind by $numSlotsBehind slots",
+  [sr]: "$__serverMessage",
+  [Jn]: "Failed to query long-term storage; please try again",
+  [Qn2]: "Minimum context slot has not been reached",
+  [Rr]: "Node is unhealthy; behind by $numSlotsBehind slots",
   [cr]: "No snapshot",
-  [dr2]: "Transaction simulation failed",
-  [Zn2]: "Rewards cannot be found because slot $slot is not the epoch boundary. This may be due to gap in the queried node's local ledger or long-term storage",
+  [dr]: "Transaction simulation failed",
+  [Zn]: "Rewards cannot be found because slot $slot is not the epoch boundary. This may be due to gap in the queried node's local ledger or long-term storage",
   [ir2]: "$__serverMessage",
   [ar]: "Transaction history is not available from this node",
   [_r2]: "$__serverMessage",
-  [nr2]: "Transaction signature length mismatch",
-  [ur]: "Transaction signature verification failure",
-  [er]: "$__serverMessage",
+  [nr]: "Transaction signature length mismatch",
+  [ur2]: "Transaction signature verification failure",
+  [er2]: "$__serverMessage",
   [wr2]: "The grind regex `/$source/` contains the character `$character`, which is not in the base58 alphabet and can never match a Solana address.",
   [Dr]: "Key pair bytes must be of length 64, got $byteLength.",
   [yr2]: "Expected private key bytes with length 32. Actual length: $actualLength.",
-  [Mr]: "Expected base58-encoded signature to decode to a byte array of length 64. Actual length: $actualLength.",
-  [Ur2]: "The provided private key does not match the provided public key.",
+  [Mr2]: "Expected base58-encoded signature to decode to a byte array of length 64. Actual length: $actualLength.",
+  [Ur]: "The provided private key does not match the provided public key.",
   [Pr2]: "Expected base58-encoded signature string of length in the range [64, 88]. Actual length: $actualLength.",
-  [xr2]: "Writing a key pair to disk is not supported in this environment.",
+  [xr]: "Writing a key pair to disk is not supported in this environment.",
   [$n]: "Lamports value must be in the range [0, 2e64-1]",
-  [Bn2]: "`$value` cannot be parsed as a `BigInt`",
-  [zn2]: "$message",
+  [Bn]: "`$value` cannot be parsed as a `BigInt`",
+  [zn]: "$message",
   [Gn]: "`$value` cannot be parsed as a `Number`",
-  [wn2]: "No nonce account could be found at address `$nonceAccountAddress`",
+  [wn]: "No nonce account could be found at address `$nonceAccountAddress`",
   [to]: "Expected base58 encoded application domain to decode to a byte array of length 32. Actual length: $actualLength.",
   [Ao]: "Attempted to sign an offchain message with an address that is not a signer for it",
-  [eo]: "Expected base58-encoded application domain string of length in the range [32, 44]. Actual length: $actualLength.",
-  [Ro]: "The signer addresses in this offchain message envelope do not match the list of required signers in the message preamble. These unexpected signers were present in the envelope: `[$unexpectedSigners]`. These required signers were missing from the envelope `[$missingSigners]`.",
-  [qa2]: "The message body provided has a byte-length of $actualBytes. The maximum allowable byte-length is $maxBytes",
-  [oo]: "Expected message format $expectedMessageFormat, got $actualMessageFormat",
+  [eo2]: "Expected base58-encoded application domain string of length in the range [32, 44]. Actual length: $actualLength.",
+  [Ro2]: "The signer addresses in this offchain message envelope do not match the list of required signers in the message preamble. These unexpected signers were present in the envelope: `[$unexpectedSigners]`. These required signers were missing from the envelope `[$missingSigners]`.",
+  [qa]: "The message body provided has a byte-length of $actualBytes. The maximum allowable byte-length is $maxBytes",
+  [oo2]: "Expected message format $expectedMessageFormat, got $actualMessageFormat",
   [so]: "The message length specified in the message preamble is $specifiedLength bytes. The actual length of the message is $actualLength bytes.",
-  [co]: "Offchain message content must be non-empty",
-  [ro]: "Offchain message must specify the address of at least one required signer",
+  [co2]: "Offchain message content must be non-empty",
+  [ro2]: "Offchain message must specify the address of at least one required signer",
   [io]: "Offchain message envelope must reserve space for at least one signature",
   [no]: "The offchain message preamble specifies $numRequiredSignatures required signature(s), got $signaturesLength.",
-  [lo]: "The signatories of this offchain message must be listed in lexicographical order",
+  [lo2]: "The signatories of this offchain message must be listed in lexicographical order",
   [Eo]: "An address must be listed no more than once among the signatories of an offchain message",
   [_o]: "Offchain message is missing signatures for addresses: $addresses.",
   [Oo]: "Offchain message signature verification failed. Signature mismatch for required signatories [$signatoriesWithInvalidSignatures]. Missing signatures for signatories [$signatoriesWithMissingSignatures]",
-  [Qa]: "The message body provided contains characters whose codes fall outside the allowed range. In order to ensure clear-signing compatiblity with hardware wallets, the message may only contain line feeds and characters in the range [\\x20-\\x7e].",
+  [Qa2]: "The message body provided contains characters whose codes fall outside the allowed range. In order to ensure clear-signing compatiblity with hardware wallets, the message may only contain line feeds and characters in the range [\\x20-\\x7e].",
   [uo]: "Expected offchain message version $expectedVersion. Got $actualVersion.",
-  [ao2]: "This version of Kit does not support decoding offchain messages with version $unsupportedVersion. The current max supported version is 0.",
+  [ao]: "This version of Kit does not support decoding offchain messages with version $unsupportedVersion. The current max supported version is 0.",
   [rt2]: "The provided account could not be identified as an account from the $programName program.",
   [tt2]: "The provided instruction could not be identified as an instruction from the $programName program.",
   [h]: "The provided instruction is missing some accounts. Expected at least $expectedAccountMetas account(s), got $actualAccountMetas.",
   [nt]: "Expected resolved instruction input '$inputName' to be non-null.",
-  [bc2]: "Expected resolved instruction input '$inputName' to be of type `$expectedType`.",
-  [Dc2]: "Unrecognized account type '$accountType' for the $programName program.",
+  [bc]: "Expected resolved instruction input '$inputName' to be of type `$expectedType`.",
+  [Dc]: "Unrecognized account type '$accountType' for the $programName program.",
   [et]: "Unrecognized instruction type '$instructionType' for the $programName program.",
   [Lc2]: "The notification name must end in 'Notifications' and the API must supply a subscription plan creator function for the notification '$notificationName'.",
-  [hc2]: "WebSocket was closed before payload could be added to the send buffer",
-  [pc2]: "WebSocket connection closed",
-  [vc2]: "WebSocket failed to connect",
-  [Cc2]: "Failed to obtain a subscription id from the server",
-  [gc2]: "Could not find an API plan for RPC method: `$method`",
-  [Ic2]: "The $argumentLabel argument to the `$methodName` RPC method$optionalPathLabel was `$value`. This number is unsafe for use with the Solana JSON-RPC because it exceeds `Number.MAX_SAFE_INTEGER`.",
-  [fc2]: "HTTP error ($statusCode): $message",
-  [Tc2]: "HTTP header(s) forbidden: $headers. Learn more at https://developer.mozilla.org/en-US/docs/Glossary/Forbidden_header_name.",
+  [hc]: "WebSocket was closed before payload could be added to the send buffer",
+  [pc]: "WebSocket connection closed",
+  [vc]: "WebSocket failed to connect",
+  [Cc]: "Failed to obtain a subscription id from the server",
+  [gc]: "Could not find an API plan for RPC method: `$method`",
+  [Ic]: "The $argumentLabel argument to the `$methodName` RPC method$optionalPathLabel was `$value`. This number is unsafe for use with the Solana JSON-RPC because it exceeds `Number.MAX_SAFE_INTEGER`.",
+  [fc]: "HTTP error ($statusCode): $message",
+  [Tc]: "HTTP header(s) forbidden: $headers. Learn more at https://developer.mozilla.org/en-US/docs/Glossary/Forbidden_header_name.",
   [Ba]: "Multiple distinct signers were identified for address `$address`. Please ensure that you are using the same signer instance for each address.",
-  [Ga2]: "The provided value does not implement the `KeyPairSigner` interface",
-  [za2]: "The provided value does not implement the `MessageModifyingSigner` interface",
-  [Ya2]: "The provided value does not implement the `MessagePartialSigner` interface",
-  [Va2]: "The provided value does not implement any of the `MessageSigner` interfaces",
-  [Wa]: "The provided value does not implement the `TransactionModifyingSigner` interface",
+  [Ga]: "The provided value does not implement the `KeyPairSigner` interface",
+  [za]: "The provided value does not implement the `MessageModifyingSigner` interface",
+  [Ya]: "The provided value does not implement the `MessagePartialSigner` interface",
+  [Va]: "The provided value does not implement any of the `MessageSigner` interfaces",
+  [Wa2]: "The provided value does not implement the `TransactionModifyingSigner` interface",
   [Ha]: "The provided value does not implement the `TransactionPartialSigner` interface",
   [Ka]: "The provided value does not implement the `TransactionSendingSigner` interface",
   [ka]: "The provided value does not implement any of the `TransactionSigner` interfaces",
   [Xa]: "More than one `TransactionSendingSigner` was identified.",
   [ja]: "No `TransactionSendingSigner` was identified. Please provide a valid `TransactionWithSingleSendingSigner` transaction.",
-  [Za2]: "The wallet account $address cannot be used to create a transaction signer because it does not implement either the `solana:signTransaction` or `solana:signAndSendTransaction` feature. At least one of these features is required. The account supports the following features: $supportedFeatures.",
-  [Ja2]: "Wallet account signers do not support signing multiple messages/transactions in a single operation",
+  [Za]: "The wallet account $address cannot be used to create a transaction signer because it does not implement either the `solana:signTransaction` or `solana:signAndSendTransaction` feature. At least one of these features is required. The account supports the following features: $supportedFeatures.",
+  [Ja]: "Wallet account signers do not support signing multiple messages/transactions in a single operation",
   [vr2]: "Cannot export a non-extractable key.",
   [ze]: "No digest implementation could be found.",
   [Ve]: "Cryptographic operations are only allowed in secure browser contexts. Read more here: https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts.",
@@ -50875,54 +51615,54 @@ var Yc2 = {
 Install @solana/webcrypto-ed25519-polyfill and call its \`install\` function before generating keys in environments that do not support Ed25519.
 
 For a list of runtimes that currently support Ed25519 operations, visit https://github.com/WICG/webcrypto-secure-curves/issues/20.`,
-  [Lr2]: "No key export implementation could be found.",
-  [Cr]: "No key generation implementation could be found.",
-  [hr2]: "No signing implementation could be found.",
+  [Lr]: "No key export implementation could be found.",
+  [Cr2]: "No key generation implementation could be found.",
+  [hr]: "No signing implementation could be found.",
   [pr2]: "No signature verification implementation could be found.",
   [Vn]: "Timestamp value must be in the range [-(2n ** 63n), (2n ** 63n) - 1]. `$value` given",
   [Es]: "Transaction processing left an account with an outstanding borrowed reference",
   [es]: "Account in use",
-  [ts]: "Account loaded twice",
+  [ts2]: "Account loaded twice",
   [ns2]: "Attempt to debit an account but found no record of a prior credit.",
   [fs2]: "Transaction loads an address table account that doesn't exist",
-  [ss]: "This transaction has already been processed",
-  [cs]: "Blockhash not found",
+  [ss2]: "This transaction has already been processed",
+  [cs2]: "Blockhash not found",
   [is2]: "Loader call chain is too deep",
-  [ls]: "Transactions are currently disabled due to cluster maintenance",
+  [ls2]: "Transactions are currently disabled due to cluster maintenance",
   [bs]: "Transaction contains a duplicate instruction ($index) that is not allowed",
   [as2]: "Insufficient funds for fee",
-  [Ds2]: "Transaction results in an account ($accountIndex) with insufficient funds for rent",
-  [os]: "This account may not be used to pay transaction fees",
+  [Ds]: "Transaction results in an account ($accountIndex) with insufficient funds for rent",
+  [os2]: "This account may not be used to pay transaction fees",
   [Rs]: "Transaction contains an invalid account reference",
-  [Ls2]: "Transaction loads an address table account with invalid data",
-  [Cs]: "Transaction address table lookup uses an invalid index",
-  [gs]: "Transaction loads an address table account with an invalid owner",
-  [Ms]: "LoadedAccountsDataSizeLimit set for transaction must be greater than 0.",
-  [us]: "This program may not be used for executing instructions",
+  [Ls]: "Transaction loads an address table account with invalid data",
+  [Cs2]: "Transaction address table lookup uses an invalid index",
+  [gs2]: "Transaction loads an address table account with an invalid owner",
+  [Ms2]: "LoadedAccountsDataSizeLimit set for transaction must be greater than 0.",
+  [us2]: "This program may not be used for executing instructions",
   [hs]: "Transaction leaves an account with a lower balance than rent-exempt minimum",
   [Ss2]: "Transaction loads a writable account that cannot be written",
-  [ys]: "Transaction exceeded max loaded accounts data size cap",
-  [_s2]: "Transaction requires a fee but has no signature present",
-  [rs]: "Attempt to load a program that does not exist",
-  [Us]: "Execution of the program referenced by account at index $accountIndex is temporarily restricted.",
+  [ys2]: "Transaction exceeded max loaded accounts data size cap",
+  [_s]: "Transaction requires a fee but has no signature present",
+  [rs2]: "Attempt to load a program that does not exist",
+  [Us2]: "Execution of the program referenced by account at index $accountIndex is temporarily restricted.",
   [Ps2]: "ResanitizationNeeded",
-  [ds]: "Transaction failed to sanitize accounts offsets correctly",
-  [As]: "Transaction did not pass signature verification",
+  [ds2]: "Transaction failed to sanitize accounts offsets correctly",
+  [As2]: "Transaction did not pass signature verification",
   [Ts]: "Transaction locked too many accounts",
-  [ws2]: "Sum of account balances before and after transaction do not match",
+  [ws]: "Sum of account balances before and after transaction do not match",
   [Qo]: "The transaction failed with the error `$errorName`",
   [Ns]: "Transaction version is unsupported",
-  [Is2]: "Transaction would exceed account data limit within the block",
+  [Is]: "Transaction would exceed account data limit within the block",
   [vs]: "Transaction would exceed total account data limit",
   [ms2]: "Transaction would exceed max account limit within the block",
   [Os]: "Transaction would exceed max Block Cost Limit",
-  [ps2]: "Transaction would exceed max Vote Cost Limit",
+  [ps]: "Transaction would exceed max Vote Cost Limit",
   [Mo]: "Attempted to sign a transaction with an address that is not a signer for it",
-  [po]: "Transaction is missing an address at index: $index.",
+  [po2]: "Transaction is missing an address at index: $index.",
   [Po]: "Transaction has no expected signers therefore it cannot be encoded",
   [Fo]: "Transaction size $transactionSize exceeds limit of $transactionSizeLimit bytes",
   [mo]: "Transaction does not have a blockhash lifetime",
-  [Io]: "Transaction is not a durable nonce transaction",
+  [Io2]: "Transaction is not a durable nonce transaction",
   [fo]: "Contents of these address lookup tables unknown: $lookupTableAddresses",
   [go]: "Lookup of address at index $highestRequestedIndex failed for lookup table `$lookupTableAddress`. Highest known index is $highestKnownIndex. The lookup table may have been extended since its contents were retrieved",
   [Co]: "No fee payer set in CompiledTransaction",
@@ -50930,13 +51670,13 @@ For a list of runtimes that currently support Ed25519 operations, visit https://
   [wo]: "Failed to estimate the compute unit consumption for this transaction message. This is likely because simulating the transaction failed. Inspect the `cause` property of this error to learn more",
   [xo]: "Transaction failed when it was simulated in order to estimate the compute unit consumption. The compute unit estimate provided is for a transaction that failed when simulated and may not be representative of the compute units this transaction would consume if successful. Inspect the `cause` property of this error to learn more",
   [vo]: "Transaction is missing a fee payer.",
-  [bo]: "Could not determine this transaction's signature. Make sure that the transaction has been signed by its fee payer.",
+  [bo2]: "Could not determine this transaction's signature. Make sure that the transaction has been signed by its fee payer.",
   [yo]: "Transaction first instruction is not advance nonce account instruction.",
-  [Do]: "Transaction with no instructions cannot be durable nonce transaction.",
+  [Do2]: "Transaction with no instructions cannot be durable nonce transaction.",
   [No]: "This transaction includes an address (`$programAddress`) which is both invoked and set as the fee payer. Program addresses may not pay fees",
   [So]: "This transaction includes an address (`$programAddress`) which is both invoked and marked writable. Program addresses may not be writable",
   [Uo]: "The transaction message expected the transaction to have $numRequiredSignatures signatures, got $signaturesLength.",
-  [ho]: "Transaction is missing signatures for addresses: $addresses.",
+  [ho2]: "Transaction is missing signatures for addresses: $addresses.",
   [To]: "Transaction version must be in the range [0, 127]. `$actualVersion` given",
   [$o]: "This version of Kit does not support decoding transactions with version $unsupportedVersion. The current max supported version is 1.",
   [Bo]: "The transaction has a durable nonce lifetime (with nonce `$nonce`), but the nonce account address is in a lookup table. The lifetime constraint cannot be constructed without fetching the lookup tables for the transaction.",
@@ -50953,89 +51693,89 @@ For a list of runtimes that currently support Ed25519 operations, visit https://
   [Jo]: "Transaction has $actualCount unique account addresses but the maximum allowed is $maxAllowed",
   [Zo]: "Transaction has $actualCount instructions but the maximum allowed is $maxAllowed",
   [qo]: "The instruction at index $instructionIndex has $actualCount account references but the maximum allowed is $maxAllowed",
-  [yc2]: "Cannot $operation: no wallet connected",
-  [Mc2]: "No signing wallet connected (status: $status)",
-  [Pc2]: "Connected wallet does not support signing"
+  [yc]: "Cannot $operation: no wallet connected",
+  [Mc]: "No signing wallet connected (status: $status)",
+  [Pc]: "Connected wallet does not support signing"
 };
 var kc2 = 1e3;
-var V8 = "i";
-var F10 = "t";
-function Wc2(e8, t = {}) {
-  const n = Yc2[e8];
+var V3 = "i";
+var F9 = "t";
+function Wc(e5, t = {}) {
+  const n = Yc2[e5];
   if (n.length === 0)
     return "";
   let a;
-  function r(o6) {
-    if (a[F10] === 2) {
-      const i = n.slice(a[V8] + 1, o6);
-      s10.push(
+  function r(o3) {
+    if (a[F9] === 2) {
+      const i = n.slice(a[V3] + 1, o3);
+      s2.push(
         i in t ? (
           // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
           `${t[i]}`
         ) : `$${i}`
       );
-    } else a[F10] === 1 && s10.push(n.slice(a[V8], o6));
+    } else a[F9] === 1 && s2.push(n.slice(a[V3], o3));
   }
-  const s10 = [];
-  n.split("").forEach((o6, i) => {
+  const s2 = [];
+  n.split("").forEach((o3, i) => {
     if (i === 0) {
       a = {
-        [V8]: 0,
-        [F10]: n[0] === "\\" ? 0 : n[0] === "$" ? 2 : 1
+        [V3]: 0,
+        [F9]: n[0] === "\\" ? 0 : n[0] === "$" ? 2 : 1
         /* Text */
       };
       return;
     }
-    let u10;
-    switch (a[F10]) {
+    let u2;
+    switch (a[F9]) {
       case 0:
-        u10 = {
-          [V8]: i,
-          [F10]: 1
+        u2 = {
+          [V3]: i,
+          [F9]: 1
           /* Text */
         };
         break;
       case 1:
-        o6 === "\\" ? u10 = {
-          [V8]: i,
-          [F10]: 0
+        o3 === "\\" ? u2 = {
+          [V3]: i,
+          [F9]: 0
           /* EscapeSequence */
-        } : o6 === "$" && (u10 = {
-          [V8]: i,
-          [F10]: 2
+        } : o3 === "$" && (u2 = {
+          [V3]: i,
+          [F9]: 2
           /* Variable */
         });
         break;
       case 2:
-        o6 === "\\" ? u10 = {
-          [V8]: i,
-          [F10]: 0
+        o3 === "\\" ? u2 = {
+          [V3]: i,
+          [F9]: 0
           /* EscapeSequence */
-        } : o6 === "$" ? u10 = {
-          [V8]: i,
-          [F10]: 2
+        } : o3 === "$" ? u2 = {
+          [V3]: i,
+          [F9]: 2
           /* Variable */
-        } : o6.match(/\w/) || (u10 = {
-          [V8]: i,
-          [F10]: 1
+        } : o3.match(/\w/) || (u2 = {
+          [V3]: i,
+          [F9]: 1
           /* Text */
         });
         break;
     }
-    u10 && (a !== u10 && r(i), a = u10);
+    u2 && (a !== u2 && r(i), a = u2);
   }), r();
-  let c = s10.join("");
-  return e8 >= ue && e8 < ue + kc2 && "index" in t && (c += ` (instruction #${t.index + 1})`), c;
+  let c = s2.join("");
+  return e5 >= ue2 && e5 < ue2 + kc2 && "index" in t && (c += ` (instruction #${t.index + 1})`), c;
 }
-function Hc2(e8, t = {}) {
+function Hc(e5, t = {}) {
   if (process.env.NODE_ENV !== "production")
-    return Wc2(e8, t);
+    return Wc(e5, t);
   {
-    let n = `Solana error #${e8}; Decode this error by running \`npx @solana/errors decode -- ${e8}`;
+    let n = `Solana error #${e5}; Decode this error by running \`npx @solana/errors decode -- ${e5}`;
     return Object.keys(t).length && (n += ` '${zc2(t)}'`), `${n}\``;
   }
 }
-var A6 = class extends Error {
+var A2 = class extends Error {
   /**
    * Indicates the root cause of this {@link SolanaError}, if any.
    *
@@ -51047,194 +51787,194 @@ var A6 = class extends Error {
    * Contains context that can assist in understanding or recovering from a {@link SolanaError}.
    */
   context;
-  constructor(...[e8, t]) {
+  constructor(...[e5, t]) {
     let n, a;
-    t && Object.entries(Object.getOwnPropertyDescriptors(t)).forEach(([s10, c]) => {
-      s10 === "cause" ? a = { cause: c.value } : (n === void 0 && (n = {
-        __code: e8
-      }), Object.defineProperty(n, s10, c));
+    t && Object.entries(Object.getOwnPropertyDescriptors(t)).forEach(([s2, c]) => {
+      s2 === "cause" ? a = { cause: c.value } : (n === void 0 && (n = {
+        __code: e5
+      }), Object.defineProperty(n, s2, c));
     });
-    const r = Hc2(e8, n);
+    const r = Hc(e5, n);
     super(r, a), this.context = Object.freeze(
       n === void 0 ? {
-        __code: e8
+        __code: e5
       } : n
     ), this.name = "SolanaError";
   }
 };
-function Kc(e8, t) {
-  if (e8.length >= t) return e8;
+function Kc2(e5, t) {
+  if (e5.length >= t) return e5;
   const n = new Uint8Array(t).fill(0);
-  return n.set(e8), n;
+  return n.set(e5), n;
 }
-var Xc2 = (e8, t) => Kc(e8.length <= t ? e8 : e8.slice(0, t), t);
-function W(e8) {
+var Xc2 = (e5, t) => Kc2(e5.length <= t ? e5 : e5.slice(0, t), t);
+function W(e5) {
   return Object.freeze({
-    ...e8,
-    decode: (t, n = 0) => e8.read(t, n)[0]
+    ...e5,
+    decode: (t, n = 0) => e5.read(t, n)[0]
   });
 }
-function B(e8) {
-  return "fixedSize" in e8 && typeof e8.fixedSize == "number";
+function B(e5) {
+  return "fixedSize" in e5 && typeof e5.fixedSize == "number";
 }
-function Zc2(e8, t, n = 0) {
+function Zc2(e5, t, n = 0) {
   if (t.length - n <= 0)
-    throw new A6(We, {
-      codecDescription: e8
+    throw new A2(We, {
+      codecDescription: e5
     });
 }
-function st(e8, t, n, a = 0) {
+function st(e5, t, n, a = 0) {
   const r = n.length - a;
   if (r < t)
-    throw new A6(He, {
+    throw new A2(He2, {
       bytesLength: r,
-      codecDescription: e8,
+      codecDescription: e5,
       expected: t
     });
 }
-function qc2(e8, t, n) {
-  const a = e8.byteOffset + (t ?? 0), r = n ?? e8.byteLength;
-  let s10;
-  return typeof SharedArrayBuffer > "u" ? s10 = e8.buffer : e8.buffer instanceof SharedArrayBuffer ? (s10 = new ArrayBuffer(e8.length), new Uint8Array(s10).set(new Uint8Array(e8))) : s10 = e8.buffer, (a === 0 || a === -e8.byteLength) && r === e8.byteLength ? s10 : s10.slice(a, a + r);
+function qc2(e5, t, n) {
+  const a = e5.byteOffset + (t ?? 0), r = n ?? e5.byteLength;
+  let s2;
+  return typeof SharedArrayBuffer > "u" ? s2 = e5.buffer : e5.buffer instanceof SharedArrayBuffer ? (s2 = new ArrayBuffer(e5.length), new Uint8Array(s2).set(new Uint8Array(e5))) : s2 = e5.buffer, (a === 0 || a === -e5.byteLength) && r === e5.byteLength ? s2 : s2.slice(a, a + r);
 }
-function T8(e8, t) {
+function T2(e5, t) {
   return W({
     fixedSize: t,
     read: (n, a) => {
-      st("fixCodecSize", t, n, a), (a > 0 || n.length > t) && (n = n.slice(a, a + t)), B(e8) && (n = Xc2(n, e8.fixedSize));
-      const [r] = e8.read(n, 0);
+      st("fixCodecSize", t, n, a), (a > 0 || n.length > t) && (n = n.slice(a, a + t)), B(e5) && (n = Xc2(n, e5.fixedSize));
+      const [r] = e5.read(n, 0);
       return [r, a + t];
     }
   });
 }
-var ti = (e8) => W({
+var ti = (e5) => W({
   read(t, n) {
     const a = n === 0 || n <= -t.byteLength ? t : t.slice(n);
     if (a.length === 0) return ["", 0];
     let r = a.findIndex((i) => i !== 0);
     r = r === -1 ? a.length : r;
-    const s10 = e8[0].repeat(r);
-    if (r === a.length) return [s10, t.length];
-    const c = a.slice(r).reduce((i, u10) => i * 256n + BigInt(u10), 0n), o6 = ni(c, e8);
-    return [s10 + o6, t.length];
+    const s2 = e5[0].repeat(r);
+    if (r === a.length) return [s2, t.length];
+    const c = a.slice(r).reduce((i, u2) => i * 256n + BigInt(u2), 0n), o3 = ni(c, e5);
+    return [s2 + o3, t.length];
   }
 });
-function ni(e8, t) {
+function ni(e5, t) {
   const n = BigInt(t.length), a = [];
-  for (; e8 > 0n; )
-    a.unshift(t[Number(e8 % n)]), e8 /= n;
+  for (; e5 > 0n; )
+    a.unshift(t[Number(e5 % n)]), e5 /= n;
   return a.join("");
 }
-var it = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
-var ai = () => ti(it);
+var it2 = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+var ai = () => ti(it2);
 var Ae;
 function _i() {
   return Ae || (Ae = ai()), Ae;
 }
 function G() {
-  return T8(_i(), 32);
+  return T2(_i(), 32);
 }
-function At(e8) {
-  return e8?.endian !== 1;
+function At(e5) {
+  return e5?.endian !== 1;
 }
-function q10(e8) {
+function q(e5) {
   return W({
-    fixedSize: e8.size,
+    fixedSize: e5.size,
     read(t, n = 0) {
-      Zc2(e8.name, t, n), st(e8.name, e8.size, t, n);
-      const a = new DataView(qc2(t, n, e8.size));
-      return [e8.get(a, At(e8.config)), n + e8.size];
+      Zc2(e5.name, t, n), st(e5.name, e5.size, t, n);
+      const a = new DataView(qc2(t, n, e5.size));
+      return [e5.get(a, At(e5.config)), n + e5.size];
     }
   });
 }
-var Se = (e8 = {}) => q10({
-  config: e8,
+var Se2 = (e5 = {}) => q({
+  config: e5,
   get: (t, n) => t.getBigInt64(0, n),
   name: "i64",
   size: 8
 });
-var l = (e8 = {}) => q10({
-  config: e8,
+var l = (e5 = {}) => q({
+  config: e5,
   get: (t, n) => t.getUint16(0, n),
   name: "u16",
   size: 2
 });
-var Li = (e8 = {}) => q10({
-  config: e8,
+var Li = (e5 = {}) => q({
+  config: e5,
   get: (t, n) => t.getUint32(0, n),
   name: "u32",
   size: 4
 });
-var me = (e8 = {}) => q10({
-  config: e8,
+var me2 = (e5 = {}) => q({
+  config: e5,
   get: (t, n) => t.getBigUint64(0, n),
   name: "u64",
   size: 8
 });
-var D10 = () => q10({
-  get: (e8) => e8.getUint8(0),
+var D3 = () => q({
+  get: (e5) => e5.getUint8(0),
   name: "u8",
   size: 1
 });
-function re2(e8) {
-  return e8.reduce((t, n) => t === null || n === null ? null : t + n, 0);
+function re(e5) {
+  return e5.reduce((t, n) => t === null || n === null ? null : t + n, 0);
 }
-function se2(e8) {
-  return B(e8) ? e8.fixedSize : null;
+function se(e5) {
+  return B(e5) ? e5.fixedSize : null;
 }
-function ce2(e8) {
-  return B(e8) ? e8.fixedSize : e8.maxSize ?? null;
+function ce2(e5) {
+  return B(e5) ? e5.fixedSize : e5.maxSize ?? null;
 }
-function U(e8, t = {}) {
-  const n = t.size ?? Li(), a = se2(e8), r = ae(n, a), s10 = ae(n, ce2(e8)) ?? void 0;
+function U2(e5, t = {}) {
+  const n = t.size ?? Li(), a = se(e5), r = ae(n, a), s2 = ae(n, ce2(e5)) ?? void 0;
   return W({
-    ...r !== null ? { fixedSize: r } : { maxSize: s10 },
-    read: (c, o6) => {
+    ...r !== null ? { fixedSize: r } : { maxSize: s2 },
+    read: (c, o3) => {
       const i = [];
-      if (typeof n == "object" && c.slice(o6).length === 0)
-        return [i, o6];
+      if (typeof n == "object" && c.slice(o3).length === 0)
+        return [i, o3];
       if (n === "remainder") {
-        for (; o6 < c.length; ) {
-          const [w10, Q] = e8.read(c, o6);
-          o6 = Q, i.push(w10);
+        for (; o3 < c.length; ) {
+          const [w2, Q] = e5.read(c, o3);
+          o3 = Q, i.push(w2);
         }
-        return [i, o6];
+        return [i, o3];
       }
-      const [u10, y10] = typeof n == "number" ? [n, o6] : n.read(c, o6);
-      o6 = y10;
-      for (let w10 = 0; w10 < u10; w10 += 1) {
-        const [Q, Mn] = e8.read(c, o6);
-        o6 = Mn, i.push(Q);
+      const [u2, y2] = typeof n == "number" ? [n, o3] : n.read(c, o3);
+      o3 = y2;
+      for (let w2 = 0; w2 < u2; w2 += 1) {
+        const [Q, Mn] = e5.read(c, o3);
+        o3 = Mn, i.push(Q);
       }
-      return [i, o6];
+      return [i, o3];
     }
   });
 }
-function ae(e8, t) {
-  return typeof e8 != "number" ? null : e8 === 0 ? 0 : t === null ? null : t * e8;
+function ae(e5, t) {
+  return typeof e5 != "number" ? null : e5 === 0 ? 0 : t === null ? null : t * e5;
 }
 function g() {
   return W({
-    read: (e8, t) => {
-      const n = e8.slice(t);
+    read: (e5, t) => {
+      const n = e5.slice(t);
       return [n, t + n.length];
     }
   });
 }
-function m(e8) {
-  const t = e8.map(([, r]) => r), n = re2(t.map(se2)), a = re2(t.map(ce2)) ?? void 0;
+function m(e5) {
+  const t = e5.map(([, r]) => r), n = re(t.map(se)), a = re(t.map(ce2)) ?? void 0;
   return W({
     ...n === null ? { maxSize: a } : { fixedSize: n },
-    read: (r, s10) => {
+    read: (r, s2) => {
       const c = {};
-      return e8.forEach(([o6, i]) => {
-        const [u10, y10] = i.read(r, s10);
-        s10 = y10, c[o6] = u10;
-      }), [c, s10];
+      return e5.forEach(([o3, i]) => {
+        const [u2, y2] = i.read(r, s2);
+        s2 = y2, c[o3] = u2;
+      }), [c, s2];
     }
   });
 }
-var Et = new Uint8Array([
+var Et2 = new Uint8Array([
   102,
   9,
   241,
@@ -51248,11 +51988,11 @@ function ft() {
   return m([
     ["key", G()],
     ["scope", G()],
-    ["expireTime", Se()],
-    ["permissions", U(D10(), { size: 8 })]
+    ["expireTime", Se2()],
+    ["permissions", U2(D3(), { size: 8 })]
   ]);
 }
-var gt = new Uint8Array([
+var gt2 = new Uint8Array([
   184,
   101,
   165,
@@ -51264,19 +52004,19 @@ var gt = new Uint8Array([
 ]);
 function Lt() {
   return m([
-    ["discriminator", T8(g(), 8)],
-    ["version", D10()],
+    ["discriminator", T2(g(), 8)],
+    ["version", D3()],
     ["authKeyCount", l()],
-    ["keyThreshold", D10()],
-    ["nextSeqId", me()],
-    ["createdAt", Se()],
+    ["keyThreshold", D3()],
+    ["nextSeqId", me2()],
+    ["createdAt", Se2()],
     [
       "profileKeys",
-      U(ft(), { size: l() })
+      U2(ft(), { size: l() })
     ]
   ]);
 }
-var ht2 = new Uint8Array([
+var ht = new Uint8Array([
   45,
   2,
   86,
@@ -51296,7 +52036,7 @@ var Dt = new Uint8Array([
   253,
   154
 ]);
-var Ut2 = new Uint8Array([
+var Ut = new Uint8Array([
   254,
   252,
   153,
@@ -51306,7 +52046,7 @@ var Ut2 = new Uint8Array([
   56,
   107
 ]);
-var Ft = new Uint8Array([
+var Ft2 = new Uint8Array([
   154,
   225,
   16,
@@ -51326,7 +52066,7 @@ var Gt = new Uint8Array([
   103,
   87
 ]);
-var zt = new Uint8Array([
+var zt2 = new Uint8Array([
   6,
   254,
   177,
@@ -51336,7 +52076,7 @@ var zt = new Uint8Array([
   12,
   211
 ]);
-var Wt = new Uint8Array([
+var Wt2 = new Uint8Array([
   225,
   205,
   234,
@@ -51366,7 +52106,7 @@ var Zt = new Uint8Array([
   194,
   32
 ]);
-var en2 = new Uint8Array([
+var en = new Uint8Array([
   253,
   134,
   248,
@@ -51386,7 +52126,7 @@ var nn = new Uint8Array([
   24,
   157
 ]);
-var on2 = new Uint8Array([
+var on = new Uint8Array([
   120,
   198,
   103,
@@ -51416,7 +52156,7 @@ var un = new Uint8Array([
   130,
   0
 ]);
-var ln2 = new Uint8Array([
+var ln = new Uint8Array([
   125,
   78,
   77,
@@ -51426,7 +52166,7 @@ var ln2 = new Uint8Array([
   246,
   14
 ]);
-var On2 = new Uint8Array([
+var On = new Uint8Array([
   78,
   194,
   111,
@@ -51476,61 +52216,60 @@ var vn = new Uint8Array([
   100,
   15
 ]);
-var I8 = "C4PRoFNroxxzdgeCoM31LJjYRg7kT6ymogSTAT99iD1u";
-var H_ = 1367932928;
+var H_2 = 1367932928;
 var K_ = 1367932929;
 var X_2 = 1367932930;
-var j_ = 1367932931;
+var j_2 = 1367932931;
 var J_2 = 1367932932;
-var Z_ = 1367932933;
+var Z_2 = 1367932933;
 var q_ = 1367932934;
-var Q_2 = 1367932935;
-var eR = 1367932936;
-var tR = 1367932937;
-var nR2 = 1367932938;
-var rR2 = 1367932939;
+var Q_ = 1367932935;
+var eR2 = 1367932936;
+var tR2 = 1367932937;
+var nR = 1367932938;
+var rR = 1367932939;
 var aR = 1367932940;
 var oR = 1367932941;
-var sR = 1367932942;
-var cR2 = 1367932943;
-var iR = 1367932944;
+var sR2 = 1367932942;
+var cR = 1367932943;
+var iR2 = 1367932944;
 var _R = 1367932945;
 var RR2 = 1367932946;
-var AR2 = 1367932947;
-var uR2 = 1367932948;
-var dR = 1367932949;
+var AR = 1367932947;
+var uR = 1367932948;
+var dR2 = 1367932949;
 var lR = 1367932950;
 var ER2 = 1367932951;
 var OR = 1367932952;
 var yn;
 process.env.NODE_ENV !== "production" && (yn = {
-  [eR]: "Auth keys cannot expire",
-  [tR]: "New auth keys must be signers",
-  [uR2]: "Cannot add authority key with add_key",
-  [AR2]: "Cannot remove authority key",
+  [eR2]: "Auth keys cannot expire",
+  [tR2]: "New auth keys must be signers",
+  [uR]: "Cannot add authority key with add_key",
+  [AR]: "Cannot remove authority key",
   [_R]: "DrainSolVault CPI failed",
-  [nR2]: "Duplicate key when adjusting auth keys",
+  [nR]: "Duplicate key when adjusting auth keys",
   [OR]: "This feature is not yet support",
-  [iR]: "Insufficient funds in SOL vault",
+  [iR2]: "Insufficient funds in SOL vault",
   [lR]: "Key threshold must be greater than 0",
-  [Z_]: "Key expired",
+  [Z_2]: "Key expired",
   [K_]: "Key index not set",
-  [H_]: "Key index out of bounds",
-  [j_]: "Key did not match profile key",
+  [H_2]: "Key index out of bounds",
+  [j_2]: "Key did not match profile key",
   [q_]: "Key is missing permissions",
-  [dR]: "No keys provided",
-  [Q_2]: "Permissions don't match available",
+  [dR2]: "No keys provided",
+  [Q_]: "Permissions don't match available",
   [X_2]: "Profile did not match profile key",
-  [rR2]: "Role authority has already been set",
-  [cR2]: "Cannot remove role with members",
-  [sR]: "Role limit exceeded",
+  [rR]: "Role authority has already been set",
+  [cR]: "Cannot remove role with members",
+  [sR2]: "Role limit exceeded",
   [oR]: "Role membership is not as expected",
   [aR]: "Role is not accepting new members",
   [J_2]: "Scope did not match profile scope",
   [RR2]: "Key cannot remove itself",
   [ER2]: "Too few authority keys to satisfy threshold"
 });
-var NR2 = {
+var NR = {
   /**
    * Key is an auth key and can update the profile.
    * Key can also edit any permissions on it's own other than AUTH.
@@ -51571,24 +52310,22 @@ var NR2 = {
 };
 
 // node_modules/@aephia/atlas-kit/dist/internal/c4/profile-permissions.js
-var PROFILE_SCOPE = I8;
-var SAGE_SCOPE = s8;
 var PROFILE_PERMISSION_BITS = [
-  [NR2.AUTH, "authenticate"],
-  [NR2.ADD_KEYS, "addKeys"],
-  [NR2.REMOVE_KEYS, "removeKeys"],
-  [NR2.CHANGE_NAME, "changeName"],
-  [NR2.CREATE_ROLE, "createRole"],
-  [NR2.REMOVE_ROLE, "removeRole"],
-  [NR2.SET_AUTHORIZER, "setAuthorizer"],
-  [NR2.JOIN_ROLE, "joinRole"],
-  [NR2.LEAVE_ROLE, "leaveRole"],
-  [NR2.TOGGLE_ACCEPTING_NEW_MEMBERS, "toggleAcceptingNewMembers"],
-  [NR2.ADD_MEMBER, "addMember"],
-  [NR2.REMOVE_MEMBER, "removeMember"]
+  [NR.AUTH, "authenticate"],
+  [NR.ADD_KEYS, "addKeys"],
+  [NR.REMOVE_KEYS, "removeKeys"],
+  [NR.CHANGE_NAME, "changeName"],
+  [NR.CREATE_ROLE, "createRole"],
+  [NR.REMOVE_ROLE, "removeRole"],
+  [NR.SET_AUTHORIZER, "setAuthorizer"],
+  [NR.JOIN_ROLE, "joinRole"],
+  [NR.LEAVE_ROLE, "leaveRole"],
+  [NR.TOGGLE_ACCEPTING_NEW_MEMBERS, "toggleAcceptingNewMembers"],
+  [NR.ADD_MEMBER, "addMember"],
+  [NR.REMOVE_MEMBER, "removeMember"]
 ];
 var GLOBAL_PERMISSION_BITS = [
-  [NR2.DRAIN_SOL_VAULT, "drainSolVault"]
+  [NR.DRAIN_SOL_VAULT, "drainSolVault"]
 ];
 var SAGE_PERMISSION_NAMES = {
   MANAGE_GAME: "manageGame",
@@ -51634,32 +52371,30 @@ var SAGE_PERMISSION_NAMES = {
   DO_RESEARCH: "doResearch",
   DAILY_CHECK_IN: "dailyCheckIn",
   MANAGE_CURRENCY: "manageCurrency",
+  MANAGE_NPC_ENCOUNTERS: "manageNpcEncounters",
   MANAGE_MISSIONS: "manageMissions",
+  MANAGE_FACTIONS: "manageFactions",
+  MANAGE_DIPLOMACY: "manageDiplomacy",
   DO_GOVERNANCE: "doGovernance",
-  MANAGE_MISSION_TREASURIES: "manageMissionTreasuries"
+  MANAGE_MISSION_TREASURIES: "manageMissionTreasuries",
+  DECODE_SDU: "decodeSdu",
+  ACTIVATE_SDU_MISSION: "activateSduMission",
+  CLAIM_ACHIEVEMENTS: "claimAchievements"
 };
-var SAGE_PROGRAM_ONLY_BITS = [
-  [1n << 43n, "manageNpcEncounters"],
-  [1n << 45n, "manageFactions"],
-  [1n << 46n, "manageDiplomacy"]
-];
 function sagePermissionBits() {
-  return [
-    ...Object.entries(SAGE_PERMISSION_NAMES).map(([flag, name]) => [lge[flag], name]),
-    ...SAGE_PROGRAM_ONLY_BITS
-  ].sort(([a], [b8]) => a < b8 ? -1 : 1);
+  return Object.entries(SAGE_PERMISSION_NAMES).map(([flag, name]) => [GPe[flag], name]).sort(([a], [b2]) => a < b2 ? -1 : 1);
 }
 var SAGE_PERMISSION_BITS = /* @__PURE__ */ sagePermissionBits();
-function permissionBitsForScope(scope) {
-  const scoped = scope === PROFILE_SCOPE ? PROFILE_PERMISSION_BITS : scope === SAGE_SCOPE ? SAGE_PERMISSION_BITS : [];
+function permissionBitsForScope(programs, scope) {
+  const scoped = scope === programs.playerProfile ? PROFILE_PERMISSION_BITS : scope === programs.sage ? SAGE_PERMISSION_BITS : [];
   return [...scoped, ...GLOBAL_PERMISSION_BITS];
 }
-function translatePermissions(raw, scope) {
-  return permissionBitsForScope(scope).flatMap(([flag, permission]) => (raw & flag) !== 0n ? [permission] : []);
+function translatePermissions(programs, raw, scope) {
+  return permissionBitsForScope(programs, scope).flatMap(([flag, permission]) => (raw & flag) !== 0n ? [permission] : []);
 }
 
 // node_modules/@aephia/atlas-kit/dist/internal/c4/identity.js
-var PROFILE_DISCRIMINATOR2 = /* @__PURE__ */ immutableBytes(gt);
+var PROFILE_DISCRIMINATOR2 = /* @__PURE__ */ immutableBytes(gt2);
 var PROFILE_MINIMUM_DATA_LENGTH = 30;
 var PROFILE_KEY_DATA_LENGTH = 80;
 function validateProfileShape(account) {
@@ -51669,7 +52404,7 @@ function validateProfileShape(account) {
     throw new AccountDecodeError("profile", account.address, new RangeError(`Profile declares ${keyCount} keys and requires ${expectedLength} bytes, received ${account.data.length}.`));
   }
 }
-function translateProfile(profile) {
+function translateProfile(profile, _account, programs) {
   return {
     authKeyCount: profile.authKeyCount,
     createdAt: profile.createdAt,
@@ -51680,7 +52415,7 @@ function translateProfile(profile) {
         address: key.key,
         ...key.expireTime < 0n ? {} : { expiresAt: key.expireTime },
         expiresAtRaw: key.expireTime,
-        permissions: translatePermissions(permissionsRaw, key.scope),
+        permissions: translatePermissions(programs, permissionsRaw, key.scope),
         permissionsRaw,
         scope: key.scope
       };
@@ -51691,7 +52426,7 @@ function translateProfile(profile) {
 }
 var PROFILE_RULE = {
   type: "profile",
-  programAddress: I8,
+  program: "playerProfile",
   discriminator: PROFILE_DISCRIMINATOR2,
   length: PROFILE_MINIMUM_DATA_LENGTH,
   validateShape: validateProfileShape
@@ -51763,12 +52498,12 @@ async function maybeGetProfile(ctx, address2, options) {
 }
 async function getCharacterForProfile(ctx, profileAddress, options) {
   const game = requireGameAddress(ctx);
-  const characterAddress = await findCharacterPda(profileAddress, game);
+  const characterAddress = await findCharacterPda(ctx.programs, profileAddress, game);
   return toValidatedCharacterSnapshot(await ctx.data.read(characterAccountDefinition, characterAddress, options), profileAddress, game);
 }
 async function maybeGetCharacterForProfile(ctx, profileAddress, options) {
   const game = requireGameAddress(ctx);
-  const characterAddress = await findCharacterPda(profileAddress, game);
+  const characterAddress = await findCharacterPda(ctx.programs, profileAddress, game);
   const [envelope] = await ctx.data.readMany(characterAccountDefinition, [characterAddress], options);
   return envelope === void 0 ? void 0 : toValidatedCharacterSnapshot(envelope, profileAddress, game);
 }
@@ -51922,11 +52657,11 @@ function assertCelestialBodyMembership(body, system) {
     return;
   throw new AccountDecodeError("celestialBody", body.address, new RangeError("The decoded StarSystem does not contain the CelestialBody relationship."), `StarSystem ${system.address} does not list CelestialBody ${body.address}, despite that body referencing the system. Refresh both accounts and verify the configured cluster before retrying.`);
 }
-async function findStarSystemPda(game, systemId) {
-  return deriveStarSystemAddress(game, systemId);
+async function findStarSystemPda(programs, game, systemId) {
+  return deriveStarSystemAddress(programs, game, systemId);
 }
-async function findCelestialBodyPda(game, bodyId) {
-  return deriveCelestialBodyAddress(game, bodyId);
+async function findCelestialBodyPda(programs, game, bodyId) {
+  return deriveCelestialBodyAddress(programs, game, bodyId);
 }
 async function getStarSystem(ctx, address2, options) {
   requireGameAddress(ctx);
@@ -51938,7 +52673,7 @@ async function maybeGetStarSystem(ctx, address2, options) {
   return envelope === void 0 ? void 0 : toStarSystemSnapshot(ctx, envelope);
 }
 async function getStarSystemById(ctx, systemId, options) {
-  const system = await getStarSystem(ctx, await findStarSystemPda(requireGameAddress(ctx), systemId), options);
+  const system = await getStarSystem(ctx, await findStarSystemPda(ctx.programs, requireGameAddress(ctx), systemId), options);
   if (system.systemId === systemId)
     return system;
   throw new AccountDecodeError("starSystem", system.address, new RangeError("The decoded StarSystem id contradicted the requested id."), `StarSystem ${system.address} requested id ${systemId} but decoded id ${system.systemId}. Refresh the account and verify the configured cluster and pinned binding version before retrying.`);
@@ -51965,7 +52700,7 @@ async function maybeGetCelestialBody(ctx, address2, options) {
   return envelope === void 0 ? void 0 : toCelestialBodySnapshot(ctx, envelope);
 }
 async function getCelestialBodyById(ctx, bodyId, options) {
-  const body = await getCelestialBody(ctx, await findCelestialBodyPda(requireGameAddress(ctx), bodyId), options);
+  const body = await getCelestialBody(ctx, await findCelestialBodyPda(ctx.programs, requireGameAddress(ctx), bodyId), options);
   if (body.id === bodyId)
     return body;
   throw new AccountDecodeError("celestialBody", body.address, new RangeError("The decoded CelestialBody id contradicted the requested id."), `CelestialBody ${body.address} requested id ${bodyId} but decoded id ${body.id}. Refresh the account and verify the configured cluster and pinned binding version before retrying.`);
@@ -52104,7 +52839,7 @@ async function maybeGetStarbasePlayer(context, address2, options) {
 }
 async function getStarbasePlayerForCharacterAtSystem(context, character, system, options) {
   requireGameAddress(context);
-  const address2 = await deriveStarbasePlayerAddress(system, character);
+  const address2 = await deriveStarbasePlayerAddress(context.programs, system, character);
   const envelope = await context.data.read(starbasePlayerAccountDefinition, address2, options);
   if (envelope.data.character !== character || envelope.data.system !== system) {
     throw new AccountDecodeError("starbasePlayer", address2, new RangeError("The decoded StarbasePlayer contradicted its PDA seeds."), `The Starbase Player at ${address2} does not reference the requested Character and Star System. Verify both addresses, the configured cluster, and pinned binding version before retrying.`);
