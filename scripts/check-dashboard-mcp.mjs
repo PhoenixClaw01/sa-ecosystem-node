@@ -118,24 +118,28 @@ if (initialized.result?.serverInfo?.version !== serverVersion) {
 await post({ jsonrpc: "2.0", method: "notifications/initialized" });
 
 const listed = await post({ jsonrpc: "2.0", id: 2, method: "tools/list", params: {} });
-const names = new Set((listed.result?.tools ?? []).map((tool) => tool.name));
-const required = [
-  "dao_overview",
-  "treasury_balances",
-  "pip_tracker",
-  "list_categories",
-  "galaxy_overview",
-  "hub_updates",
-  "list_listings",
-  "search_hub",
-  "player_legacy",
-  "player_story",
-  "data_health",
-];
-const missing = required.filter((name) => !names.has(name));
-if (missing.length > 0) {
-  console.error(`tools/list is missing ${missing.join(", ")}`);
+const tools = listed.result?.tools ?? [];
+const names = new Set(tools.map((tool) => tool.name));
+const toolFile = readFileSync("src/tool-names.ts", "utf8");
+const expected = [...toolFile.matchAll(/"([a-z0-9_]+)"/g)].map((match) => match[1]);
+if (expected.length !== 24 || names.size !== 24) {
+  console.error(`tools/list returned ${names.size} tools; READ_ONLY_TOOLS has ${expected.length}. Expected 24.`);
+  process.exit(1);
+}
+if (names.has("submit_hub_update")) {
+  console.error("tools/list includes submit_hub_update.");
+  process.exit(1);
+}
+const missing = expected.filter((name) => !names.has(name));
+const extra = [...names].filter((name) => !expected.includes(name));
+if (missing.length > 0 || extra.length > 0) {
+  console.error(`tools/list does not match READ_ONLY_TOOLS. Missing ${missing.join(", ") || "none"}. Extra ${extra.join(", ") || "none"}.`);
+  process.exit(1);
+}
+const writable = tools.filter((tool) => tool.annotations?.readOnlyHint !== true).map((tool) => tool.name);
+if (writable.length > 0) {
+  console.error(`tools/list is missing readOnlyHint: true on ${writable.join(", ")}.`);
   process.exit(1);
 }
 
-console.log(`bundle ok: ${names.size} tools`);
+console.log(`bundle ok: ${names.size} read-only tools`);

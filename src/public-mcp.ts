@@ -1,6 +1,7 @@
 import { publicErrorMessage } from "./errors.js";
 import type { NodeHandler } from "./handler.js";
 import { h2hFeedResponse, type H2hFeeds } from "./h2h/routes.js";
+import { createToolTelemetry, type ToolTelemetry, type WaitUntil } from "./telemetry.js";
 
 /** Public ecosystem node. The dashboard project serves this path. */
 export const PUBLIC_MCP_URL = "https://sa-ecosystem-node-dashboard.vercel.app/api/mcp";
@@ -45,15 +46,27 @@ export function jsonRpcError(message: string, status = 500): Response {
  */
 export function createPublicMcpFetch(
   handler: NodeHandler,
-  options?: { timeoutMs?: number; maxBytes?: number; maxRequestBytes?: number; feeds?: H2hFeeds },
+  options?: {
+    timeoutMs?: number;
+    maxBytes?: number;
+    maxRequestBytes?: number;
+    feeds?: H2hFeeds;
+    /** Pass null to force telemetry off. Omit it to read operator env, which is off until a sink URL is set. */
+    telemetry?: ToolTelemetry | null;
+    /** Read during a sink send. The public entry supplies the Vercel request context. */
+    waitUntil?: () => WaitUntil | undefined;
+  },
 ): (request: Request) => Promise<Response> {
   const timeoutMs = options?.timeoutMs ?? REQUEST_TIMEOUT_MS;
   const maxBytes = options?.maxBytes ?? MAX_RESPONSE_BYTES;
   const maxRequestBytes = options?.maxRequestBytes ?? MAX_REQUEST_BYTES;
+  const telemetry = resolveTelemetry(options);
 
   return async (request: Request): Promise<Response> => {
     if (request.method === "OPTIONS") return withCors(new Response(null, { status: 204 }));
 
+    const started = Date.now();
+    let observed: Awaited<ReturnType<ToolTelemetry["observe"]>> = null;
     let timer: ReturnType<typeof setTimeout> | undefined;
     const pending = (async () => {
       if (options?.feeds) {
@@ -62,6 +75,13 @@ export function createPublicMcpFetch(
       }
       const prepared = await limitedRequest(request, maxRequestBytes);
       if (prepared instanceof Response) return prepared;
+      if (telemetry) {
+        try {
+          observed = await telemetry.observe(prepared.clone(), request.headers.get("user-agent"));
+        } catch {
+          observed = null;
+        }
+      }
       return handler.fetch(prepared);
     })().catch((error: unknown) => jsonRpcError(publicErrorMessage(error)));
     const timeout = new Promise<Response>((resolve) => {
@@ -69,19 +89,64 @@ export function createPublicMcpFetch(
     });
     try {
       const response = await Promise.race([pending, timeout]);
-      const bytes = await response.arrayBuffer();
+      const bytes = new Uint8Array(await response.arrayBuffer());
       if (bytes.byteLength > maxBytes) {
-        return jsonRpcError("The response exceeded the size cap. No partial data was returned.", 413);
+        const outgoing = jsonRpcError("The response exceeded the size cap. No partial data was returned.", 413);
+        await reportResponse(telemetry, observed, outgoing, started);
+        return outgoing;
       }
       const headers = new Headers(response.headers);
       headers.set("content-length", String(bytes.byteLength));
+      reportBytes(telemetry, observed, bytes, response.status, started);
       return withCors(new Response(bytes, { status: response.status, statusText: response.statusText, headers }));
     } catch (error) {
-      return jsonRpcError(publicErrorMessage(error));
+      const outgoing = jsonRpcError(publicErrorMessage(error));
+      await reportResponse(telemetry, observed, outgoing, started);
+      return outgoing;
     } finally {
       if (timer) clearTimeout(timer);
     }
   };
+}
+
+function resolveTelemetry(options?: {
+  telemetry?: ToolTelemetry | null;
+  waitUntil?: () => WaitUntil | undefined;
+}): ToolTelemetry | null {
+  if (options && Object.prototype.hasOwnProperty.call(options, "telemetry")) {
+    return options.telemetry?.enabled ? options.telemetry : null;
+  }
+  const fromEnv = createToolTelemetry({ waitUntil: options?.waitUntil });
+  return fromEnv.enabled ? fromEnv : null;
+}
+
+function reportBytes(
+  telemetry: ToolTelemetry | null,
+  observed: Awaited<ReturnType<ToolTelemetry["observe"]>>,
+  bytes: Uint8Array,
+  status: number,
+  started: number,
+): void {
+  if (!telemetry) return;
+  try {
+    telemetry.finish(observed, bytes, status, started);
+  } catch {
+    // Telemetry never changes the MCP response.
+  }
+}
+
+async function reportResponse(
+  telemetry: ToolTelemetry | null,
+  observed: Awaited<ReturnType<ToolTelemetry["observe"]>>,
+  response: Response,
+  started: number,
+): Promise<void> {
+  if (!telemetry) return;
+  try {
+    reportBytes(telemetry, observed, new Uint8Array(await response.clone().arrayBuffer()), response.status, started);
+  } catch {
+    // Telemetry never changes the MCP response.
+  }
 }
 
 const REQUEST_TOO_LARGE = "The request exceeded the size cap.";

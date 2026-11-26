@@ -325,7 +325,9 @@ Live balances still answer when the cache file is absent. History and payment to
 
 ## Public MCP endpoint
 
-The live read-only endpoint is [https://sa-ecosystem-node-dashboard.vercel.app/api/mcp](https://sa-ecosystem-node-dashboard.vercel.app/api/mcp). No API key. A short discovery file is at [https://sa-ecosystem-node-dashboard.vercel.app/.well-known/mcp.json](https://sa-ecosystem-node-dashboard.vercel.app/.well-known/mcp.json).
+The live read-only endpoint is [https://sa-ecosystem-node-dashboard.vercel.app/api/mcp](https://sa-ecosystem-node-dashboard.vercel.app/api/mcp). No sign-in and no API key. A short discovery file is at [https://sa-ecosystem-node-dashboard.vercel.app/.well-known/mcp.json](https://sa-ecosystem-node-dashboard.vercel.app/.well-known/mcp.json). [`server.json`](server.json) is the MCP Registry document for that remote endpoint (`io.github.PhoenixClaw01/sa-ecosystem-node`, schema `2025-12-11`). This repository does not publish that file to the registry.
+
+Tool-outcome telemetry is off unless an operator sets `MCP_TELEMETRY_URL`. A stock node makes no telemetry request. The event is the tool name, time, a coarse environment, a coarse client family, the outcome, a result count, latency, and an error class, plus fixed enum fields. It does not include wallet addresses, search text, or IP addresses. See [docs/telemetry.md](docs/telemetry.md).
 
 Cursor, in `~/.cursor/mcp.json` or the project `.cursor/mcp.json`:
 
