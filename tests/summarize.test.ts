@@ -58,9 +58,9 @@ describe("game summaries", () => {
     expect(fleet.ships).toEqual([{ name: "Fimbul", mint: "Mint111", sizeClass: "small", quantity: "2" }]);
     expect(JSON.stringify(fleet)).not.toContain("bigint");
   });
-});
 
   it("counts a __proto__ starbase level without writing to Object.prototype", () => {
+    const prototypeKeys = Object.getOwnPropertyNames(Object.prototype);
     const system = (name: string, level: string) =>
       summarizeStarSystem({
         address: name,
@@ -71,12 +71,29 @@ describe("game summaries", () => {
         celestialBodyCount: 0,
         starbase: { owner: "owner", level },
       });
-    const result = summarizeGalaxyActivity([system("A", "__proto__"), system("B", "constructor"), system("C", "level-1")]);
+    const result = summarizeGalaxyActivity([
+      system("A", "__proto__"),
+      system("B", "constructor"),
+      system("C", "prototype"),
+      system("D", "level-1"),
+    ]);
     expect(Object.getPrototypeOf(result.starbaseLevels)).toBeNull();
-    expect(Object.getOwnPropertyNames(result.starbaseLevels).sort()).toEqual(["__proto__", "constructor", "level-1"]);
+    expect(Object.getOwnPropertyNames(result.starbaseLevels).sort()).toEqual(["__proto__", "constructor", "level-1", "prototype"]);
     expect(result.starbaseLevels["__proto__"]).toBe(1);
     expect(result.starbaseLevels.constructor).toBe(1);
+    expect(result.starbaseLevels.prototype).toBe(1);
     expect(result.starbaseLevels["level-1"]).toBe(1);
-    expect(Object.prototype).not.toHaveProperty("__testPollution");
+    expect(Object.getOwnPropertyNames(Object.prototype)).toEqual(prototypeKeys);
+
+    const roundTrip = JSON.parse(JSON.stringify({ activity: result })) as {
+      activity: { starbaseLevels: Record<string, number> };
+    };
+    const levels = roundTrip.activity.starbaseLevels;
+    expect(Object.getOwnPropertyDescriptor(levels, "__proto__")).toMatchObject({ value: 1, enumerable: true });
+    expect(levels["constructor"]).toBe(1);
+    expect(levels["prototype"]).toBe(1);
+    expect(levels["level-1"]).toBe(1);
+    expect(Object.getOwnPropertyNames(Object.prototype)).toEqual(prototypeKeys);
   });
+});
 
