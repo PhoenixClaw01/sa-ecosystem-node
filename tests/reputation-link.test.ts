@@ -303,8 +303,9 @@ describe("reputation-link kind", () => {
       expect(text).not.toContain("kinds");
       expect(text).not.toContain("player-tools");
     }
-    expect(existsSync("hub/signers/player-tools.json")).toBe(false);
-    expect(existsSync("dashboard/hub/signers/player-tools.json")).toBe(false);
+    // The player-tools file is prepared for the M6 switch and is not a live set.
+    expect(existsSync("hub/signers/player-tools.json")).toBe(true);
+    expect(existsSync("dashboard/hub/signers/player-tools.json")).toBe(true);
   });
 });
 
