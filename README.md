@@ -4,7 +4,7 @@ A read-only ecosystem node inspired by Star Atlas. It is an MCP server anyone ca
 
 This is not an ATMTA product, and the product name is not Star Atlas. It holds no funds, no game keys, and no Council keys. The server does not sign, and it does not write to any chain.
 
-**Status:** public v1.0.2. Game reads use the z.ink test realm. Treasury, proposals, and player records use public mainnet data. Licensed under [Apache-2.0](LICENSE) ([NOTICE](NOTICE)). Hub listings, guild records, descriptions, and lore are CC BY 4.0, as the hub repository states. Each project keeps the rights to its own name and logo.
+**Status:** public v1.0.3. Game reads use the z.ink test realm. Treasury, proposals, and player records use public mainnet data. Licensed under [Apache-2.0](LICENSE) ([NOTICE](NOTICE)). Hub listings, guild records, descriptions, and lore are CC BY 4.0, as the hub repository states. Each project keeps the rights to its own name and logo.
 
 **New here?** One-screen plug-in page: [PLUG-IN.md](PLUG-IN.md).
 
@@ -13,7 +13,7 @@ The public node is [https://sa-ecosystem-node-dashboard.vercel.app](https://sa-e
 This deployment uses threshold 2 with `HUB_ALLOW_AUTHOR_APPROVAL=true`. Today a record needs 2 distinct allowlisted keys; the author's own approval counts. Since M5 the live approvals are two Phoenix agent keys in `hub/signers/agents.json`: the Phoenix Collective author and Phoenix reviewer. The player wallet stays on the default allowlist and is not that second approval. `HUB_GIT_REPO`, `HUB_GIT_COMMIT`, and `HUB_STORE_MANIFEST_HASH` are set. On 1 November 2026 the pinned commit was `f064f18db1da60c4f3e562d4064c8f344042e97e`.
 
 - [Plug in (one screen)](PLUG-IN.md)
-- [Spec v1.0.2](docs/spec.md)
+- [Spec v1.0.3](docs/spec.md)
 - [Hosting](docs/hosting.md)
 - [Decentralization](docs/decentralization.md) (what is live, then the later design)
 - [Claim and verify](docs/claim-and-verify.md)
@@ -330,7 +330,9 @@ Live balances still answer when the cache file is absent. History and payment to
 
 The live read-only endpoint is [https://sa-ecosystem-node-dashboard.vercel.app/api/mcp](https://sa-ecosystem-node-dashboard.vercel.app/api/mcp). No sign-in and no API key. A short discovery file is at [https://sa-ecosystem-node-dashboard.vercel.app/.well-known/mcp.json](https://sa-ecosystem-node-dashboard.vercel.app/.well-known/mcp.json). [`server.json`](server.json) is the MCP Registry document for that remote endpoint (`io.github.PhoenixClaw01/sa-ecosystem-node`, schema `2025-12-11`). The official registry lists that name at version `1.0.2`.
 
-Tool-outcome telemetry is off unless an operator sets `MCP_TELEMETRY_URL`. A stock node makes no telemetry request. The event is the tool name, time, a coarse environment, a coarse client family, the outcome, a result count, latency, and an error class, plus fixed enum fields. It does not include wallet addresses, search text, or IP addresses. See [docs/telemetry.md](docs/telemetry.md).
+A machine-readable index for agents is [llms.txt](llms.txt), also served at [https://sa-ecosystem-node-dashboard.vercel.app/llms.txt](https://sa-ecosystem-node-dashboard.vercel.app/llms.txt).
+
+Tool-outcome telemetry writes one JSON line to stdout by default, so any fork or host log collector gets observability with no vendor lock-in. Set `MCP_TELEMETRY_SINK=off` to silence it. An optional HTTP POST (`MCP_TELEMETRY_URL`) or a custom callback stays off until configured. The event is the tool name, time, a coarse environment, a coarse client family, a self-traffic flag, the outcome, a result count, latency, and an error class, plus fixed enum fields. It does not include wallet addresses, search text, IP addresses, raw User-Agent strings, or auth headers. See [docs/telemetry.md](docs/telemetry.md).
 
 Cursor, in `~/.cursor/mcp.json` or the project `.cursor/mcp.json`:
 
@@ -378,7 +380,7 @@ The in-memory rate limiter is a placeholder. It resets when the process restarts
 ## Checks
 
 ```bash
-npm run lint && npm run typecheck && npm test
+npm run verify
 ```
 
-GitHub Actions runs those three on push and pull request. Tests do not hit the network.
+That one command runs lint, typecheck, the offline test suite, the TypeScript build, and the dashboard bundle check. No API key is required. GitHub Actions runs the same command, then `npm run record-mcp` and a bundle freshness diff, on push and pull request. Tests do not hit the network.

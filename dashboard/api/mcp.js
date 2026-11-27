@@ -178,6 +178,9 @@ var READ_ONLY_TOOLS = [
 var TOOL_OUTCOMES = ["ok", "empty", "unmatched", "invalid_args", "error"];
 var CLIENT_FAMILIES = ["cursor", "claude", "vscode", "chatgpt", "browser", "node", "unknown"];
 var ERROR_CLASSES = ["invalid_args", "timeout", "unavailable", "upstream", "rate_limited", "internal"];
+var SELF_TRAFFIC_AGENT_HEADER = "x-phoenix-agent";
+var SELF_TRAFFIC_SWEEP_HEADER = "x-phoenix-sweep";
+var SELF_USER_AGENT = /phoenixcollectiveagent|phoenix-mcp-smoke/i;
 var TELEMETRY_META_FIELDS = [
   "stream",
   "category",
@@ -257,67 +260,93 @@ var COUNT_FIELD = {
   treasury_balances: { kind: "array", field: "wallets" },
   pip_tracker: { kind: "number", field: "rowCount" }
 };
-function readTelemetryConfig(env = process.env) {
+function readTelemetryConfig(env = process.env, options) {
+  const write = options?.write ?? defaultStdoutWrite;
+  if (options?.sink) {
+    return {
+      kind: "custom",
+      url: null,
+      key: null,
+      env: coarseEnv(env),
+      timeoutMs: timeoutMs(env.MCP_TELEMETRY_TIMEOUT_MS),
+      rest: false,
+      fetch: options.fetch ?? globalThis.fetch,
+      sink: options.sink,
+      write,
+      waitUntil: options.waitUntil
+    };
+  }
+  const mode = sinkMode(env.MCP_TELEMETRY_SINK);
+  if (mode === "off") return null;
   const url2 = sinkUrl(env.MCP_TELEMETRY_URL);
-  if (!url2) return null;
-  return {
-    url: url2,
-    key: sinkKey(env.MCP_TELEMETRY_KEY),
-    env: coarseEnv(env),
-    timeoutMs: timeoutMs(env.MCP_TELEMETRY_TIMEOUT_MS),
-    rest: restTable(url2),
-    fetch: globalThis.fetch
-  };
+  if (mode === "http") {
+    if (!url2) return null;
+    return httpConfig(env, url2, "http", options, write);
+  }
+  if (mode === "both") {
+    if (url2) return httpConfig(env, url2, "both", options, write);
+    return stdoutConfig(env, options, write);
+  }
+  if (mode === "stdout") return stdoutConfig(env, options, write);
+  if (url2) return httpConfig(env, url2, "http", options, write);
+  if (isTestEnv(env)) return null;
+  return stdoutConfig(env, options, write);
 }
 function createToolTelemetry(options) {
-  const config2 = readTelemetryConfig(options?.env ?? process.env);
+  const config2 = readTelemetryConfig(options?.env ?? process.env, options);
   if (!config2) return disabledTelemetry();
-  if (options?.fetch) config2.fetch = options.fetch;
-  if (options?.waitUntil) config2.waitUntil = options.waitUntil;
   let chain = Promise.resolve();
   const telemetry = {
     enabled: true,
+    sinkKind: config2.kind,
     observe,
     finish(observed, body, status2, startedAtMs) {
-      if (!observed || observed.calls.length === 0) return;
-      let payload;
       try {
-        payload = parseRpcBody(body);
-      } catch {
-        payload = null;
-      }
-      const calledAt = new Date(startedAtMs).toISOString();
-      const latencyMs = Math.max(0, Date.now() - startedAtMs);
-      const only = observed.calls.length === 1;
-      for (const call of observed.calls) {
+        if (!observed || observed.calls.length === 0) return;
+        let payload;
         try {
-          const message = messageFor(payload, call.id, only);
-          const classified = classifyCall(call, message, status2);
-          const event = sealEvent(call, classified, config2.env, calledAt, latencyMs);
-          if (event) send(config2, event, (work) => {
-            chain = chain.then(() => work).catch(() => void 0);
-          });
+          payload = parseRpcBody(body);
         } catch {
+          payload = null;
         }
+        const calledAt = new Date(startedAtMs).toISOString();
+        const latencyMs = Math.max(0, Date.now() - startedAtMs);
+        const only = observed.calls.length === 1;
+        for (const call of observed.calls) {
+          try {
+            const message = messageFor(payload, call.id, only);
+            const classified = classifyCall(call, message, status2);
+            const event = sealEvent(call, classified, config2.env, calledAt, latencyMs);
+            if (event) send(config2, event, (work) => {
+              chain = chain.then(() => work).catch(() => void 0);
+            });
+          } catch {
+          }
+        }
+      } catch {
       }
     },
-    noteStatus(userAgent, status2) {
-      telemetry.finish(
-        {
-          calls: [
-            {
-              id: null,
-              tool: "unknown",
-              meta: {},
-              clientFamily: clientFamily(userAgent),
-              lookupFiltered: false
-            }
-          ]
-        },
-        new Uint8Array(),
-        status2,
-        Date.now()
-      );
+    noteStatus(userAgent, status2, headers) {
+      try {
+        telemetry.finish(
+          {
+            calls: [
+              {
+                id: null,
+                tool: "unknown",
+                meta: {},
+                clientFamily: clientFamily(userAgent),
+                selfTraffic: isSelfTraffic(headers ?? null, userAgent),
+                lookupFiltered: false
+              }
+            ]
+          },
+          new Uint8Array(),
+          status2,
+          Date.now()
+        );
+      } catch {
+      }
     },
     settled: () => chain
   };
@@ -377,6 +406,7 @@ function clientFamily(userAgent) {
 function disabledTelemetry() {
   return {
     enabled: false,
+    sinkKind: "off",
     async observe() {
       return null;
     },
@@ -387,6 +417,71 @@ function disabledTelemetry() {
     settled: () => Promise.resolve()
   };
 }
+function stdoutConfig(env, options, write) {
+  return {
+    kind: "stdout",
+    url: null,
+    key: null,
+    env: coarseEnv(env),
+    timeoutMs: timeoutMs(env.MCP_TELEMETRY_TIMEOUT_MS),
+    rest: false,
+    fetch: options?.fetch ?? globalThis.fetch,
+    write,
+    waitUntil: options?.waitUntil
+  };
+}
+function httpConfig(env, url2, kind, options, write) {
+  return {
+    kind,
+    url: url2,
+    key: sinkKey(env.MCP_TELEMETRY_KEY),
+    env: coarseEnv(env),
+    timeoutMs: timeoutMs(env.MCP_TELEMETRY_TIMEOUT_MS),
+    rest: restTable(url2),
+    fetch: options?.fetch ?? globalThis.fetch,
+    write,
+    waitUntil: options?.waitUntil
+  };
+}
+function ignoreTelemetryStdoutError(_error) {
+  void _error;
+}
+function ensureStdoutErrorGuard() {
+  if (process.stdout.listeners("error").includes(ignoreTelemetryStdoutError)) return;
+  process.stdout.on("error", ignoreTelemetryStdoutError);
+}
+function defaultStdoutWrite(line) {
+  try {
+    ensureStdoutErrorGuard();
+    process.stdout.write(`${line}
+`);
+  } catch {
+  }
+}
+function isSelfTraffic(headers, userAgent) {
+  try {
+    const marker = headers?.get(SELF_TRAFFIC_AGENT_HEADER);
+    if (marker !== null && marker !== void 0 && marker.trim() !== "") return true;
+    const sweep = headers?.get(SELF_TRAFFIC_SWEEP_HEADER);
+    if (sweep !== null && sweep !== void 0 && sweep.trim() !== "") return true;
+    const ua2 = userAgent ?? headers?.get("user-agent") ?? "";
+    return SELF_USER_AGENT.test(ua2);
+  } catch {
+    return false;
+  }
+}
+function sinkMode(value) {
+  const raw = value?.trim().toLowerCase() ?? "";
+  if (!raw) return null;
+  if (raw === "off" || raw === "noop" || raw === "false" || raw === "0") return "off";
+  if (raw === "stdout" || raw === "log") return "stdout";
+  if (raw === "http") return "http";
+  if (raw === "both") return "both";
+  return null;
+}
+function isTestEnv(env) {
+  return Boolean(env.VITEST) || env.NODE_ENV === "test";
+}
 async function observe(request, userAgent) {
   if (request.method !== "POST") return null;
   let payload;
@@ -396,6 +491,7 @@ async function observe(request, userAgent) {
     return null;
   }
   const family = clientFamily(userAgent);
+  const selfTraffic = isSelfTraffic(request.headers, userAgent);
   const calls = [];
   for (const message of rpcMessages(payload)) {
     if (!message || typeof message !== "object" || Array.isArray(message)) continue;
@@ -410,6 +506,7 @@ async function observe(request, userAgent) {
       tool: name,
       meta: argumentMeta(name, args),
       clientFamily: family,
+      selfTraffic,
       lookupFiltered: name === "claim_status" && identityPresent(args)
     });
   }
@@ -427,6 +524,24 @@ function send(config2, event, track) {
   } catch {
     return;
   }
+  if (config2.kind === "stdout" || config2.kind === "both" || config2.kind === "custom") {
+    try {
+      if (config2.kind === "custom" && config2.sink) {
+        const result = config2.sink(event);
+        if (result && typeof result.then === "function") {
+          const work2 = Promise.resolve(result).then(() => void 0).catch(() => void 0);
+          track(work2);
+          attachWaitUntil(config2, work2);
+        }
+      } else {
+        config2.write(body);
+      }
+    } catch {
+    }
+    if (config2.kind !== "both") return;
+  }
+  const url2 = config2.url;
+  if (!url2) return;
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), config2.timeoutMs);
   if (typeof timer === "object" && timer && "unref" in timer && typeof timer.unref === "function") timer.unref();
@@ -442,7 +557,7 @@ function send(config2, event, track) {
     }
   }
   const work = Promise.resolve().then(
-    () => config2.fetch(config2.url, {
+    () => config2.fetch(url2, {
       method: "POST",
       headers,
       body,
@@ -451,6 +566,9 @@ function send(config2, event, track) {
     })
   ).then(() => void 0).catch(() => void 0).finally(() => clearTimeout(timer));
   track(work);
+  attachWaitUntil(config2, work);
+}
+function attachWaitUntil(config2, work) {
   const waitUntil = config2.waitUntil?.() ?? resolveRequestWaitUntil();
   if (typeof waitUntil === "function") {
     try {
@@ -470,6 +588,7 @@ function sealEvent(call, classified, env, calledAt, latencyMs) {
     called_at: calledAt,
     env,
     client_family: call.clientFamily,
+    self_traffic: call.selfTraffic === true,
     outcome: classified.outcome,
     result_count: sanitizeCount(classified.result_count),
     latency_ms: latency,
@@ -30171,7 +30290,7 @@ function summarizeFleet(input) {
 
 // src/version.ts
 var SERVER_NAME = "sa-ecosystem-node";
-var SERVER_VERSION = "1.0.2";
+var SERVER_VERSION = "1.0.3";
 
 // src/server.ts
 var DEFAULT_SYSTEM_LIMIT = 100;

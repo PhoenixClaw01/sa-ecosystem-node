@@ -1,10 +1,13 @@
 import { READ_ONLY_TOOLS } from "./tool-names.js";
 
 /**
- * Optional tool-outcome telemetry for operators who self-host this node.
- * Off unless `MCP_TELEMETRY_URL` is set. No URL means no outbound call.
+ * Vendor-neutral tool-outcome telemetry. The default sink writes one JSON
+ * line to stdout, which works on Vercel, Cloudflare, Fly, Docker, or a
+ * local process. An HTTP POST or a custom callback is optional and off
+ * until configured. A sink error never changes the MCP response.
  * The event is a fixed set of fields. Wallets, player ids, search text,
- * IP addresses, and raw request bodies are not fields of that event.
+ * IP addresses, raw User-Agent or client names, auth headers, and raw
+ * request bodies are not fields of that event.
  */
 
 export const TOOL_OUTCOMES = ["ok", "empty", "unmatched", "invalid_args", "error"] as const;
@@ -21,11 +24,23 @@ export const TELEMETRY_FIELDS = [
   "called_at",
   "env",
   "client_family",
+  "self_traffic",
   "outcome",
   "result_count",
   "latency_ms",
   "error_class",
 ] as const;
+
+/** Marks operator or smoke traffic. The header value is never copied into the event. */
+export const SELF_TRAFFIC_AGENT_HEADER = "x-phoenix-agent";
+export const SELF_TRAFFIC_SWEEP_HEADER = "x-phoenix-sweep";
+const SELF_USER_AGENT = /phoenixcollectiveagent|phoenix-mcp-smoke/i;
+
+export const TELEMETRY_SINK_KINDS = ["off", "stdout", "http", "both", "custom"] as const;
+export type TelemetrySinkKind = (typeof TELEMETRY_SINK_KINDS)[number];
+
+/** A custom sink. It must not throw into the MCP response; the caller still fail-opens. */
+export type TelemetrySink = (event: Record<string, unknown>) => void | Promise<void>;
 
 export const TELEMETRY_META_FIELDS = [
   "stream",
@@ -117,10 +132,11 @@ export type WaitUntil = (promise: Promise<unknown>) => void;
 
 export interface ToolTelemetry {
   readonly enabled: boolean;
+  readonly sinkKind: TelemetrySinkKind;
   observe(request: Request, userAgent: string | null): Promise<ObservedCall | null>;
   finish(observed: ObservedCall | null, body: Uint8Array, status: number, startedAtMs: number): void;
   /** Record an HTTP denial, such as a Node rate limit, without reading a body or an address. */
-  noteStatus(userAgent: string | null, status: number): void;
+  noteStatus(userAgent: string | null, status: number, headers?: Headers | null): void;
   settled(): Promise<void>;
 }
 
@@ -133,16 +149,20 @@ interface PendingCall {
   tool: string;
   meta: Record<string, string | boolean>;
   clientFamily: ClientFamily;
+  selfTraffic: boolean;
   lookupFiltered: boolean;
 }
 
 interface TelemetryConfig {
-  url: string;
+  kind: Exclude<TelemetrySinkKind, "off">;
+  url: string | null;
   key: string | null;
   env: string;
   timeoutMs: number;
   rest: boolean;
   fetch: typeof fetch;
+  sink?: TelemetrySink;
+  write: (line: string) => void;
   waitUntil?: () => WaitUntil | undefined;
 }
 
@@ -154,78 +174,120 @@ interface Classified {
 }
 
 /**
- * Read operator env. An unset or invalid URL returns null and sends nothing.
+ * Read operator env and optional hooks. A custom `sink` always wins.
+ * Otherwise: `MCP_TELEMETRY_SINK=off` disables; `stdout` writes JSON lines;
+ * a valid `MCP_TELEMETRY_URL` enables the optional HTTP POST (off until set);
+ * `both` writes stdout and HTTP. In a test process the default is off so
+ * unit tests stay quiet unless a sink is set explicitly.
  * The URL and key are not written into the event.
  */
-export function readTelemetryConfig(env: NodeJS.ProcessEnv = process.env): TelemetryConfig | null {
+export function readTelemetryConfig(
+  env: NodeJS.ProcessEnv = process.env,
+  options?: {
+    fetch?: typeof fetch;
+    sink?: TelemetrySink;
+    write?: (line: string) => void;
+    waitUntil?: () => WaitUntil | undefined;
+  },
+): TelemetryConfig | null {
+  const write = options?.write ?? defaultStdoutWrite;
+  if (options?.sink) {
+    return {
+      kind: "custom",
+      url: null,
+      key: null,
+      env: coarseEnv(env),
+      timeoutMs: timeoutMs(env.MCP_TELEMETRY_TIMEOUT_MS),
+      rest: false,
+      fetch: options.fetch ?? globalThis.fetch,
+      sink: options.sink,
+      write,
+      waitUntil: options.waitUntil,
+    };
+  }
+  const mode = sinkMode(env.MCP_TELEMETRY_SINK);
+  if (mode === "off") return null;
   const url = sinkUrl(env.MCP_TELEMETRY_URL);
-  if (!url) return null;
-  return {
-    url,
-    key: sinkKey(env.MCP_TELEMETRY_KEY),
-    env: coarseEnv(env),
-    timeoutMs: timeoutMs(env.MCP_TELEMETRY_TIMEOUT_MS),
-    rest: restTable(url),
-    fetch: globalThis.fetch,
-  };
+  if (mode === "http") {
+    if (!url) return null;
+    return httpConfig(env, url, "http", options, write);
+  }
+  if (mode === "both") {
+    if (url) return httpConfig(env, url, "both", options, write);
+    return stdoutConfig(env, options, write);
+  }
+  if (mode === "stdout") return stdoutConfig(env, options, write);
+  if (url) return httpConfig(env, url, "http", options, write);
+  if (isTestEnv(env)) return null;
+  return stdoutConfig(env, options, write);
 }
 
 export function createToolTelemetry(options?: {
   env?: NodeJS.ProcessEnv;
   fetch?: typeof fetch;
+  sink?: TelemetrySink;
+  write?: (line: string) => void;
   /** Called when a sink promise starts. The public entry passes the Vercel request context. */
   waitUntil?: () => WaitUntil | undefined;
 }): ToolTelemetry {
-  const config = readTelemetryConfig(options?.env ?? process.env);
+  const config = readTelemetryConfig(options?.env ?? process.env, options);
   if (!config) return disabledTelemetry();
-  if (options?.fetch) config.fetch = options.fetch;
-  if (options?.waitUntil) config.waitUntil = options.waitUntil;
 
   let chain: Promise<void> = Promise.resolve();
   const telemetry: ToolTelemetry = {
     enabled: true,
+    sinkKind: config.kind,
     observe,
     finish(observed, body, status, startedAtMs) {
-      if (!observed || observed.calls.length === 0) return;
-      let payload: unknown;
       try {
-        payload = parseRpcBody(body);
-      } catch {
-        payload = null;
-      }
-      const calledAt = new Date(startedAtMs).toISOString();
-      const latencyMs = Math.max(0, Date.now() - startedAtMs);
-      const only = observed.calls.length === 1;
-      for (const call of observed.calls) {
+        if (!observed || observed.calls.length === 0) return;
+        let payload: unknown;
         try {
-          const message = messageFor(payload, call.id, only);
-          const classified = classifyCall(call, message, status);
-          const event = sealEvent(call, classified, config.env, calledAt, latencyMs);
-          if (event) send(config, event, (work) => {
-            chain = chain.then(() => work).catch(() => undefined);
-          });
+          payload = parseRpcBody(body);
         } catch {
-          // A bad event never affects the MCP response.
+          payload = null;
         }
+        const calledAt = new Date(startedAtMs).toISOString();
+        const latencyMs = Math.max(0, Date.now() - startedAtMs);
+        const only = observed.calls.length === 1;
+        for (const call of observed.calls) {
+          try {
+            const message = messageFor(payload, call.id, only);
+            const classified = classifyCall(call, message, status);
+            const event = sealEvent(call, classified, config.env, calledAt, latencyMs);
+            if (event) send(config, event, (work) => {
+              chain = chain.then(() => work).catch(() => undefined);
+            });
+          } catch {
+            // A bad event never affects the MCP response.
+          }
+        }
+      } catch {
+        // Building an event must not throw into the MCP response.
       }
     },
-    noteStatus(userAgent, status) {
-      telemetry.finish(
-        {
-          calls: [
-            {
-              id: null,
-              tool: "unknown",
-              meta: {},
-              clientFamily: clientFamily(userAgent),
-              lookupFiltered: false,
-            },
-          ],
-        },
-        new Uint8Array(),
-        status,
-        Date.now(),
-      );
+    noteStatus(userAgent, status, headers) {
+      try {
+        telemetry.finish(
+          {
+            calls: [
+              {
+                id: null,
+                tool: "unknown",
+                meta: {},
+                clientFamily: clientFamily(userAgent),
+                selfTraffic: isSelfTraffic(headers ?? null, userAgent),
+                lookupFiltered: false,
+              },
+            ],
+          },
+          new Uint8Array(),
+          status,
+          Date.now(),
+        );
+      } catch {
+        // A telemetry failure must not affect the response.
+      }
     },
     settled: () => chain,
   };
@@ -296,6 +358,7 @@ export function clientFamily(userAgent: string | null): ClientFamily {
 function disabledTelemetry(): ToolTelemetry {
   return {
     enabled: false,
+    sinkKind: "off",
     async observe() {
       return null;
     },
@@ -303,6 +366,97 @@ function disabledTelemetry(): ToolTelemetry {
     noteStatus() {},
     settled: () => Promise.resolve(),
   };
+}
+
+function stdoutConfig(
+  env: NodeJS.ProcessEnv,
+  options: { fetch?: typeof fetch; waitUntil?: () => WaitUntil | undefined } | undefined,
+  write: (line: string) => void,
+): TelemetryConfig {
+  return {
+    kind: "stdout",
+    url: null,
+    key: null,
+    env: coarseEnv(env),
+    timeoutMs: timeoutMs(env.MCP_TELEMETRY_TIMEOUT_MS),
+    rest: false,
+    fetch: options?.fetch ?? globalThis.fetch,
+    write,
+    waitUntil: options?.waitUntil,
+  };
+}
+
+function httpConfig(
+  env: NodeJS.ProcessEnv,
+  url: string,
+  kind: "http" | "both",
+  options: { fetch?: typeof fetch; waitUntil?: () => WaitUntil | undefined } | undefined,
+  write: (line: string) => void,
+): TelemetryConfig {
+  return {
+    kind,
+    url,
+    key: sinkKey(env.MCP_TELEMETRY_KEY),
+    env: coarseEnv(env),
+    timeoutMs: timeoutMs(env.MCP_TELEMETRY_TIMEOUT_MS),
+    rest: restTable(url),
+    fetch: options?.fetch ?? globalThis.fetch,
+    write,
+    waitUntil: options?.waitUntil,
+  };
+}
+
+/**
+ * Listener for the default stdout sink. `stdout.write` reports a closed pipe
+ * as an async `error` event, not a throw. Without a listener that event
+ * becomes an uncaught exception and ends the process.
+ */
+export function ignoreTelemetryStdoutError(_error: unknown): void {
+  void _error;
+}
+
+function ensureStdoutErrorGuard(): void {
+  if (process.stdout.listeners("error").includes(ignoreTelemetryStdoutError)) return;
+  process.stdout.on("error", ignoreTelemetryStdoutError);
+}
+
+function defaultStdoutWrite(line: string): void {
+  try {
+    ensureStdoutErrorGuard();
+    process.stdout.write(`${line}\n`);
+  } catch {
+    // A full or closed stdout must not affect the MCP response.
+  }
+}
+
+export function isSelfTraffic(
+  headers: { get(name: string): string | null } | null | undefined,
+  userAgent: string | null,
+): boolean {
+  try {
+    const marker = headers?.get(SELF_TRAFFIC_AGENT_HEADER);
+    if (marker !== null && marker !== undefined && marker.trim() !== "") return true;
+    const sweep = headers?.get(SELF_TRAFFIC_SWEEP_HEADER);
+    if (sweep !== null && sweep !== undefined && sweep.trim() !== "") return true;
+    const ua = userAgent ?? headers?.get("user-agent") ?? "";
+    return SELF_USER_AGENT.test(ua);
+  } catch {
+    return false;
+  }
+}
+
+function sinkMode(value: string | undefined): "off" | "stdout" | "http" | "both" | null {
+  const raw = value?.trim().toLowerCase() ?? "";
+  if (!raw) return null;
+  if (raw === "off" || raw === "noop" || raw === "false" || raw === "0") return "off";
+  if (raw === "stdout" || raw === "log") return "stdout";
+  if (raw === "http") return "http";
+  if (raw === "both") return "both";
+  return null;
+}
+
+function isTestEnv(env: NodeJS.ProcessEnv): boolean {
+  return Boolean(env.VITEST) || env.NODE_ENV === "test";
 }
 
 async function observe(request: Request, userAgent: string | null): Promise<ObservedCall | null> {
@@ -314,6 +468,7 @@ async function observe(request: Request, userAgent: string | null): Promise<Obse
     return null;
   }
   const family = clientFamily(userAgent);
+  const selfTraffic = isSelfTraffic(request.headers, userAgent);
   const calls: PendingCall[] = [];
   for (const message of rpcMessages(payload)) {
     if (!message || typeof message !== "object" || Array.isArray(message)) continue;
@@ -328,6 +483,7 @@ async function observe(request: Request, userAgent: string | null): Promise<Obse
       tool: name,
       meta: argumentMeta(name, args),
       clientFamily: family,
+      selfTraffic,
       lookupFiltered: name === "claim_status" && identityPresent(args),
     });
   }
@@ -347,6 +503,25 @@ function send(config: TelemetryConfig, event: Record<string, unknown>, track: (w
   } catch {
     return;
   }
+  if (config.kind === "stdout" || config.kind === "both" || config.kind === "custom") {
+    try {
+      if (config.kind === "custom" && config.sink) {
+        const result = config.sink(event);
+        if (result && typeof result.then === "function") {
+          const work = Promise.resolve(result).then(() => undefined).catch(() => undefined);
+          track(work);
+          attachWaitUntil(config, work);
+        }
+      } else {
+        config.write(body);
+      }
+    } catch {
+      // A sink throw never affects the MCP response.
+    }
+    if (config.kind !== "both") return;
+  }
+  const url = config.url;
+  if (!url) return;
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), config.timeoutMs);
   if (typeof timer === "object" && timer && "unref" in timer && typeof timer.unref === "function") timer.unref();
@@ -363,7 +538,7 @@ function send(config: TelemetryConfig, event: Record<string, unknown>, track: (w
   }
   const work = Promise.resolve()
     .then(() =>
-      config.fetch(config.url, {
+      config.fetch(url, {
         method: "POST",
         headers,
         body,
@@ -375,6 +550,10 @@ function send(config: TelemetryConfig, event: Record<string, unknown>, track: (w
     .catch(() => undefined)
     .finally(() => clearTimeout(timer));
   track(work);
+  attachWaitUntil(config, work);
+}
+
+function attachWaitUntil(config: TelemetryConfig, work: Promise<void>): void {
   const waitUntil = config.waitUntil?.() ?? resolveRequestWaitUntil();
   if (typeof waitUntil === "function") {
     try {
@@ -402,6 +581,7 @@ function sealEvent(
     called_at: calledAt,
     env,
     client_family: call.clientFamily,
+    self_traffic: call.selfTraffic === true,
     outcome: classified.outcome,
     result_count: sanitizeCount(classified.result_count),
     latency_ms: latency,

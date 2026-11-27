@@ -73,6 +73,34 @@ describe("local http server", () => {
     expect(JSON.parse(second.body)).toMatchObject({ error: "rate_limited", placeholder: true });
   });
 
+  it("keeps the 429 when telemetry throws while recording the denial", async () => {
+    const started = await startHttpServer({
+      config: loadConfig({ HOST: "127.0.0.1", PORT: "0", RATE_LIMIT_MAX: "1", RATE_LIMIT_WINDOW_MS: "60000" }),
+      deps,
+      telemetry: {
+        enabled: true,
+        sinkKind: "custom",
+        async observe() {
+          return null;
+        },
+        finish() {},
+        noteStatus() {
+          throw new Error("telemetry blew up LeakWallet1111111111111111111111111111111");
+        },
+        settled: () => Promise.resolve(),
+      },
+    });
+    closeServer = started.close;
+    const first = await request(`${started.url}/`);
+    expect(first.status).toBe(200);
+    const second = await request(`${started.url}/`);
+    expect(second.status).toBe(429);
+    expect(JSON.parse(second.body)).toMatchObject({ error: "rate_limited" });
+    expect(second.body).not.toContain("telemetry blew up");
+    const third = await request(`${started.url}/`);
+    expect(third.status).toBe(429);
+  });
+
   it("records a 429 rate limit without the client address or request text", async () => {
     const sent: Record<string, unknown>[] = [];
     const telemetry = createToolTelemetry({
@@ -110,10 +138,41 @@ describe("local http server", () => {
     expect(JSON.parse(second.body)).toMatchObject({ error: "rate_limited" });
     await telemetry.settled();
     const denied = sent.find((event) => event.error_class === "rate_limited");
-    expect(denied).toMatchObject({ tool: "unknown", outcome: "error", error_class: "rate_limited", client_family: "unknown" });
+    expect(denied).toMatchObject({ tool: "unknown", outcome: "error", error_class: "rate_limited", client_family: "unknown", self_traffic: false });
     const encoded = JSON.stringify(sent);
     expect(encoded).not.toContain(wallet);
     expect(encoded).not.toContain("203.0.113.44");
+  });
+
+  it("keeps the 429 when noteStatus throws", async () => {
+    const started = await startHttpServer({
+      config: loadConfig({ HOST: "127.0.0.1", PORT: "0", RATE_LIMIT_MAX: "1", RATE_LIMIT_WINDOW_MS: "60000" }),
+      deps,
+      telemetry: {
+        enabled: true,
+        sinkKind: "custom",
+        async observe() {
+          return null;
+        },
+        finish() {
+          throw new Error("finish leak");
+        },
+        noteStatus() {
+          throw new Error("note leak-token");
+        },
+        settled: () => Promise.resolve(),
+      },
+    });
+    closeServer = started.close;
+    const headers = { "content-type": "application/json" };
+    const body = JSON.stringify({ jsonrpc: "2.0", id: 1, method: "tools/list", params: {} });
+    const first = await request(`${started.url}/mcp`, headers, body);
+    expect(first.status).not.toBe(429);
+    const second = await request(`${started.url}/mcp`, headers, body);
+    expect(second.status).toBe(429);
+    expect(second.body).toMatch(/rate_limited/);
+    expect(second.body).not.toContain("note leak-token");
+    expect(second.body).not.toContain("finish leak");
   });
 
   it("refuses an MCP response that exceeds the size cap", async () => {

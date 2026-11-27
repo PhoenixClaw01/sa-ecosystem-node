@@ -51,7 +51,7 @@ export function createPublicMcpFetch(
     maxBytes?: number;
     maxRequestBytes?: number;
     feeds?: H2hFeeds;
-    /** Pass null to force telemetry off. Omit it to read operator env, which is off until a sink URL is set. */
+    /** Pass null to force telemetry off. Omit it to read operator env (stdout by default, off in tests). */
     telemetry?: ToolTelemetry | null;
     /** Read during a sink send. The public entry supplies the Vercel request context. */
     waitUntil?: () => WaitUntil | undefined;

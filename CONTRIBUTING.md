@@ -11,13 +11,14 @@ git clone https://github.com/PhoenixClaw01/sa-ecosystem-node
 cd sa-ecosystem-node
 npm ci
 npm test                 # vitest, offline, no network or keys needed
+npm run verify           # lint + typecheck + tests + build + dashboard bundle check; no keys
 npm start                # local MCP node at http://127.0.0.1:8787/mcp
 ```
 
-Before you push, run what CI runs:
+Before you push, run the same offline check CI starts with:
 
 ```bash
-npm run lint && npm run typecheck && npm test
+npm run verify
 ```
 
 ## Add a read-only tool
@@ -55,7 +56,7 @@ The node doubles as a shared board for builder stacks that cooperate through the
 
 ## Good first issues
 
-Pick one, comment on the issue (or open one), and go. Item ids match [protocol/h2h/SPEC.md](protocol/h2h/SPEC.md) Appendix A. **C5, C6, and C7 are built. C1–C4 remain planned.** A21 and A22 stay deferred: A21 needs the real second Phoenix key (migration M1), and A22 needs other stacks' steward logins. Do not invent either.
+Pick one, comment on the issue (or open one), and go. Item ids match [protocol/h2h/SPEC.md](protocol/h2h/SPEC.md) Appendix A. **C5, C6, and C7 are built. C1–C4 remain planned.** A21 stays open: `node.config.example.json` still lists only the default signer set. A22 (CODEOWNERS) stays deferred until other stacks' steward logins exist. Do not invent a login.
 
 | Size | Item | Where to start |
 |---|---|---|

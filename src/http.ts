@@ -17,6 +17,15 @@ function headerValue(value: string | string[] | undefined): string | null {
   return typeof value === "string" && value.length > 0 ? value : null;
 }
 
+function nodeHeaders(request: IncomingMessage): Headers {
+  const headers = new Headers();
+  for (const [key, value] of Object.entries(request.headers)) {
+    if (typeof value === "string") headers.set(key, value);
+    else if (Array.isArray(value) && typeof value[0] === "string") headers.set(key, value[0]);
+  }
+  return headers;
+}
+
 function writeJson(response: ServerResponse, status: number, body: unknown) {
   response.writeHead(status, {
     "content-type": "application/json",
@@ -101,7 +110,13 @@ export async function startHttpServer(options?: { config?: Config; deps?: NodeDe
     const decision = limiter.check(clientKeyFromNode(request, config.trustProxy));
     if (!decision.allowed) {
       writeJson(response, 429, { error: "rate_limited", ...decision });
-      if (telemetry.enabled) telemetry.noteStatus(headerValue(request.headers["user-agent"]), 429);
+      if (telemetry.enabled) {
+        try {
+          telemetry.noteStatus(headerValue(request.headers["user-agent"]), 429, nodeHeaders(request));
+        } catch {
+          // The 429 is already written. A telemetry throw must not replace it.
+        }
+      }
       return;
     }
 
