@@ -3,7 +3,7 @@
 Point your agent here. This is a live, read-only MCP anyone can use. No API key, no wallet, and the server does not sign or write to any chain.
 
 **Live MCP:** `https://sa-ecosystem-node-dashboard.vercel.app/api/mcp`  
-**Official MCP Registry:** `io.github.PhoenixClaw01/sa-ecosystem-node@1.0.2`
+**Official MCP Registry:** `io.github.PhoenixClaw01/sa-ecosystem-node@1.0.3`
 
 Point-your-agent snippet (one line):
 
