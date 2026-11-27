@@ -33,7 +33,8 @@ describe("llms.txt", () => {
     expect(root).toContain("node.config.example.json");
     expect(root).toContain("A22 stays deferred");
     expect(root).not.toContain("second Phoenix key");
-    expect(root).toContain("Publishing that version is a separate step");
+    expect(root).toContain("published as latest in the Official MCP Registry");
+    expect(root).not.toContain("Publishing that version is a separate step");
     expect(root).not.toMatch(/Registry: io\.github\.PhoenixClaw01\/sa-ecosystem-node \(v/);
     expect(root).not.toMatch(/Founder/);
   });
