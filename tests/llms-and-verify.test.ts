@@ -17,7 +17,12 @@ describe("llms.txt", () => {
     expect(dashboard).toBe(root);
     expect(root).toContain(`v${SERVER_VERSION}`);
     expect(root).toContain(pkg.version);
-    expect(root).toContain("io.github.PhoenixClaw01/sa-ecosystem-node");
+    expect(root).toContain(`io.github.PhoenixClaw01/sa-ecosystem-node@${SERVER_VERSION}`);
+    expect(root).not.toMatch(/sa-ecosystem-node@1\.0\.[12]\b/);
+    const plugin = readFileSync("PLUG-IN.md", "utf8");
+    expect(plugin).toContain(`io.github.PhoenixClaw01/sa-ecosystem-node@${SERVER_VERSION}`);
+    expect(plugin).not.toMatch(/sa-ecosystem-node@1\.0\.[12]\b/);
+    expect(plugin).toContain("24 read-only tools");
     expect(root).toContain("https://sa-ecosystem-node-dashboard.vercel.app/api/mcp");
     expect(root).toContain("https://sa-ecosystem-node-dashboard.vercel.app/llms.txt");
     expect(root).toContain("https://github.com/PhoenixClaw01/sa-ecosystem-node/issues?q=label%3Ah2h");
@@ -86,6 +91,8 @@ describe("zero-secret verify", () => {
     const ci = readFileSync(".github/workflows/ci.yml", "utf8");
     expect(contributing).toContain("npm run verify");
     expect(readme).toContain("npm run verify");
+    expect(readme).toContain(`lists that name at version \`${SERVER_VERSION}\` (latest)`);
+    expect(readme).not.toMatch(/lists that name at version `1\.0\.[12]`/);
     expect(ci).toContain("npm run verify");
     expect(READ_ONLY_TOOLS).toHaveLength(24);
   });

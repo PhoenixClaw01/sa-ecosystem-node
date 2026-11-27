@@ -328,7 +328,7 @@ Live balances still answer when the cache file is absent. History and payment to
 
 ## Public MCP endpoint
 
-The live read-only endpoint is [https://sa-ecosystem-node-dashboard.vercel.app/api/mcp](https://sa-ecosystem-node-dashboard.vercel.app/api/mcp). No sign-in and no API key. A short discovery file is at [https://sa-ecosystem-node-dashboard.vercel.app/.well-known/mcp.json](https://sa-ecosystem-node-dashboard.vercel.app/.well-known/mcp.json). [`server.json`](server.json) is the MCP Registry document for that remote endpoint (`io.github.PhoenixClaw01/sa-ecosystem-node`, schema `2025-12-11`). The official registry lists that name at version `1.0.2`.
+The live read-only endpoint is [https://sa-ecosystem-node-dashboard.vercel.app/api/mcp](https://sa-ecosystem-node-dashboard.vercel.app/api/mcp). No sign-in and no API key. A short discovery file is at [https://sa-ecosystem-node-dashboard.vercel.app/.well-known/mcp.json](https://sa-ecosystem-node-dashboard.vercel.app/.well-known/mcp.json). [`server.json`](server.json) is the MCP Registry document for that remote endpoint (`io.github.PhoenixClaw01/sa-ecosystem-node`, schema `2025-12-11`). The official registry lists that name at version `1.0.3` (latest).
 
 A machine-readable index for agents is [llms.txt](llms.txt), also served at [https://sa-ecosystem-node-dashboard.vercel.app/llms.txt](https://sa-ecosystem-node-dashboard.vercel.app/llms.txt).
 
