@@ -73,6 +73,34 @@ describe("local http server", () => {
     expect(JSON.parse(second.body)).toMatchObject({ error: "rate_limited", placeholder: true });
   });
 
+  it("keeps the 429 when telemetry throws while recording the denial", async () => {
+    const started = await startHttpServer({
+      config: loadConfig({ HOST: "127.0.0.1", PORT: "0", RATE_LIMIT_MAX: "1", RATE_LIMIT_WINDOW_MS: "60000" }),
+      deps,
+      telemetry: {
+        enabled: true,
+        sinkKind: "custom",
+        async observe() {
+          return null;
+        },
+        finish() {},
+        noteStatus() {
+          throw new Error("telemetry blew up LeakWallet1111111111111111111111111111111");
+        },
+        settled: () => Promise.resolve(),
+      },
+    });
+    closeServer = started.close;
+    const first = await request(`${started.url}/`);
+    expect(first.status).toBe(200);
+    const second = await request(`${started.url}/`);
+    expect(second.status).toBe(429);
+    expect(JSON.parse(second.body)).toMatchObject({ error: "rate_limited" });
+    expect(second.body).not.toContain("telemetry blew up");
+    const third = await request(`${started.url}/`);
+    expect(third.status).toBe(429);
+  });
+
   it("records a 429 rate limit without the client address or request text", async () => {
     const sent: Record<string, unknown>[] = [];
     const telemetry = createToolTelemetry({

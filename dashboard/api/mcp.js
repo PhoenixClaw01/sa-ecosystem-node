@@ -301,46 +301,52 @@ function createToolTelemetry(options) {
     sinkKind: config2.kind,
     observe,
     finish(observed, body, status2, startedAtMs) {
-      if (!observed || observed.calls.length === 0) return;
-      let payload;
       try {
-        payload = parseRpcBody(body);
-      } catch {
-        payload = null;
-      }
-      const calledAt = new Date(startedAtMs).toISOString();
-      const latencyMs = Math.max(0, Date.now() - startedAtMs);
-      const only = observed.calls.length === 1;
-      for (const call of observed.calls) {
+        if (!observed || observed.calls.length === 0) return;
+        let payload;
         try {
-          const message = messageFor(payload, call.id, only);
-          const classified = classifyCall(call, message, status2);
-          const event = sealEvent(call, classified, config2.env, calledAt, latencyMs);
-          if (event) send(config2, event, (work) => {
-            chain = chain.then(() => work).catch(() => void 0);
-          });
+          payload = parseRpcBody(body);
         } catch {
+          payload = null;
         }
+        const calledAt = new Date(startedAtMs).toISOString();
+        const latencyMs = Math.max(0, Date.now() - startedAtMs);
+        const only = observed.calls.length === 1;
+        for (const call of observed.calls) {
+          try {
+            const message = messageFor(payload, call.id, only);
+            const classified = classifyCall(call, message, status2);
+            const event = sealEvent(call, classified, config2.env, calledAt, latencyMs);
+            if (event) send(config2, event, (work) => {
+              chain = chain.then(() => work).catch(() => void 0);
+            });
+          } catch {
+          }
+        }
+      } catch {
       }
     },
     noteStatus(userAgent, status2, headers) {
-      telemetry.finish(
-        {
-          calls: [
-            {
-              id: null,
-              tool: "unknown",
-              meta: {},
-              clientFamily: clientFamily(userAgent),
-              selfTraffic: isSelfTraffic(headers ?? null, userAgent),
-              lookupFiltered: false
-            }
-          ]
-        },
-        new Uint8Array(),
-        status2,
-        Date.now()
-      );
+      try {
+        telemetry.finish(
+          {
+            calls: [
+              {
+                id: null,
+                tool: "unknown",
+                meta: {},
+                clientFamily: clientFamily(userAgent),
+                selfTraffic: isSelfTraffic(headers ?? null, userAgent),
+                lookupFiltered: false
+              }
+            ]
+          },
+          new Uint8Array(),
+          status2,
+          Date.now()
+        );
+      } catch {
+      }
     },
     settled: () => chain
   };
@@ -437,8 +443,16 @@ function httpConfig(env, url2, kind, options, write) {
     waitUntil: options?.waitUntil
   };
 }
+function ignoreTelemetryStdoutError(_error) {
+  void _error;
+}
+function ensureStdoutErrorGuard() {
+  if (process.stdout.listeners("error").includes(ignoreTelemetryStdoutError)) return;
+  process.stdout.on("error", ignoreTelemetryStdoutError);
+}
 function defaultStdoutWrite(line) {
   try {
+    ensureStdoutErrorGuard();
     process.stdout.write(`${line}
 `);
   } catch {

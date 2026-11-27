@@ -239,47 +239,55 @@ export function createToolTelemetry(options?: {
     sinkKind: config.kind,
     observe,
     finish(observed, body, status, startedAtMs) {
-      if (!observed || observed.calls.length === 0) return;
-      let payload: unknown;
       try {
-        payload = parseRpcBody(body);
-      } catch {
-        payload = null;
-      }
-      const calledAt = new Date(startedAtMs).toISOString();
-      const latencyMs = Math.max(0, Date.now() - startedAtMs);
-      const only = observed.calls.length === 1;
-      for (const call of observed.calls) {
+        if (!observed || observed.calls.length === 0) return;
+        let payload: unknown;
         try {
-          const message = messageFor(payload, call.id, only);
-          const classified = classifyCall(call, message, status);
-          const event = sealEvent(call, classified, config.env, calledAt, latencyMs);
-          if (event) send(config, event, (work) => {
-            chain = chain.then(() => work).catch(() => undefined);
-          });
+          payload = parseRpcBody(body);
         } catch {
-          // A bad event never affects the MCP response.
+          payload = null;
         }
+        const calledAt = new Date(startedAtMs).toISOString();
+        const latencyMs = Math.max(0, Date.now() - startedAtMs);
+        const only = observed.calls.length === 1;
+        for (const call of observed.calls) {
+          try {
+            const message = messageFor(payload, call.id, only);
+            const classified = classifyCall(call, message, status);
+            const event = sealEvent(call, classified, config.env, calledAt, latencyMs);
+            if (event) send(config, event, (work) => {
+              chain = chain.then(() => work).catch(() => undefined);
+            });
+          } catch {
+            // A bad event never affects the MCP response.
+          }
+        }
+      } catch {
+        // Building an event must not throw into the MCP response.
       }
     },
     noteStatus(userAgent, status, headers) {
-      telemetry.finish(
-        {
-          calls: [
-            {
-              id: null,
-              tool: "unknown",
-              meta: {},
-              clientFamily: clientFamily(userAgent),
-              selfTraffic: isSelfTraffic(headers ?? null, userAgent),
-              lookupFiltered: false,
-            },
-          ],
-        },
-        new Uint8Array(),
-        status,
-        Date.now(),
-      );
+      try {
+        telemetry.finish(
+          {
+            calls: [
+              {
+                id: null,
+                tool: "unknown",
+                meta: {},
+                clientFamily: clientFamily(userAgent),
+                selfTraffic: isSelfTraffic(headers ?? null, userAgent),
+                lookupFiltered: false,
+              },
+            ],
+          },
+          new Uint8Array(),
+          status,
+          Date.now(),
+        );
+      } catch {
+        // A telemetry failure must not affect the response.
+      }
     },
     settled: () => chain,
   };
@@ -398,8 +406,23 @@ function httpConfig(
   };
 }
 
+/**
+ * Listener for the default stdout sink. `stdout.write` reports a closed pipe
+ * as an async `error` event, not a throw. Without a listener that event
+ * becomes an uncaught exception and ends the process.
+ */
+export function ignoreTelemetryStdoutError(_error: unknown): void {
+  void _error;
+}
+
+function ensureStdoutErrorGuard(): void {
+  if (process.stdout.listeners("error").includes(ignoreTelemetryStdoutError)) return;
+  process.stdout.on("error", ignoreTelemetryStdoutError);
+}
+
 function defaultStdoutWrite(line: string): void {
   try {
+    ensureStdoutErrorGuard();
     process.stdout.write(`${line}\n`);
   } catch {
     // A full or closed stdout must not affect the MCP response.

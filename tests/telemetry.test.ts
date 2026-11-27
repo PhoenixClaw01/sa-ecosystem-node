@@ -14,6 +14,7 @@ import {
   clientFamily,
   createToolTelemetry,
   ERROR_CLASSES,
+  ignoreTelemetryStdoutError,
   isSelfTraffic,
   isTelemetryLoopbackHost,
   resolveRequestWaitUntil,
@@ -214,6 +215,9 @@ describe("telemetry configuration", () => {
       throw new Error("network");
     }) as typeof fetch;
     expect(createToolTelemetry({ env: { MCP_TELEMETRY_SINK: "http", MCP_TELEMETRY_URL: "http://telemetry.example/hook" }, fetch: fetchImpl }).enabled).toBe(false);
+    expect(createToolTelemetry({ env: { MCP_TELEMETRY_SINK: "http", MCP_TELEMETRY_URL: "http://169.254.169.254/latest/meta-data/" }, fetch: fetchImpl }).enabled).toBe(false);
+    expect(createToolTelemetry({ env: { MCP_TELEMETRY_SINK: "http", MCP_TELEMETRY_URL: "http://0xa9fea9fe/" }, fetch: fetchImpl }).enabled).toBe(false);
+    expect(createToolTelemetry({ env: { MCP_TELEMETRY_SINK: "http", MCP_TELEMETRY_URL: "http://2852039166/" }, fetch: fetchImpl }).enabled).toBe(false);
     expect(createToolTelemetry({ env: { MCP_TELEMETRY_SINK: "http", MCP_TELEMETRY_URL: "https://user:secret@telemetry.example/hook" }, fetch: fetchImpl }).enabled).toBe(false);
     expect(createToolTelemetry({ env: { MCP_TELEMETRY_SINK: "off" }, fetch: fetchImpl }).enabled).toBe(false);
     const local = createToolTelemetry({
@@ -223,6 +227,7 @@ describe("telemetry configuration", () => {
     expect(local.enabled).toBe(true);
     expect(local.sinkKind).toBe("http");
     expect(createToolTelemetry({ env: { MCP_TELEMETRY_URL: "http://[::1]:9/hook" }, fetch: fetchImpl }).enabled).toBe(true);
+    expect(createToolTelemetry({ env: { MCP_TELEMETRY_URL: "http://2130706433/" }, fetch: fetchImpl }).sinkKind).toBe("http");
     expect(createToolTelemetry({ env: { MCP_TELEMETRY_SINK: "http", MCP_TELEMETRY_URL: "http://[2001:db8::1]/hook" }, fetch: fetchImpl }).enabled).toBe(false);
   });
 
@@ -671,6 +676,25 @@ describe("stdout, no-op, and custom sinks", () => {
     expect(await second.json()).toMatchObject({ result: { structuredContent: { categories: ["events"] } } });
     await failing.settled();
     expect(Date.now() - started).toBeLessThan(500);
+  });
+
+  it("ignores a closed stdout instead of ending the process", async () => {
+    process.stdout.off("error", ignoreTelemetryStdoutError);
+    try {
+      const telemetry = createToolTelemetry({
+        env: { MCP_TELEMETRY_SINK: "stdout", MCP_TELEMETRY_ENV: "local" },
+      });
+      const response = await call(telemetry, toolCall("list_categories", {}), undefined, () =>
+        okResult(1, { categories: ["events"] }),
+      );
+      expect(response.status).toBe(200);
+      expect(await response.json()).toMatchObject({ result: { structuredContent: { categories: ["events"] } } });
+      expect(process.stdout.listeners("error")).toContain(ignoreTelemetryStdoutError);
+      const broken = Object.assign(new Error("broken pipe"), { code: "EPIPE" });
+      expect(() => process.stdout.emit("error", broken)).not.toThrow();
+    } finally {
+      process.stdout.off("error", ignoreTelemetryStdoutError);
+    }
   });
 
   it("writes stdout even when a custom write throws", async () => {

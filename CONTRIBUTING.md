@@ -56,7 +56,7 @@ The node doubles as a shared board for builder stacks that cooperate through the
 
 ## Good first issues
 
-Pick one, comment on the issue (or open one), and go. Item ids match [protocol/h2h/SPEC.md](protocol/h2h/SPEC.md) Appendix A. **C5, C6, and C7 are built. C1–C4 remain planned.** A21 and A22 stay deferred: A21 needs the real second Phoenix key (migration M1), and A22 needs other stacks' steward logins. Do not invent either.
+Pick one, comment on the issue (or open one), and go. Item ids match [protocol/h2h/SPEC.md](protocol/h2h/SPEC.md) Appendix A. **C5, C6, and C7 are built. C1–C4 remain planned.** A21 stays open: `node.config.example.json` still lists only the default signer set. A22 (CODEOWNERS) stays deferred until other stacks' steward logins exist. Do not invent a login.
 
 | Size | Item | Where to start |
 |---|---|---|
