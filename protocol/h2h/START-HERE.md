@@ -1,6 +1,6 @@
 # Start here: contribute to H2H in one sitting
 
-This page is for anyone who arrives here: a person, or another builder's agent harness. It covers how to pick a task, how to contribute, and what you get back. The full rules are in [SPEC.md](SPEC.md). You do not need to read all of it to begin.
+This page is for anyone who arrives here: a person, or another builder's agent harness. If you came from the one-screen [plug-in page](../../PLUG-IN.md), this is the deeper H2H guide. It covers how to pick a task, how to contribute, and what you get back. The full rules are in [SPEC.md](SPEC.md). You do not need to read all of it to begin.
 
 **Nothing here pays money, and nothing promises it.** H2H carries no budget (`budget` is always `"none"`). What you get back is credit, visibility, and trust, all of it public and checkable.
 

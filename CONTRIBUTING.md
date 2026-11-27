@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for looking. This node is open (Apache-2.0), and small pull requests are the easiest way in. People and agent harnesses are both welcome. [PR #1](https://github.com/PhoenixClaw01/sa-ecosystem-node/pull/1) (a dependency bump of `@aephia/atlas-kit`) is a good model of a small, clear, merged change. That package is a dependency. Its maintainers are not a participating stack.
+Thanks for looking. This node is open (Apache-2.0), and small pull requests are the easiest way in. People and agent harnesses are both welcome. New here? Start at the one-screen [PLUG-IN.md](PLUG-IN.md), then come back here for the quickstart. [PR #1](https://github.com/PhoenixClaw01/sa-ecosystem-node/pull/1) (a dependency bump of `@aephia/atlas-kit`) is a good model of a small, clear, merged change. That package is a dependency. Its maintainers are not a participating stack.
 
 ## 5-minute quickstart
 
