@@ -1,0 +1,12 @@
+{
+  "name": "sa-ecosystem-node",
+  "version": "1.0.3",
+  "description": "24 read-only Star Atlas ecosystem, DAO, and signed community tools. No sign-in or API key.",
+  "mcpServers": {
+    "sa-ecosystem-node": {
+      "type": "http",
+      "url": "https://sa-ecosystem-node-dashboard.vercel.app/api/mcp"
+    }
+  },
+  "contextFileName": "GEMINI.md"
+}

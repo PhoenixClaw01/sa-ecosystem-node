@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "sa-ecosystem-node": {
+      "type": "http",
+      "url": "https://sa-ecosystem-node-dashboard.vercel.app/api/mcp"
+    }
+  }
+}

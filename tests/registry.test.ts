@@ -24,7 +24,11 @@ const discovery = JSON.parse(readFileSync("dashboard/.well-known/mcp.json", "utf
   toolCount: number;
   note: string;
 };
-const pkg = JSON.parse(readFileSync("package.json", "utf8")) as { version: string; description: string };
+const pkg = JSON.parse(readFileSync("package.json", "utf8")) as {
+  version: string;
+  description: string;
+  license: string;
+};
 
 describe("MCP registry server.json", () => {
   it("matches the 2025-12-11 schema and the published read-only endpoint", () => {
@@ -81,5 +85,78 @@ describe("public discovery", () => {
     expect(spec).not.toMatch(/returned 22 tools/);
     expect(readme).not.toMatch(/\b22 read-only tools\b/);
     expect(server.description).toContain("24");
+  });
+});
+
+describe("multi-ecosystem MCP manifests", () => {
+  const gemini = JSON.parse(readFileSync("gemini-extension.json", "utf8")) as {
+    name: string;
+    version: string;
+    description: string;
+    mcpServers: Record<string, { type?: string; url?: string; httpUrl?: string; command?: string }>;
+    contextFileName?: string;
+  };
+  const grokMcp = JSON.parse(readFileSync(".mcp.json", "utf8")) as {
+    mcpServers: Record<string, { type: string; url: string }>;
+  };
+  const plugin = JSON.parse(readFileSync(".grok-plugin/plugin.json", "utf8")) as {
+    name: string;
+    version: string;
+    description: string;
+    homepage: string;
+    repository: string;
+    license: string;
+    keywords: string[];
+    domains: string[];
+  };
+
+  it("points Grok, Gemini CLI, and plugin metadata at the published read-only endpoint", () => {
+    expect(gemini.name).toBe("sa-ecosystem-node");
+    expect(gemini.version).toBe(SERVER_VERSION);
+    expect(gemini.description).toBe(server.description);
+    expect(gemini.name).toMatch(/^[a-z0-9]+(?:-[a-z0-9]+)*$/);
+    expect(gemini.mcpServers["sa-ecosystem-node"]).toEqual({ type: "http", url: PUBLIC_MCP_URL });
+    expect(Object.keys(gemini.mcpServers["sa-ecosystem-node"]).sort()).toEqual(["type", "url"]);
+    expect(gemini.contextFileName).toBe("GEMINI.md");
+    const geminiContext = readFileSync("GEMINI.md", "utf8");
+    expect(geminiContext).toContain(PUBLIC_MCP_URL);
+    expect(geminiContext.toLowerCase()).toContain("read-only");
+    expect(geminiContext).toContain("not an ATMTA product");
+
+    expect(grokMcp.mcpServers["sa-ecosystem-node"]).toEqual({ type: "http", url: PUBLIC_MCP_URL });
+    expect(Object.keys(grokMcp.mcpServers["sa-ecosystem-node"]).sort()).toEqual(["type", "url"]);
+
+    expect(plugin.name).toBe("sa-ecosystem-node");
+    expect(plugin.name).toMatch(/^[a-z0-9]+(?:-[a-z0-9]+)*$/);
+    expect(plugin.name.length).toBeLessThanOrEqual(64);
+    expect(plugin.version).toBe(SERVER_VERSION);
+    expect(plugin.license).toBe(pkg.license);
+    expect(plugin.license).toBe("Apache-2.0");
+    expect(plugin.homepage).toBe(server.websiteUrl);
+    expect(plugin.repository).toBe(server.repository.url);
+    expect(plugin.keywords).toEqual([
+      "sa-ecosystem-node",
+      "star atlas ecosystem node",
+      "sa-ecosystem-node mcp",
+    ]);
+    expect(plugin.domains).toEqual(["sa-ecosystem-node-dashboard.vercel.app"]);
+    expect(plugin.description.toLowerCase()).toContain("read-only");
+    expect(plugin.description).toContain("sa-ecosystem-node-dashboard.vercel.app");
+
+    const readme = readFileSync("README.md", "utf8");
+    const useIn = readme.slice(
+      readme.indexOf("## Use in Grok / Gemini CLI / Claude / ChatGPT"),
+      readme.indexOf("## Deploy"),
+    );
+    expect(useIn.startsWith("## Use in Grok")).toBe(true);
+    expect(useIn).toContain(PUBLIC_MCP_URL);
+    expect(useIn).toContain("default branch");
+    expect(useIn).toContain("gemini extensions install https://github.com/PhoenixClaw01/sa-ecosystem-node");
+    expect(useIn).toContain("that listing is not part of this change");
+    expect(useIn).not.toMatch(/staratlas\.com|mika|mikatachan/i);
+
+    const packed = JSON.stringify({ gemini, grokMcp, plugin, geminiContext });
+    expect(packed).not.toMatch(/supabase|service_role|eyJ|staratlas\.com|mika|mikatachan/i);
+    expect(packed).not.toMatch(/"command"|"args"|"headers"|"env"/);
   });
 });
