@@ -83,3 +83,62 @@ describe("public discovery", () => {
     expect(server.description).toContain("24");
   });
 });
+
+describe("multi-ecosystem MCP manifests", () => {
+  const gemini = JSON.parse(readFileSync("gemini-extension.json", "utf8")) as {
+    name: string;
+    version: string;
+    description: string;
+    mcpServers: Record<string, { type?: string; url?: string; httpUrl?: string; command?: string }>;
+    contextFileName?: string;
+  };
+  const grokMcp = JSON.parse(readFileSync(".mcp.json", "utf8")) as {
+    mcpServers: Record<string, { type: string; url: string }>;
+  };
+  const plugin = JSON.parse(readFileSync(".grok-plugin/plugin.json", "utf8")) as {
+    name: string;
+    version: string;
+    description: string;
+    homepage: string;
+    repository: string;
+    license: string;
+    keywords: string[];
+    domains: string[];
+  };
+
+  it("points Grok, Gemini CLI, and plugin metadata at the published read-only endpoint", () => {
+    expect(gemini.name).toBe("sa-ecosystem-node");
+    expect(gemini.version).toBe(SERVER_VERSION);
+    expect(gemini.description).toBe(server.description);
+    expect(gemini.mcpServers["sa-ecosystem-node"]).toEqual({ type: "http", url: PUBLIC_MCP_URL });
+    expect(gemini.mcpServers["sa-ecosystem-node"].command).toBeUndefined();
+    expect(gemini.mcpServers["sa-ecosystem-node"].httpUrl).toBeUndefined();
+    expect(gemini.contextFileName).toBe("GEMINI.md");
+    expect(readFileSync("GEMINI.md", "utf8")).toContain(PUBLIC_MCP_URL);
+    expect(readFileSync("GEMINI.md", "utf8").toLowerCase()).toContain("read-only");
+
+    expect(grokMcp.mcpServers["sa-ecosystem-node"]).toEqual({ type: "http", url: PUBLIC_MCP_URL });
+
+    expect(plugin.name).toBe("sa-ecosystem-node");
+    expect(plugin.version).toBe(SERVER_VERSION);
+    expect(plugin.license).toBe("Apache-2.0");
+    expect(plugin.homepage).toBe(server.websiteUrl);
+    expect(plugin.repository).toBe(server.repository.url);
+    expect(plugin.keywords).toEqual([
+      "sa-ecosystem-node",
+      "star atlas ecosystem node",
+      "sa-ecosystem-node mcp",
+    ]);
+    expect(plugin.domains).toEqual(["sa-ecosystem-node-dashboard.vercel.app"]);
+    expect(plugin.description.toLowerCase()).toContain("read-only");
+    expect(plugin.description).toContain("sa-ecosystem-node-dashboard.vercel.app");
+
+    const readme = readFileSync("README.md", "utf8");
+    expect(readme).toContain("## Use in Grok / Gemini CLI / Claude / ChatGPT");
+    expect(readme).toContain(PUBLIC_MCP_URL);
+    expect(readme).toContain("gemini extensions install https://github.com/PhoenixClaw01/sa-ecosystem-node");
+
+    const packed = JSON.stringify({ gemini, grokMcp, plugin });
+    expect(packed).not.toMatch(/supabase|service_role|eyJ/i);
+  });
+});

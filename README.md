@@ -369,6 +369,21 @@ The MCP Playground at `/playground/` calls this endpoint from the browser, on wh
 
 On the public Vercel project `sa-ecosystem-node-dashboard`, leave Root Directory as `dashboard` and the production branch as `main`. Leave the install command empty: the MCP route is already bundled, and a parent `npm ci` is not used. Confirm the Node.js version is 22.x. Set the `HUB_*` pins from [docs/hosting.md](docs/hosting.md). `SOLANA_RPC_URL` and `SOLANA_RPC_FALLBACK_URLS` are optional; unset, they stay on the public defaults. Do not add an API key. `dashboard/vercel.json` includes `data/treasury-cache.json`, `hub/signers.json`, and `hub/signers/agents.json` in the function. `ata.js` and `squads.js` are inlined in the bundle and listed in `dashboard/.vercelignore`, so the deploy does not ship them as separate files. `hub/signers.json` there is a byte-for-byte copy of the repository `hub/signers.json`, written by `npm run build:dashboard-mcp`. Do not edit the copy. `dashboard/data/treasury-cache.json` is the committed cache the tools read. A missing match does not fail the deploy. If that file is absent, `treasury_history` and `ecofund_limit` say the cache is not yet populated and include no figures. Payment and flow tools fail closed until the file is present. On 1 November 2026 `data_health` on the public node reported `treasury_cache` ok, and `treasury_history` returned cached series. `data_health` and `treasury_balances` can read live balances without that file. The bundle carries `ata.js` and `squads.js` inside it, so the function does not `require()` those scripts. When `git` is not on the function, a pinned `github.com` hub is read over HTTPS. Docker and the other container hosts still use `git`.
 
+## Use in Grok / Gemini CLI / Claude / ChatGPT
+
+The live read-only MCP is:
+
+```
+https://sa-ecosystem-node-dashboard.vercel.app/api/mcp
+```
+
+No sign-in and no API key. 24 read-only tools. The same URL is in [`server.json`](server.json) and at [/.well-known/mcp.json](https://sa-ecosystem-node-dashboard.vercel.app/.well-known/mcp.json). The Official MCP Registry lists `io.github.PhoenixClaw01/sa-ecosystem-node@1.0.3`.
+
+- **Grok Build:** this repository includes [`.mcp.json`](.mcp.json) and [`.grok-plugin/plugin.json`](.grok-plugin/plugin.json). Point Grok at the URL above. A later listing in the [xAI plugin marketplace](https://github.com/xai-org/plugin-marketplace) can reference this repo; that listing is not part of this change.
+- **Gemini CLI:** this repository includes [`gemini-extension.json`](gemini-extension.json). Install from the default branch with `gemini extensions install https://github.com/PhoenixClaw01/sa-ecosystem-node`. You can also add the URL as an MCP server in `settings.json` with `"type": "http"` and `"url"`.
+- **Claude:** in Claude.ai or Claude Desktop, add a custom MCP connector and paste the URL. A Desktop config example is under [Public MCP endpoint](#public-mcp-endpoint).
+- **ChatGPT:** add a custom MCP connector and paste the same URL.
+
 ## Deploy
 
 The files in `dashboard/` are what project `sa-ecosystem-node-dashboard` deploys. That project uses Root Directory `dashboard` and does not use the root `vercel.json`. See `dashboard/README.md`. `/` serves `dashboard/index.html`, the DAO dashboard front page. `home.js` calls same-origin `/mcp` for live revenue, treasury balances, and the Ecosystem Fund limit, and paints those figures. A failed read says "Data unavailable" and shows no figure.

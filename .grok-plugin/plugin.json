@@ -1,0 +1,20 @@
+{
+  "name": "sa-ecosystem-node",
+  "version": "1.0.3",
+  "description": "24 read-only Star Atlas ecosystem, DAO, and signed community tools via the hosted MCP at sa-ecosystem-node-dashboard.vercel.app. No sign-in or API key. The server does not sign or write to any chain.",
+  "author": {
+    "name": "PhoenixClaw01",
+    "url": "https://github.com/PhoenixClaw01"
+  },
+  "homepage": "https://sa-ecosystem-node-dashboard.vercel.app",
+  "repository": "https://github.com/PhoenixClaw01/sa-ecosystem-node",
+  "license": "Apache-2.0",
+  "keywords": [
+    "sa-ecosystem-node",
+    "star atlas ecosystem node",
+    "sa-ecosystem-node mcp"
+  ],
+  "domains": [
+    "sa-ecosystem-node-dashboard.vercel.app"
+  ]
+}
