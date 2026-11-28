@@ -379,8 +379,8 @@ https://sa-ecosystem-node-dashboard.vercel.app/api/mcp
 
 No sign-in and no API key. 24 read-only tools. The same URL is in [`server.json`](server.json) and at [/.well-known/mcp.json](https://sa-ecosystem-node-dashboard.vercel.app/.well-known/mcp.json). The Official MCP Registry lists `io.github.PhoenixClaw01/sa-ecosystem-node@1.0.3`.
 
-- **Grok Build:** this repository includes [`.mcp.json`](.mcp.json) and [`.grok-plugin/plugin.json`](.grok-plugin/plugin.json). Point Grok at the URL above. A later listing in the [xAI plugin marketplace](https://github.com/xai-org/plugin-marketplace) can reference this repo; that listing is not part of this change.
-- **Gemini CLI:** this repository includes [`gemini-extension.json`](gemini-extension.json). Install from the default branch with `gemini extensions install https://github.com/PhoenixClaw01/sa-ecosystem-node`. You can also add the URL as an MCP server in `settings.json` with `"type": "http"` and `"url"`.
+- **Grok Build:** add the URL above as a remote MCP server. This repository includes [`.mcp.json`](.mcp.json) and [`.grok-plugin/plugin.json`](.grok-plugin/plugin.json) so a plugin install uses that same URL. A later listing in the [xAI plugin marketplace](https://github.com/xai-org/plugin-marketplace) can reference this repo; that listing is not part of this change.
+- **Gemini CLI:** this repository includes [`gemini-extension.json`](gemini-extension.json). Install from the default branch, after these files are on it, with `gemini extensions install https://github.com/PhoenixClaw01/sa-ecosystem-node`. You can also add the URL as an MCP server in `settings.json` with `"type": "http"` and `"url"`.
 - **Claude:** in Claude.ai or Claude Desktop, add a custom MCP connector and paste the URL. A Desktop config example is under [Public MCP endpoint](#public-mcp-endpoint).
 - **ChatGPT:** add a custom MCP connector and paste the same URL.
 

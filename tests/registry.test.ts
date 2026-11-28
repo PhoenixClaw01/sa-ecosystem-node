@@ -24,7 +24,11 @@ const discovery = JSON.parse(readFileSync("dashboard/.well-known/mcp.json", "utf
   toolCount: number;
   note: string;
 };
-const pkg = JSON.parse(readFileSync("package.json", "utf8")) as { version: string; description: string };
+const pkg = JSON.parse(readFileSync("package.json", "utf8")) as {
+  version: string;
+  description: string;
+  license: string;
+};
 
 describe("MCP registry server.json", () => {
   it("matches the 2025-12-11 schema and the published read-only endpoint", () => {
@@ -110,17 +114,23 @@ describe("multi-ecosystem MCP manifests", () => {
     expect(gemini.name).toBe("sa-ecosystem-node");
     expect(gemini.version).toBe(SERVER_VERSION);
     expect(gemini.description).toBe(server.description);
+    expect(gemini.name).toMatch(/^[a-z0-9]+(?:-[a-z0-9]+)*$/);
     expect(gemini.mcpServers["sa-ecosystem-node"]).toEqual({ type: "http", url: PUBLIC_MCP_URL });
-    expect(gemini.mcpServers["sa-ecosystem-node"].command).toBeUndefined();
-    expect(gemini.mcpServers["sa-ecosystem-node"].httpUrl).toBeUndefined();
+    expect(Object.keys(gemini.mcpServers["sa-ecosystem-node"]).sort()).toEqual(["type", "url"]);
     expect(gemini.contextFileName).toBe("GEMINI.md");
-    expect(readFileSync("GEMINI.md", "utf8")).toContain(PUBLIC_MCP_URL);
-    expect(readFileSync("GEMINI.md", "utf8").toLowerCase()).toContain("read-only");
+    const geminiContext = readFileSync("GEMINI.md", "utf8");
+    expect(geminiContext).toContain(PUBLIC_MCP_URL);
+    expect(geminiContext.toLowerCase()).toContain("read-only");
+    expect(geminiContext).toContain("not an ATMTA product");
 
     expect(grokMcp.mcpServers["sa-ecosystem-node"]).toEqual({ type: "http", url: PUBLIC_MCP_URL });
+    expect(Object.keys(grokMcp.mcpServers["sa-ecosystem-node"]).sort()).toEqual(["type", "url"]);
 
     expect(plugin.name).toBe("sa-ecosystem-node");
+    expect(plugin.name).toMatch(/^[a-z0-9]+(?:-[a-z0-9]+)*$/);
+    expect(plugin.name.length).toBeLessThanOrEqual(64);
     expect(plugin.version).toBe(SERVER_VERSION);
+    expect(plugin.license).toBe(pkg.license);
     expect(plugin.license).toBe("Apache-2.0");
     expect(plugin.homepage).toBe(server.websiteUrl);
     expect(plugin.repository).toBe(server.repository.url);
@@ -134,11 +144,19 @@ describe("multi-ecosystem MCP manifests", () => {
     expect(plugin.description).toContain("sa-ecosystem-node-dashboard.vercel.app");
 
     const readme = readFileSync("README.md", "utf8");
-    expect(readme).toContain("## Use in Grok / Gemini CLI / Claude / ChatGPT");
-    expect(readme).toContain(PUBLIC_MCP_URL);
-    expect(readme).toContain("gemini extensions install https://github.com/PhoenixClaw01/sa-ecosystem-node");
+    const useIn = readme.slice(
+      readme.indexOf("## Use in Grok / Gemini CLI / Claude / ChatGPT"),
+      readme.indexOf("## Deploy"),
+    );
+    expect(useIn.startsWith("## Use in Grok")).toBe(true);
+    expect(useIn).toContain(PUBLIC_MCP_URL);
+    expect(useIn).toContain("default branch");
+    expect(useIn).toContain("gemini extensions install https://github.com/PhoenixClaw01/sa-ecosystem-node");
+    expect(useIn).toContain("that listing is not part of this change");
+    expect(useIn).not.toMatch(/staratlas\.com|mika|mikatachan/i);
 
-    const packed = JSON.stringify({ gemini, grokMcp, plugin });
-    expect(packed).not.toMatch(/supabase|service_role|eyJ/i);
+    const packed = JSON.stringify({ gemini, grokMcp, plugin, geminiContext });
+    expect(packed).not.toMatch(/supabase|service_role|eyJ|staratlas\.com|mika|mikatachan/i);
+    expect(packed).not.toMatch(/"command"|"args"|"headers"|"env"/);
   });
 });
